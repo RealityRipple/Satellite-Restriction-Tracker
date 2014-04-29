@@ -24,6 +24,14 @@
     Else
       optGraph.Checked = True
     End If
+    Select Case useStyle
+      Case SatHostTypes.DishNet, SatHostTypes.Exede, SatHostTypes.RuralPortal
+        cmd30Days.Text = "This Period"
+        cmd60Days.Text = "Last Period"
+      Case Else
+        cmd30Days.Text = "30 Days"
+        cmd60Days.Text = "60 Days"
+    End Select
     Select Case mySettings.Ago
       Case 1 : cmdToday.PerformClick()
       Case 30 : cmd30Days.PerformClick()
@@ -466,12 +474,37 @@
   Private Sub cmd30Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd30Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From30DaysAgo As Date
-    If DateAdd(DateInterval.Day, -30, RightNow) > dtpFrom.MaxDate Then
-      From30DaysAgo = dtpFrom.MaxDate
-    ElseIf DateAdd(DateInterval.Day, -30, RightNow) < dtpFrom.MinDate Then
-      From30DaysAgo = dtpFrom.MinDate
+    If useStyle = SatHostTypes.WildBlue Then
+      If DateAdd(DateInterval.Day, -30, RightNow) > dtpFrom.MaxDate Then
+        From30DaysAgo = dtpFrom.MaxDate
+      ElseIf DateAdd(DateInterval.Day, -30, RightNow) < dtpFrom.MinDate Then
+        From30DaysAgo = dtpFrom.MinDate
+      Else
+        From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
+      End If
     Else
-      From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
+      If usageDB.Count > 1 Then
+        For I As Integer = usageDB.Count - 1 To 1 Step -1
+          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+            If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+              From30DaysAgo = dtpFrom.MaxDate
+            ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+              From30DaysAgo = dtpFrom.MinDate
+            Else
+              From30DaysAgo = usageDB(I).DATETIME
+            End If
+            Exit For
+          End If
+        Next
+      Else
+        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+          From30DaysAgo = dtpFrom.MaxDate
+        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+          From30DaysAgo = dtpFrom.MinDate
+        Else
+          From30DaysAgo = usageDB(0).DATETIME
+        End If
+      End If
     End If
     Dim ToNow As Date
     If RightNow > dtpTo.MaxDate Then
@@ -488,12 +521,42 @@
   Private Sub cmd60Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd60Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From60DaysAgo As Date
-    If DateAdd(DateInterval.Day, -60, RightNow) > dtpFrom.MaxDate Then
-      From60DaysAgo = dtpFrom.MaxDate
-    ElseIf DateAdd(DateInterval.Day, -60, RightNow) < dtpFrom.MinDate Then
-      From60DaysAgo = dtpFrom.MinDate
+    If useStyle = SatHostTypes.WildBlue Then
+      If DateAdd(DateInterval.Day, -60, RightNow) > dtpFrom.MaxDate Then
+        From60DaysAgo = dtpFrom.MaxDate
+      ElseIf DateAdd(DateInterval.Day, -60, RightNow) < dtpFrom.MinDate Then
+        From60DaysAgo = dtpFrom.MinDate
+      Else
+        From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
+      End If
     Else
-      From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
+      If usageDB.Count > 1 Then
+        Dim Finds As Integer = 0
+        For I As Integer = usageDB.Count - 1 To 1 Step -1
+          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+            Finds += 1
+            If Finds = 2 Then
+              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                From60DaysAgo = dtpFrom.MaxDate
+              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                From60DaysAgo = dtpFrom.MinDate
+              Else
+                From60DaysAgo = usageDB(I).DATETIME
+              End If
+              Exit For
+            End If
+          End If
+        Next
+        If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
+      Else
+        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+          From60DaysAgo = dtpFrom.MaxDate
+        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+          From60DaysAgo = dtpFrom.MinDate
+        Else
+          From60DaysAgo = usageDB(0).DATETIME
+        End If
+      End If
     End If
     Dim ToNow As Date
     If RightNow > dtpTo.MaxDate Then
