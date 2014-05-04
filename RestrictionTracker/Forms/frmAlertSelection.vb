@@ -205,7 +205,7 @@
       cmdSave.Enabled = Not (lstStyles.SelectedItem.ToLower = AlertStyle.ToLower)
     Catch ex As Exception
       pctPreview.BackgroundImage = Nothing
-      pctPreview.Image = pctPreview.ErrorImage
+      pctPreview.Image = pctPreview.ErrorImage.Clone
       cmdSave.Enabled = False
     End Try
   End Sub

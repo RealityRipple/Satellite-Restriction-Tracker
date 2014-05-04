@@ -166,7 +166,7 @@
       End Using
       pctMain.Image = fakeI
     Else
-      pctMain.Image = pctMain.ErrorImage
+      pctMain.Image = pctMain.ErrorImage.Clone
     End If
 
     If pctTray.Image IsNot Nothing Then
@@ -274,7 +274,7 @@
       End Using
       pctHistory.Image = fakeI
     Else
-      pctHistory.Image = pctHistory.ErrorImage
+      pctHistory.Image = pctHistory.ErrorImage.Clone
     End If
   End Sub
 #Region "Buttons"

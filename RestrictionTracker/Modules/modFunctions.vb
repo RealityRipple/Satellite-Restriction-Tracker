@@ -415,6 +415,35 @@ Module modFunctions
     End Get
   End Property
 
+  Public ReadOnly Property MonospaceFont(Size As Single) As Font
+    Get
+      Try
+        If Drawing.FontFamily.GenericMonospace.IsStyleAvailable(FontStyle.Regular) Then
+          Return New Font(Drawing.FontFamily.GenericMonospace, Size)
+        Else
+          Dim FontList As New Collections.Generic.List(Of String)
+          For Each fam In Drawing.FontFamily.Families
+            If fam.IsStyleAvailable(FontStyle.Regular) Then FontList.Add(fam.Name)
+          Next
+          If FontList.Contains("Courier New") Then
+            Return New Font("Courier New", Size)
+          ElseIf FontList.Contains("Consolas") Then
+            Return New Font("Consolas", Size)
+          ElseIf FontList.Contains("Fixedsys") Then
+            Return New Font("Fixedsys", Size)
+          ElseIf FontList.Contains("Courier Regular") Then
+            Return New Font("Courier Regular", Size)
+          ElseIf FontList.Contains("Lucida Console") Then
+            Return New Font("Lucida Console", Size)
+          Else
+            Return New Font(SystemFonts.DefaultFont.Name, Size)
+          End If
+        End If
+      Catch ex As Exception
+        Return New Font(SystemFonts.DefaultFont.Name, Size)
+      End Try
+    End Get
+  End Property
   Friend Function GrantFullControlToEveryone(ByVal Folder As String) As Boolean
     Try
       Dim Security As System.Security.AccessControl.DirectorySecurity = Directory.GetAccessControl(Folder)
@@ -1463,7 +1492,7 @@ Module modFunctions
         fontSize = 8
       End If
     End If
-    Dim fFont As New Font(Drawing.FontFamily.GenericMonospace, fontSize)
+    Dim fFont As Font = MonospaceFont(fontSize)
     Dim linGrBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(0, ImgSize.Height), ColorA, ColorB, ColorC)
     If Total = 0 Then
       Using g As Graphics = Graphics.FromImage(bmpTmp)
@@ -1536,7 +1565,7 @@ Module modFunctions
         fontSize = 8
       End If
     End If
-    Dim fFont As New Font(Drawing.FontFamily.GenericMonospace, fontSize)
+    Dim fFont As Font = MonospaceFont(fontSize)
     Dim downBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorDC, ColorDB, ColorDA)
     Dim upBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorUC, ColorUB, ColorUA)
     If Down + Up + Over < Total Then
@@ -1620,7 +1649,7 @@ Module modFunctions
         fontSize = 8
       End If
     End If
-    Dim fFont As New Font(Drawing.FontFamily.GenericMonospace, fontSize)
+    Dim fFont As Font = MonospaceFont(fontSize)
     Dim downBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorC, ColorB, ColorA)
     If Down < Total Then
       Using g As Graphics = Graphics.FromImage(bmpTmp)
