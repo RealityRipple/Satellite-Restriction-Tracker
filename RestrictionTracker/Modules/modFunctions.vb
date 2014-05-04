@@ -429,10 +429,6 @@ Module modFunctions
             Return New Font("Courier New", Size)
           ElseIf FontList.Contains("Consolas") Then
             Return New Font("Consolas", Size)
-          ElseIf FontList.Contains("Fixedsys") Then
-            Return New Font("Fixedsys", Size)
-          ElseIf FontList.Contains("Courier Regular") Then
-            Return New Font("Courier Regular", Size)
           ElseIf FontList.Contains("Lucida Console") Then
             Return New Font("Lucida Console", Size)
           Else
