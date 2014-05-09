@@ -99,7 +99,7 @@
             RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
           End If
           wResponse.Close()
-          wRequest = Nothing
+          wResponse = Nothing
         Catch ex As Exception
           RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
         End Try
