@@ -392,7 +392,7 @@
           wsData.UploadStringAsync(uriURL, "POST", sSend, "LOGIN")
         Catch ex As Exception
           ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & ex.Message))
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & LocalErrorToString(ex)))
         End Try
       End If
     ElseIf mySettings.AccountType = SatHostTypes.RuralPortal Then
@@ -417,7 +417,7 @@
           wsData.UploadStringAsync(uriURL, "POST", sSend, "LOGIN")
         Catch ex As Exception
           ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & ex.Message))
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & LocalErrorToString(ex)))
         End Try
       End If
     ElseIf mySettings.AccountType = SatHostTypes.DishNet Then
@@ -440,7 +440,7 @@
           wsData.DownloadStringAsync(uriURL, "LOGINPAGE")
         Catch ex As Exception
           ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & ex.Message))
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & LocalErrorToString(ex)))
         End Try
       End If
     End If
@@ -465,11 +465,11 @@
         RestartNoCert()
       Else
         ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & e.Error.Message & " (" & e.Error.InnerException.Message & ")"))
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & LocalErrorToString(e.Error)))
       End If
     Else
       ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & e.Error.Message))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & LocalErrorToString(e.Error)))
     End If
     If wsData IsNot Nothing Then
       wsData.Dispose()
@@ -490,7 +490,6 @@
     GetUsage()
   End Sub
 #End Region
-
 #Region "Parsing Functions"
   Private Sub wsData_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsData.DownloadStringCompleted
     If bCancelled Then
@@ -565,11 +564,11 @@
               RestartNoCert()
               Exit Sub
             Else
-              sErrMsg = "Login Error: " & e.Error.Message & "(" & e.Error.InnerException.Message & ")" & " loading " & sAttemptedURL
+              sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
               bReset = True
             End If
           Else
-            sErrMsg = "Login Error: " & e.Error.Message & " loading " & sAttemptedURL
+            sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
             bReset = True
           End If
         End If
@@ -701,11 +700,11 @@
               RestartNoCert()
               Exit Sub
             Else
-              sErrMsg = "Usage Error: " & e.Error.Message & "(" & e.Error.InnerException.Message & ")" & " loading " & sAttemptedURL
+              sErrMsg = "Usage Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
               bReset = True
             End If
           Else
-            sErrMsg = "Usage Error: " & e.Error.Message & " loading " & sAttemptedURL
+            sErrMsg = "Usage Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
             bReset = True
           End If
         End If
@@ -763,11 +762,11 @@
               RestartNoCert()
               Exit Sub
             Else
-              sErrMsg = "Login Error: " & e.Error.Message & "(" & e.Error.InnerException.Message & ")" & " loading " & sAttemptedURL
+              sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
               bReset = True
             End If
           Else
-            sErrMsg = "Login Error: " & e.Error.Message & " loading " & sAttemptedURL
+            sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
             bReset = True
           End If
         End If
@@ -798,7 +797,7 @@
     Dim bReset As Boolean = False
     If e.Error IsNot Nothing Then
       If e.Error.InnerException Is Nothing Then
-        sErrMsg = "Login Error: " & e.Error.Message & " loading " & sAttemptedURL
+        sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
         bReset = True
       Else
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
@@ -810,7 +809,7 @@
           RestartNoCert()
           Exit Sub
         Else
-          sErrMsg = "Login Error: " & e.Error.Message & "(" & e.Error.InnerException.Message & ")" & " loading " & sAttemptedURL
+          sErrMsg = "Login Error: " & LocalErrorToString(e.Error) & " loading " & sAttemptedURL
           bReset = True
         End If
       End If
@@ -1365,9 +1364,9 @@
       End If
     End If
     wsData.CookieJar = New Net.CookieContainer
+    SendSocketErrors()
   End Sub
 #End Region
-
 #Region "Useful Functions"
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
@@ -1381,11 +1380,37 @@
     result = Replace(result, vbLf, "")
     result = Trim(result)
   End Sub
+  Private Function LocalErrorToString(ex As System.Exception)
+    Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
+    If ex.InnerException Is Nothing Then
+      If ex.Message.StartsWith("The remote name could not be resolved:") Then
+        Return "Could not connect to your DNS. Check your internet connection."
+      Else
+        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        Return ex.Message
+      End If
+    Else
+      If ex.Message.StartsWith("Unable to connect to the remote server") Then
+        If ex.InnerException.Message.StartsWith("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "The server did not respond. Check your internet connection."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
+          Return "The host is unreachable. Check your local network."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
+          Return "The network is unreachable. Check your internet connection."
+        Else
+          reportHandler.BeginInvoke(ex, Nothing, Nothing)
+          Return "Can't connect to the server - " & ex.InnerException.Message
+        End If
+      Else
+        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        Return ex.Message & " - " & ex.InnerException.Message
+      End If
+    End If
+  End Function
   Public Function IgnoreCert(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Net.Security.SslPolicyErrors) As Boolean
     Return True
   End Function
 #End Region
-
 #Region "IDisposable Support"
   Private disposedValue As Boolean
   Protected Overridable Sub Dispose(disposing As Boolean)
@@ -1406,7 +1431,6 @@
     GC.SuppressFinalize(Me)
   End Sub
 #End Region
-
   Protected Overrides Sub Finalize()
     MyBase.Finalize()
   End Sub

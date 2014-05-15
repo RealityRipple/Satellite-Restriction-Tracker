@@ -18,6 +18,70 @@ Module modFunctions
     Do While sVal.Length < Length : sVal = "0" & sVal : Loop
     Return sVal
   End Function
+  Public Delegate Sub ReportSocketErrorInvoker(ex As Exception)
+  Public Sub ReportSocketError(ex As Exception)
+    Dim ReportList As String = AppData & "\sckerrs.log"
+    If IO.File.Exists(ReportList) Then
+      If InUseChecker(ReportList, FileAccess.ReadWrite) Then
+        My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, True)
+        If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+        My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
+      End If
+    Else
+      My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, False)
+      If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+      My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
+    End If
+    SendSocketErrors()
+  End Sub
+  Public Sub SendSocketErrors()
+    Dim ReportList As String = AppData & "\sckerrs.log"
+    If IO.File.Exists(ReportList) Then
+      Dim reports As New Collections.Generic.List(Of String)(Split(My.Computer.FileSystem.ReadAllText(ReportList), vbNewLine & vbNewLine))
+      For I As Integer = reports.Count - 1 To 0 Step -1
+        Dim ReportBunch As String = reports(I)
+        If Not String.IsNullOrEmpty(ReportBunch) Then
+          Dim e, ie As String
+          If ReportBunch.Contains(vbNewLine) Then
+            e = Split(ReportBunch, vbNewLine)(0)
+            ie = Split(ReportBunch, vbNewLine)(1)
+          Else
+            e = ReportBunch
+            ie = Nothing
+          End If
+          Try
+            Using sckUpload As New CookieAwareWebClient
+              Dim params As New Collections.Specialized.NameValueCollection
+              params.Add("e", e)
+              If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)
+              Dim bRet() As Byte = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
+              Dim sRet As String = System.Text.Encoding.GetEncoding(LATIN_1).GetString(bRet)
+              If sRet = "e exists" Or sRet = "e added" Then
+                reports.RemoveAt(I)
+              Else
+                Debug.Print(sRet)
+              End If
+            End Using
+          Catch
+            Exit For
+          End Try
+        Else
+          reports.RemoveAt(I)
+        End If
+      Next
+      If InUseChecker(ReportList, FileAccess.ReadWrite) Then
+        If reports.Count > 0 Then
+          If reports.Count = 1 AndAlso String.IsNullOrEmpty(reports(0)) Then
+            IO.File.Delete(ReportList)
+          Else
+            My.Computer.FileSystem.WriteAllText(ReportList, Join(reports.ToArray, vbNewLine & vbNewLine) & vbNewLine & vbNewLine, False)
+          End If
+        Else
+          IO.File.Delete(ReportList)
+        End If
+      End If
+    End If
+  End Sub
   ''' <summary>
   ''' Attempts to see if a file is in use, waiting up to five seconds for it to be freed.
   ''' </summary>
@@ -73,4 +137,15 @@ Module modFunctions
       Return False
     End If
   End Function
+  Private ReadOnly Property AppData As String
+    Get
+      Static sTmp As String
+      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName)
+      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName)
+      If String.IsNullOrEmpty(sTmp) Then
+        sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
+      End If
+      Return sTmp
+    End Get
+  End Property
 End Module

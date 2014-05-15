@@ -67,7 +67,6 @@ Public Class remoteRestrictionTracker
   Public Event Success(sender As Object, e As SuccessEventArgs)
   Public Event OKKey(sender As Object, e As EventArgs)
   Private WithEvents wsLogin As CookieAwareWebClient
-
   Private ReadTimeoutCount As Integer
   Private Sub tmrReadTimeout_Tick()
     ReadTimeoutCount += 1
@@ -79,7 +78,7 @@ Public Class remoteRestrictionTracker
         tmrReadTimeout = Nothing
       End If
       ReadTimeoutCount = 0
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Connection Timed Out!"))
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "The Remote Service timed out!"))
     End If
   End Sub
   Private Sub ResetTimeout(Optional enable As Boolean = False)
@@ -90,7 +89,6 @@ Public Class remoteRestrictionTracker
     ReadTimeoutCount = 0
     If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), New Object, 1000, 1000)
   End Sub
-
   Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As IWebProxy, Timeout As Integer, UpdateFrom As Date)
     ResetTimeout()
     If Username.Contains("@") Then
@@ -112,7 +110,7 @@ Public Class remoteRestrictionTracker
   Private Sub BeginLogin()
     ResetTimeout(True)
     If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Login Terminated Prematurely"))
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated prematurely"))
       Exit Sub
     End If
     wsLogin.Headers.Clear()
@@ -124,7 +122,7 @@ Public Class remoteRestrictionTracker
     GenCC()
     ClientResponse = HashA()
     If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Login Terminated Prematurely"))
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated during initialization"))
       Exit Sub
     End If
     wsLogin.Headers.Clear()
@@ -156,7 +154,7 @@ Public Class remoteRestrictionTracker
     End Using
     CSP = Nothing
     If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Login Terminated Prematurely"))
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated during verification"))
       Exit Sub
     End If
     wsLogin.Headers.Clear()
@@ -207,13 +205,8 @@ Public Class remoteRestrictionTracker
   End Function
   Private Sub wsLogin_Failure(sender As Object, e As CookieAwareWebClient.ErrorEventArgs) Handles wsLogin.Failure
     ResetTimeout()
-    If e.Error.InnerException Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, e.Error.Message))
-    Else
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, e.Error.Message & " (" & e.Error.InnerException.Message & ")"))
-    End If
+    RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, RemoteErrorToString(e.Error)))
   End Sub
-
   Private Sub wsLogin_UploadStringCompleted(sender As Object, e As System.Net.UploadStringCompletedEventArgs) Handles wsLogin.UploadStringCompleted
     ResetTimeout()
     If e.Error Is Nothing Then
@@ -371,14 +364,11 @@ Public Class remoteRestrictionTracker
             Else
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
             End If
+            SendSocketErrors()
         End Select
       End If
     Else
-      If e.Error.InnerException Is Nothing Then
-        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, e.Error.Message))
-      Else
-        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, e.Error.Message & " (" & e.Error.InnerException.Message & ")"))
-      End If
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, RemoteErrorToString(e.Error)))
     End If
   End Sub
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
@@ -402,7 +392,33 @@ Public Class remoteRestrictionTracker
       Return outData.ToArray
     End Using
   End Function
-
+  Private Function RemoteErrorToString(ex As System.Exception)
+    Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
+    If ex.InnerException Is Nothing Then
+      If ex.Message.StartsWith("The remote name could not be resolved:") Then
+        Return "Could not connect to your DNS. Check your internet connection."
+      Else
+        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        Return ex.Message
+      End If
+    Else
+      If ex.Message.StartsWith("Unable to connect to the remote server") Then
+        If ex.InnerException.Message.StartsWith("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "The Remote Service did not respond. Check your internet connection."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
+          Return "The host is unreachable. Check your local network."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
+          Return "The network is unreachable. Check your internet connection."
+        Else
+          reportHandler.BeginInvoke(ex, Nothing, Nothing)
+          Return "Can't connect to the Remote Service - " & ex.InnerException.Message
+        End If
+      Else
+        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        Return ex.Message & " - " & ex.InnerException.Message
+      End If
+    End If
+  End Function
 #Region "IDisposable Support"
   Private disposedValue As Boolean 
   Protected Overridable Sub Dispose(disposing As Boolean)

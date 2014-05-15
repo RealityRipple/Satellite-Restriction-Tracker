@@ -209,9 +209,11 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmCustomColors.resx">
       <DependentUpon>frmCustomColors.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmDBProgress.resx">
       <DependentUpon>frmDBProgress.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
@@ -219,6 +221,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmHistory.resx">
       <DependentUpon>frmHistory.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUpdate.resx">
       <DependentUpon>frmUpdate.vb</DependentUpon>
