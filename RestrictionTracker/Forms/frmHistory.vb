@@ -534,7 +534,7 @@
         From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
       End If
     Else
-      If usageDB isnot Nothing  usageDB.Count > 1 Then
+      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
         Dim Finds As Integer = 0
         For I As Integer = usageDB.Count - 1 To 1 Step -1
           If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
