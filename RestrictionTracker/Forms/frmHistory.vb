@@ -467,6 +467,8 @@
     Else
       ToNow = RightNow
     End If
+    If FromNow.Year < 2000 Then FromNow = dtpFrom.MinDate
+    If ToNow.Year < 2000 Then ToNow = dtpTo.MinDate
     dtpFrom.Value = FromNow
     dtpTo.Value = ToNow
     cmdQuery.PerformClick()
@@ -483,7 +485,7 @@
         From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
       End If
     Else
-      If usageDB.Count > 1 Then
+      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
         For I As Integer = usageDB.Count - 1 To 1 Step -1
           If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
             If usageDB(I).DATETIME > dtpFrom.MaxDate Then
@@ -514,6 +516,8 @@
     Else
       ToNow = RightNow
     End If
+    If From30DaysAgo.Year < 2000 Then From30DaysAgo = dtpFrom.MinDate
+    If ToNow.Year < 2000 Then ToNow = dtpTo.MinDate
     dtpFrom.Value = From30DaysAgo
     dtpTo.Value = ToNow
     cmdQuery.PerformClick()
@@ -530,7 +534,7 @@
         From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
       End If
     Else
-      If usageDB.Count > 1 Then
+      If usageDB isnot Nothing  usageDB.Count > 1 Then
         Dim Finds As Integer = 0
         For I As Integer = usageDB.Count - 1 To 1 Step -1
           If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
@@ -566,6 +570,8 @@
     Else
       ToNow = RightNow
     End If
+    If From60DaysAgo.Year < 2000 Then From60DaysAgo = dtpFrom.MinDate
+    If ToNow.Year < 2000 Then ToNow = dtpTo.MinDate
     dtpFrom.Value = From60DaysAgo
     dtpTo.Value = ToNow
     cmdQuery.PerformClick()
