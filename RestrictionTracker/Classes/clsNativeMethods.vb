@@ -48,4 +48,7 @@ Public NotInheritable Class NativeMethods
   <DllImport("user32", SetLastError:=True)>
   Public Shared Function GetAncestor(ByVal hWnd As IntPtr, ByVal gaFlags As Integer) As IntPtr
   End Function
+  <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
+  Public Shared Function DestroyIcon(ByVal hWnd As IntPtr) As Boolean
+  End Function
 End Class

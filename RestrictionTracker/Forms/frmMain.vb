@@ -1747,7 +1747,9 @@
     End Using
     Try
       Dim hIcon As IntPtr = imgTray.GetHicon()
-      Return Icon.FromHandle(hIcon)
+      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
+      NativeMethods.DestroyIcon(hIcon)
+      Return iIcon
     Catch ex As Exception
       Return My.Resources.small
     End Try
@@ -1769,7 +1771,9 @@
     End Using
     Try
       Dim hIcon As IntPtr = imgTray.GetHicon()
-      Return Icon.FromHandle(hIcon)
+      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
+      NativeMethods.DestroyIcon(hIcon)
+      Return iIcon
     Catch ex As Exception
       Return My.Resources.small
     End Try
@@ -1793,7 +1797,9 @@
     End Using
     Try
       Dim hIcon As IntPtr = imgTray.GetHicon()
-      Return Icon.FromHandle(hIcon)
+      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
+      NativeMethods.DestroyIcon(hIcon)
+      Return iIcon
     Catch ex As Exception
       Return My.Resources.small
     End Try
