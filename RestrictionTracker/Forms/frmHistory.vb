@@ -24,14 +24,7 @@
     Else
       optGraph.Checked = True
     End If
-    Select Case useStyle
-      Case SatHostTypes.DishNet, SatHostTypes.Exede, SatHostTypes.RuralPortal
-        cmd30Days.Text = "This Period"
-        cmd60Days.Text = "Last Period"
-      Case Else
-        cmd30Days.Text = "30 Days"
-        cmd60Days.Text = "60 Days"
-    End Select
+    ChangeStyle()
     Select Case mySettings.Ago
       Case 1 : cmdToday.PerformClick()
       Case 30 : cmd30Days.PerformClick()
@@ -301,10 +294,9 @@
         lItems = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
         dgvBandwidth.Rows.Clear()
         Dim SameLim As Boolean = True
+        ChangeStyle()
         Select Case useStyle
           Case SatHostTypes.DishNet
-            dgvBandwidth.Columns(1).HeaderText = "Anytime"
-            dgvBandwidth.Columns(2).HeaderText = "Off-Peak"
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems
@@ -335,14 +327,10 @@
               Next lItem
             End If
           Case SatHostTypes.RuralPortal
-            dgvBandwidth.Columns(1).HeaderText = "Used"
-            dgvBandwidth.Columns(2).HeaderText = "Total"
             For Each lItem As DataBase.DataRow In lItems
               dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.DOWNLIM)
             Next lItem
           Case SatHostTypes.WildBlue
-            dgvBandwidth.Columns(1).HeaderText = "Download"
-            dgvBandwidth.Columns(2).HeaderText = "Upload"
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems
@@ -374,8 +362,6 @@
               Next lItem
             End If
           Case SatHostTypes.Exede
-            dgvBandwidth.Columns(1).HeaderText = "Download, Upload, & Over"
-            dgvBandwidth.Columns(2).HeaderText = "Limit"
             For Each lItem As DataBase.DataRow In lItems
               If lItem.DOWNLIM = lItem.UPLIM Then
                 If mySettings.HistoryInversion Then
@@ -398,11 +384,8 @@
                   End If
                 End If
               End If
-
             Next lItem
           Case Else
-            dgvBandwidth.Columns(1).HeaderText = "Download"
-            dgvBandwidth.Columns(2).HeaderText = "Upload"
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems
@@ -729,6 +712,50 @@
     Return iPic
   End Function
 #End Region
+  Private Sub ChangeStyle()
+    If Me.InvokeRequired Then
+      Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
+    Else
+      Select Case useStyle
+        Case SatHostTypes.DishNet
+          cmd30Days.Text = "This Period"
+          cmd60Days.Text = "Last Period"
+          dgvBandwidth.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Anytime"
+          colUPLOAD.HeaderText = "Off-Peak"
+          dgvBandwidth.Columns.Add(colDATETIME)
+          dgvBandwidth.Columns.Add(colDOWNLOAD)
+          dgvBandwidth.Columns.Add(colUPLOAD)
+        Case SatHostTypes.Exede
+          cmd30Days.Text = "This Period"
+          cmd60Days.Text = "Last Period"
+          dgvBandwidth.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Download, Upload, & Over"
+          colUPLOAD.HeaderText = "Limit"
+          dgvBandwidth.Columns.Add(colDATETIME)
+          dgvBandwidth.Columns.Add(colDOWNLOAD)
+          dgvBandwidth.Columns.Add(colUPLOAD)
+        Case SatHostTypes.RuralPortal
+          cmd30Days.Text = "This Period"
+          cmd60Days.Text = "Last Period"
+          dgvBandwidth.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Used"
+          colUPLOAD.HeaderText = "Total"
+          dgvBandwidth.Columns.Add(colDATETIME)
+          dgvBandwidth.Columns.Add(colDOWNLOAD)
+          dgvBandwidth.Columns.Add(colUPLOAD)
+        Case Else
+          cmd30Days.Text = "30 Days"
+          cmd60Days.Text = "60 Days"
+          dgvBandwidth.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Download"
+          colUPLOAD.HeaderText = "Upload"
+          dgvBandwidth.Columns.Add(colDATETIME)
+          dgvBandwidth.Columns.Add(colDOWNLOAD)
+          dgvBandwidth.Columns.Add(colUPLOAD)
+      End Select
+    End If
+  End Sub
   Private Sub SetDefaultColors()
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))

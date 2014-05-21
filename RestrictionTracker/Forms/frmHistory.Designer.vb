@@ -37,9 +37,6 @@ Partial Class frmHistory
     Me.pctUld = New System.Windows.Forms.PictureBox()
     Me.pctDld = New System.Windows.Forms.PictureBox()
     Me.dgvBandwidth = New System.Windows.Forms.DataGridView()
-    Me.DATENTIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.DOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.UPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.DATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.pnlAge = New System.Windows.Forms.TableLayoutPanel()
     Me.lblFrom = New System.Windows.Forms.Label()
@@ -56,6 +53,9 @@ Partial Class frmHistory
     Me.pctErr = New System.Windows.Forms.PictureBox()
     Me.grpAge = New System.Windows.Forms.GroupBox()
     Me.ttHistory = New RestrictionTracker.ToolTip(Me.components)
+    Me.colDATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colDOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colUPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.pnlButtons.SuspendLayout()
     Me.pnlGraph.SuspendLayout()
     CType(Me.pctUld, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -196,7 +196,7 @@ Partial Class frmHistory
     Me.dgvBandwidth.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
     Me.dgvBandwidth.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
     Me.dgvBandwidth.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-    Me.dgvBandwidth.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.DATENTIME, Me.DOWNLOAD, Me.UPLOAD})
+    Me.dgvBandwidth.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colDOWNLOAD, Me.colUPLOAD})
     Me.dgvBandwidth.Dock = System.Windows.Forms.DockStyle.Fill
     Me.dgvBandwidth.Location = New System.Drawing.Point(0, 76)
     Me.dgvBandwidth.Name = "dgvBandwidth"
@@ -206,30 +206,6 @@ Partial Class frmHistory
     Me.dgvBandwidth.Size = New System.Drawing.Size(514, 205)
     Me.dgvBandwidth.TabIndex = 2
     Me.dgvBandwidth.Visible = False
-    '
-    'DATENTIME
-    '
-    DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-    Me.DATENTIME.DefaultCellStyle = DataGridViewCellStyle2
-    Me.DATENTIME.HeaderText = "Date and Time"
-    Me.DATENTIME.Name = "DATENTIME"
-    Me.DATENTIME.ReadOnly = True
-    '
-    'DOWNLOAD
-    '
-    DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.DOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
-    Me.DOWNLOAD.HeaderText = "Download"
-    Me.DOWNLOAD.Name = "DOWNLOAD"
-    Me.DOWNLOAD.ReadOnly = True
-    '
-    'UPLOAD
-    '
-    DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.UPLOAD.DefaultCellStyle = DataGridViewCellStyle4
-    Me.UPLOAD.HeaderText = "Upload"
-    Me.UPLOAD.Name = "UPLOAD"
-    Me.UPLOAD.ReadOnly = True
     '
     'DATETIME
     '
@@ -428,6 +404,30 @@ Partial Class frmHistory
     '
     Me.ttHistory.Persistant = True
     '
+    'colDATETIME
+    '
+    DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+    Me.colDATETIME.DefaultCellStyle = DataGridViewCellStyle2
+    Me.colDATETIME.HeaderText = "Date and Time"
+    Me.colDATETIME.Name = "colDATETIME"
+    Me.colDATETIME.ReadOnly = True
+    '
+    'colDOWNLOAD
+    '
+    DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
+    Me.colDOWNLOAD.HeaderText = "Download"
+    Me.colDOWNLOAD.Name = "colDOWNLOAD"
+    Me.colDOWNLOAD.ReadOnly = True
+    '
+    'colUPLOAD
+    '
+    DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle4
+    Me.colUPLOAD.HeaderText = "Upload"
+    Me.colUPLOAD.Name = "colUPLOAD"
+    Me.colUPLOAD.ReadOnly = True
+    '
     'frmHistory
     '
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -479,10 +479,10 @@ Partial Class frmHistory
   Friend WithEvents lblBackup As System.Windows.Forms.Label
   Friend WithEvents pctUld As System.Windows.Forms.PictureBox
   Friend WithEvents pctDld As System.Windows.Forms.PictureBox
-  Friend WithEvents DATENTIME As System.Windows.Forms.DataGridViewTextBoxColumn
-  Friend WithEvents DOWNLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
-  Friend WithEvents UPLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
   Friend WithEvents pctErr As System.Windows.Forms.PictureBox
   Friend WithEvents ttHistory As ToolTip
   Friend WithEvents chkExportRange As System.Windows.Forms.CheckBox
+  Friend WithEvents colDATETIME As System.Windows.Forms.DataGridViewTextBoxColumn
+  Friend WithEvents colDOWNLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
+  Friend WithEvents colUPLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class
