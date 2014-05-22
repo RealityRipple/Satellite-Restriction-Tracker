@@ -668,14 +668,14 @@
     LOG_Get(0, dMin, 0, 0, 0, 0)
     Dim fDate As Date = DateSerial(2000, 1, 1)
     If DateDiff(DateInterval.Year, fDate, dMin) < 0 Then dMin = fDate
-    If DateDiff(DateInterval.Minute, dMin, Now) < 0 Then
+    If DateDiff(DateInterval.Second, dMin, Now) < 0 Then
       pctErr.Image = New ErrorProvider().Icon.ToBitmap
       ttHistory.SetTooltip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
     Else
       dMax = Now
       pctErr.Image = Nothing
       ttHistory.SetTooltip(pctErr, Nothing)
-      If DateDiff(DateInterval.Minute, dMin, dMax) > 0 Then
+      If DateDiff(DateInterval.Second, dMin, dMax) > 0 Then
         dtpFrom.MaxDate = dMax
         dtpTo.MaxDate = dMax
         dtpFrom.MinDate = dMin
