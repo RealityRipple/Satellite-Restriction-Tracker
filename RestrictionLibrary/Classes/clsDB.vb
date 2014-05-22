@@ -160,22 +160,26 @@ Public Class DataBase
     End If
   End Sub
   Public Sub Sort()
-
     Array.Sort(Of DataRow)(data, Function(drA As DataBase.DataRow, drB As DataBase.DataRow) Date.Compare(drA.DATETIME, drB.DATETIME))
+    If data.LongLength > 1 Then
+      For I As Long = data.LongLength - 2 To 0 Step -1
+        If Math.Abs(data(I).DATETIME.Subtract(data(I + 1).DATETIME).TotalMinutes) < 1 Then Remove(data(I))
+      Next
+    End If
   End Sub
   Public Sub Add(item As DataRow) Implements System.Collections.Generic.ICollection(Of DataRow).Add
     If data IsNot Nothing Then
-      Dim noGood As Boolean = False
-      For Each datum In data
-        If Math.Abs(datum.DATETIME.Subtract(item.DATETIME).TotalMinutes) < 1 Then
-          noGood = True
-          Exit For
-        End If
-      Next
-      If Not noGood Then
-        Array.Resize(data, data.Length + 1)
-        data(data.Length - 1) = item
-      End If
+      'Dim noGood As Boolean = False
+      'For Each datum In data
+      '  If Math.Abs(datum.DATETIME.Subtract(item.DATETIME).TotalMinutes) < 1 Then
+      '    noGood = True
+      '    Exit For
+      '  End If
+      'Next
+      'If Not noGood Then
+      Array.Resize(data, data.Length + 1)
+      data(data.Length - 1) = item
+      'End If
     Else
       ReDim data(0)
       data(0) = item

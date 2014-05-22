@@ -18,20 +18,20 @@
   End Property
   Public Sub LOG_Add(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, Optional Save As Boolean = True)
     If Not isLoaded Then Exit Sub
-    If Math.Abs(DateDiff(DateInterval.Minute, dTime, LOG_GetLast)) >= HistoryAge Then
-      If lDownLim > 0 Then
-        If usageDB Is Nothing Then
-          usageDB = New DataBase
-          usageDB.StartNew()
-        End If
-        usageDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
-        If Save Then
-          LOG_Sort()
-          Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
-          tX.Start(False)
-        End If
+    'If Math.Abs(DateDiff(DateInterval.Minute, dTime, LOG_GetLast)) >= HistoryAge Then
+    If lDownLim > 0 Then
+      If usageDB Is Nothing Then
+        usageDB = New DataBase
+        usageDB.StartNew()
+      End If
+      usageDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+      If Save Then
+        LOG_Sort()
+        Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
+        tX.Start(False)
       End If
     End If
+    'End If
   End Sub
   Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
     If Not isLoaded Then Exit Sub
