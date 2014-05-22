@@ -95,8 +95,8 @@
       End If
       graphSpaceD = GetGraphRect(True, graphMinX, graphMaxX)
       graphSpaceU = GetGraphRect(False, Nothing, Nothing)
-      If fDB.Visible Then fDB.Close()
       If fDB IsNot Nothing Then
+        If fDB.Visible Then fDB.Close()
         fDB.Dispose()
         fDB = Nothing
       End If
@@ -351,7 +351,7 @@
                 End If
               End If
             Next
-            fDB.SetAction("Querying DataBase...", "Populating Table...")
+            If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
                 dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
@@ -422,8 +422,8 @@
       End If
     End If
     If bClose Then
-      If fDB.Visible Then fDB.Close()
       If fDB IsNot Nothing Then
+        If fDB.Visible Then fDB.Close()
         fDB.Dispose()
         fDB = Nothing
       End If
