@@ -1,5 +1,5 @@
 ﻿Public Class frmMain
-  Friend myPanel As SatHostTypes
+  Private myPanel As SatHostTypes
 
   Private Enum LoadStates
     Loading
@@ -824,8 +824,11 @@
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
+      mySettings.DisplayType = SatHostTypes.DishNet
+      myPanel = SatHostTypes.DishNet
       mySettings.AccountType = SatHostTypes.DishNet
       mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -840,8 +843,30 @@
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.Limit + e.BuyMore, e.Upload, e.Over, True)
+      mySettings.DisplayType = SatHostTypes.Exede
+      myPanel = SatHostTypes.Exede
       mySettings.AccountType = SatHostTypes.Exede
       mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
+      DisplayUsage(True, True)
+      If localData IsNot Nothing Then
+        localData.Dispose()
+        localData = Nothing
+      End If
+    End If
+  End Sub
+  Private Sub localData_ConnectionEEResult(sender As Object, e As localRestrictionTracker.ConnectionRP2ResultEventArgs) Handles localData.ConnectionEEResult
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionEEResult), sender, e)
+    Else
+      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
+      mySettings.DisplayType = SatHostTypes.RuralPortal
+      myPanel = SatHostTypes.RuralPortal
+      mySettings.AccountType = SatHostTypes.Exede
+      mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -856,9 +881,11 @@
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
+      mySettings.DisplayType = SatHostTypes.RuralPortal
       myPanel = SatHostTypes.RuralPortal
       mySettings.AccountType = SatHostTypes.RuralPortal
       mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -873,12 +900,11 @@
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
+      mySettings.DisplayType = SatHostTypes.WildBlue
       myPanel = SatHostTypes.WildBlue
-      If mySettings.Colors.MainUpA.A = 0 Then
-        SetDefaultColors()
-      End If
       mySettings.AccountType = SatHostTypes.RuralPortal
       mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -893,8 +919,11 @@
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
+      mySettings.DisplayType = SatHostTypes.WildBlue
+      myPanel = SatHostTypes.WildBlue
       mySettings.AccountType = SatHostTypes.WildBlue
       mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -1131,7 +1160,8 @@
     pnlExede.Visible = False
     pnlRural.Visible = True
     pnlNothing.Visible = False
-    myPanel = SatHostTypes.RuralPortal
+    mySettings.DisplayType = SatHostTypes.RuralPortal
+    mySettings.Save()
     r_used = lDown
     r_lim = lDownLim
     If tmrChanges IsNot Nothing Then
@@ -1186,7 +1216,8 @@
     pnlExede.Visible = False
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    myPanel = SatHostTypes.WildBlue
+    mySettings.DisplayType = SatHostTypes.WildBlue
+    mySettings.Save()
     wb_down = lDown
     wb_dlim = lDownLim
     wb_up = lUp
@@ -1285,7 +1316,8 @@
     pnlExede.Visible = True
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    myPanel = SatHostTypes.Exede
+    mySettings.DisplayType = SatHostTypes.Exede
+    mySettings.Save()
     e_down = lDown
     e_up = lUp
     e_over = lOver
@@ -1376,7 +1408,8 @@
     pnlExede.Visible = False
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    myPanel = SatHostTypes.WildBlue
+    mySettings.DisplayType = SatHostTypes.WildBlue
+    mySettings.Save()
     wb_down = lDown
     wb_dlim = lDownLim
     wb_up = lUp
@@ -1469,7 +1502,8 @@
     If lDownLim > 0 Or lUpLim > 0 Then
       Dim lastUpdate As Date = LOG_GetLast()
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
-      Select Case mySettings.AccountType
+      myPanel = mySettings.DisplayType
+      Select Case mySettings.DisplayType
         Case SatHostTypes.RuralPortal : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.DishNet : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.WildBlue : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
@@ -2143,7 +2177,7 @@
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
     Else
-      Dim useStyle As SatHostTypes = myPanel
+      Dim useStyle As SatHostTypes = mySettings.DisplayType
       If useStyle = SatHostTypes.Other Then useStyle = mySettings.AccountType
       Select Case useStyle
         Case SatHostTypes.WildBlue

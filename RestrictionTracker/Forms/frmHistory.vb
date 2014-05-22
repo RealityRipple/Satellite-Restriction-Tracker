@@ -13,7 +13,7 @@
 #Region "Form Events"
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
-    useStyle = frmMain.myPanel
+    useStyle = mySettings.DisplayType
     If useStyle = SatHostTypes.Other Then useStyle = mySettings.AccountType
     If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
     ResetDates()

@@ -201,6 +201,7 @@
     End Property
   End Class
   Public Event ConnectionRP2Result(sender As Object, e As ConnectionRP2ResultEventArgs)
+  Public Event ConnectionEEResult(sender As Object, e As ConnectionRP2ResultEventArgs)
   Public Class ConnectionRP4ResultEventArgs
     Inherits EventArgs
     Private m_Down As Long
@@ -1137,41 +1138,70 @@
         End If
       ElseIf Table.Contains("allowance") Then
         Dim sPlusT As String = String.Empty
-        For I As Integer = 0 To sRows.Length - 1
-          If Not String.IsNullOrEmpty(sRows(I)) Then
-            If sRows(I).Contains("<strong>") Then
-              If String.IsNullOrEmpty(sDownT) Then
-                sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-              ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</span>") And String.IsNullOrEmpty(sUpT) Then
-                If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-                  sUpT = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
+        If Table.Contains("loaded:") Then
+          For I As Integer = 0 To sRows.Length - 1
+            If Not String.IsNullOrEmpty(sRows(I)) Then
+              If sRows(I).Contains("<strong>") Then
+                If String.IsNullOrEmpty(sDownT) Then
+                  sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+                  sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
+                ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</span>") And String.IsNullOrEmpty(sUpT) Then
+                  If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+                    sUpT = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+                    sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
+                  End If
+                ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
+                  If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+                    sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+                    sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
+                  End If
                 End If
-              ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-                If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
-                  sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                  sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-                End If
-              End If
-            ElseIf sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-              If sRows(I).Contains("loaded:") Then
-                If String.IsNullOrEmpty(sDown) Then
-                  sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-                ElseIf String.IsNullOrEmpty(sUp) Then
-                  sUp = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
+              ElseIf sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+                If sRows(I).Contains("loaded:") Then
+                  If String.IsNullOrEmpty(sDown) Then
+                    sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+                    sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
+                  ElseIf String.IsNullOrEmpty(sUp) Then
+                    sUp = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+                    sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
+                  End If
                 End If
               End If
             End If
+          Next
+          ResetTimeout()
+          If String.IsNullOrEmpty(sDownT) Then
+            RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+          Else
+            RaiseEvent ConnectionEResult(Me, New ConnectionEResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sUp, MBPerGB), StrToVal(sUpT, MBPerGB), StrToVal(sDownT, MBPerGB), StrToVal(sPlusT, MBPerGB), Now))
           End If
-        Next
-        ResetTimeout()
-        If String.IsNullOrEmpty(sDownT) Then
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
         Else
-          RaiseEvent ConnectionEResult(Me, New ConnectionEResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sUp, MBPerGB), StrToVal(sUpT, MBPerGB), StrToVal(sDownT, MBPerGB), StrToVal(sPlusT, MBPerGB), Now))
+          For I As Integer = 0 To sRows.Length - 1
+            If Not String.IsNullOrEmpty(sRows(I)) Then
+              If sRows(I).Contains("<strong>") Then
+                If String.IsNullOrEmpty(sDownT) Then
+                  sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+                  sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
+                ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
+                  If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+                    sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+                    sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
+                  End If
+                ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
+                  If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+                    sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+                    sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
+                  End If
+                End If
+              End If
+            End If
+          Next
+          ResetTimeout()
+          If String.IsNullOrEmpty(sDownT) Then
+            RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+          Else
+            RaiseEvent ConnectionEEResult(Me, New ConnectionRP2ResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
+          End If
         End If
       End If
     ElseIf mySettings.AccountType = SatHostTypes.RuralPortal Then

@@ -19,7 +19,7 @@
       dUp = True
       iU = 1
     End If
-    useStyle = frmMain.myPanel
+    useStyle = mySettings.DisplayType
     If useStyle = SatHostTypes.Other Then useStyle = mySettings.AccountType
     If useStyle = SatHostTypes.WildBlue Then
       grpMainDown.Text = "Download Colors"
