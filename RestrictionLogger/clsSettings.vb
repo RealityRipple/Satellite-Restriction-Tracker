@@ -201,10 +201,10 @@
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-      Case "WildBlue" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "Exede" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DishNet" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-      Case "RuralPortal" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+      Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "DISHNET" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case Else : Return localRestrictionTracker.SatHostTypes.Other
     End Select
   End Function
