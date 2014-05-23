@@ -202,7 +202,7 @@
   Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
   Public Event ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs)
   Public Event ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs)
-  Public Event ConnectionRPEResult(sender As Object, e As TYPEBResultEventArgs)
+  Public Event ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs)
   Public Class ConnectionStatusEventArgs
     Inherits EventArgs
     Public Enum ConnectionStates
@@ -1248,7 +1248,7 @@
       If String.IsNullOrEmpty(sDownT) Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       Else
-        RaiseEvent ConnectionRPEResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now))
+        RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now))
       End If
     End If
   End Sub

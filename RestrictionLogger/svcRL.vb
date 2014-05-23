@@ -212,7 +212,7 @@ Public Class svcRL
     myLog.WriteEntry(e.Type.ToString & ": " & e.Message, EventLogEntryType.Error)
   End Sub
 
-  Private Sub tracker_ConnectionRPEResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPEResult
+  Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub

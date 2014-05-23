@@ -835,9 +835,9 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionRPEResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionRPEResult
+  Private Sub localData_ConnectionRPXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPEResult), sender, e)
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPXResult), sender, e)
     Else
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
