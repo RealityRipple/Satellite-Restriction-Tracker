@@ -18,9 +18,9 @@ Module modFunctions
     Do While sVal.Length < Length : sVal = "0" & sVal : Loop
     Return sVal
   End Function
-  Public Delegate Sub ReportSocketErrorInvoker(ex As Exception)
-  Public Sub ReportSocketError(ex As Exception) 'needs AppData path passed
-    Dim ReportList As String = AppData & "\sckerrs.log"
+  Public Delegate Sub ReportSocketErrorInvoker(ex As Exception, DataPath As String)
+  Public Sub ReportSocketError(ex As Exception, DataPath As String)
+    Dim ReportList As String = DataPath & "\sckerrs.log"
     If IO.File.Exists(ReportList) Then
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
         My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, True)
@@ -32,10 +32,10 @@ Module modFunctions
       If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
       My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
     End If
-    SendSocketErrors()
+    SendSocketErrors(DataPath)
   End Sub
-  Public Sub SendSocketErrors()
-    Dim ReportList As String = AppData & "\sckerrs.log"
+  Public Sub SendSocketErrors(DataPath As String)
+    Dim ReportList As String = DataPath & "\sckerrs.log"
     If IO.File.Exists(ReportList) Then
       Dim reports As New Collections.Generic.List(Of String)(Split(My.Computer.FileSystem.ReadAllText(ReportList), vbNewLine & vbNewLine))
       For I As Integer = reports.Count - 1 To 0 Step -1
@@ -164,15 +164,15 @@ Module modFunctions
       Return False
     End If
   End Function
-  Private ReadOnly Property AppData As String
-    Get
-      Static sTmp As String
-      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName)
-      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName)
-      If String.IsNullOrEmpty(sTmp) Then
-        sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
-      End If
-      Return sTmp
-    End Get
-  End Property
+  'Private ReadOnly Property AppData As String
+  '  Get
+  '    Static sTmp As String
+  '    If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName)
+  '    If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName)
+  '    If String.IsNullOrEmpty(sTmp) Then
+  '      sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
+  '    End If
+  '    Return sTmp
+  '  End Get
+  'End Property
 End Module

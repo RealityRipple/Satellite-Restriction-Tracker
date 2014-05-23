@@ -240,8 +240,10 @@
   Private FullCheck As Boolean = True
   Private myUID, myPass As String
   Private ClosingTime As Boolean
+  Private sDataPath As String
 #Region "Initialization Functions"
   Public Sub New(ConfigPath As String)
+    sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
     InitAccount()
   End Sub
@@ -1090,7 +1092,7 @@
       Case SatHostTypes.DishNet_EXEDE : ReadUsageDN(Table)
     End Select
     wsData.CookieJar = New Net.CookieContainer
-    SendSocketErrors()
+    SendSocketErrors(sDataPath)
   End Sub
   Private Sub ReadUsageWB(Table As String)
     Dim sRows As String() = Split(Table, vbLf)
@@ -1401,7 +1403,7 @@
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
         Return "Could not connect to your DNS. Check your internet connection."
       Else
-        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
       End If
     Else
@@ -1413,11 +1415,11 @@
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
           Return "The network is unreachable. Check your internet connection."
         Else
-          reportHandler.BeginInvoke(ex, Nothing, Nothing)
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
         End If
       Else
-        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message & " - " & ex.InnerException.Message
       End If
     End If

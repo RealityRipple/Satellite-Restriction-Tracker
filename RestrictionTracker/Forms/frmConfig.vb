@@ -141,7 +141,7 @@
     Else
       Exit Sub
     End If
-    remoteTest = New remoteRestrictionTracker(txtAccount.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1))
+    remoteTest = New remoteRestrictionTracker(txtAccount.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then

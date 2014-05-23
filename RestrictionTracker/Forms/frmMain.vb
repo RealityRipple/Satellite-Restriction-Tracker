@@ -721,7 +721,7 @@ Public Class frmMain
     Dim fromDate = mySettings.LastSyncTime
     If My.Computer.Keyboard.CtrlKeyDown Then fromDate = New Date(2000, 1, 1)
     If LOG_GetCount() = 0 Then fromDate = New Date(2000, 1, 1)
-    remoteData = New remoteRestrictionTracker(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate)
+    remoteData = New remoteRestrictionTracker(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, AppData)
   End Sub
   Private Sub DisplayUsage(bStatusText As Boolean, bHardTime As Boolean)
     If Me.InvokeRequired Then

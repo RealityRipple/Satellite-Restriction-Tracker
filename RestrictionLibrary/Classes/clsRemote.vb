@@ -68,6 +68,7 @@ Public Class remoteRestrictionTracker
   Public Event OKKey(sender As Object, e As EventArgs)
   Private WithEvents wsLogin As CookieAwareWebClient
   Private ReadTimeoutCount As Integer
+  Private sDataPath As String
   Private Sub tmrReadTimeout_Tick()
     ReadTimeoutCount += 1
     Dim TimeOutTime As Integer = iTimeout
@@ -89,7 +90,7 @@ Public Class remoteRestrictionTracker
     ReadTimeoutCount = 0
     If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), New Object, 1000, 1000)
   End Sub
-  Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As IWebProxy, Timeout As Integer, UpdateFrom As Date)
+  Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As IWebProxy, Timeout As Integer, UpdateFrom As Date, DataPath As String)
     ResetTimeout()
     If Username.Contains("@") Then
       sUsername = Split(Username, "@", 2)(0)
@@ -101,6 +102,7 @@ Public Class remoteRestrictionTracker
     sPassword = Password
     dFrom = UpdateFrom
     sProduct = ProductKey
+    sDataPath = DataPath
     Secret = System.Text.Encoding.UTF8.GetBytes(ProductKey)
     wsLogin = New CookieAwareWebClient
     wsLogin.Timeout = Timeout
@@ -367,7 +369,7 @@ Public Class remoteRestrictionTracker
             Else
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
             End If
-            SendSocketErrors()
+            SendSocketErrors(sDataPath)
         End Select
       End If
     Else
@@ -401,7 +403,7 @@ Public Class remoteRestrictionTracker
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
         Return "Could not connect to your DNS. Check your internet connection."
       Else
-        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
       End If
     Else
@@ -413,11 +415,11 @@ Public Class remoteRestrictionTracker
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
           Return "The network is unreachable. Check your internet connection."
         Else
-          reportHandler.BeginInvoke(ex, Nothing, Nothing)
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the Remote Service - " & ex.InnerException.Message
         End If
       Else
-        reportHandler.BeginInvoke(ex, Nothing, Nothing)
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message & " - " & ex.InnerException.Message
       End If
     End If
