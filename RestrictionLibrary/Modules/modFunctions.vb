@@ -19,7 +19,7 @@ Module modFunctions
     Return sVal
   End Function
   Public Delegate Sub ReportSocketErrorInvoker(ex As Exception)
-  Public Sub ReportSocketError(ex As Exception)
+  Public Sub ReportSocketError(ex As Exception) 'needs AppData path passed
     Dim ReportList As String = AppData & "\sckerrs.log"
     If IO.File.Exists(ReportList) Then
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
@@ -82,6 +82,33 @@ Module modFunctions
       End If
     End If
   End Sub
+
+  Public Function HostTypeToString(ht As localRestrictionTracker.SatHostTypes) As String
+    Select Case ht
+      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
+      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
+      Case localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION : Return "WBV"
+      Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
+      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
+      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : Return "DNX"
+      Case Else : Return "O"
+    End Select
+  End Function
+  Public Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
+    Select Case st.ToUpper
+      Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      Case "WBX" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+      Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+      Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+      Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "DISHNET" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+      Case Else : Return localRestrictionTracker.SatHostTypes.Other
+    End Select
+  End Function
   ''' <summary>
   ''' Attempts to see if a file is in use, waiting up to five seconds for it to be freed.
   ''' </summary>

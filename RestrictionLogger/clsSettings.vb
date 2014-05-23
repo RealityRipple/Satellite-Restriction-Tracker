@@ -35,13 +35,7 @@
         If xAccountType Is Nothing Then
           m_AccountType = localRestrictionTracker.SatHostTypes.Other
         Else
-          Select Case xAccountType.Value
-            Case "WildBlue" : m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue
-            Case "Exede" : m_AccountType = localRestrictionTracker.SatHostTypes.Exede
-            Case "DishNet" : m_AccountType = localRestrictionTracker.SatHostTypes.DishNet
-            Case "RuralPortal" : m_AccountType = localRestrictionTracker.SatHostTypes.RuralPortal
-            Case Else : m_AccountType = localRestrictionTracker.SatHostTypes.Other
-          End Select
+          m_AccountType = StringToHostType(xAccountType.Value)
         End If
       Catch ex As Exception
         m_AccountType = localRestrictionTracker.SatHostTypes.Other
@@ -198,4 +192,20 @@
       End If
     End Set
   End Property
+
+  Private Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
+    Select Case st.ToUpper
+      Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      Case "WBX" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+      Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+      Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+      Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "WildBlue" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      Case "Exede" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "DishNet" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "RuralPortal" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+      Case Else : Return localRestrictionTracker.SatHostTypes.Other
+    End Select
+  End Function
 End Class

@@ -1,4 +1,6 @@
-﻿Public Class frmHistory
+﻿Imports RestrictionLibrary.localRestrictionTracker
+
+Public Class frmHistory
   Friend mySettings As AppSettings
   Private lastRect As Rectangle
   Private bSizeBegin As Boolean
@@ -13,8 +15,7 @@
 #Region "Form Events"
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
-    useStyle = mySettings.DisplayType
-    If useStyle = SatHostTypes.Other Then useStyle = mySettings.AccountType
+    useStyle = mySettings.AccountType
     If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
     ResetDates()
     dtpFrom.Value = dtpFrom.MinDate
@@ -147,7 +148,7 @@
             Dim GraphInvoker As New ParameterizedInvoker(AddressOf DoGraph)
             Dim bDisplayed As Boolean = False
             Select Case useStyle
-              Case SatHostTypes.DishNet
+              Case SatHostTypes.DishNet_EXEDE
                 pnlGraph.RowStyles(0).Height = 50
                 pnlGraph.RowStyles(1).Height = 50
                 lastRect = Me.Bounds
@@ -155,21 +156,21 @@
                 pctUld.Image = ResizingNote(pctUld.Size)
                 GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
                 bDisplayed = True
-              Case SatHostTypes.RuralPortal
+              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds
                 pctDld.Image = ResizingNote(pctDld.Size)
                 GraphInvoker.BeginInvoke({1, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
                 bDisplayed = True
-              Case SatHostTypes.Exede
+              Case SatHostTypes.WildBlue_EXEDE
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds
                 pctDld.Image = ResizingNote(pctDld.Size)
                 GraphInvoker.BeginInvoke({2, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
                 bDisplayed = True
-              Case SatHostTypes.WildBlue
+              Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
                 pnlGraph.RowStyles(0).Height = 50
                 pnlGraph.RowStyles(1).Height = 50
                 lastRect = Me.Bounds
@@ -217,7 +218,7 @@
       Dim gShow = GetGraphData(dNow, True)
       Dim showTime As String = gShow.DATETIME.ToString("g")
       Dim Show As String = showTime & " : " & gShow.DOWNLOAD & " MB / " & gShow.UPLIM & " MB"
-      If useStyle = SatHostTypes.Exede Then
+      If useStyle = SatHostTypes.WildBlue_EXEDE Then
         If mySettings.HistoryInversion Then
           If gShow.DOWNLIM > 0 And Not gShow.UPLIM = gShow.DOWNLIM Then
             Show = showTime & " : " & (gShow.DOWNLOAD + gShow.UPLOAD + gShow.DOWNLIM) & " MB / " & gShow.UPLIM & " MB" & vbNewLine &
@@ -296,7 +297,7 @@
         Dim SameLim As Boolean = True
         ChangeStyle()
         Select Case useStyle
-          Case SatHostTypes.DishNet
+          Case SatHostTypes.DishNet_EXEDE
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems
@@ -326,11 +327,11 @@
                 dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
               Next lItem
             End If
-          Case SatHostTypes.RuralPortal
+          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
             For Each lItem As DataBase.DataRow In lItems
               dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.DOWNLIM)
             Next lItem
-          Case SatHostTypes.WildBlue
+          Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems
@@ -361,7 +362,7 @@
                 dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD.ToString & " / " & lItem.DOWNLIM.ToString, lItem.UPLOAD.ToString & " / " & lItem.UPLIM.ToString)
               Next lItem
             End If
-          Case SatHostTypes.Exede
+          Case SatHostTypes.WildBlue_EXEDE
             For Each lItem As DataBase.DataRow In lItems
               If lItem.DOWNLIM = lItem.UPLIM Then
                 If mySettings.HistoryInversion Then
@@ -459,7 +460,7 @@
   Private Sub cmd30Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd30Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From30DaysAgo As Date
-    If useStyle = SatHostTypes.WildBlue Then
+    If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
       If DateAdd(DateInterval.Day, -30, RightNow) > dtpFrom.MaxDate Then
         From30DaysAgo = dtpFrom.MaxDate
       ElseIf DateAdd(DateInterval.Day, -30, RightNow) < dtpFrom.MinDate Then
@@ -508,7 +509,7 @@
   Private Sub cmd60Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd60Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From60DaysAgo As Date
-    If useStyle = SatHostTypes.WildBlue Then
+    If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
       If DateAdd(DateInterval.Day, -60, RightNow) > dtpFrom.MaxDate Then
         From60DaysAgo = dtpFrom.MaxDate
       ElseIf DateAdd(DateInterval.Day, -60, RightNow) < dtpFrom.MinDate Then
@@ -717,7 +718,7 @@
       Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
     Else
       Select Case useStyle
-        Case SatHostTypes.DishNet
+        Case SatHostTypes.DishNet_EXEDE
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
           dgvBandwidth.Columns.Clear()
@@ -726,7 +727,7 @@
           dgvBandwidth.Columns.Add(colDATETIME)
           dgvBandwidth.Columns.Add(colDOWNLOAD)
           dgvBandwidth.Columns.Add(colUPLOAD)
-        Case SatHostTypes.Exede
+        Case SatHostTypes.WildBlue_EXEDE
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
           dgvBandwidth.Columns.Clear()
@@ -735,7 +736,7 @@
           dgvBandwidth.Columns.Add(colDATETIME)
           dgvBandwidth.Columns.Add(colDOWNLOAD)
           dgvBandwidth.Columns.Add(colUPLOAD)
-        Case SatHostTypes.RuralPortal
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
           dgvBandwidth.Columns.Clear()
@@ -761,7 +762,7 @@
       Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
     Else
       Select Case useStyle
-        Case SatHostTypes.WildBlue
+        Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
           mySettings.Colors.MainDownA = Color.DarkBlue
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -789,7 +790,7 @@
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.Exede
+        Case SatHostTypes.WildBlue_EXEDE
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -817,7 +818,7 @@
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.RuralPortal
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -845,7 +846,7 @@
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.DishNet
+        Case SatHostTypes.DishNet_EXEDE
           mySettings.Colors.MainDownA = Color.DarkBlue
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red

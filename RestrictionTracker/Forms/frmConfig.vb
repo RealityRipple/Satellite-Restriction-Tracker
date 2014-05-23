@@ -692,7 +692,7 @@
         ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & Application.ProductName & ".")
       End If
     Else
-      txtInterval.Minimum = 60
+      txtInterval.Minimum = 30
       chkService.Enabled = False
       chkService.Checked = False
       ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service is not needed when using the Remote Service!")

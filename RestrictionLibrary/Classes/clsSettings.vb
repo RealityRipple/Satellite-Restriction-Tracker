@@ -41,13 +41,7 @@ Class AppSettings
                   If xName.CompareTo("Account") = 0 Then
                     m_Account = xValue
                     If m_node.Attributes.Count > 1 Then
-                      Select Case m_node.Attributes(1).InnerText
-                        Case "WildBlue" : m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue
-                        Case "Exede" : m_AccountType = localRestrictionTracker.SatHostTypes.Exede
-                        Case "DishNet" : m_AccountType = localRestrictionTracker.SatHostTypes.DishNet
-                        Case "RuralPortal" : m_AccountType = localRestrictionTracker.SatHostTypes.RuralPortal
-                        Case Else : m_AccountType = localRestrictionTracker.SatHostTypes.Other
-                      End Select
+                      m_AccountType = StringToHostType(m_node.Attributes(1).InnerText)
                     Else
                       m_AccountType = localRestrictionTracker.SatHostTypes.Other
                     End If

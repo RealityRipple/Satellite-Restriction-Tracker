@@ -1,4 +1,5 @@
-﻿Public Class frmMain
+﻿Imports RestrictionLibrary.localRestrictionTracker
+Public Class frmMain
   Private myPanel As SatHostTypes
 
   Private Enum LoadStates
@@ -121,7 +122,7 @@
       Dim Provider As String = state(0)
       Dim Sender As Object = state(1)
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
-        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.DishNet))
+        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.DishNet_EXEDE))
       Else
         If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
         sProvider = Provider & ".ruralportal.net"
@@ -175,15 +176,15 @@
         RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Other))
       Else
         If rpP > exP And rpP > wbP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.RuralPortal))
+          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.RuralPortal_EXEDE))
         ElseIf exP > rpP And exP > wbP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Exede))
+          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
         ElseIf wbP > rpP And wbP > exP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue))
+          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
         Else
           Debug.Print("RP: " & FormatPercent(rpP) & ", Ex: " & FormatPercent(exP) & ", WB: " & FormatPercent(wbP))
           If rpP > wbP And exP > wbP And rpP = exP Then
-            RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Exede))
+            RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
           Else
             RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Other))
             Stop
@@ -203,25 +204,25 @@
           End If
         Case Else
           If e.Result Then
-            RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.RuralPortal))
+            RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.RuralPortal_EXEDE))
           Else
             Dim rpP, exP, wbP As Single
             OfflineStats(rpP, exP, wbP)
             If rpP = 0 And exP = 0 And wbP = 0 Then
-              RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue))
+              RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
             Else
               If rpP > exP And rpP > wbP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.Exede))
+                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
               ElseIf exP > rpP And exP > wbP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.Exede))
+                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
               ElseIf wbP > rpP And wbP > exP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue))
+                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
               Else
                 Debug.Print("RP: " & FormatPercent(rpP) & ", Ex: " & FormatPercent(exP) & ", WB: " & FormatPercent(wbP))
                 If rpP > wbP And exP > wbP And rpP = exP Then
-                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.Exede))
+                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
                 Else
-                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue))
+                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
                 End If
               End If
             End If
@@ -454,7 +455,7 @@
     End If
   End Sub
   Private Sub ResizePanels()
-    If myPanel = SatHostTypes.WildBlue Then
+    If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.DishNet_EXEDE Then
       If wb_dlim = 0 And wb_ulim = 0 Then
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
@@ -464,7 +465,7 @@
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
       End If
-    ElseIf myPanel = SatHostTypes.Exede Then
+    ElseIf myPanel = SatHostTypes.WildBlue_EXEDE Then
       If e_lim = 0 Then
         pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, 0, 0, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = My.Resources.small
@@ -472,7 +473,7 @@
         pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, e_down, e_up, e_over, e_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateETrayIcon(e_down, e_up, e_lim)
       End If
-    ElseIf myPanel = SatHostTypes.RuralPortal Then
+    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EVOLUTION Then
       If r_lim = 0 Then
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = My.Resources.small
@@ -816,17 +817,15 @@
       End If
     End If
   End Sub
-
-  Private Sub localData_ConnectionDNResult(sender As Object, e As localRestrictionTracker.ConnectionDNResultEventArgs) Handles localData.ConnectionDNResult
+  Private Sub localData_ConnectionDNXResult(sender As Object, e As localRestrictionTracker.TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionDNResult), sender, e)
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionDNXResult), sender, e)
     Else
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
-      mySettings.DisplayType = SatHostTypes.DishNet
-      myPanel = SatHostTypes.DishNet
-      mySettings.AccountType = SatHostTypes.DishNet
+      myPanel = SatHostTypes.DishNet_EXEDE
+      mySettings.AccountType = SatHostTypes.DishNet_EXEDE
       mySettings.Save()
       If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -836,16 +835,69 @@
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionEResult(sender As Object, e As localRestrictionTracker.ConnectionEResultEventArgs) Handles localData.ConnectionEResult
+  Private Sub localData_ConnectionRPEResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionRPEResult
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionEResult), sender, e)
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPEResult), sender, e)
+    Else
+      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
+      myPanel = SatHostTypes.RuralPortal_EXEDE
+      mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+      mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
+      DisplayUsage(True, True)
+      If localData IsNot Nothing Then
+        localData.Dispose()
+        localData = Nothing
+      End If
+    End If
+  End Sub
+  Private Sub localData_ConnectionRPLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPLResult), sender, e)
+    Else
+      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
+      myPanel = SatHostTypes.RuralPortal_LEGACY
+      mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
+      mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
+      DisplayUsage(True, True)
+      If localData IsNot Nothing Then
+        localData.Dispose()
+        localData = Nothing
+      End If
+    End If
+  End Sub
+  Private Sub localData_ConnectionWBLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBLResult), sender, e)
+    Else
+      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
+      myPanel = SatHostTypes.WildBlue_LEGACY
+      mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
+      mySettings.Save()
+      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
+      DisplayUsage(True, True)
+      If localData IsNot Nothing Then
+        localData.Dispose()
+        localData = Nothing
+      End If
+    End If
+  End Sub
+  Private Sub localData_ConnectionWBXResult(sender As Object, e As localRestrictionTracker.TYPECResultEventArgs) Handles localData.ConnectionWBXResult
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
     Else
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.Limit + e.BuyMore, e.Upload, e.Over, True)
-      mySettings.DisplayType = SatHostTypes.Exede
-      myPanel = SatHostTypes.Exede
-      mySettings.AccountType = SatHostTypes.Exede
+      myPanel = SatHostTypes.WildBlue_EXEDE
+      mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       mySettings.Save()
       If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -855,16 +907,15 @@
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionEEResult(sender As Object, e As localRestrictionTracker.ConnectionRP2ResultEventArgs) Handles localData.ConnectionEEResult
+  Private Sub localData_ConnectionWBVResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionEEResult), sender, e)
+      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBVResult), sender, e)
     Else
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-      mySettings.DisplayType = SatHostTypes.RuralPortal
-      myPanel = SatHostTypes.RuralPortal
-      mySettings.AccountType = SatHostTypes.Exede
+      myPanel = SatHostTypes.WildBlue_EVOLUTION
+      mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
       mySettings.Save()
       If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -874,63 +925,8 @@
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionRP2Result(sender As Object, e As localRestrictionTracker.ConnectionRP2ResultEventArgs) Handles localData.ConnectionRP2Result
-    If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRP2Result), sender, e)
-    Else
-      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-      LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-      mySettings.DisplayType = SatHostTypes.RuralPortal
-      myPanel = SatHostTypes.RuralPortal
-      mySettings.AccountType = SatHostTypes.RuralPortal
-      mySettings.Save()
-      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
-      DisplayUsage(True, True)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-    End If
-  End Sub
-  Private Sub localData_ConnectionRP4Result(sender As Object, e As localRestrictionTracker.ConnectionRP4ResultEventArgs) Handles localData.ConnectionRP4Result
-    If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRP4Result), sender, e)
-    Else
-      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-      LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-      mySettings.DisplayType = SatHostTypes.WildBlue
-      myPanel = SatHostTypes.WildBlue
-      mySettings.AccountType = SatHostTypes.RuralPortal
-      mySettings.Save()
-      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
-      DisplayUsage(True, True)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-    End If
-  End Sub
-  Private Sub localData_ConnectionWBResult(sender As Object, e As localRestrictionTracker.ConnectionWBResultEventArgs) Handles localData.ConnectionWBResult
-    If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBResult), sender, e)
-    Else
-      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-      LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-      mySettings.DisplayType = SatHostTypes.WildBlue
-      myPanel = SatHostTypes.WildBlue
-      mySettings.AccountType = SatHostTypes.WildBlue
-      mySettings.Save()
-      If mySettings.Colors.MainUpA.A = 0 Then SetDefaultColors()
-      DisplayUsage(True, True)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-    End If
-  End Sub
+
+
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
@@ -1160,8 +1156,6 @@
     pnlExede.Visible = False
     pnlRural.Visible = True
     pnlNothing.Visible = False
-    mySettings.DisplayType = SatHostTypes.RuralPortal
-    mySettings.Save()
     r_used = lDown
     r_lim = lDownLim
     If tmrChanges IsNot Nothing Then
@@ -1216,8 +1210,6 @@
     pnlExede.Visible = False
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    mySettings.DisplayType = SatHostTypes.WildBlue
-    mySettings.Save()
     wb_down = lDown
     wb_dlim = lDownLim
     wb_up = lUp
@@ -1316,8 +1308,6 @@
     pnlExede.Visible = True
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    mySettings.DisplayType = SatHostTypes.Exede
-    mySettings.Save()
     e_down = lDown
     e_up = lUp
     e_over = lOver
@@ -1408,8 +1398,6 @@
     pnlExede.Visible = False
     pnlRural.Visible = False
     pnlNothing.Visible = False
-    mySettings.DisplayType = SatHostTypes.WildBlue
-    mySettings.Save()
     wb_down = lDown
     wb_dlim = lDownLim
     wb_up = lUp
@@ -1502,12 +1490,12 @@
     If lDownLim > 0 Or lUpLim > 0 Then
       Dim lastUpdate As Date = LOG_GetLast()
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
-      myPanel = mySettings.DisplayType
-      Select Case mySettings.DisplayType
-        Case SatHostTypes.RuralPortal : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.DishNet : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.WildBlue : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.Exede
+      myPanel = mySettings.AccountType
+      Select Case mySettings.AccountType
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.DishNet_EXEDE : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.WildBlue_EXEDE
           If mySettings.HistoryInversion Then
             DisplayEResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
           Else
@@ -2177,10 +2165,8 @@
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
     Else
-      Dim useStyle As SatHostTypes = mySettings.DisplayType
-      If useStyle = SatHostTypes.Other Then useStyle = mySettings.AccountType
-      Select Case useStyle
-        Case SatHostTypes.WildBlue
+      Select Case mySettings.AccountType
+        Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
           mySettings.Colors.MainDownA = Color.DarkBlue
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -2207,7 +2193,7 @@
           mySettings.Colors.HistoryUpMax = Color.Yellow
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
-        Case SatHostTypes.Exede
+        Case SatHostTypes.WildBlue_EXEDE
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -2235,7 +2221,7 @@
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.RuralPortal
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red
@@ -2263,7 +2249,7 @@
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.DishNet
+        Case SatHostTypes.DishNet_EXEDE
 
           mySettings.Colors.MainDownA = Color.DarkBlue
           mySettings.Colors.MainDownB = Color.Transparent

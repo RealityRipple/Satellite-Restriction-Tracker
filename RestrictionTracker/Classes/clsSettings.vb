@@ -1,4 +1,6 @@
 ﻿Imports System.Xml.Linq
+Imports RestrictionLibrary.localRestrictionTracker
+
 Class SvcSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
@@ -151,7 +153,7 @@ End Class
 Class AppSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
-  Private m_DisplayType As SatHostTypes
+
   Private m_Interval As Integer
   Private m_Gr As String
   Private m_LastUpdate As Date
@@ -216,7 +218,6 @@ Class AppSettings
       If xAccount Is Nothing Then
         m_Account = String.Empty
         m_AccountType = SatHostTypes.Other
-        m_DisplayType = SatHostTypes.Other
       Else
         Try
           m_Account = xAccount.Element("value").Value
@@ -228,32 +229,10 @@ Class AppSettings
           If xAccountType Is Nothing Then
             m_AccountType = SatHostTypes.Other
           Else
-            Select Case xAccountType.Value
-              Case "WildBlue" : m_AccountType = SatHostTypes.WildBlue
-              Case "Exede" : m_AccountType = SatHostTypes.Exede
-              Case "DishNet" : m_AccountType = SatHostTypes.DishNet
-              Case "RuralPortal" : m_AccountType = SatHostTypes.RuralPortal
-              Case Else : m_AccountType = SatHostTypes.Other
-            End Select
+            m_AccountType = StringToHostType(xAccountType.Value)
           End If
         Catch ex As Exception
           m_AccountType = SatHostTypes.Other
-        End Try
-        Try
-          Dim xDisplayType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "display")
-          If xDisplayType Is Nothing Then
-            m_DisplayType = SatHostTypes.Other
-          Else
-            Select Case xDisplayType.Value
-              Case "WB" : m_DisplayType = SatHostTypes.WildBlue
-              Case "E" : m_DisplayType = SatHostTypes.Exede
-              Case "DN" : m_DisplayType = SatHostTypes.DishNet
-              Case "RP" : m_DisplayType = SatHostTypes.RuralPortal
-              Case Else : m_DisplayType = SatHostTypes.Other
-            End Select
-          End If
-        Catch ex As Exception
-          m_DisplayType = SatHostTypes.Other
         End Try
       End If
       Dim xInterval As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Interval")
@@ -793,7 +772,6 @@ Class AppSettings
   Private Sub Reset()
     m_Account = Nothing
     m_AccountType = SatHostTypes.Other
-    m_DisplayType = SatHostTypes.Other
     m_Interval = 15
     m_Gr = "aph"
     m_LastUpdate = New Date(2000, 1, 1)
@@ -854,26 +832,11 @@ Class AppSettings
   End Sub
 
   Public Sub Save()
-    Dim sAccountType As String = "O"
-    Dim sDisplayType As String = "O"
-    Select Case m_AccountType
-      Case SatHostTypes.WildBlue : sAccountType = "WildBlue"
-      Case SatHostTypes.Exede : sAccountType = "Exede"
-      Case SatHostTypes.DishNet : sAccountType = "DishNet"
-      Case SatHostTypes.RuralPortal : sAccountType = "RuralPortal"
-      Case Else : sAccountType = "Other"
-    End Select
-    Select Case m_DisplayType
-      Case SatHostTypes.WildBlue : sDisplayType = "WB"
-      Case SatHostTypes.Exede : sDisplayType = "E"
-      Case SatHostTypes.DishNet : sDisplayType = "DN"
-      Case SatHostTypes.RuralPortal : sDisplayType = "RP"
-      Case Else : sAccountType = "O"
-    End Select
+    Dim sAccountType As String = HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
-                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XAttribute("display", sDisplayType), New XElement("value", m_Account)),
+                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Gr"), New XElement("value", m_Gr)),
@@ -1033,14 +996,6 @@ Class AppSettings
     End Get
     Set(value As SatHostTypes)
       m_AccountType = value
-    End Set
-  End Property
-  Public Property DisplayType As SatHostTypes
-    Get
-      Return m_DisplayType
-    End Get
-    Set(value As SatHostTypes)
-      m_DisplayType = value
     End Set
   End Property
   Public Property PassCrypt As String
