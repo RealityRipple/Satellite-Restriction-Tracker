@@ -18,6 +18,44 @@ Module modFunctions
     Do While sVal.Length < Length : sVal = "0" & sVal : Loop
     Return sVal
   End Function
+  Public Function NetworkErrorToString(ex As System.Exception, sDataPath As String)
+    Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
+    If ex.InnerException Is Nothing Then
+      If ex.Message.StartsWith("The remote name could not be resolved:") Then
+        Return "Could not connect to your DNS. Check your internet connection."
+      ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
+        If ex.Message.Contains("504") Then
+          Return "The server timed out."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If ex.Message.Contains(")") Then
+            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(")") + 1).Trim
+          Else
+            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(":") + 1).Trim
+          End If
+        End If
+      Else
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+        Return ex.Message
+      End If
+    Else
+      If ex.Message.StartsWith("Unable to connect to the remote server") Then
+        If ex.InnerException.Message.StartsWith("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "The server did not respond. Check your internet connection."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
+          Return "The host is unreachable. Check your local network."
+        ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
+          Return "The network is unreachable. Check your internet connection."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Can't connect to the server - " & ex.InnerException.Message
+        End If
+      Else
+        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+        Return ex.Message & " - " & ex.InnerException.Message
+      End If
+    End If
+  End Function
   Public Delegate Sub ReportSocketErrorInvoker(ex As Exception, DataPath As String)
   Public Sub ReportSocketError(ex As Exception, DataPath As String)
     Dim ReportList As String = DataPath & "\sckerrs.log"
