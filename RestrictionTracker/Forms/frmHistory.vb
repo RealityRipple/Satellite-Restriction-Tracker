@@ -460,6 +460,7 @@ Public Class frmHistory
   Private Sub cmd30Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd30Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From30DaysAgo As Date
+    Dim bClose As Boolean = False
     If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
       If DateAdd(DateInterval.Day, -30, RightNow) > dtpFrom.MaxDate Then
         From30DaysAgo = dtpFrom.MaxDate
@@ -470,16 +471,25 @@ Public Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
+        If fDB Is Nothing Then fDB = New frmDBProgress
+        If Not fDB.Visible Then
+          fDB.Show(Me)
+          bClose = True
+        End If
+        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
         For I As Integer = usageDB.Count - 1 To 1 Step -1
+          fDB.SetProgress(usageDB.Count - I, usageDB.Count)
           If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-              From30DaysAgo = dtpFrom.MaxDate
-            ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-              From30DaysAgo = dtpFrom.MinDate
-            Else
-              From30DaysAgo = usageDB(I).DATETIME
+            If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
+              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                From30DaysAgo = dtpFrom.MaxDate
+              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                From30DaysAgo = dtpFrom.MinDate
+              Else
+                From30DaysAgo = usageDB(I).DATETIME
+              End If
+              Exit For
             End If
-            Exit For
           End If
         Next
       Else
@@ -505,10 +515,18 @@ Public Class frmHistory
     dtpFrom.Value = From30DaysAgo
     dtpTo.Value = ToNow
     cmdQuery.PerformClick()
+    If bClose Then
+      If fDB IsNot Nothing Then
+        If fDB.Visible Then fDB.Close()
+        fDB.Dispose()
+        fDB = Nothing
+      End If
+    End If
   End Sub
   Private Sub cmd60Days_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmd60Days.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From60DaysAgo As Date
+    Dim bClose As Boolean = False
     If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
       If DateAdd(DateInterval.Day, -60, RightNow) > dtpFrom.MaxDate Then
         From60DaysAgo = dtpFrom.MaxDate
@@ -519,19 +537,28 @@ Public Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
+        If fDB Is Nothing Then fDB = New frmDBProgress
+        If Not fDB.Visible Then
+          fDB.Show(Me)
+          bClose = True
+        End If
+        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
         Dim Finds As Integer = 0
         For I As Integer = usageDB.Count - 1 To 1 Step -1
+          fDB.SetProgress(usageDB.Count - I, usageDB.Count)
           If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            Finds += 1
-            If Finds = 2 Then
-              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-                From60DaysAgo = dtpFrom.MaxDate
-              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-                From60DaysAgo = dtpFrom.MinDate
-              Else
-                From60DaysAgo = usageDB(I).DATETIME
+            If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
+              Finds += 1
+              If Finds = 2 Then
+                If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                  From60DaysAgo = dtpFrom.MaxDate
+                ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                  From60DaysAgo = dtpFrom.MinDate
+                Else
+                  From60DaysAgo = usageDB(I).DATETIME
+                End If
+                Exit For
               End If
-              Exit For
             End If
           End If
         Next
@@ -559,6 +586,13 @@ Public Class frmHistory
     dtpFrom.Value = From60DaysAgo
     dtpTo.Value = ToNow
     cmdQuery.PerformClick()
+    If bClose Then
+      If fDB IsNot Nothing Then
+        If fDB.Visible Then fDB.Close()
+        fDB.Dispose()
+        fDB = Nothing
+      End If
+    End If
   End Sub
   Private Sub cmdAllTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAllTime.Click
     dtpFrom.Value = dtpFrom.MinDate

@@ -987,7 +987,7 @@ Module modFunctions
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         'If Data(J).DATETIME.Date = DateAdd(dInterval, I, lStart).Date Then
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jLim As Long = IIf(Down, Data(J).DOWNLIM, Data(J).UPLIM)
           If lHigh < jLim Then
             lHigh = jLim
@@ -1021,7 +1021,7 @@ Module modFunctions
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         'If Data(J).DATETIME.Date = DateAdd(dInterval, I, lStart).Date Then If lVal < IIf(Down, Data(J).DOWNLOAD, Data(J).UPLOAD) Then lVal = IIf(Down, Data(J).DOWNLOAD, Data(J).UPLOAD)
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jVal As Long = IIf(Down, Data(J).DOWNLOAD, Data(J).UPLOAD)
           If lHigh < jVal Then
             lHigh = jVal
@@ -1177,8 +1177,6 @@ Module modFunctions
     Else
       MaxY = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
     End If
-    'Dim WarnY As Integer = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM * 0.7 / lMax * yHeight)
-
     Dim lMaxPoints(lMaxTime) As Point
     Dim lastLVal As Long = 0
 
@@ -1187,7 +1185,7 @@ Module modFunctions
       Dim lLow As Long = Long.MaxValue
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           If Invert Then
             If lHigh < Data(J).UPLIM Then
               lHigh = Data(J).UPLIM
@@ -1203,7 +1201,6 @@ Module modFunctions
               lLow = Data(J).DOWNLIM
             End If
           End If
-          'If lVal < Data(J).DOWNLIM Then lVal = Data(J).DOWNLIM
         End If
       Next
 
@@ -1222,25 +1219,28 @@ Module modFunctions
     Dim lastUVal As Long = 0
     Dim lastOVal As Long = 0
     For I As Long = 0 To lMaxTime
-      Dim lDVal As Long = 0
-      Dim lUVal As Long = 0
-      Dim lOVal As Long = 0
+      Dim lDRange As New Collections.Generic.List(Of Long)
+      Dim lDVal As Long = -1
+      Dim lURange As New Collections.Generic.List(Of Long)
+      Dim lUVal As Long = -1
+      Dim lORange As New Collections.Generic.List(Of Long)
+      Dim lOVal As Long = -1
       Dim lDLow As Long = Long.MaxValue
-      Dim lDHigh As Long = 0
+      Dim lDHigh As Long = -1
       Dim lULow As Long = Long.MaxValue
-      Dim lUHigh As Long = 0
+      Dim lUHigh As Long = -1
       Dim lOLow As Long = Long.MaxValue
-      Dim lOHigh As Long = 0
+      Dim lOHigh As Long = -1
 
       For J As Integer = 0 To Data.Length - 1
-        'If Data(J).DATETIME.Date = DateAdd(dInterval, I, lStart).Date Then
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
-
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jDVal As Long = Data(J).DOWNLOAD
+          lDRange.Add(jDVal)
           If lDHigh < jDVal Then lDHigh = jDVal
           If lDLow > jDVal Then lDLow = jDVal
 
           Dim jUVal As Long = Data(J).UPLOAD
+          lURange.Add(jUVal)
           If lUHigh < jUVal Then lUHigh = jUVal
           If lULow > jUVal Then lULow = jUVal
 
@@ -1254,29 +1254,57 @@ Module modFunctions
               jOVal = Data(J).UPLIM
             End If
           End If
+          lORange.Add(jOVal)
           If lOHigh < jOVal Then lOHigh = jOVal
           If lOLow > jOVal Then lOLow = jOVal
-
-          'If lDVal < Data(J).DOWNLOAD Then lDVal = Data(J).DOWNLOAD
-          'If lUVal < Data(J).UPLOAD Then lUVal = Data(J).UPLOAD
         End If
       Next
-      If lDHigh > 0 And lDLow < Long.MaxValue Then lDVal = (lDHigh + lDLow) / 2
-      If lDVal = -1 And lastDVal > 0 Then lDVal = lastDVal
-      If lUHigh > 0 And lULow < Long.MaxValue Then lUVal = (lUHigh + lULow) / 2
-      If lUVal = -1 And lastUVal > 0 Then lUVal = lastUVal
-      If lOHigh > 0 And lOLow < Long.MaxValue Then lOVal = (lOHigh + lOLow) / 2
-      If lOVal = -1 And lastOVal > 0 Then lOVal = lastOVal
+
+      If lDHigh > -1 And lDLow < Long.MaxValue Then
+        Dim Nulls As Integer = lDRange.FindAll(Function(val As Long) val = 0).Count
+        If Nulls > lDRange.Count * 0.4 Then
+          lDVal = 0
+        Else
+          lDVal = lDHigh
+        End If
+      ElseIf lastDVal > 0 Then
+        lDVal = lastDVal
+      End If
+
+      If lUHigh > -1 And lULow < Long.MaxValue Then
+        Dim Nulls As Integer = lURange.FindAll(Function(val As Long) val = 0).Count
+        If Nulls > lURange.Count * 0.4 Then
+          lUVal = 0
+        Else
+          lUVal = lUHigh
+        End If
+      ElseIf lastUVal > 0 Then
+        lUVal = lastUVal
+      End If
+
+      If lOHigh > -1 And lOLow < Long.MaxValue Then
+        Dim Nulls As Integer = lORange.FindAll(Function(val As Long) val = 0).Count
+        If Nulls > lORange.Count * 0.4 Then
+          lOVal = 0
+        Else
+          lOVal = lOHigh
+        End If
+      ElseIf lastOVal > 0 Then
+        lOVal = lastOVal
+      End If
 
       lUPoints(I).X = lYWidth + (I * dCompInter)
       lUPoints(I).Y = yTop + yHeight - (lUVal / lMax * yHeight)
+
       lDPoints(I).X = lYWidth + (I * dCompInter) '           '''\/'''
       lDPoints(I).Y = yTop + yHeight - (lDVal / lMax * yHeight) - (yTop + yHeight - lUPoints(I).Y) ''''
+
       lOPoints(I).X = lYWidth + (I * dCompInter)
       lOPoints(I).Y = yTop + yHeight - (lOVal / lMax * yHeight) - (yTop + yHeight - lDPoints(I).Y)
-      lastDVal = lDVal
-      lastUVal = lUVal
-      lastOVal = lOVal
+
+      If lDVal > 0 Then lastDVal = lDVal
+      If lUVal > 0 Then lastUVal = lUVal
+      If lOVal > 0 Then lastOVal = lOVal
     Next I
     lTypes(0) = Drawing2D.PathPointType.Start
     For I As Long = 1 To lMaxTime + 2
@@ -1310,7 +1338,6 @@ Module modFunctions
     g.FillPath(dBrush, New Drawing2D.GraphicsPath(lDPoints, lTypes))
     g.FillPath(uBrush, New Drawing2D.GraphicsPath(lUPoints, lTypes))
     g.FillRectangle(New Drawing2D.HatchBrush(Drawing2D.HatchStyle.DottedGrid, Color.FromArgb(192, ColorBG), Color.Transparent), lYWidth, yTop - 1, ImgSize.Width, MaxY - yTop + 1)
-    'g.FillRectangle(New Drawing2D.HatchBrush(Drawing2D.HatchStyle.NarrowHorizontal, Color.FromArgb(128, Color.Yellow), Color.Transparent), lYWidth, MaxY + 1, ImgSize.Width, CInt(Data(Data.Length - 1).DOWNLIM * 0.3 / lMax * yHeight))
     g.DrawLines(New Pen(New SolidBrush(Color.FromArgb(96, ColorMax)), 5), lMaxPoints)
     g.Dispose()
     Return iPic
@@ -1421,7 +1448,7 @@ Module modFunctions
       Dim lLow As Long = Long.MaxValue
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           If lHigh < Data(J).DOWNLIM Then
             lHigh = Data(J).DOWNLIM
           End If
@@ -1448,7 +1475,7 @@ Module modFunctions
       Dim lLow As Long = Long.MaxValue
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) < 2 Then
+        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           If lHigh < Data(J).DOWNLOAD Then
             lHigh = Data(J).DOWNLOAD
           End If
