@@ -1402,6 +1402,17 @@
     If ex.InnerException Is Nothing Then
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
         Return "Could not connect to your DNS. Check your internet connection."
+      ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
+        If ex.Message.Contains("504") Then
+          Return "The server timed out."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If ex.Message.Contains(")") Then
+            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(")") + 1).Trim
+          Else
+            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(":") + 1).Trim
+          End If
+        End If
       Else
         reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
