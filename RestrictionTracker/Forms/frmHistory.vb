@@ -469,27 +469,31 @@ Public Class frmHistory
         From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
       End If
     Else
-      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
-        For I As Integer = usageDB.Count - 1 To 1 Step -1
-          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-              From30DaysAgo = dtpFrom.MaxDate
-            ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-              From30DaysAgo = dtpFrom.MinDate
-            Else
-              From30DaysAgo = usageDB(I).DATETIME
+      If usageDB IsNot Nothing Then
+        If usageDB.Count > 1 Then
+          For I As Integer = usageDB.Count - 1 To 1 Step -1
+            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                From30DaysAgo = dtpFrom.MaxDate
+              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                From30DaysAgo = dtpFrom.MinDate
+              Else
+                From30DaysAgo = usageDB(I).DATETIME
+              End If
+              Exit For
             End If
-            Exit For
-          End If
-        Next
-      Else
-        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
-          From30DaysAgo = dtpFrom.MaxDate
-        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
-          From30DaysAgo = dtpFrom.MinDate
+          Next
         Else
-          From30DaysAgo = usageDB(0).DATETIME
+          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+            From30DaysAgo = dtpFrom.MaxDate
+          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+            From30DaysAgo = dtpFrom.MinDate
+          Else
+            From30DaysAgo = usageDB(0).DATETIME
+          End If
         End If
+      Else
+        From30DaysAgo = dtpFrom.MinDate
       End If
     End If
     Dim ToNow As Date
@@ -518,32 +522,36 @@ Public Class frmHistory
         From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
       End If
     Else
-      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
-        Dim Finds As Integer = 0
-        For I As Integer = usageDB.Count - 1 To 1 Step -1
-          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            Finds += 1
-            If Finds = 2 Then
-              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-                From60DaysAgo = dtpFrom.MaxDate
-              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-                From60DaysAgo = dtpFrom.MinDate
-              Else
-                From60DaysAgo = usageDB(I).DATETIME
+      If usageDB IsNot Nothing Then
+        If usageDB.Count > 1 Then
+          Dim Finds As Integer = 0
+          For I As Integer = usageDB.Count - 1 To 1 Step -1
+            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+              Finds += 1
+              If Finds = 2 Then
+                If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                  From60DaysAgo = dtpFrom.MaxDate
+                ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                  From60DaysAgo = dtpFrom.MinDate
+                Else
+                  From60DaysAgo = usageDB(I).DATETIME
+                End If
+                Exit For
               End If
-              Exit For
             End If
-          End If
-        Next
-        If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
-      Else
-        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
-          From60DaysAgo = dtpFrom.MaxDate
-        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
-          From60DaysAgo = dtpFrom.MinDate
+          Next
+          If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
         Else
-          From60DaysAgo = usageDB(0).DATETIME
+          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+            From60DaysAgo = dtpFrom.MaxDate
+          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+            From60DaysAgo = dtpFrom.MinDate
+          Else
+            From60DaysAgo = usageDB(0).DATETIME
+          End If
         End If
+      Else
+        From60DaysAgo = dtpFrom.MinDate
       End If
     End If
     Dim ToNow As Date
