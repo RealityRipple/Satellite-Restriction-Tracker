@@ -551,17 +551,18 @@ Public Class frmHistory
           For I As Integer = usageDB.Count - 1 To 1 Step -1
             fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
-              Finds += 1
-              If Finds = 2 Then
-                If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-                  From60DaysAgo = dtpFrom.MaxDate
-                ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-                  From60DaysAgo = dtpFrom.MinDate
-                Else
-                  From60DaysAgo = usageDB(I).DATETIME
+              If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
+                Finds += 1
+                If Finds = 2 Then
+                  If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                    From60DaysAgo = dtpFrom.MaxDate
+                  ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                    From60DaysAgo = dtpFrom.MinDate
+                  Else
+                    From60DaysAgo = usageDB(I).DATETIME
+                  End If
+                  Exit For
                 End If
-                Exit For
               End If
             End If
           Next
