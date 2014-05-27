@@ -23,9 +23,15 @@ Module modFunctions
     If ex.InnerException Is Nothing Then
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
         Return "Could not connect to your DNS. Check your internet connection."
+      ElseIf ex.Message.StartsWith("The underlying connection was closed: The connection was closed unexpectedly.") Then
+        Return "Connection to server dropped. Please try again."
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
-        If ex.Message.Contains("504") Then
-          Return "The server timed out."
+        If ex.Message.Contains("400") Then
+          Return "The server did not like the request. Please try again."
+        ElseIf ex.Message.Contains("503") Then
+          Return "The server is temporarily unavailable. Please try again later."
+        ElseIf ex.Message.Contains("504") Then
+          Return "The server timed out. Please try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           If ex.Message.Contains(")") Then
@@ -49,6 +55,20 @@ Module modFunctions
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
+        End If
+      ElseIf ex.Message.StartsWith("An exception occurred during a WebClient request") Then
+        If ex.InnerException.Message.StartsWith("Received an unexpected EOF or 0 bytes from the transport stream") Then
+          Return "Received empty response from server. Please try again."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Error during request - " & ex.InnerException.Message
+        End If
+      ElseIf ex.Message.StartsWith("Error getting response stream") Then
+        If ex.InnerException.Message.StartsWith("BeginWrite failure") Then
+          Return "Could not write response data. Check your local network."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Error during response - " & ex.InnerException.Message
         End If
       Else
         reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)

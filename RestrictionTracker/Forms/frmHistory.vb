@@ -470,36 +470,40 @@ Public Class frmHistory
         From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
       End If
     Else
-      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
-        If fDB Is Nothing Then fDB = New frmDBProgress
-        If Not fDB.Visible Then
-          fDB.Show(Me)
-          bClose = True
-        End If
-        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
-        For I As Integer = usageDB.Count - 1 To 1 Step -1
-          fDB.SetProgress(usageDB.Count - I, usageDB.Count)
-          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
-            If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
-              If usageDB(I).DATETIME > dtpFrom.MaxDate Then
-                From30DaysAgo = dtpFrom.MaxDate
-              ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
-                From30DaysAgo = dtpFrom.MinDate
-              Else
-                From30DaysAgo = usageDB(I).DATETIME
-              End If
-              Exit For
-            End If
+      If usageDB IsNot Nothing Then
+        If usageDB.Count > 1 Then
+          If fDB Is Nothing Then fDB = New frmDBProgress
+          If Not fDB.Visible Then
+            fDB.Show(Me)
+            bClose = True
           End If
-        Next
-      Else
-        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
-          From30DaysAgo = dtpFrom.MaxDate
-        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
-          From30DaysAgo = dtpFrom.MinDate
+          fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
+          For I As Integer = usageDB.Count - 1 To 1 Step -1
+            fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+              If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
+                If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                  From30DaysAgo = dtpFrom.MaxDate
+                ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                  From30DaysAgo = dtpFrom.MinDate
+                Else
+                  From30DaysAgo = usageDB(I).DATETIME
+                End If
+                Exit For
+              End If
+            End If
+          Next
         Else
-          From30DaysAgo = usageDB(0).DATETIME
+          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+            From30DaysAgo = dtpFrom.MaxDate
+          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+            From30DaysAgo = dtpFrom.MinDate
+          Else
+            From30DaysAgo = usageDB(0).DATETIME
+          End If
         End If
+      Else
+        From30DaysAgo = dtpFrom.MinDate
       End If
     End If
     Dim ToNow As Date
@@ -536,17 +540,17 @@ Public Class frmHistory
         From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
       End If
     Else
-      If usageDB IsNot Nothing AndAlso usageDB.Count > 1 Then
-        If fDB Is Nothing Then fDB = New frmDBProgress
-        If Not fDB.Visible Then
-          fDB.Show(Me)
-          bClose = True
-        End If
-        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
-        Dim Finds As Integer = 0
-        For I As Integer = usageDB.Count - 1 To 1 Step -1
-          fDB.SetProgress(usageDB.Count - I, usageDB.Count)
-          If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+      If usageDB IsNot Nothing Then
+        If usageDB.Count > 1 Then
+          If Not fDB.Visible Then
+            fDB.Show(Me)
+            bClose = True
+          End If
+          fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
+          Dim Finds As Integer = 0
+          For I As Integer = usageDB.Count - 1 To 1 Step -1
+            fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
             If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
               Finds += 1
               If Finds = 2 Then
@@ -560,17 +564,19 @@ Public Class frmHistory
                 Exit For
               End If
             End If
-          End If
-        Next
-        If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
-      Else
-        If usageDB(0).DATETIME > dtpFrom.MaxDate Then
-          From60DaysAgo = dtpFrom.MaxDate
-        ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
-          From60DaysAgo = dtpFrom.MinDate
+          Next
+          If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
         Else
-          From60DaysAgo = usageDB(0).DATETIME
+          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+            From60DaysAgo = dtpFrom.MaxDate
+          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+            From60DaysAgo = dtpFrom.MinDate
+          Else
+            From60DaysAgo = usageDB(0).DATETIME
+          End If
         End If
+      Else
+        From60DaysAgo = dtpFrom.MinDate
       End If
     End If
     Dim ToNow As Date
