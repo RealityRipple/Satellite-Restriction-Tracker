@@ -542,6 +542,7 @@ Public Class frmHistory
     Else
       If usageDB IsNot Nothing Then
         If usageDB.Count > 1 Then
+          If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
             fDB.Show(Me)
             bClose = True
