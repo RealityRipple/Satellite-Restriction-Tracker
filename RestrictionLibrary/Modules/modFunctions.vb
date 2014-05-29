@@ -3,6 +3,7 @@ Module modFunctions
   Public Const LATIN_1 As Integer = 28591
   Public Function PercentEncode(inString As String) As String
     Dim sRet As String = String.Empty
+    If String.IsNullOrEmpty(inString) Then Return inString
     For I As Integer = inString.Length - 1 To 0 Step -1
       Dim iChar As Integer = Convert.ToInt32(inString(I))
       Select Case iChar
