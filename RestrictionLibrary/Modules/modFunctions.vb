@@ -23,14 +23,23 @@ Module modFunctions
     Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
     If ex.InnerException Is Nothing Then
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
-        Return "Could not connect to your DNS. Check your internet connection."
-      ElseIf ex.Message.StartsWith("The underlying connection was closed: The connection was closed unexpectedly.") Then
-        Return "Connection to server dropped. Please try again."
+        Return "Could not connect to your DNS. Check your Internet connection."
+      ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
+        If ex.Message.Contains("The connection was closed unexpectedly") Then
+          Return "Connection to server dropped. Please try again."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Connection to server closed - " & ex.InnerException.Message
+        End If
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
           Return "The server did not like the request. Please try again."
+        ElseIf ex.Message.Contains("405") Then
+          Return "The server did not like the method. Please try again."
+        ElseIf ex.Message.Contains("502") Then
+          Return "The gateway is unavailable. Please try again later."
         ElseIf ex.Message.Contains("503") Then
-          Return "The server is temporarily unavailable. Please try again later."
+          Return "The server is unavailable. Please try again later."
         ElseIf ex.Message.Contains("504") Then
           Return "The server timed out. Please try again."
         Else
@@ -41,6 +50,15 @@ Module modFunctions
             Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(":") + 1).Trim
           End If
         End If
+      ElseIf ex.Message = "The request timed out" Then
+        Return "Connection to the server timed out. Please try again."
+      ElseIf ex.Message.StartsWith("Error:") Then
+        If ex.Message.Contains("NameResolutionFailure") Then
+          Return "Could not connect to your DNS. Check your Internet connection."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Error - " & ex.Message
+        End If
       Else
         reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
@@ -48,11 +66,15 @@ Module modFunctions
     Else
       If ex.Message.StartsWith("Unable to connect to the remote server") Then
         If ex.InnerException.Message.StartsWith("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
-          Return "The server did not respond. Check your internet connection."
+          Return "The server did not respond. Check your Internet connection."
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
           Return "The host is unreachable. Check your local network."
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
-          Return "The network is unreachable. Check your internet connection."
+          Return "The network is unreachable. Check your Internet connection."
+        ElseIf ex.InnerException.Message.StartsWith("No connection could be made because the target machine actively refused it") Then
+          Return "The server refused the connection. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("An attempt was made to access a socket in a way forbidden by its access permissions") Then
+          Return "The connection was forbidden. Please check your local network and firewall settings."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
@@ -67,9 +89,54 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("Error getting response stream") Then
         If ex.InnerException.Message.StartsWith("BeginWrite failure") Then
           Return "Could not write response data. Check your local network."
+        ElseIf ex.Message.Contains("ReadDone2") Then
+          Return "Received empty response from server. Please try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during response - " & ex.InnerException.Message
+        End If
+      ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
+        If ex.Message.Contains("An unexpected error occurred on a send") Then
+          If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
+            If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
+              Return "The server is too busy. Please try again later."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Connection to server failed to read - " & ex.InnerException.Message
+            End If
+          ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
+            Return "The server closed the connection. Please try again."
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
+          End If
+        ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
+          If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
+            If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.") Then
+              Return "Connection to the server timed out. Please try again."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Read failure - " & ex.InnerException.Message
+            End If
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Receive failure - " & ex.InnerException.Message
+          End If
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Connection to server closed - " & ex.InnerException.Message
+        End If
+      ElseIf ex.Message.StartsWith("Error:") Then
+        If ex.Message.Contains("ConnectFailure") Then
+          If ex.InnerException.Message.Contains("No route to host") Then
+            Return "Could not connect to the server. Check your Internet connection."
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Connection Error - " & ex.InnerException.Message
+          End If
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Error - " & ex.Message
         End If
       Else
         reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)

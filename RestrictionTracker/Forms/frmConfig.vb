@@ -435,7 +435,7 @@
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "There is no data on your account yet!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoPassword : sErr = "Your account has no password registered to it!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your internet connection."
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection."
       End Select
       If remoteTest IsNot Nothing Then
         remoteTest.Dispose()
