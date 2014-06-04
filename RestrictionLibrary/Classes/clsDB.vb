@@ -59,10 +59,11 @@ Public Class DataBase
         m_xmld.Load(sPath)
         Dim m_nodelist As XmlNodeList = m_xmld.ChildNodes(1).ChildNodes
         Dim I As Integer = 0
+        Dim iMax As Integer = m_nodelist.Count
         If isNew Then ReDim data(m_nodelist.Count - 1)
         For Each m_node As XmlNode In m_nodelist
           I += 1
-          If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, m_nodelist.Count))
+          If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, iMax))
           Dim sDT, sD, sDL, sU, sUL As String : sDT = "0" : sD = "0" : sDL = "0" : sU = "0" : sUL = "0"
           For Each m_child As XmlNode In m_node.ChildNodes
             Select Case m_child.Name
@@ -181,8 +182,9 @@ Public Class DataBase
     End If
   End Sub
   Public Sub Merge(db As DataBase, withDisplay As Boolean)
+    Dim dbCount As Integer = db.Count
     For I As Integer = 0 To db.Count - 1
-      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1, db.Count))
+      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1, dbCount))
       Add(db.data(I))
     Next
   End Sub
@@ -270,9 +272,10 @@ Public Class DataBase
     Dim sDB As String = "<?xml version=""1.0"" standalone=""yes""?>" & vbNewLine &
                         "<RestrictionTrackerUsage>" & vbNewLine
     Sort()
+    Dim uLen As ULong = CULng(data.LongLength)
     For I As UInt64 = 0 To data.LongLength - 1
       Dim dRow As DataRow = data(I)
-      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, CULng(data.LongLength)))
+      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uLen))
       sDB &= "  <History>" & vbNewLine &
              "    <DATETIME>" & dRow.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
              "    <DOWNLOAD>" & dRow.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
@@ -296,7 +299,7 @@ Public Class DataBase
           Using nOut As New IO.StreamWriter(nWrite)
             nOut.WriteLine("<?xml version=""1.0"" standalone=""yes""?>")
             nOut.WriteLine("<RestrictionTrackerUsage>")
-            Dim uData As UInt64 = data.LongLength
+            Dim uData As UInt64 = CULng(data.LongLength)
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
@@ -314,7 +317,7 @@ Public Class DataBase
       ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".wb") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.BinaryWriter(nWrite)
-            Dim uData As UInt64 = data.LongLength
+            Dim uData As UInt64 = CULng(data.LongLength)
             SAVE_Write(nOut, uData)
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)
@@ -331,7 +334,7 @@ Public Class DataBase
       ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".csv") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.OpenOrCreate, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.StreamWriter(nWrite)
-            Dim uData As UInt64 = data.LongLength
+            Dim uData As UInt64 = CULng(data.LongLength)
             nOut.WriteLine("Time,Download,Download Limit,Upload,Upload Limit")
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)

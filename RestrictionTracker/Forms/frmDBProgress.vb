@@ -12,6 +12,7 @@
     Application.DoEvents()
   End Sub
   Public Sub SetProgress(Current As Integer, Total As Integer)
+    If Current > Total Then Current = Total
     Dim bRefresh As Boolean = False
     Dim sPercent As String = FormatPercent(Current / Total, 0, TriState.False, TriState.False, TriState.False)
     If Not lblPercentage.Text = sPercent Then lblPercentage.Text = sPercent : bRefresh = True
@@ -25,6 +26,7 @@
     If bRefresh Then Application.DoEvents()
   End Sub
   Public Sub SetProgress(Current As UInt64, Total As UInt64)
+    If Current > Total Then Current = Total
     Dim bRefresh As Boolean = False
     Dim sPercent As String = FormatPercent(Current / Total, 0, TriState.False, TriState.False, TriState.False)
     If Not lblPercentage.Text = sPercent Then lblPercentage.Text = sPercent : bRefresh = True
