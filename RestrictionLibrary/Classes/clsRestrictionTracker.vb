@@ -21,6 +21,7 @@
     TableDownloadRetry
     TableRead
   End Enum
+#Region "Events"
   Public Class ConnectionFailureEventArgs
     Inherits EventArgs
     Public Enum FailureType
@@ -228,6 +229,7 @@
     End Property
   End Class
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
+#End Region
   Private WithEvents wsData As CookieAwareWebClient
   Private tmrReadTimeout As Threading.Timer
   Private mySettings As AppSettings
