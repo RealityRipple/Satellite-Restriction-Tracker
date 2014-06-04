@@ -228,7 +228,6 @@
     End Property
   End Class
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
-
   Private WithEvents wsData As CookieAwareWebClient
   Private tmrReadTimeout As Threading.Timer
   Private mySettings As AppSettings
@@ -685,7 +684,6 @@
     wsData.CookieJar = New Net.CookieContainer
     SendSocketErrors(sDataPath)
   End Sub
-
 #Region "WB"
   Private Sub LoginWB(sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If sRet.Contains("usage.jsp") Then
@@ -1307,8 +1305,6 @@
       bReset = True
     End If
   End Sub
-
-
   Private Sub ReadUsageDN(Table As String)
     If Table.Contains("alertError") Then
       ResetTimeout()
@@ -1473,7 +1469,6 @@
     End If
     Me.disposedValue = True
   End Sub
-
   Public Sub Dispose() Implements IDisposable.Dispose
     Dispose(True)
     GC.SuppressFinalize(Me)
