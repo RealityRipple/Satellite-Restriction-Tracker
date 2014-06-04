@@ -394,7 +394,7 @@
   Private Sub ContinueLoginDN(sUID As String, sPass As String)
     Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
     sAttemptedURL = uriString
-    sAttemptedTag = "LOGINPAGE"
+    sAttemptedTag = "LOGIN"
     myUID = sUID
     myPass = sPass
     Dim uriURL As Uri = Nothing
@@ -408,7 +408,7 @@
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
     Else
       Try
-        wsData.DownloadStringAsync(uriURL, "LOGINPAGE")
+        wsData.DownloadStringAsync(uriURL, "LOGIN")
       Catch ex As Exception
         ResetTimeout()
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
@@ -514,6 +514,37 @@
                 Else
                   sErrMsg = "Login Failed: Could not understand response."
                   sFailText = "RuralPortal Parse Error = " & sErrMsg & vbNewLine & sRet
+                  bReset = True
+                End If
+              Case SatHostTypes.DishNet_EXEDE
+                If Not wsData.ResponseURI.Host = "identity1.dishnetwork.com" Then
+                  sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & wsData.ResponseURI.Host & "]"
+                  bReset = False
+                ElseIf wsData.ResponseURI.LocalPath.Contains("login.php") Then
+                  If wsData.ResponseURI.Query.StartsWith("?") Then
+                    Dim AuthState As String = wsData.ResponseURI.Query.Substring(wsData.ResponseURI.Query.IndexOf("=") + 1)
+                    Dim uriString As String = wsData.ResponseURI.AbsoluteUri
+                    wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+                    wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+                    Dim sSend As String = "AuthState=" & AuthState &
+                                          "&username=" & myUID &
+                                          "&password=" & PercentEncode(myPass) &
+                                          "&login_type=username,password" &
+                                          "&source=" &
+                                          "&remember_me=" &
+                                          "&source_button="
+                    sAttemptedURL = uriString
+                    sAttemptedTag = "LOGINPAGE"
+                    wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, "LOGINPAGE")
+                    myUID = Nothing
+                    myPass = Nothing
+                  Else
+                    sErrMsg = "Login Failed: Logon info not passed!"
+                    bReset = True
+                  End If
+                Else
+                  sErrMsg = "Login Failed: Could not understand response."
+                  sFailText = "DishNet LoginPage Error = " & sErrMsg & vbNewLine & sRet
                   bReset = True
                 End If
               Case Else
@@ -680,69 +711,6 @@
             bReset = True
           End If
         End If
-      Case "LOGINPAGE"
-        If e.Error Is Nothing Then
-          Dim sRet As String = e.Result
-          If Not String.IsNullOrEmpty(sRet) Then
-            Select Case mySettings.AccountType
-              Case SatHostTypes.DishNet_EXEDE
-                If Not wsData.ResponseURI.Host = "identity1.dishnetwork.com" Then
-                  sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & wsData.ResponseURI.Host & "]"
-                  bReset = False
-                ElseIf wsData.ResponseURI.LocalPath.Contains("login.php") Then
-                  If wsData.ResponseURI.Query.StartsWith("?") Then
-                    Dim AuthState As String = wsData.ResponseURI.Query.Substring(wsData.ResponseURI.Query.IndexOf("=") + 1)
-                    Dim uriString As String = wsData.ResponseURI.AbsoluteUri
-                    wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-                    wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-                    Dim sSend As String = "AuthState=" & AuthState &
-                                          "&username=" & myUID &
-                                          "&password=" & PercentEncode(myPass) &
-                                          "&login_type=username,password" &
-                                          "&source=" &
-                                          "&remember_me=" &
-                                          "&source_button="
-                    sAttemptedURL = uriString
-                    sAttemptedTag = "LOGIN"
-                    wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, "LOGIN")
-                    myUID = Nothing
-                    myPass = Nothing
-                  Else
-                    sErrMsg = "Login Failed: Logon info not passed!"
-                    bReset = True
-                  End If
-                Else
-                  sErrMsg = "Login Failed: Could not understand response."
-                  sFailText = "DishNet LoginPage Error = " & sErrMsg & vbNewLine & sRet
-                  bReset = True
-                End If
-              Case Else
-                sErrMsg = "Login Failed: Host Type not determined (" & mySettings.AccountType.ToString & ")!"
-                bReset = True
-            End Select
-          Else
-            sErrMsg = "Login Failed: No page data!"
-            bReset = True
-          End If
-        Else
-          If e.Error.InnerException IsNot Nothing Then
-            If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
-              sErrMsg = Nothing
-              bReset = False
-            ElseIf e.Error.InnerException.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-              ResetTimeout()
-              RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
-              RestartNoCert()
-              Exit Sub
-            Else
-              sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-              bReset = True
-            End If
-          Else
-            sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-            bReset = True
-          End If
-        End If
       Case Else
         If e.UserState IsNot Nothing Then
           sErrMsg = "Download Failed. Unknown User State: " & e.UserState.ToString & " loading " & sAttemptedURL
@@ -853,8 +821,6 @@
                       PrepareLogin()
                       wsData.CookieJar = cJar
                       wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-                      'wsData.Timeout = mySettings.Timeout
-                      'wsData.Proxy = mySettings.Proxy
                       wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
                       Dim sSend As String = "warningTrip=true&userName=" & sAccount & "&passwd=" & PercentEncode(sPassword)
                       sAttemptedURL = uriString
@@ -885,6 +851,45 @@
                 sErrMsg = "Unknown Login Result [" & sPath & "?" & sQuery & "]"
                 bReset = True
               End If
+            Case SatHostTypes.DishNet_EXEDE
+              If Not wsData.ResponseURI.Host = "identity1.dishnetwork.com" Then
+                sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & wsData.ResponseURI.Host & "]"
+                bReset = False
+              ElseIf sPath.Contains("/login.php") Or sPath.Contains("/finish.php") Then
+                Dim sRet As String = e.Result
+                If sRet.Contains("SAMLResponse"" value=""") Then
+                  RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStatusEventArgs.ConnectionStates.Authentication))
+                  Dim SAMLResponse As String
+                  SAMLResponse = sRet.Substring(sRet.IndexOf("SAMLResponse"" value=""") + 21)
+                  SAMLResponse = SAMLResponse.Substring(0, SAMLResponse.IndexOf(""" />"))
+                  Dim uriString As String = "https://my.dish.com/customercare/saml/post"
+                  Dim cJar As Net.CookieContainer = wsData.CookieJar
+                  PrepareLogin()
+                  wsData.CookieJar = cJar
+                  wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+                  wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+                  Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
+                  sAttemptedURL = uriString
+                  sAttemptedTag = "LOGIN2"
+                  wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, "LOGIN2")
+                ElseIf sRet.Contains("The system is currently unavailable. Please try again later.") Then
+                  sErrMsg = "System currently unavailable."
+                  bReset = False
+                Else
+                  sErrMsg = "No SAML Response"
+                  bReset = False
+                  sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
+                End If
+              Else
+                sErrMsg = "Unknown Login Result [" & sPath & "?" & sQuery & "]"
+                bReset = True
+              End If
+            Case Else
+              sErrMsg = "Login Upload Failed: Host Type not determined (" & mySettings.AccountType.ToString & ")!"
+              bReset = True
+          End Select
+        ElseIf e.UserState = "LOGINPAGE" Then
+          Select Case mySettings.AccountType
             Case SatHostTypes.DishNet_EXEDE
               If Not wsData.ResponseURI.Host = "identity1.dishnetwork.com" Then
                 sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & wsData.ResponseURI.Host & "]"
