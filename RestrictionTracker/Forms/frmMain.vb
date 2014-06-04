@@ -773,11 +773,16 @@ Public Class frmMain
     Else
       NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
       Select Case e.Status
-        Case localRestrictionTracker.ConnectionStatusEventArgs.ConnectionStates.Authentication : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
-        Case localRestrictionTracker.ConnectionStatusEventArgs.ConnectionStates.Login : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
-        Case localRestrictionTracker.ConnectionStatusEventArgs.ConnectionStates.TableDownload : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
-        Case localRestrictionTracker.ConnectionStatusEventArgs.ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table...", False)
-        Case localRestrictionTracker.ConnectionStatusEventArgs.ConnectionStates.UsageRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage...", False)
+        Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection...", False)
+        Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing Login...", False)
+        Case ConnectionStates.FirstBookend : SetStatusText(LOG_GetLast.ToString("g"), "Setting Initial Coefficient...", False)
+        Case ConnectionStates.Login : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
+        Case ConnectionStates.LoginRetry : SetStatusText(LOG_GetLast.ToString("g"), "Attempting Second Login...", False)
+        Case ConnectionStates.LastBookend : SetStatusText(LOG_GetLast.ToString("g"), "Setting Final Coefficient...", False)
+        Case ConnectionStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
+        Case ConnectionStates.TableDownload : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
+        Case ConnectionStates.TableDownloadRetry : SetStatusText(LOG_GetLast.ToString("g"), "Attempting Second Usage Table Download...", False)
+        Case ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table...", False)
       End Select
     End If
   End Sub
