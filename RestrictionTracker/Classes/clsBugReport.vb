@@ -71,6 +71,9 @@
       bRet = httpSend.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
     Catch ex As Exception
       Return "Failed to Send Report - " & ex.Message
+    Finally
+      httpSend.Dispose()
+      httpSend = Nothing
     End Try
     Dim sRet As String = System.Text.Encoding.GetEncoding(28591).GetString(bRet)
     If sRet.Contains("Operation successful.") Then
@@ -82,9 +85,17 @@
     End If
   End Function
   Friend Shared Function ReportIssue(e As Exception) As String
+    If httpSend IsNot Nothing Then
+      httpSend.Dispose()
+      httpSend = Nothing
+    End If
     httpSend = New CookieAwareWebClient
     Dim sTok As String = GetToken(1)
-    If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
+    If String.IsNullOrEmpty(sTok) Then
+      httpSend.Dispose()
+      httpSend = Nothing
+      Return "No token was supplied by the server."
+    End If
     Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
     Dim sSum As String = e.Message
     If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."
