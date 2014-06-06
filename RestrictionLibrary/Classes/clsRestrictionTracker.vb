@@ -320,6 +320,7 @@
     Return False
   End Function
   Private Sub PrepareLogin()
+    iHist = 0
     If wsData Is Nothing Then
       wsData = New CookieAwareWebClient
     Else
@@ -468,6 +469,7 @@
   End Sub
 #End Region
 #Region "Parsing Functions"
+  Private iHist As Integer = 0
   Private Sub wsData_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsData.DownloadStringCompleted
     If bCancelled Then
       bCancelled = False
@@ -607,6 +609,7 @@
     End If
   End Sub
   Private Sub HandleResponse(ConnState As ConnectionStates, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    iHist += 1
     Select Case AccountType
       Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
         Select Case ConnState
@@ -1073,7 +1076,7 @@
     If Not sHost = "identity1.dishnetwork.com" Then
       sErrMsg = "Prepare Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath.Contains("firstbookend.php") Then
+    ElseIf sPath.Contains("/firstbookend.php") Then
       If sQuery.StartsWith("?") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
         wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
@@ -1084,7 +1087,7 @@
         End If
         sURI &= "&id=" & id
         sURI &= "&coeff=0"
-        sURI &= "&history=1"
+        sURI &= "&history=" & iHist
         sAttemptedURL = sURI
         AttemptedTag = ConnectionStates.FirstBookend
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.FirstBookend))
@@ -1103,7 +1106,7 @@
     If Not sHost = "identity1.dishnetwork.com" Then
       sErrMsg = "FirstBookend Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath.Contains("login.php") Then
+    ElseIf sPath.Contains("/login.php") Then
       If sQuery.StartsWith("?") Then
         Dim AuthState As String = sQuery.Substring(sQuery.IndexOf("=") + 1)
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
@@ -1123,6 +1126,8 @@
         sErrMsg = "FirstBookend Failed: AuthState is missing!"
         bReset = True
       End If
+    ElseIf sPath.Contains("/firstbookend.php") Then
+      PrepareDN(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
     Else
       sErrMsg = "FirstBookend Failed: Could not understand response."
       sFailText = "DishNet FirstBookend Error = " & sErrMsg & vbNewLine & sRet
@@ -1144,7 +1149,7 @@
         End If
         sURI &= "&id=" & id
         sURI &= "&coeff=1"
-        sURI &= "&history=3"
+        sURI &= "&history=" & iHist
         sAttemptedURL = sURI
         AttemptedTag = ConnectionStates.LastBookend
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.LastBookend))
@@ -1202,7 +1207,7 @@
     If Not sHost = "my.dish.com" Then
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath.Contains("processsynacoreresponse.do") Then
+    ElseIf sPath.Contains("/processsynacoreresponse.do") Then
       Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
       Dim cJar As Net.CookieContainer = wsData.CookieJar
       PrepareLogin()
@@ -1223,7 +1228,7 @@
     If Not sHost = "my.dish.com" Then
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath.Contains("prepbroadband.do") Then
+    ElseIf sPath.Contains("/prepbroadband.do") Then
       If sRet.Contains("<div id=""usagestatus""") Then
         Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<div id=""usagestatus"""))
         If sUsageDiv.Contains("</h2>") Then
@@ -1271,7 +1276,7 @@
     If Not sHost = "my.dish.com" Then
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath.Contains("prepbroadband.do") Then
+    ElseIf sPath.Contains("/prepbroadband.do") Then
       If sRet.Contains("<div id=""usagestatus""") Then
         Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<div id=""usagestatus"""))
         If sUsageDiv.Contains("</h2>") Then
