@@ -34,6 +34,8 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
           Return "The server did not like the request. Please try again."
+        ElseIf ex.Message.Contains("404") Then
+          Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
         ElseIf ex.Message.Contains("405") Then
           Return "The server did not like the method. Please try again."
         ElseIf ex.Message.Contains("502") Then
@@ -75,6 +77,10 @@ Module modFunctions
           Return "The server refused the connection. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("An attempt was made to access a socket in a way forbidden by its access permissions") Then
           Return "The connection was forbidden. Please check your local network and firewall settings."
+        ElseIf ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
+          Return "Too many connections open. Check your network activity or restart your computer."
+        ElseIf ex.InnerException.Message.StartsWith("An established connection was aborted by the software in your host machine") Then
+          Return "Connection aborted."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
@@ -99,7 +105,7 @@ Module modFunctions
         If ex.Message.Contains("An unexpected error occurred on a send") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
-              Return "The server is too busy. Please try again later."
+              Return "The server is too busy to respond. Please try again later."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Connection to server failed to read - " & ex.InnerException.Message
@@ -113,7 +119,7 @@ Module modFunctions
         ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
             If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.") Then
-              Return "Connection to the server timed out. Please try again."
+              Return "The server did not respond. Please try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
@@ -121,6 +127,13 @@ Module modFunctions
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Receive failure - " & ex.InnerException.Message
+          End If
+        ElseIf ex.Message.Contains("Could not establish trust relationship for the SSL/TLS secure channel.") Then
+          If ex.InnerException.Message.StartsWith("The remote certificate is invalid according to the validation procedure") Then
+            Return "Server certificate is invalid. Check your clock and system certificates list."
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Server security could not be established - " & ex.InnerException.Message
           End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
