@@ -1,7 +1,6 @@
 ﻿Imports RestrictionLibrary
 Public Class svcRL
   Private Const LATIN_1 As Integer = 28591
-  Private WithEvents DataClient As CookieAwareWebClient
   Private MySettings As Settings
   Private sAccount, sPassword, sProvider As String
   Private tmrCheck As System.Threading.Timer
