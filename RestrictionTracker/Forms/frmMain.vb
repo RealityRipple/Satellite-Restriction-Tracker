@@ -418,7 +418,18 @@ Public Class frmMain
           ReLoadSettings()
         End If
         Static fRatio As Single
-        If fRatio = 0.0! Or Single.IsInfinity(fRatio) Or Single.IsNaN(fRatio) Then fRatio = Me.Font.SizeInPoints / 200
+        If fRatio = 0.0! Or Single.IsInfinity(fRatio) Or Single.IsNaN(fRatio) Then
+          Dim icoSize As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMSIZE)
+          'If icoSize < 15 Then
+          '  fRatio = 0.05
+          'ElseIf icoSize > 17 Then
+          '  fRatio = 0.03
+          'Else
+          '  fRatio = 0.04
+          'End If
+          fRatio = Me.Font.SizeInPoints / (icoSize * 12.5)
+          'fRatio = Me.Font.SizeInPoints / 200
+        End If
         Static fMin As Single
         If fMin = 0.0! Or Single.IsInfinity(fMin) Or Single.IsNaN(fMin) Then fMin = Me.Font.SizeInPoints
         If mySettings.ScaleScreen Then

@@ -37,6 +37,9 @@ Partial Class frmHistory
     Me.pctUld = New System.Windows.Forms.PictureBox()
     Me.pctDld = New System.Windows.Forms.PictureBox()
     Me.dgvBandwidth = New System.Windows.Forms.DataGridView()
+    Me.colDATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colDOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colUPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.DATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.pnlAge = New System.Windows.Forms.TableLayoutPanel()
     Me.lblFrom = New System.Windows.Forms.Label()
@@ -53,9 +56,6 @@ Partial Class frmHistory
     Me.pctErr = New System.Windows.Forms.PictureBox()
     Me.grpAge = New System.Windows.Forms.GroupBox()
     Me.ttHistory = New RestrictionTracker.ToolTip(Me.components)
-    Me.colDATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.colDOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.colUPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.pnlButtons.SuspendLayout()
     Me.pnlGraph.SuspendLayout()
     CType(Me.pctUld, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -206,6 +206,30 @@ Partial Class frmHistory
     Me.dgvBandwidth.Size = New System.Drawing.Size(514, 205)
     Me.dgvBandwidth.TabIndex = 2
     Me.dgvBandwidth.Visible = False
+    '
+    'colDATETIME
+    '
+    DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+    Me.colDATETIME.DefaultCellStyle = DataGridViewCellStyle2
+    Me.colDATETIME.HeaderText = "Date and Time"
+    Me.colDATETIME.Name = "colDATETIME"
+    Me.colDATETIME.ReadOnly = True
+    '
+    'colDOWNLOAD
+    '
+    DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
+    Me.colDOWNLOAD.HeaderText = "Download"
+    Me.colDOWNLOAD.Name = "colDOWNLOAD"
+    Me.colDOWNLOAD.ReadOnly = True
+    '
+    'colUPLOAD
+    '
+    DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle4
+    Me.colUPLOAD.HeaderText = "Upload"
+    Me.colUPLOAD.Name = "colUPLOAD"
+    Me.colUPLOAD.ReadOnly = True
     '
     'DATETIME
     '
@@ -404,34 +428,10 @@ Partial Class frmHistory
     '
     Me.ttHistory.Persistant = True
     '
-    'colDATETIME
-    '
-    DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-    Me.colDATETIME.DefaultCellStyle = DataGridViewCellStyle2
-    Me.colDATETIME.HeaderText = "Date and Time"
-    Me.colDATETIME.Name = "colDATETIME"
-    Me.colDATETIME.ReadOnly = True
-    '
-    'colDOWNLOAD
-    '
-    DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
-    Me.colDOWNLOAD.HeaderText = "Download"
-    Me.colDOWNLOAD.Name = "colDOWNLOAD"
-    Me.colDOWNLOAD.ReadOnly = True
-    '
-    'colUPLOAD
-    '
-    DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle4
-    Me.colUPLOAD.HeaderText = "Upload"
-    Me.colUPLOAD.Name = "colUPLOAD"
-    Me.colUPLOAD.ReadOnly = True
-    '
     'frmHistory
     '
-    Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-    Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+    Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+    Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
     Me.ClientSize = New System.Drawing.Size(514, 312)
     Me.Controls.Add(Me.pnlGraph)
     Me.Controls.Add(Me.dgvBandwidth)

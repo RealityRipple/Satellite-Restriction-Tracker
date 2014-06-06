@@ -123,9 +123,11 @@ Public Class frmCustomColors
       pctMain.Image.Dispose()
       pctMain.Image = Nothing
     End If
+    Dim iSize As Integer = pctMain.Width
+    Dim iHalf As Integer = Math.Floor(iSize / 2)
     Select Case DisplayAs
       Case SatHostTypes.WildBlue_LEGACY
-        Dim FakeMRect As New Rectangle(0, 0, 74, 150)
+        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
@@ -134,14 +136,14 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, 37, 75)
-          Dim uRect As New Rectangle(38, 0, 37, 75)
+          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
+          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
           g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
         pctMain.Image = fakeI
       Case SatHostTypes.WildBlue_EXEDE
-        Dim FakeMRect As New Rectangle(0, 0, 200, 150)
+        Dim FakeMRect As New Rectangle(0, 0, iSize * 2, iSize * 1.5)
         Dim FakeE As Image = DisplayEProgress(FakeMRect.Size, lDown, lUp, 0, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
         Using g As Graphics = Graphics.FromImage(fakeI)
@@ -149,14 +151,14 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim MRect As New Rectangle(0, 9, 75, 56)
+          Dim MRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
           g.DrawImage(FakeE, MRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
         pctMain.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
         pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
       Case SatHostTypes.DishNet_EXEDE
-        Dim FakeMRect As New Rectangle(0, 0, 74, 150)
+        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
@@ -165,8 +167,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, 37, 75)
-          Dim uRect As New Rectangle(38, 0, 37, 75)
+          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
+          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
           g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
@@ -236,8 +238,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 5, 75, 30)
-          Dim uRect As New Rectangle(0, 40, 75, 30)
+          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
+          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
           g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
@@ -250,7 +252,7 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 22, 75, 30)
+          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
           g.DrawImage(FakeE, dRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
         pctHistory.Image = fakeI
@@ -262,7 +264,7 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 22, 75, 30)
+          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
           g.DrawImage(FakeR, dRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
         pctHistory.Image = fakeI
@@ -275,8 +277,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 5, 75, 30)
-          Dim uRect As New Rectangle(0, 40, 75, 30)
+          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
+          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
           g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
         End Using

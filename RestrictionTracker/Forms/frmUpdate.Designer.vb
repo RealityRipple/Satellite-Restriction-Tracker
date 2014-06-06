@@ -36,6 +36,8 @@ Partial Class frmUpdate
     '
     'pnlUpdate
     '
+    Me.pnlUpdate.AutoSize = True
+    Me.pnlUpdate.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlUpdate.ColumnCount = 1
     Me.pnlUpdate.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlUpdate.Controls.Add(Me.lblNewVer, 0, 0)
@@ -52,7 +54,7 @@ Partial Class frmUpdate
     Me.pnlUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlUpdate.Size = New System.Drawing.Size(269, 326)
+    Me.pnlUpdate.Size = New System.Drawing.Size(276, 332)
     Me.pnlUpdate.TabIndex = 0
     '
     'lblNewVer
@@ -62,7 +64,7 @@ Partial Class frmUpdate
     Me.lblNewVer.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.lblNewVer.Location = New System.Drawing.Point(3, 0)
     Me.lblNewVer.Name = "lblNewVer"
-    Me.lblNewVer.Size = New System.Drawing.Size(263, 40)
+    Me.lblNewVer.Size = New System.Drawing.Size(270, 40)
     Me.lblNewVer.TabIndex = 0
     Me.lblNewVer.Text = "Satellite Restriction Tracker Update" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Version 0.0.0.0"
     Me.lblNewVer.TextAlign = System.Drawing.ContentAlignment.TopCenter
@@ -75,20 +77,20 @@ Partial Class frmUpdate
     Me.txtInfo.Name = "txtInfo"
     Me.txtInfo.ReadOnly = True
     Me.txtInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-    Me.txtInfo.Size = New System.Drawing.Size(263, 173)
+    Me.txtInfo.Size = New System.Drawing.Size(270, 179)
     Me.txtInfo.TabIndex = 1
     '
     'lblBETA
     '
     Me.lblBETA.AutoSize = True
     Me.lblBETA.ForeColor = System.Drawing.Color.Firebrick
-    Me.lblBETA.Location = New System.Drawing.Point(3, 219)
+    Me.lblBETA.Location = New System.Drawing.Point(3, 225)
     Me.lblBETA.Name = "lblBETA"
-    Me.lblBETA.Size = New System.Drawing.Size(255, 52)
+    Me.lblBETA.Size = New System.Drawing.Size(245, 52)
     Me.lblBETA.TabIndex = 2
-    Me.lblBETA.Text = "BETA updates may have bugs and other issues that haven't been worked out yet, but" & _
-    " need testing on a wide range of accounts." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Please back up your history before u" & _
-    "sing BETAs."
+    Me.lblBETA.Text = "BETA updates may have bugs and other issues" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "that haven't been worked out yet, bu" & _
+    "t need testing" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "on a wide range of accounts." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Please back up your history before" & _
+    " using BETAs."
     '
     'pnlButtons
     '
@@ -101,33 +103,33 @@ Partial Class frmUpdate
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlButtons.Controls.Add(Me.cmdDownload, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdCancel, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 295)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 301)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
     Me.pnlButtons.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlButtons.Size = New System.Drawing.Size(269, 31)
+    Me.pnlButtons.Size = New System.Drawing.Size(276, 31)
     Me.pnlButtons.TabIndex = 3
     '
     'cmdDownload
     '
-    Me.cmdDownload.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.cmdDownload.Dock = System.Windows.Forms.DockStyle.Fill
     Me.cmdDownload.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdDownload.Location = New System.Drawing.Point(12, 3)
+    Me.cmdDownload.Location = New System.Drawing.Point(3, 3)
     Me.cmdDownload.Name = "cmdDownload"
-    Me.cmdDownload.Size = New System.Drawing.Size(110, 25)
+    Me.cmdDownload.Size = New System.Drawing.Size(132, 25)
     Me.cmdDownload.TabIndex = 0
     Me.cmdDownload.Text = "Download Update"
     Me.cmdDownload.UseVisualStyleBackColor = True
     '
     'cmdCancel
     '
-    Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+    Me.cmdCancel.Dock = System.Windows.Forms.DockStyle.Fill
     Me.cmdCancel.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdCancel.Location = New System.Drawing.Point(146, 3)
+    Me.cmdCancel.Location = New System.Drawing.Point(141, 3)
     Me.cmdCancel.Name = "cmdCancel"
-    Me.cmdCancel.Size = New System.Drawing.Size(110, 25)
+    Me.cmdCancel.Size = New System.Drawing.Size(132, 25)
     Me.cmdCancel.TabIndex = 1
     Me.cmdCancel.Text = "Not Now"
     Me.cmdCancel.UseVisualStyleBackColor = True
@@ -136,7 +138,7 @@ Partial Class frmUpdate
     '
     Me.chkStopBETA.AutoSize = True
     Me.chkStopBETA.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkStopBETA.Location = New System.Drawing.Point(6, 274)
+    Me.chkStopBETA.Location = New System.Drawing.Point(6, 280)
     Me.chkStopBETA.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
     Me.chkStopBETA.Name = "chkStopBETA"
     Me.chkStopBETA.Size = New System.Drawing.Size(189, 18)
@@ -149,8 +151,10 @@ Partial Class frmUpdate
     Me.AcceptButton = Me.cmdDownload
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+    Me.AutoSize = True
+    Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdCancel
-    Me.ClientSize = New System.Drawing.Size(269, 326)
+    Me.ClientSize = New System.Drawing.Size(276, 332)
     Me.Controls.Add(Me.pnlUpdate)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -165,6 +169,7 @@ Partial Class frmUpdate
     Me.pnlUpdate.PerformLayout()
     Me.pnlButtons.ResumeLayout(False)
     Me.ResumeLayout(False)
+    Me.PerformLayout()
 
   End Sub
   Friend WithEvents pnlUpdate As System.Windows.Forms.TableLayoutPanel

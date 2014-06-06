@@ -38,20 +38,21 @@ Partial Class frmDBProgress
     Me.pnlStatus.Controls.Add(Me.lblAction, 0, 0)
     Me.pnlStatus.Controls.Add(Me.pbActivity, 0, 1)
     Me.pnlStatus.Controls.Add(Me.lblPercentage, 0, 2)
+    Me.pnlStatus.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlStatus.Location = New System.Drawing.Point(0, 0)
     Me.pnlStatus.Name = "pnlStatus"
     Me.pnlStatus.RowCount = 3
     Me.pnlStatus.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlStatus.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlStatus.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlStatus.Size = New System.Drawing.Size(226, 65)
+    Me.pnlStatus.Size = New System.Drawing.Size(227, 78)
     Me.pnlStatus.TabIndex = 0
     '
     'lblAction
     '
     Me.lblAction.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.lblAction.AutoSize = True
-    Me.lblAction.Location = New System.Drawing.Point(61, 4)
+    Me.lblAction.Location = New System.Drawing.Point(61, 10)
     Me.lblAction.Margin = New System.Windows.Forms.Padding(4)
     Me.lblAction.Name = "lblAction"
     Me.lblAction.Size = New System.Drawing.Size(104, 13)
@@ -62,11 +63,11 @@ Partial Class frmDBProgress
     'pbActivity
     '
     Me.pbActivity.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pbActivity.Location = New System.Drawing.Point(13, 25)
+    Me.pbActivity.Location = New System.Drawing.Point(13, 38)
     Me.pbActivity.Margin = New System.Windows.Forms.Padding(13, 4, 13, 4)
     Me.pbActivity.MarqueeAnimationSpeed = 15
     Me.pbActivity.Name = "pbActivity"
-    Me.pbActivity.Size = New System.Drawing.Size(200, 15)
+    Me.pbActivity.Size = New System.Drawing.Size(201, 15)
     Me.pbActivity.Style = System.Windows.Forms.ProgressBarStyle.Marquee
     Me.pbActivity.TabIndex = 1
     '
@@ -74,7 +75,7 @@ Partial Class frmDBProgress
     '
     Me.lblPercentage.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.lblPercentage.AutoSize = True
-    Me.lblPercentage.Location = New System.Drawing.Point(102, 48)
+    Me.lblPercentage.Location = New System.Drawing.Point(103, 61)
     Me.lblPercentage.Margin = New System.Windows.Forms.Padding(4)
     Me.lblPercentage.Name = "lblPercentage"
     Me.lblPercentage.Size = New System.Drawing.Size(21, 13)
@@ -84,7 +85,6 @@ Partial Class frmDBProgress
     '
     'frmDBProgress
     '
-    Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.AutoSize = True
@@ -93,6 +93,7 @@ Partial Class frmDBProgress
     Me.ControlBox = False
     Me.Controls.Add(Me.pnlStatus)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+    Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
     Me.MaximizeBox = False
     Me.MinimizeBox = False
     Me.Name = "frmDBProgress"

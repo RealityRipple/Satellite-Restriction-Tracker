@@ -33,6 +33,7 @@ Partial Class frmMain
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
+    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.pnlWildBlue = New System.Windows.Forms.TableLayoutPanel()
     Me.gbUld = New System.Windows.Forms.GroupBox()
     Me.pnlUld = New System.Windows.Forms.TableLayoutPanel()
@@ -40,6 +41,7 @@ Partial Class frmMain
     Me.mnuGraph = New System.Windows.Forms.ContextMenu()
     Me.mnuGraphRefresh = New System.Windows.Forms.MenuItem()
     Me.mnuGraphSpace = New System.Windows.Forms.MenuItem()
+    Me.mnuGraphInvert = New System.Windows.Forms.MenuItem()
     Me.mnuGraphColors = New System.Windows.Forms.MenuItem()
     Me.pnlUldText = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlUldTextUsed = New System.Windows.Forms.TableLayoutPanel()
@@ -103,8 +105,6 @@ Partial Class frmMain
     Me.tmrIcoDelay = New System.Windows.Forms.Timer(Me.components)
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.tmrStatus = New System.Windows.Forms.Timer(Me.components)
-    Me.mnuGraphInvert = New System.Windows.Forms.MenuItem()
-    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.ttUI = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
@@ -290,6 +290,18 @@ Partial Class frmMain
     Me.lblNothing.TabIndex = 0
     Me.lblNothing.Text = "Satellite Restriction Tracker"
     '
+    'lblRRS
+    '
+    Me.lblRRS.AutoSize = True
+    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
+    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
+    Me.lblRRS.Name = "lblRRS"
+    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
+    Me.lblRRS.TabIndex = 1
+    Me.lblRRS.Text = "by RealityRipple Software"
+    '
     'pnlWildBlue
     '
     Me.pnlWildBlue.ColumnCount = 2
@@ -361,6 +373,11 @@ Partial Class frmMain
     '
     Me.mnuGraphSpace.Index = 1
     Me.mnuGraphSpace.Text = "-"
+    '
+    'mnuGraphInvert
+    '
+    Me.mnuGraphInvert.Index = 2
+    Me.mnuGraphInvert.Text = "Invert &Numbers"
     '
     'mnuGraphColors
     '
@@ -1124,23 +1141,6 @@ Partial Class frmMain
     Me.tmrStatus.Enabled = True
     Me.tmrStatus.Interval = 500
     '
-    'mnuGraphInvert
-    '
-    Me.mnuGraphInvert.Index = 2
-    Me.mnuGraphInvert.Text = "Invert &Numbers"
-    '
-    'lblRRS
-    '
-    Me.lblRRS.AutoSize = True
-    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
-    Me.lblRRS.Name = "lblRRS"
-    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
-    Me.lblRRS.TabIndex = 1
-    Me.lblRRS.Text = "by RealityRipple Software"
-    '
     'ttUI
     '
     Me.ttUI.AutoPopDelay = 30000
@@ -1149,8 +1149,8 @@ Partial Class frmMain
     '
     'frmMain
     '
-    Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-    Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+    Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+    Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
     Me.ClientSize = New System.Drawing.Size(434, 162)
     Me.Controls.Add(Me.pnlDetails)
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat

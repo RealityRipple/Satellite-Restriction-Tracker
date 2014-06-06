@@ -155,6 +155,8 @@ Partial Class frmCustomColors
     '
     'pnlCustomColors
     '
+    Me.pnlCustomColors.AutoSize = True
+    Me.pnlCustomColors.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlCustomColors.ColumnCount = 2
     Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
@@ -216,6 +218,7 @@ Partial Class frmCustomColors
     'cmdClose
     '
     Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.cmdClose.AutoSize = True
     Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.cmdClose.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.cmdClose.Location = New System.Drawing.Point(319, 466)
@@ -819,6 +822,7 @@ Partial Class frmCustomColors
     'cmdSave
     '
     Me.cmdSave.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.cmdSave.AutoSize = True
     Me.cmdSave.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.cmdSave.Location = New System.Drawing.Point(238, 466)
     Me.cmdSave.Name = "cmdSave"
@@ -1175,6 +1179,8 @@ Partial Class frmCustomColors
     Me.AcceptButton = Me.cmdSave
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+    Me.AutoSize = True
+    Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
     Me.ClientSize = New System.Drawing.Size(397, 494)
     Me.Controls.Add(Me.pnlCustomColors)
@@ -1257,6 +1263,7 @@ Partial Class frmCustomColors
     CType(Me.pctMainBG, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctMainText, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
+    Me.PerformLayout()
 
   End Sub
   Friend WithEvents pnlCustomColors As System.Windows.Forms.TableLayoutPanel
