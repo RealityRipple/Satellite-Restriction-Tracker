@@ -221,7 +221,6 @@ Module modFunctions
       End If
     End If
   End Sub
-
   Public Function HostTypeToString(ht As localRestrictionTracker.SatHostTypes) As String
     Select Case ht
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
@@ -303,15 +302,4 @@ Module modFunctions
       Return False
     End If
   End Function
-  'Private ReadOnly Property AppData As String
-  '  Get
-  '    Static sTmp As String
-  '    If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName)
-  '    If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName)
-  '    If String.IsNullOrEmpty(sTmp) Then
-  '      sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
-  '    End If
-  '    Return sTmp
-  '  End Get
-  'End Property
 End Module
