@@ -184,32 +184,32 @@ Public Class frmCustomColors
       Select Case DisplayAs
         Case SatHostTypes.WildBlue_LEGACY
           If lDown >= lDownLim Or lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
           Else
-            g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
           End If
           CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
           CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor)
         Case SatHostTypes.WildBlue_EXEDE
           If lDown + lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
           Else
-            g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
           End If
           CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor)
         Case SatHostTypes.RuralPortal_EXEDE
           If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
           Else
-            g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
           End If
           CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
           CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
         Case SatHostTypes.DishNet_EXEDE
           If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
           Else
-            g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
           End If
           CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
           CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)

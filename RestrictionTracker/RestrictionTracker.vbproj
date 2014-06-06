@@ -250,7 +250,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\sat.ico" />
-    <None Include="Resources\small.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\throbber.gif" />
@@ -285,20 +284,33 @@
   <ItemGroup>
     <Content Include="Resources\default_alert.png" />
     <Content Include="Resources\default_close.png" />
-    <Content Include="Resources\throbsprite\1.ico" />
-    <Content Include="Resources\throbsprite\10.ico" />
-    <Content Include="Resources\throbsprite\2.ico" />
-    <Content Include="Resources\throbsprite\3.ico" />
-    <Content Include="Resources\throbsprite\4.ico" />
-    <Content Include="Resources\throbsprite\5.ico" />
-    <Content Include="Resources\throbsprite\7.ico" />
-    <Content Include="Resources\throbsprite\8.ico" />
-    <Content Include="Resources\throbsprite\9.ico" />
+    <Content Include="Resources\tray_16\free.ico" />
+    <Content Include="Resources\tray_16\norm.ico" />
+    <Content Include="Resources\tray_16\restricted.ico" />
+    <Content Include="Resources\tray_16\throbsprite\1.ico" />
+    <Content Include="Resources\tray_16\throbsprite\10.ico" />
+    <Content Include="Resources\tray_16\throbsprite\2.ico" />
+    <Content Include="Resources\tray_16\throbsprite\3.ico" />
+    <Content Include="Resources\tray_16\throbsprite\4.ico" />
+    <Content Include="Resources\tray_16\throbsprite\5.ico" />
+    <Content Include="Resources\tray_16\throbsprite\7.ico" />
+    <Content Include="Resources\tray_16\throbsprite\8.ico" />
+    <Content Include="Resources\tray_16\throbsprite\9.ico" />
+    <None Include="Resources\tray_32\throbsprite\10.ico" />
+    <None Include="Resources\tray_32\throbsprite\9.ico" />
+    <None Include="Resources\tray_32\throbsprite\8.ico" />
+    <None Include="Resources\tray_32\throbsprite\7.ico" />
+    <None Include="Resources\tray_32\throbsprite\5.ico" />
+    <None Include="Resources\tray_32\throbsprite\4.ico" />
+    <None Include="Resources\tray_32\throbsprite\3.ico" />
+    <None Include="Resources\tray_32\throbsprite\2.ico" />
+    <None Include="Resources\tray_32\throbsprite\1.ico" />
+    <None Include="Resources\tray_32\restricted.ico" />
+    <None Include="Resources\tray_32\norm.ico" />
+    <None Include="Resources\tray_32\free.ico" />
     <None Include="Resources\ok.png" />
-    <None Include="Resources\restricted.ico" />
     <None Include="Resources\side.jpg" />
     <None Include="Resources\error.png" />
-    <Content Include="Resources\free.ico" />
     <Content Include="Resources\Song.mid" />
   </ItemGroup>
   <ItemGroup>

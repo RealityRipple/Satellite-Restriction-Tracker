@@ -81,16 +81,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property free() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("free", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property ico_err() As System.Drawing.Bitmap
@@ -107,16 +97,6 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("ico_ok", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property restricted() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("restricted", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
         
@@ -141,16 +121,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property small() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("small", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Byte[].
         '''</summary>
         Friend ReadOnly Property Song() As Byte()
@@ -161,102 +131,252 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_1() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_1", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_10() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_10", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_2() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_2", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_3() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_3", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_4() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_4", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_5() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_5", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_7() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_7", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_8() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_8", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_9() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_9", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_free() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_free", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_norm() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_norm", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_restricted() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_restricted", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_1() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_1", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_10() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_10", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_2() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_2", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_3() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_3", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_4() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_4", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_5() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_5", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_7() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_7", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_8() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_8", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_9() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_9", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_free() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_free", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_norm() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_norm", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_restricted() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_restricted", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property throbber() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("throbber", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_1() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_1", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_10() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_10", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_2() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_2", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_3() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_3", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_4() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_4", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_5() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_5", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_7() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_7", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_8() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_8", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        '''</summary>
-        Friend ReadOnly Property throbsprite_9() As System.Drawing.Icon
-            Get
-                Dim obj As Object = ResourceManager.GetObject("throbsprite_9", resourceCulture)
-                Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
     End Module

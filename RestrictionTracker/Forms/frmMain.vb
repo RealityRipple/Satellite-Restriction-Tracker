@@ -329,7 +329,7 @@ Public Class frmMain
           tmrIcoDelay.Enabled = True
         Else
           trayIcon.ContextMenu = mnuTray
-          trayIcon.Icon = My.Resources.small
+          trayIcon.Icon = MakeIcon(IconName.norm)
           trayIcon.Text = Me.Text
           trayIcon.Visible = True
         End If
@@ -353,7 +353,7 @@ Public Class frmMain
       Else
         mnuRestore.Text = "&Focus"
         tmrIcon.Enabled = False
-        trayIcon.Icon = My.Resources.small
+        trayIcon.Icon = MakeIcon(IconName.norm)
         Me.ShowInTaskbar = True
         If Me.Opacity = 0 Then Me.Opacity = 1
         SetTag(LoadStates.Loaded)
@@ -459,7 +459,7 @@ Public Class frmMain
       If wb_dlim = 0 And wb_ulim = 0 Then
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = My.Resources.small
+        trayIcon.Icon = MakeIcon(IconName.norm)
       Else
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, wb_down, wb_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
@@ -468,7 +468,7 @@ Public Class frmMain
     ElseIf myPanel = SatHostTypes.WildBlue_EXEDE Then
       If e_lim = 0 Then
         pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, 0, 0, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = My.Resources.small
+        trayIcon.Icon = MakeIcon(IconName.norm)
       Else
         pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, e_down, e_up, e_over, e_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateETrayIcon(e_down, e_up, e_lim)
@@ -476,7 +476,7 @@ Public Class frmMain
     ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EVOLUTION Then
       If r_lim = 0 Then
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = My.Resources.small
+        trayIcon.Icon = MakeIcon(IconName.norm)
       Else
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, r_used, r_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateRTrayIcon(r_used, r_lim)
@@ -1525,7 +1525,7 @@ Public Class frmMain
       myPanel = SatHostTypes.Other
       trayIcon.Text = Me.Text
       tmrIcon.Enabled = False
-      trayIcon.Icon = My.Resources.small
+      trayIcon.Icon = MakeIcon(IconName.norm)
     End If
   End Sub
 #End Region
@@ -1707,20 +1707,77 @@ Public Class frmMain
 #End Region
 #End Region
 #Region "Tray Icon"
+  Private Enum IconName
+    norm
+    free
+    restricted
+    throb1
+    throb2
+    throb3
+    throb4
+    throb5
+    throb7
+    throb8
+    throb9
+    throb10
+  End Enum
+  Private Function MakeIcon(name As IconName, Optional icoX As Integer = -1, Optional icoY As Integer = -1) As Icon
+    If icoX < 0 Then icoX = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
+    If icoY < 0 Then icoY = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
+    Dim large As Boolean = icoX > 16 Or icoY > 16
+    Dim imgICO As New Bitmap(icoX, icoY)
+    Using g As Graphics = Graphics.FromImage(imgICO)
+      g.Clear(Color.Transparent)
+      Select Case name
+        Case IconName.norm
+          g.DrawIcon(IIf(large, My.Resources.t32_norm, My.Resources.t16_norm), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.free
+          g.DrawIcon(IIf(large, My.Resources.t32_free, My.Resources.t16_free), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.restricted
+          g.DrawIcon(IIf(large, My.Resources.t32_restricted, My.Resources.t16_restricted), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb1
+          g.DrawIcon(IIf(large, My.Resources.t32_1, My.Resources.t16_1), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb2
+          g.DrawIcon(IIf(large, My.Resources.t32_2, My.Resources.t16_2), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb3
+          g.DrawIcon(IIf(large, My.Resources.t32_3, My.Resources.t16_3), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb4
+          g.DrawIcon(IIf(large, My.Resources.t32_4, My.Resources.t16_4), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb5
+          g.DrawIcon(IIf(large, My.Resources.t32_5, My.Resources.t16_5), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb7
+          g.DrawIcon(IIf(large, My.Resources.t32_7, My.Resources.t16_7), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb8
+          g.DrawIcon(IIf(large, My.Resources.t32_8, My.Resources.t16_8), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb9
+          g.DrawIcon(IIf(large, My.Resources.t32_9, My.Resources.t16_9), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb10
+          g.DrawIcon(IIf(large, My.Resources.t32_10, My.Resources.t16_10), New Rectangle(0, 0, icoX, icoY))
+      End Select
+    End Using
+    Try
+      Dim hIcon As IntPtr = imgICO.GetHicon()
+      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
+      NativeMethods.DestroyIcon(hIcon)
+      Return iIcon
+    Catch ex As Exception
+      Return IIf(large, My.Resources.t32_norm, My.Resources.t16_norm)
+    End Try
+  End Function
   Private Sub tmrIcon_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcon.Tick
     Try
       Static iItem As Integer
       Select Case iItem
-        Case 0, 6, 11 : trayIcon.Icon = My.Resources.small
-        Case 1 : trayIcon.Icon = My.Resources.throbsprite_1
-        Case 2 : trayIcon.Icon = My.Resources.throbsprite_2
-        Case 3 : trayIcon.Icon = My.Resources.throbsprite_3
-        Case 4 : trayIcon.Icon = My.Resources.throbsprite_4
-        Case 5 : trayIcon.Icon = My.Resources.throbsprite_5
-        Case 7 : trayIcon.Icon = My.Resources.throbsprite_7
-        Case 8 : trayIcon.Icon = My.Resources.throbsprite_8
-        Case 9 : trayIcon.Icon = My.Resources.throbsprite_9
-        Case 10 : trayIcon.Icon = My.Resources.throbsprite_10
+        Case 0, 6, 11 : trayIcon.Icon = MakeIcon(IconName.norm)
+        Case 1 : trayIcon.Icon = MakeIcon(IconName.throb1)
+        Case 2 : trayIcon.Icon = MakeIcon(IconName.throb2)
+        Case 3 : trayIcon.Icon = MakeIcon(IconName.throb3)
+        Case 4 : trayIcon.Icon = MakeIcon(IconName.throb4)
+        Case 5 : trayIcon.Icon = MakeIcon(IconName.throb5)
+        Case 7 : trayIcon.Icon = MakeIcon(IconName.throb7)
+        Case 8 : trayIcon.Icon = MakeIcon(IconName.throb8)
+        Case 9 : trayIcon.Icon = MakeIcon(IconName.throb9)
+        Case 10 : trayIcon.Icon = MakeIcon(IconName.throb10)
       End Select
       iItem += 1
       If iItem >= 12 Then iItem = 0
@@ -1756,18 +1813,19 @@ Public Class frmMain
   End Sub
 #Region "Graphs"
   Private Function CreateTrayIcon(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long) As Icon
-    Const Square As Integer = 16
-    Dim imgTray As New Bitmap(Square, Square)
+    Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
+    Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
+    Dim imgTray As New Bitmap(icoX, icoY)
     Using g As Graphics = Graphics.FromImage(imgTray)
       g.Clear(Color.Transparent)
       If imSlowed Then
-        g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.restricted, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Left(g, lDown, lDownLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
         CreateTrayIcon_Right(g, lUp, lUpLim, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC)
       ElseIf imFree Then
-        g.DrawIconUnstretched(My.Resources.free, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.free, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
       Else
-        g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Left(g, lDown, lDownLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
         CreateTrayIcon_Right(g, lUp, lUpLim, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC)
       End If
@@ -1778,21 +1836,22 @@ Public Class frmMain
       NativeMethods.DestroyIcon(hIcon)
       Return iIcon
     Catch ex As Exception
-      Return My.Resources.small
+      Return MakeIcon(IconName.norm, icoX, icoY)
     End Try
   End Function
   Private Function CreateETrayIcon(lDown As Long, lUp As Long, lLim As Long) As Icon
-    Const Square As Integer = 16
-    Dim imgTray As New Bitmap(Square, Square)
+    Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
+    Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
+    Dim imgTray As New Bitmap(icoX, icoY)
     Using g As Graphics = Graphics.FromImage(imgTray)
       g.Clear(Color.Transparent)
       If imSlowed Then
-        g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.restricted, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Dual(g, lDown, lUp, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC)
       ElseIf imFree Then
-        g.DrawIconUnstretched(My.Resources.free, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.free, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
       Else
-        g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Dual(g, lDown, lUp, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC)
       End If
     End Using
@@ -1802,22 +1861,23 @@ Public Class frmMain
       NativeMethods.DestroyIcon(hIcon)
       Return iIcon
     Catch ex As Exception
-      Return My.Resources.small
+      Return MakeIcon(IconName.norm, icoX, icoY)
     End Try
   End Function
   Private Function CreateRTrayIcon(lUsed As Long, lLim As Long) As Icon
-    Const Square As Integer = 16
-    Dim imgTray As New Bitmap(Square, Square)
+    Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
+    Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
+    Dim imgTray As New Bitmap(icoX, icoY)
     Using g As Graphics = Graphics.FromImage(imgTray)
       g.Clear(Color.Transparent)
       If imSlowed Then
-        g.DrawIconUnstretched(My.Resources.restricted, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.restricted, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Left(g, lUsed, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
         CreateTrayIcon_Right(g, lUsed, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
       ElseIf imFree Then
-        g.DrawIconUnstretched(My.Resources.free, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.free, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
       Else
-        g.DrawIconUnstretched(My.Resources.small, New Rectangle(0, 0, Square, Square))
+        g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Left(g, lUsed, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
         CreateTrayIcon_Right(g, lUsed, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC)
       End If
@@ -1828,7 +1888,7 @@ Public Class frmMain
       NativeMethods.DestroyIcon(hIcon)
       Return iIcon
     Catch ex As Exception
-      Return My.Resources.small
+      Return MakeIcon(IconName.norm, icoX, icoY)
     End Try
   End Function
 #End Region
