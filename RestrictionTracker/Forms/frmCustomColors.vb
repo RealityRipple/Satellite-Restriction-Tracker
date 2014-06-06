@@ -178,41 +178,42 @@ Public Class frmCustomColors
       pctTray.Image.Dispose()
       pctTray.Image = Nothing
     End If
-    Dim imgTray As New Bitmap(16, 16)
+    Const traySquare As Integer = 16
+    Dim imgTray As New Bitmap(traySquare, traySquare)
     Using g As Graphics = Graphics.FromImage(imgTray)
       g.Clear(Color.Transparent)
       Select Case DisplayAs
         Case SatHostTypes.WildBlue_LEGACY
           If lDown >= lDownLim Or lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
           Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
           End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
-          CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor)
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
         Case SatHostTypes.WildBlue_EXEDE
           If lDown + lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
           Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
           End If
-          CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor)
+          CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
         Case SatHostTypes.RuralPortal_EXEDE
           If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
           Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
           End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
-          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
         Case SatHostTypes.DishNet_EXEDE
           If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
           Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, 16, 16))
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
           End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
-          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor)
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
         Case Else
           g.DrawImage(pctTray.ErrorImage, 0, 0)
       End Select

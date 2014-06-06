@@ -1753,47 +1753,47 @@ Module modFunctions
 
 #Region "Tray"
   Private Const Alpha As Integer = 192
-  Public Sub CreateTrayIcon_Left(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color)
+  Public Sub CreateTrayIcon_Left(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim fillBrush As Drawing2D.LinearGradientBrush
     If cB.A = 0 Then
-      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
+      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
     Else
-      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.Black, Color.Black)
+      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
       Dim cBlend As New Drawing2D.ColorBlend
       cBlend.Positions = {0, 0.5, 1}
       cBlend.Colors = {Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cB), Color.FromArgb(Alpha, cA)}
       fillBrush.InterpolationColors = cBlend
     End If
-    Dim yUsed As Integer = 16 - (lUsed / lLim * 16)
+    Dim yUsed As Integer = icoY - (lUsed / lLim * icoY)
     If yUsed < 0 Then yUsed = 0
-    If yUsed > 16 Then yUsed = 16
-    g.FillRectangle(fillBrush, 0, yUsed, 8, 16 - yUsed)
+    If yUsed > icoY Then yUsed = icoY
+    g.FillRectangle(fillBrush, 0, yUsed, CInt(Math.Floor(icoX / 2)), icoY - yUsed)
   End Sub
-  Public Sub CreateTrayIcon_Right(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color)
+  Public Sub CreateTrayIcon_Right(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim fillBrush As Drawing2D.LinearGradientBrush
     If cB.A = 0 Then
-      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
+      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
     Else
-      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.Black, Color.Black)
+      fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
       Dim cBlend As New Drawing2D.ColorBlend
       cBlend.Positions = {0, 0.5, 1}
       cBlend.Colors = {Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cB), Color.FromArgb(Alpha, cA)}
       fillBrush.InterpolationColors = cBlend
     End If
-    Dim yUsed As Integer = 16 - (lUsed / lLim * 16)
+    Dim yUsed As Integer = icoY - (lUsed / lLim * icoY)
     If yUsed < 0 Then yUsed = 0
-    If yUsed > 16 Then yUsed = 16
-    g.FillRectangle(fillBrush, 8, yUsed, 8, 16 - yUsed)
+    If yUsed > icoY Then yUsed = icoY
+    g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Floor(icoX / 2)), icoY - yUsed)
   End Sub
-  Public Sub CreateTrayIcon_Dual(ByRef g As Graphics, lDown As Long, lUp As Long, lLim As Long, cDA As Color, cDB As Color, cDC As Color, cUA As Color, cUB As Color, cUC As Color)
+  Public Sub CreateTrayIcon_Dual(ByRef g As Graphics, lDown As Long, lUp As Long, lLim As Long, cDA As Color, cDB As Color, cDC As Color, cUA As Color, cUB As Color, cUC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim upBrush As Drawing2D.LinearGradientBrush
     If cUB.A = 0 Then
-      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUA))
+      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUA))
     Else
-      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.Black, Color.Black)
+      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
       Dim cBlend As New Drawing2D.ColorBlend
       cBlend.Positions = {0, 0.5, 1}
       cBlend.Colors = {Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUB), Color.FromArgb(Alpha, cUA)}
@@ -1801,9 +1801,9 @@ Module modFunctions
     End If
     Dim downBrush As Drawing2D.LinearGradientBrush
     If cDB.A = 0 Then
-      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDA))
+      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDA))
     Else
-      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, 16), Color.Black, Color.Black)
+      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
       Dim cBlend As New Drawing2D.ColorBlend
       cBlend.Positions = {0, 0.5, 1}
       cBlend.Colors = {Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDB), Color.FromArgb(Alpha, cDA)}
@@ -1812,15 +1812,15 @@ Module modFunctions
     If lDown + lUp > lLim Then
       'Maxed
       Dim fillLim As Long = lDown + lUp
-      Dim yUp As Integer = 16 - (lUp / fillLim * 16)
-      Dim yDown As Integer = yUp - (lDown / fillLim * 16)
-      g.FillRectangle(downBrush, 0, yDown, 16, 16 - ((16 - yUp) - 1) - yDown)
-      g.FillRectangle(upBrush, 0, yUp, 16, 16 - yUp)
+      Dim yUp As Integer = icoY - (lUp / fillLim * icoY)
+      Dim yDown As Integer = yUp - (lDown / fillLim * icoY)
+      g.FillRectangle(downBrush, 0, yDown, icoX, icoY - ((icoY - yUp) - 1) - yDown)
+      g.FillRectangle(upBrush, 0, yUp, icoX, icoY - yUp)
     Else
-      Dim yUp As Integer = 16 - (lUp / lLim * 16)
-      Dim yDown As Integer = yUp - (lDown / lLim * 16)
-      g.FillRectangle(downBrush, 0, yDown, 16, 16 - ((16 - yUp) - 1) - yDown)
-      g.FillRectangle(upBrush, 0, yUp, 16, 16 - yUp)
+      Dim yUp As Integer = icoY - (lUp / lLim * icoY)
+      Dim yDown As Integer = yUp - (lDown / lLim * icoY)
+      g.FillRectangle(downBrush, 0, yDown, icoX, icoY - ((icoY - yUp) - 1) - yDown)
+      g.FillRectangle(upBrush, 0, yUp, icoX, icoY - yUp)
     End If
   End Sub
 #End Region
