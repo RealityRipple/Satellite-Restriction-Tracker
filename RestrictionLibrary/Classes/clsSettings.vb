@@ -1,5 +1,4 @@
 ﻿Imports System.Xml
-
 Class AppSettings
   Private m_Config As String
   Private m_Account As String

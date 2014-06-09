@@ -115,7 +115,6 @@
     If My.Computer.FileSystem.FileExists(Path) Then Return My.Computer.FileSystem.GetFileInfo(Path).Length
     Return -1
   End Function
-
   Private Sub usageDB_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageDB.ProgressState
     If frmDBProgress.Visible Then frmDBProgress.SetProgress(e.Value, e.Total)
   End Sub

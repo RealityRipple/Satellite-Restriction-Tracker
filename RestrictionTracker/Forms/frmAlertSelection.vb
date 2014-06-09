@@ -2,14 +2,12 @@
   Friend AlertStyle As String
   Private Changed As Boolean
   Private taskNotifier As TaskbarNotifier = Nothing
-
   Private Sub frmAlertSelection_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If taskNotifier IsNot Nothing Then
       taskNotifier.Dispose()
       taskNotifier = Nothing
     End If
   End Sub
-
   Private Sub frmAlertSelection_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     lstStyles.Items.Clear()
     Dim iFirst As Integer = lstStyles.Items.Add("Default")
@@ -32,13 +30,11 @@
     lstStyles_SelectedIndexChanged(New Object, EventArgs.Empty)
     cmdSave.Enabled = False
   End Sub
-
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     AlertStyle = lstStyles.SelectedItem
     Changed = True
     cmdSave.Enabled = False
   End Sub
-
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click
     If Changed Then
       Me.DialogResult = Windows.Forms.DialogResult.Yes
@@ -46,7 +42,6 @@
       Me.DialogResult = Windows.Forms.DialogResult.No
     End If
   End Sub
-
   Private Sub lstStyles_DragDrop(sender As Object, e As System.Windows.Forms.DragEventArgs) Handles lstStyles.DragDrop
     If e.Data.GetFormats(True).Contains("FileDrop") Then
       Dim Data = e.Data.GetData("FileDrop")
@@ -90,11 +85,9 @@
       e.Effect = DragDropEffects.None
     End If
   End Sub
-
   Private Sub lstStyles_DragEnter(sender As Object, e As System.Windows.Forms.DragEventArgs) Handles lstStyles.DragEnter
     e.Effect = DragDropEffects.Link
   End Sub
-
   Private Sub lstStyles_DragOver(sender As Object, e As System.Windows.Forms.DragEventArgs) Handles lstStyles.DragOver
     If e.Data.GetFormats(True).Contains("FileDrop") Then
       Dim Data = e.Data.GetData("FileDrop")
@@ -137,7 +130,6 @@
       e.Effect = DragDropEffects.None
     End If
   End Sub
-
   Private Sub lstStyles_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles lstStyles.KeyUp
     If e.KeyCode = Keys.Delete AndAlso lstStyles.SelectedIndices.Count = 1 Then
       Dim index As Integer = lstStyles.SelectedIndex
@@ -161,7 +153,6 @@
       End If
     End If
   End Sub
-
   Private Sub lstStyles_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles lstStyles.SelectedIndexChanged
     Try
       If pctPreview.BackgroundImage IsNot Nothing Then
@@ -209,7 +200,6 @@
       cmdSave.Enabled = False
     End Try
   End Sub
-
   Private Sub pctPreview_MouseUp(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctPreview.MouseUp
     If e.Button = Windows.Forms.MouseButtons.Right Then
       Clipboard.SetImage(pctPreview.Image)
@@ -222,7 +212,6 @@
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Hello World", "This alert is a live example of your currently selected alert. What do you think?", 200, 5000, 100)
     End If
   End Sub
-
   Private Sub lblMore_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblMore.LinkClicked
     Try
       Process.Start("http://srt.realityripple.com/Alert_Styles/")

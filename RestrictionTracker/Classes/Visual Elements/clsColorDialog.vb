@@ -1,9 +1,7 @@
 ﻿Public Class ColorDialog
   Inherits System.Windows.Forms.ColorDialog
-
   Private m_title As String = String.Empty
   Private titleSet As Boolean = False
-
   Public Property Title() As String
     Get
       Return m_title
@@ -15,7 +13,6 @@
       End If
     End Set
   End Property
-
   <System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.Demand, Name:="FullTrust")>
   Protected Overrides Function HookProc(ByVal hWnd As IntPtr, ByVal msg As Integer, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr
     If msg = &HF Then

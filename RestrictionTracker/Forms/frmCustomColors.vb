@@ -1,5 +1,4 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
-
 Public Class frmCustomColors
   Private lDown, lUp, lDownLim, lUpLim As Long
   Private iD, iU As Integer

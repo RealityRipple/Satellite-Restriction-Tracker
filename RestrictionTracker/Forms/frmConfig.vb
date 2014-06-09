@@ -777,7 +777,6 @@
       pctSRT.Image = bmpAnim.Clone
     End Using
   End Sub
-
   Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs)
 
   End Sub

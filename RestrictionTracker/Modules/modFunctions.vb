@@ -26,7 +26,6 @@ Module modFunctions
       Case Else : Return localRestrictionTracker.SatHostTypes.Other
     End Select
   End Function
-
   Private Class MCIPlayer
     Implements IDisposable
     Private sAlias As String
@@ -433,7 +432,6 @@ Module modFunctions
       Return mySettings.HistoryDir
     End Get
   End Property
-
   Public ReadOnly Property MonospaceFont(Size As Single) As Font
     Get
       Try
@@ -853,7 +851,6 @@ Module modFunctions
       Return closestRow
     End If
   End Function
-
   Public Function DrawLineGraph(ByVal Data() As DataBase.DataRow, ByVal Down As Boolean, ByVal ImgSize As Size, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
     Dim yDMax As Long = 0
@@ -1513,9 +1510,7 @@ Module modFunctions
     g.Dispose()
     Return iPic
   End Function
-
 #End Region
-
 #Region "Progress"
   Public Function DisplayProgress(ImgSize As Size, Current As Long, Total As Long, Accuracy As Integer, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color) As Image
     If ImgSize.IsEmpty Then Return Nothing
@@ -1750,7 +1745,6 @@ Module modFunctions
     Return tBrush
   End Function
 #End Region
-
 #Region "Tray"
   Private Const Alpha As Integer = 192
   Public Sub CreateTrayIcon_Left(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)

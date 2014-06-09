@@ -1,20 +1,17 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
 Public Class frmMain
   Private myPanel As SatHostTypes
-
   Private Enum LoadStates
     Loading
     Loaded
     Lookup
   End Enum
-
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Private Delegate Sub ParamaterizedInvoker2(parameter As Object, secondParam As Object)
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
-
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
   Private Const sDISPLAY As String = "Bandwidth Levels (%lt)"
@@ -25,16 +22,13 @@ Public Class frmMain
   Private Const sDISPLAY_TT_ERR As String = "%e" & vbNewLine & "%m"
   Private Const sDISPLAY_TT_T_SOON As String = "a Moment"
   Private Const MBPerGB As Integer = 1000
-
   Private myState As LoadStates = LoadStates.Loading
-
   Private sDisp As String = sDISPLAY.Replace("%lt", sDisp_LT)
   Private sDisp_LT As String = sDISPLAY_LT_NONE
   Private sDispTT As String = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_M = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
-
   Private sEXEPath As String = AppData & "\Setup.exe"
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
@@ -49,7 +43,6 @@ Public Class frmMain
   Private e_down, e_up, e_over, e_lim As Long
   Private r_used, r_lim As Long
   Private lastBalloon As Long
-
 #Region "Server Type Determination"
   Private Class DetermineType
     Private Class URLChecker
@@ -2359,6 +2352,4 @@ Public Class frmMain
     End If
   End Sub
 #End Region
-
-
 End Class

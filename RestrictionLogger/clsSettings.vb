@@ -192,7 +192,6 @@
       End If
     End Set
   End Property
-
   Private Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
     Select Case st.ToUpper
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY

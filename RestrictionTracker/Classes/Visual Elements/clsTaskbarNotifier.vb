@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-
 ''' <summary>
 ''' TaskbarNotifier allows to display MSN style/Skinned instant messaging popups
 ''' </summary>
@@ -49,7 +48,6 @@ Public Class TaskbarNotifier
   Public Event TitleClick As EventHandler
   Public Event ContentClick As EventHandler
 #End Region
-
 #Region "TaskbarNotifier Enums"
   ''' <summary>
   ''' List of the different popup animation status
@@ -61,7 +59,6 @@ Public Class TaskbarNotifier
     disappearing = 3
   End Enum
 #End Region
-
 #Region "TaskbarNotifier Constructor"
   ''' <summary>
   ''' The Constructor for TaskbarNotifier
@@ -83,7 +80,6 @@ Public Class TaskbarNotifier
     AddHandler timer.Tick, New EventHandler(AddressOf OnTimer)
   End Sub
 #End Region
-
 #Region "TaskbarNotifier Properties"
   ''' <summary>
   ''' Get the current TaskbarState (hidden, showing, visible, hiding)
@@ -251,7 +247,6 @@ Public Class TaskbarNotifier
   End Property
 
 #End Region
-
 #Region "TaskbarNotifier Public Methods"
   <DllImport("user32.dll")> _
   Private Shared Function ShowWindow(hWnd As IntPtr, nCmdShow As Int32) As [Boolean]
@@ -406,7 +401,6 @@ Public Class TaskbarNotifier
     CloseBitmapLocation = position
   End Sub
 #End Region
-
 #Region "TaskbarNotifier Protected Methods"
   Protected Sub DrawCloseButton(grfx As Graphics)
     If CloseBitmap IsNot Nothing Then
@@ -502,7 +496,6 @@ Public Class TaskbarNotifier
     Return region
   End Function
 #End Region
-
 #Region "TaskbarNotifier Events Overrides"
   Protected Sub OnTimer(obj As [Object], ea As EventArgs)
     Select Case m_taskbarState
@@ -643,7 +636,6 @@ Public Class TaskbarNotifier
   End Sub
 #End Region
 End Class
-
 Public Class TaskBarPosition
   <DllImport("shell32.dll")>
   Private Shared Function SHAppBarMessage(ByVal dwMessage As Integer, ByRef pData As APPBARDATA) As Integer

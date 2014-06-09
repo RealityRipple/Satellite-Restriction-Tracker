@@ -1,19 +1,15 @@
 ﻿Imports System.Security.Cryptography
-
 Public MustInherit Class RR_HMAC
   Inherits KeyedHashAlgorithm
-
   Private _disposed As Boolean
   Private _hashName As String
   Private _algo As HashAlgorithm
   Private _block As BlockProcessor
   Private _blockSizeValue As Integer
-
   Protected Sub New()
     _disposed = False
     _blockSizeValue = 64
   End Sub
-
   Protected Property BlockSizeValue() As Integer
     Get
       Return _blockSizeValue
@@ -22,7 +18,6 @@ Public MustInherit Class RR_HMAC
       _blockSizeValue = value
     End Set
   End Property
-
   Public Property HashName() As String
     Get
       Return _hashName
@@ -32,7 +27,6 @@ Public MustInherit Class RR_HMAC
       _algo = HashAlgorithm.Create(_hashName)
     End Set
   End Property
-
   Public Overrides Property Key() As Byte()
     Get
       Return DirectCast(MyBase.Key.Clone(), Byte())
@@ -45,7 +39,6 @@ Public MustInherit Class RR_HMAC
       End If
     End Set
   End Property
-
   Friend ReadOnly Property Block() As BlockProcessor
     Get
       If _block Is Nothing Then
@@ -54,27 +47,21 @@ Public MustInherit Class RR_HMAC
       Return _block
     End Get
   End Property
-
   Private Function KeySetup(key As Byte(), padding As Byte) As Byte()
     Dim buf As Byte() = New Byte(BlockSizeValue - 1) {}
-
     For i As Integer = 0 To key.Length - 1
       buf(i) = CByte(CByte(key(i)) Xor padding)
     Next
-
     For i As Integer = key.Length To BlockSizeValue - 1
       buf(i) = padding
     Next
-
     Return buf
   End Function
-
   Protected Overrides Sub Dispose(disposing As Boolean)
     If Not _disposed Then
       MyBase.Dispose(disposing)
     End If
   End Sub
-
   Protected Overrides Sub HashCore(rgb As Byte(), ib As Integer, cb As Integer)
     If _disposed Then
       Throw New ObjectDisposedException("HMACSHA1")
@@ -86,16 +73,13 @@ Public MustInherit Class RR_HMAC
     End If
     Block.Core(rgb, ib, cb)
   End Sub
-
   Protected Overrides Function HashFinal() As Byte()
     If _disposed Then
       Throw New ObjectDisposedException("HMAC")
     End If
     State = 0
-
     Block.Final()
     Dim intermediate As Byte() = _algo.Hash
-
     Dim buf As Byte() = KeySetup(Key, &H5C)
     _algo.Initialize()
     _algo.TransformBlock(buf, 0, buf.Length, buf, 0)
@@ -106,7 +90,6 @@ Public MustInherit Class RR_HMAC
     Array.Clear(intermediate, 0, intermediate.Length)
     Return hash
   End Function
-
   Public Overrides Sub Initialize()
     If _disposed Then
       Throw New ObjectDisposedException("HMAC")
@@ -118,7 +101,6 @@ Public MustInherit Class RR_HMAC
     Block.Core(buf)
     Array.Clear(buf, 0, buf.Length)
   End Sub
-
   Public Shared Shadows Function Create() As HMAC
 #If FULL_AOT_RUNTIME Then
 			Return New System.Security.Cryptography.HMACSHA1()
@@ -126,19 +108,16 @@ Public MustInherit Class RR_HMAC
     Return Create("System.Security.Cryptography.HMAC")
 #End If
   End Function
-
   Public Shared Shadows Function Create(algorithmName As String) As HMAC
     Return DirectCast(CryptoConfig.CreateFromName(algorithmName), HMAC)
   End Function
 End Class
-
 Public Class RR_HMACSHA512
   Inherits RR_HMAC
-
   Shared legacy_mode As Boolean
   Private legacy As Boolean
   Shared Sub New()
-    legacy_mode = False '(Environment.GetEnvironmentVariable("legacyHMACMode").CompareTo("1") = 0)
+    legacy_mode = False
   End Sub
   Public Sub New()
     Me.New(KeyBuilder.Key(8))
@@ -160,7 +139,6 @@ Public Class RR_HMACSHA512
     End Set
   End Property
 End Class
-
 Public Class KeyBuilder
   Private Shared rng As RandomNumberGenerator
   Shared Sub New()
@@ -177,7 +155,6 @@ Public Class KeyBuilder
     Return iv__1
   End Function
 End Class
-
 Public Class BlockProcessor
   Private transform As ICryptoTransform
   Private block As Byte()

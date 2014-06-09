@@ -1,6 +1,5 @@
 ﻿Imports System.Xml.Linq
 Imports RestrictionLibrary.localRestrictionTracker
-
 Class SvcSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
@@ -153,7 +152,6 @@ End Class
 Class AppSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
-
   Private m_Interval As Integer
   Private m_Gr As String
   Private m_LastUpdate As Date
@@ -830,7 +828,6 @@ Class AppSettings
     Colors.HistoryText = Color.Transparent
     Colors.HistoryBackground = Color.Transparent
   End Sub
-
   Public Sub Save()
     Dim sAccountType As String = HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
@@ -899,7 +896,6 @@ Class AppSettings
       MsgBox("Failed to save settings!", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal)
     End If
   End Sub
-
   Private Function ColorToStr(c As Color) As String
     Dim sA As String
     If c.A > 0 Then
@@ -955,7 +951,6 @@ Class AppSettings
       Return Color.Transparent
     End If
   End Function
-
   Public Sub MakeBackup()
     If My.Computer.FileSystem.FileExists(ConfigFile) Then
       My.Computer.FileSystem.CopyFile(ConfigFile, ConfigFileBackup, True)
@@ -1230,7 +1225,6 @@ Class AppSettings
       End If
     End Set
   End Property
-
   Class AppColors
     Private c_MainDA As Color
     Private c_MainDB As Color
@@ -1240,14 +1234,12 @@ Class AppSettings
     Private c_MainUC As Color
     Private c_MainText As Color
     Private c_MainBG As Color
-
     Private c_TrayDA As Color
     Private c_TrayDB As Color
     Private c_TrayDC As Color
     Private c_TrayUA As Color
     Private c_TrayUB As Color
     Private c_TrayUC As Color
-
     Private c_HistoryDA As Color
     Private c_HistoryDB As Color
     Private c_HistoryDC As Color
@@ -1258,7 +1250,6 @@ Class AppSettings
     Private c_HistoryUM As Color
     Private c_HistoryText As Color
     Private c_HistoryBG As Color
-
     Public Property MainDownA As Color
       Get
         Return c_MainDA
@@ -1323,8 +1314,6 @@ Class AppSettings
         c_MainBG = value
       End Set
     End Property
-
-
     Public Property TrayDownA As Color
       Get
         Return c_TrayDA
@@ -1373,8 +1362,6 @@ Class AppSettings
         c_TrayUC = value
       End Set
     End Property
-
-
     Public Property HistoryDownA As Color
       Get
         Return c_HistoryDA

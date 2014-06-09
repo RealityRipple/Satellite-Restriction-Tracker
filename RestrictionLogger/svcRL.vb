@@ -8,7 +8,6 @@ Public Class svcRL
   Private DataPath As String
   Private WithEvents tracker As localRestrictionTracker
   Private WithEvents typeDetermination As DetermineType
-
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.DishNet
@@ -105,7 +104,6 @@ Public Class svcRL
         End If
       End If
     End Function
-
     Private Shared Function CheckURL(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy) As Boolean
       Dim sAddr As String = HostAddress
       If HostAddress.IndexOf("://") < 0 Then HostAddress = "http://" & HostAddress
@@ -137,7 +135,6 @@ Public Class svcRL
       End Try
     End Function
   End Class
-
   Protected Overrides Sub OnStart(ByVal args() As String)
     myLog = New EventLog("Satellite Restriction Service Log")
     myLog.Source = "Service"
@@ -201,40 +198,32 @@ Public Class svcRL
       End If
     End If
   End Sub
-
   Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
-
   Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure
     myLog.WriteEntry(e.Type.ToString & ": " & e.Message, EventLogEntryType.Error)
   End Sub
-
   Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
-
   Private Sub tracker_ConnectionRPLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionRPLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-
   Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
     myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information)
   End Sub
-
   Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-
   Private Sub tracker_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBVResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
-
   Private Sub tracker_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPECResultEventArgs) Handles tracker.ConnectionWBXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
     LOG_Add(e.Update, e.Download, e.Limit, e.Upload, e.Over)
