@@ -38,6 +38,8 @@ Module modFunctions
           Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
         ElseIf ex.Message.Contains("405") Then
           Return "The server did not like the method. Please try again."
+        ElseIf ex.Message.Contains("500") Then
+          Return "The server is too busy. Please try again."
         ElseIf ex.Message.Contains("502") Then
           Return "The gateway is unavailable. Please try again later."
         ElseIf ex.Message.Contains("503") Then
