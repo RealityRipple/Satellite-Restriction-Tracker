@@ -117,4 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="lblNewVer.Text" xml:space="preserve">
+    <value>Version %v has been released and is available for download.
+To keep up-to-date with the latest features, improvements, bug fixes, and
+meter compliance, please update Satellite Restriction Tracker immediately.
+</value>
+  </data>
 </root>
