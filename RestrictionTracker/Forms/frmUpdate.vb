@@ -13,13 +13,18 @@
   End Sub
   Public Sub NewUpdate(Version As String, BETA As Boolean)
     If BETA Then
-      Me.Text = "New BETA Version Available"
+      Me.Text = "New BETA Version Available - " & Application.ProductName
       lblTitle.Text = Application.ProductName & " BETA Update"
     Else
-      Me.Text = "New Version Available"
+      Me.Text = "New Version Available - " & Application.ProductName
       lblTitle.Text = Application.ProductName & " Update"
     End If
-    lblNewVer.Text = lblNewVer.Text.Replace("%v", DisplayVersion(Version))
+    Dim newVer As String = "Version %v has been released and is available for download." & vbNewLine &
+                           "To keep up-to-date with the latest features, improvements, bug fixes, and" & vbNewLine &
+                           "meter compliance, please update %p immediately."
+    newVer = newVer.Replace("%v", DisplayVersion(Version))
+    newVer = newVer.Replace("%p", Application.ProductName)
+    lblNewVer.Text = newVer
     txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
     lblBETA.Visible = BETA
     chkStopBETA.Visible = BETA
@@ -51,6 +56,7 @@
       cmdChanges.Text = "Changes <<"
       txtInfo.Visible = True
       If Not txtInfo.Text.StartsWith("Released:") Then
+        pctThrobber.Visible = True
         cmdDownload.Focus()
         cmdChanges.Enabled = False
         txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
@@ -71,6 +77,7 @@
     If Me.InvokeRequired Then
       Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf sckVerInfo_DownloadStringCompleted), sender, e)
     Else
+      pctThrobber.Visible = False
       If e.Cancelled Then
         txtInfo.Text = "Info Request Cancelled"
       ElseIf e.Error IsNot Nothing Then
@@ -91,6 +98,7 @@
     If Me.InvokeRequired Then
       Me.Invoke(New FailureHandler(AddressOf sckVerInfo_Failure), sender, e)
     Else
+      pctThrobber.Visible = False
       txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
       If sckVerInfo IsNot Nothing Then
         sckVerInfo.Dispose()
