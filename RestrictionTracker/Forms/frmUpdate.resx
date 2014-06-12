@@ -120,13 +120,4 @@
   <metadata name="ttUpdate.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="ttUpdate.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <data name="lblNewVer.Text" xml:space="preserve">
-    <value>Version %v has been released and is available for download.
-To keep up-to-date with the latest features, improvements, bug fixes, and
-meter compliance, please update Satellite Restriction Tracker immediately.
-</value>
-  </data>
 </root>

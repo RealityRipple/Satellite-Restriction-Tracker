@@ -20,8 +20,8 @@
       lblTitle.Text = Application.ProductName & " Update"
     End If
     Dim newVer As String = "Version %v has been released and is available for download." & vbNewLine &
-                           "To keep up-to-date with the latest features, improvements, bug fixes, and" & vbNewLine &
-                           "meter compliance, please update %p immediately."
+             "To keep up-to-date with the latest features, improvements, bug fixes, and" & vbNewLine &
+             "meter compliance, please update %p immediately."
     newVer = newVer.Replace("%v", DisplayVersion(Version))
     newVer = newVer.Replace("%p", Application.ProductName)
     lblNewVer.Text = newVer

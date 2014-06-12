@@ -23,7 +23,6 @@ Partial Class frmUpdate
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
-    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmUpdate))
     Me.pnlUpdate = New System.Windows.Forms.TableLayoutPanel()
     Me.lblTitle = New System.Windows.Forms.Label()
     Me.txtInfo = New System.Windows.Forms.TextBox()
@@ -35,7 +34,7 @@ Partial Class frmUpdate
     Me.pctThrobber = New System.Windows.Forms.PictureBox()
     Me.chkStopBETA = New System.Windows.Forms.CheckBox()
     Me.lblNewVer = New System.Windows.Forms.Label()
-    Me.ttUpdate = New System.Windows.Forms.ToolTip(Me.components)
+    Me.ttUpdate = New ToolTip(Me.components)
     Me.pnlUpdate.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     CType(Me.pctThrobber, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -81,7 +80,7 @@ Partial Class frmUpdate
     'txtInfo
     '
     Me.txtInfo.Dock = System.Windows.Forms.DockStyle.Top
-    Me.txtInfo.Location = New System.Drawing.Point(3, 226)
+    Me.txtInfo.Location = New System.Drawing.Point(3, 211)
     Me.txtInfo.Multiline = True
     Me.txtInfo.Name = "txtInfo"
     Me.txtInfo.ReadOnly = True
@@ -94,7 +93,7 @@ Partial Class frmUpdate
     '
     Me.lblBETA.AutoSize = True
     Me.lblBETA.ForeColor = System.Drawing.Color.Firebrick
-    Me.lblBETA.Location = New System.Drawing.Point(3, 126)
+    Me.lblBETA.Location = New System.Drawing.Point(3, 111)
     Me.lblBETA.Margin = New System.Windows.Forms.Padding(3)
     Me.lblBETA.Name = "lblBETA"
     Me.lblBETA.Size = New System.Drawing.Size(317, 39)
@@ -119,7 +118,7 @@ Partial Class frmUpdate
     Me.pnlButtons.Controls.Add(Me.cmdCancel, 2, 0)
     Me.pnlButtons.Controls.Add(Me.cmdChanges, 3, 0)
     Me.pnlButtons.Controls.Add(Me.pctThrobber, 0, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 192)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 177)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -136,7 +135,7 @@ Partial Class frmUpdate
     Me.cmdDownload.Name = "cmdDownload"
     Me.cmdDownload.Size = New System.Drawing.Size(120, 25)
     Me.cmdDownload.TabIndex = 0
-    Me.cmdDownload.Text = "Download Update"
+    Me.cmdDownload.Text = "Download &Update"
     Me.ttUpdate.SetToolTip(Me.cmdDownload, "Download the new version.")
     Me.cmdDownload.UseVisualStyleBackColor = True
     '
@@ -150,7 +149,7 @@ Partial Class frmUpdate
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(80, 25)
     Me.cmdCancel.TabIndex = 1
-    Me.cmdCancel.Text = "Not Now"
+    Me.cmdCancel.Text = "&Not Now"
     Me.ttUpdate.SetToolTip(Me.cmdCancel, "Ignore the new version for now.")
     Me.cmdCancel.UseVisualStyleBackColor = True
     '
@@ -162,7 +161,7 @@ Partial Class frmUpdate
     Me.cmdChanges.Name = "cmdChanges"
     Me.cmdChanges.Size = New System.Drawing.Size(80, 25)
     Me.cmdChanges.TabIndex = 2
-    Me.cmdChanges.Text = "Changes >>"
+    Me.cmdChanges.Text = "&Changes >>"
     Me.ttUpdate.SetToolTip(Me.cmdChanges, "View the latest version's Change Log.")
     Me.cmdChanges.UseVisualStyleBackColor = True
     '
@@ -182,12 +181,12 @@ Partial Class frmUpdate
     '
     Me.chkStopBETA.AutoSize = True
     Me.chkStopBETA.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkStopBETA.Location = New System.Drawing.Point(6, 171)
+    Me.chkStopBETA.Location = New System.Drawing.Point(6, 156)
     Me.chkStopBETA.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
     Me.chkStopBETA.Name = "chkStopBETA"
     Me.chkStopBETA.Size = New System.Drawing.Size(189, 18)
     Me.chkStopBETA.TabIndex = 5
-    Me.chkStopBETA.Text = "Don't notify me of BETA updates."
+    Me.chkStopBETA.Text = "Don't notify me of &BETA updates."
     Me.ttUpdate.SetToolTip(Me.chkStopBETA, "Disable notifications of BETA version updates.")
     Me.chkStopBETA.UseVisualStyleBackColor = True
     Me.chkStopBETA.Visible = False
@@ -199,9 +198,11 @@ Partial Class frmUpdate
     Me.lblNewVer.Location = New System.Drawing.Point(3, 42)
     Me.lblNewVer.Margin = New System.Windows.Forms.Padding(3, 6, 3, 6)
     Me.lblNewVer.Name = "lblNewVer"
-    Me.lblNewVer.Size = New System.Drawing.Size(379, 75)
+    Me.lblNewVer.Size = New System.Drawing.Size(379, 60)
     Me.lblNewVer.TabIndex = 1
-    Me.lblNewVer.Text = resources.GetString("lblNewVer.Text")
+    Me.lblNewVer.Text = "Version %v has been released and is available for download." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "To keep up-to-date w" & _
+    "ith the latest features, improvements, bug fixes, and" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "meter compliance, please " & _
+    "update %p immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
     '
     'frmUpdate
     '
@@ -238,5 +239,5 @@ Partial Class frmUpdate
   Friend WithEvents chkStopBETA As System.Windows.Forms.CheckBox
   Friend WithEvents lblNewVer As System.Windows.Forms.Label
   Friend WithEvents pctThrobber As System.Windows.Forms.PictureBox
-  Friend WithEvents ttUpdate As System.Windows.Forms.ToolTip
+  Friend WithEvents ttUpdate As ToolTip
 End Class
