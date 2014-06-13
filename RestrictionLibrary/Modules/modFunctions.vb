@@ -46,6 +46,8 @@ Module modFunctions
           Return "The server is unavailable. Please try again later."
         ElseIf ex.Message.Contains("504") Then
           Return "The server timed out. Please try again."
+        ElseIf ex.Message.Contains("505") Then
+          Return "Server 505 (Version Not Supported). The server may not be supported or may be down. Check your account settings and try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           If ex.Message.Contains(")") Then
