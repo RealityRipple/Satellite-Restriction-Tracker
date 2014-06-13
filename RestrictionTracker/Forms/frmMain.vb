@@ -572,6 +572,7 @@ Public Class frmMain
       Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
       UsageInvoker.BeginInvoke(Nothing, Nothing)
     End If
+    If ClosingTime Then Exit Sub
     Dim sizeChangeInvoker As New EventHandler(AddressOf frmMain_SizeChanged)
     sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
   End Sub
