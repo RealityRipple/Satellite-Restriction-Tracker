@@ -9,6 +9,10 @@
     c_Timeout = 60
     c_HTVer = Net.HttpVersion.Version10
   End Sub
+  Sub New(v As Version)
+    Me.New(New Net.CookieContainer)
+    c_HTVer = v
+  End Sub
   Public CookieJar As Net.CookieContainer
   Public ResponseURI As Uri
   Public Class ErrorEventArgs
