@@ -7,6 +7,7 @@
   Sub New(c As Net.CookieContainer)
     Me.CookieJar = c
     c_Timeout = 60
+    c_HTVer = Net.HttpVersion.Version10
   End Sub
   Public CookieJar As Net.CookieContainer
   Public ResponseURI As Uri
@@ -25,6 +26,15 @@
       c_Timeout = value
     End Set
   End Property
+  Private c_HTVer As Version
+  Public Property HTTPVersion As Version
+    Get
+      Return c_HTVer
+    End Get
+    Set(value As Version)
+      c_HTVer = value
+    End Set
+  End Property
   Public Event Failure(sender As Object, e As ErrorEventArgs)
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
@@ -37,7 +47,7 @@
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = True
         CType(request, Net.HttpWebRequest).KeepAlive = False
         'CType(request, Net.HttpWebRequest).Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-        CType(request, Net.HttpWebRequest).ProtocolVersion = Net.HttpVersion.Version10
+        CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
       End If
       Return request
     Catch ex As Net.WebException
