@@ -66,7 +66,7 @@
     End If
   End Sub
   Private Sub GetVerInfo()
-    sckVerInfo = New CookieAwareWebClient
+    sckVerInfo = New CookieAwareWebClient(Net.HttpVersion.Version11)
     If lblBETA.Visible Then
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/infob"))
     Else

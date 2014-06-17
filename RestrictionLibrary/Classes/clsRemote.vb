@@ -104,7 +104,7 @@ Public Class remoteRestrictionTracker
     sProduct = ProductKey
     sDataPath = DataPath
     Secret = System.Text.Encoding.UTF8.GetBytes(ProductKey)
-    wsLogin = New CookieAwareWebClient
+    wsLogin = New CookieAwareWebClient(Net.HttpVersion.Version11)
     wsLogin.Timeout = Timeout
     wsLogin.Proxy = Proxy
     BeginLogin()

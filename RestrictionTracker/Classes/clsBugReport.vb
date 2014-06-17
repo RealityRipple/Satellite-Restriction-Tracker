@@ -89,7 +89,7 @@
       httpSend.Dispose()
       httpSend = Nothing
     End If
-    httpSend = New CookieAwareWebClient
+    httpSend = New CookieAwareWebClient(Net.HttpVersion.Version11)
     Dim sTok As String = GetToken(1)
     If String.IsNullOrEmpty(sTok) Then
       httpSend.Dispose()
