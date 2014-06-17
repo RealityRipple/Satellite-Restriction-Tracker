@@ -457,6 +457,7 @@
     Else
       Dim bToSave As Boolean = True
       If Not CheckState Then bToSave = False
+      If SettingsChanged() Then bToSave = True
       pctKeyState.Tag = 0
       pctKeyState.Image = My.Resources.ico_err
       Dim sErr As String = "There was an error verifying your key!"
@@ -488,6 +489,7 @@
     Else
       Dim bToSave As Boolean = True
       If CheckState Then bToSave = False
+      If SettingsChanged() Then bToSave = True
       pctKeyState.Tag = 1
       pctKeyState.Image = My.Resources.ico_ok
       ttConfig.SetTooltip(pctKeyState, "Your key has been verified!")
@@ -739,7 +741,6 @@
     If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
     If Not mySettings.BetaCheck = chkBeta.Checked Then Return True
-
     If mySettings.Proxy Is Nothing Then
       If Not cmbProxyType.SelectedIndex = 0 Then Return True
     ElseIf mySettings.Proxy Is Net.WebRequest.DefaultWebProxy Then
@@ -748,9 +749,6 @@
       If cmbProxyType.SelectedIndex = 0 Then Return True
       If cmbProxyType.SelectedIndex = 1 Then Return True
       Dim addr As Uri = CType(mySettings.Proxy, Net.WebProxy).Address
-      Debug.Print(addr.OriginalString)
-      Debug.Print(addr.Host)
-      Debug.Print(addr.Port)
       If cmbProxyType.SelectedIndex = 2 Then
         If Not String.Compare(txtProxyAddress.Text, addr.Host) = 0 Then Return True
         If Not txtProxyPort.Value = addr.Port Then Return True
