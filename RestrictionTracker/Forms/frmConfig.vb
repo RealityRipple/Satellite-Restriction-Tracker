@@ -161,6 +161,22 @@
         Else
           Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
+      ElseIf cmdSave.Enabled Then
+        Dim saveRet As MsgBoxResult = MsgBox("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", MsgBoxStyle.Question Or MsgBoxStyle.YesNoCancel, "Save Configuration?")
+        If saveRet = MsgBoxResult.Yes Then
+          cmdSave.PerformClick()
+          If bAccount Then
+            Me.DialogResult = Windows.Forms.DialogResult.Yes
+          Else
+            Me.DialogResult = Windows.Forms.DialogResult.OK
+          End If
+        ElseIf saveRet = MsgBoxResult.No Then
+          Me.DialogResult = Windows.Forms.DialogResult.No
+        ElseIf saveRet = MsgBoxResult.Cancel Then
+          e.Cancel = True
+          Me.DialogResult = Windows.Forms.DialogResult.None
+          Exit Sub
+        End If
       Else
         Me.DialogResult = Windows.Forms.DialogResult.No
       End If
@@ -659,8 +675,6 @@
           End If
         End If
     End Select
-
-
     mySettings.Save()
     If mySettings.Service Then
       Dim cSave As New SvcSettings

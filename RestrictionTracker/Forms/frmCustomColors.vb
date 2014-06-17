@@ -8,6 +8,24 @@ Public Class frmCustomColors
   Private DisplayAs As SatHostTypes
   Private useStyle As SatHostTypes = SatHostTypes.Other
   Private FakeData As Collections.Generic.List(Of DataBase.DataRow)
+  Private Sub frmCustomColors_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    If cmdSave.Enabled Then
+      Dim saveRet As MsgBoxResult = MsgBox("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your color scheme?", MsgBoxStyle.Question Or MsgBoxStyle.YesNoCancel, "Save Colors?")
+      If saveRet = MsgBoxResult.Yes Then
+        cmdSave.PerformClick()
+      ElseIf saveRet = MsgBoxResult.No Then
+        Me.DialogResult = Windows.Forms.DialogResult.No
+      ElseIf saveRet = MsgBoxResult.Cancel Then
+        Me.DialogResult = Windows.Forms.DialogResult.None
+        e.Cancel = True
+      End If
+    End If
+    If HasSaved Then
+      Me.DialogResult = Windows.Forms.DialogResult.Yes
+    Else
+      Me.DialogResult = Windows.Forms.DialogResult.No
+    End If
+  End Sub
   Private Sub frmCustomColors_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Randomize()
     If lDownLim = 0 And lUpLim = 0 Then
@@ -317,11 +335,6 @@ Public Class frmCustomColors
     HasSaved = True
   End Sub
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click
-    If HasSaved Then
-      Me.DialogResult = Windows.Forms.DialogResult.Yes
-    Else
-      Me.DialogResult = Windows.Forms.DialogResult.No
-    End If
     Me.Close()
   End Sub
 #End Region
