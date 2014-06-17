@@ -135,175 +135,6 @@ Public Class frmCustomColors
     cmdSave.Enabled = False
     HasSaved = False
   End Sub
-  Private Sub RedrawImages()
-    If pctMain.Image IsNot Nothing Then
-      pctMain.Image.Dispose()
-      pctMain.Image = Nothing
-    End If
-    Dim iSize As Integer = pctMain.Width
-    Dim iHalf As Integer = Math.Floor(iSize / 2)
-    Select Case DisplayAs
-      Case SatHostTypes.WildBlue_LEGACY
-        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
-        Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
-          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
-          g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
-          g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
-        End Using
-        pctMain.Image = fakeI
-      Case SatHostTypes.WildBlue_EXEDE
-        Dim FakeMRect As New Rectangle(0, 0, iSize * 2, iSize * 1.5)
-        Dim FakeE As Image = DisplayEProgress(FakeMRect.Size, lDown, lUp, 0, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim MRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
-          g.DrawImage(FakeE, MRect, FakeMRect, GraphicsUnit.Pixel)
-        End Using
-        pctMain.Image = fakeI
-      Case SatHostTypes.RuralPortal_EXEDE
-        pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-      Case SatHostTypes.DishNet_EXEDE
-        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
-        Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
-          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
-          g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
-          g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
-        End Using
-        pctMain.Image = fakeI
-      Case Else
-        pctMain.Image = pctMain.ErrorImage.Clone
-    End Select
-    If pctTray.Image IsNot Nothing Then
-      pctTray.Image.Dispose()
-      pctTray.Image = Nothing
-    End If
-    Const traySquare As Integer = 16
-    Dim imgTray As New Bitmap(traySquare, traySquare)
-    Using g As Graphics = Graphics.FromImage(imgTray)
-      g.Clear(Color.Transparent)
-      Select Case DisplayAs
-        Case SatHostTypes.WildBlue_LEGACY
-          If lDown >= lDownLim Or lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
-          Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
-          End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-          CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
-        Case SatHostTypes.WildBlue_EXEDE
-          If lDown + lUp >= lUpLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
-          Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
-          End If
-          CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
-        Case SatHostTypes.RuralPortal_EXEDE
-          If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
-          Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
-          End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-        Case SatHostTypes.DishNet_EXEDE
-          If lDown >= lDownLim Then
-            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
-          Else
-            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
-          End If
-          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-        Case Else
-          g.DrawImage(pctTray.ErrorImage, 0, 0)
-      End Select
-    End Using
-    pctTray.Image = imgTray
-
-    If pctHistory.Image IsNot Nothing Then
-      pctHistory.Image.Dispose()
-      pctHistory.Image = Nothing
-    End If
-    If FakeData Is Nothing OrElse FakeData.Count = 0 Then MakeFakeData()
-    Dim FakeHRect As New Rectangle(0, 0, 500, 200)
-    Select Case DisplayAs
-      Case SatHostTypes.WildBlue_LEGACY
-        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
-          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
-          g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
-          g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
-        End Using
-        pctHistory.Image = fakeI
-      Case SatHostTypes.WildBlue_EXEDE
-        Dim FakeE As Image = DrawEGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
-          g.DrawImage(FakeE, dRect, FakeHRect, GraphicsUnit.Pixel)
-        End Using
-        pctHistory.Image = fakeI
-      Case SatHostTypes.RuralPortal_EXEDE
-        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
-          g.DrawImage(FakeR, dRect, FakeHRect, GraphicsUnit.Pixel)
-        End Using
-        pctHistory.Image = fakeI
-      Case SatHostTypes.DishNet_EXEDE
-        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        Using g As Graphics = Graphics.FromImage(fakeI)
-          g.Clear(Color.Black)
-          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
-          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
-          g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
-          g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
-        End Using
-        pctHistory.Image = fakeI
-      Case Else
-        pctHistory.Image = pctHistory.ErrorImage.Clone
-    End Select
-  End Sub
 #Region "Buttons"
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     mySettings.Colors.MainDownA = pctMainDownA.BackColor
@@ -452,7 +283,7 @@ Public Class frmCustomColors
       pctThis.Tag = pctThis.BackColor
       pctThis.BackColor = Color.Transparent
     End If
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
     RedrawImages()
   End Sub
 #End Region
@@ -479,7 +310,7 @@ Public Class frmCustomColors
         If dlgColor.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
           pctColor.BackColor = dlgColor.Color
           RedrawImages()
-          cmdSave.Enabled = True
+          cmdSave.Enabled = SettingsChanged()
         End If
         customColors = dlgColor.CustomColors
       End Using
@@ -489,7 +320,7 @@ Public Class frmCustomColors
     Dim pctColor As PictureBox = mnuColorOpts.Tag
     If pctColor IsNot Nothing Then
       SetElColor(pctColor, DefaultColorForElement(pctColor.Name, useStyle))
-      cmdSave.Enabled = True
+      cmdSave.Enabled = SettingsChanged()
     End If
     RedrawImages()
   End Sub
@@ -513,7 +344,7 @@ Public Class frmCustomColors
       SetElColor(pColor, bColor)
     Next
     RedrawImages()
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub mnuAllDefault_Click(sender As System.Object, e As System.EventArgs) Handles mnuAllDefault.Click
     Dim pctColor As PictureBox = mnuColorOpts.Tag
@@ -531,10 +362,37 @@ Public Class frmCustomColors
       SetElColor(pColor, bColor)
     Next
     RedrawImages()
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
   End Sub
 #End Region
 #Region "Functions"
+  Private Function SettingsChanged() As Boolean
+    If Not mySettings.Colors.MainDownA.ToArgb = pctMainDownA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainDownB.ToArgb = pctMainDownB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainDownC.ToArgb = pctMainDownC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainUpA.ToArgb = pctMainUpA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainUpB.ToArgb = pctMainUpB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainUpC.ToArgb = pctMainUpC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainText.ToArgb = pctMainText.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.MainBackground.ToArgb = pctMainBG.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayDownA.ToArgb = pctTrayDownA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayDownB.ToArgb = pctTrayDownB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayDownC.ToArgb = pctTrayDownC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayUpA.ToArgb = pctTrayUpA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayUpB.ToArgb = pctTrayUpB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.TrayUpC.ToArgb = pctTrayUpC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDownA.ToArgb = pctHistoryDownA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDownB.ToArgb = pctHistoryDownB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDownC.ToArgb = pctHistoryDownC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDownMax.ToArgb = pctHistoryDownMax.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryUpA.ToArgb = pctHistoryUpA.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryUpB.ToArgb = pctHistoryUpB.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryUpC.ToArgb = pctHistoryUpC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryUpMax.ToArgb = pctHistoryUpMax.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryText.ToArgb = pctHistoryText.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryBackground.ToArgb = pctHistoryBG.BackColor.ToArgb Then Return True
+    Return False
+  End Function
   Private Function getControlFromName(ByRef containerObj As Object, ByVal name As String) As Control
     Try
       For Each tempCtrl As Control In containerObj.Controls
@@ -780,6 +638,175 @@ Public Class frmCustomColors
         FakeData.Add(dRow)
       Next
     End If
+  End Sub
+  Private Sub RedrawImages()
+    If pctMain.Image IsNot Nothing Then
+      pctMain.Image.Dispose()
+      pctMain.Image = Nothing
+    End If
+    Dim iSize As Integer = pctMain.Width
+    Dim iHalf As Integer = Math.Floor(iSize / 2)
+    Select Case DisplayAs
+      Case SatHostTypes.WildBlue_LEGACY
+        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
+        Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+        Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
+          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
+          g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
+          g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
+        End Using
+        pctMain.Image = fakeI
+      Case SatHostTypes.WildBlue_EXEDE
+        Dim FakeMRect As New Rectangle(0, 0, iSize * 2, iSize * 1.5)
+        Dim FakeE As Image = DisplayEProgress(FakeMRect.Size, lDown, lUp, 0, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim MRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
+          g.DrawImage(FakeE, MRect, FakeMRect, GraphicsUnit.Pixel)
+        End Using
+        pctMain.Image = fakeI
+      Case SatHostTypes.RuralPortal_EXEDE
+        pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+      Case SatHostTypes.DishNet_EXEDE
+        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
+        Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+        Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
+          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
+          g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
+          g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
+        End Using
+        pctMain.Image = fakeI
+      Case Else
+        pctMain.Image = pctMain.ErrorImage.Clone
+    End Select
+    If pctTray.Image IsNot Nothing Then
+      pctTray.Image.Dispose()
+      pctTray.Image = Nothing
+    End If
+    Const traySquare As Integer = 16
+    Dim imgTray As New Bitmap(traySquare, traySquare)
+    Using g As Graphics = Graphics.FromImage(imgTray)
+      g.Clear(Color.Transparent)
+      Select Case DisplayAs
+        Case SatHostTypes.WildBlue_LEGACY
+          If lDown >= lDownLim Or lUp >= lUpLim Then
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
+          Else
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
+          End If
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
+        Case SatHostTypes.WildBlue_EXEDE
+          If lDown + lUp >= lUpLim Then
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
+          Else
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
+          End If
+          CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
+        Case SatHostTypes.RuralPortal_EXEDE
+          If lDown >= lDownLim Then
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
+          Else
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
+          End If
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+        Case SatHostTypes.DishNet_EXEDE
+          If lDown >= lDownLim Then
+            g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
+          Else
+            g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
+          End If
+          CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+          CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
+        Case Else
+          g.DrawImage(pctTray.ErrorImage, 0, 0)
+      End Select
+    End Using
+    pctTray.Image = imgTray
+
+    If pctHistory.Image IsNot Nothing Then
+      pctHistory.Image.Dispose()
+      pctHistory.Image = Nothing
+    End If
+    If FakeData Is Nothing OrElse FakeData.Count = 0 Then MakeFakeData()
+    Dim FakeHRect As New Rectangle(0, 0, 500, 200)
+    Select Case DisplayAs
+      Case SatHostTypes.WildBlue_LEGACY
+        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
+        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
+          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
+          g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
+          g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
+        End Using
+        pctHistory.Image = fakeI
+      Case SatHostTypes.WildBlue_EXEDE
+        Dim FakeE As Image = DrawEGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
+          g.DrawImage(FakeE, dRect, FakeHRect, GraphicsUnit.Pixel)
+        End Using
+        pctHistory.Image = fakeI
+      Case SatHostTypes.RuralPortal_EXEDE
+        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
+          g.DrawImage(FakeR, dRect, FakeHRect, GraphicsUnit.Pixel)
+        End Using
+        pctHistory.Image = fakeI
+      Case SatHostTypes.DishNet_EXEDE
+        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
+        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
+        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Using g As Graphics = Graphics.FromImage(fakeI)
+          g.Clear(Color.Black)
+          g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
+          g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
+          g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
+          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
+          g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
+          g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
+        End Using
+        pctHistory.Image = fakeI
+      Case Else
+        pctHistory.Image = pctHistory.ErrorImage.Clone
+    End Select
   End Sub
   Private Function RandSel(Low As Integer, High As Integer) As Integer
     Dim I As Integer = Int(Rnd() * (High - Low)) + Low

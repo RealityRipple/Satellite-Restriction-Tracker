@@ -1,6 +1,6 @@
 ﻿Public Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
-  Private bSaved, bAccount, bLoaded, bToSave As Boolean
+  Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
   Private Const LINK_PURCHASE As String = "Purchase a Key"
@@ -208,18 +208,25 @@
     End If
   End Sub
   Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkInvert.CheckedChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
-    cmdSave.Enabled = True
+    If mySettings Is Nothing Then Exit Sub
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged
     If Not bLoaded Then Exit Sub
+    If pChecker IsNot Nothing Then
+      pctKeyState.Tag = IIf(CheckState, 1, 0)
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
     If remoteTest IsNot Nothing Then
+      pctKeyState.Tag = IIf(CheckState, 1, 0)
       remoteTest.Dispose()
       remoteTest = Nothing
     End If
     lblPurchaseKey.Text = LINK_PURCHASE
     ttConfig.SetTooltip(lblPurchaseKey, LINK_PURCHASE_TT)
     If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
-      cmdSave.Enabled = True
+      cmdSave.Enabled = SettingsChanged()
     Else
       KeyCheck()
     End If
@@ -293,7 +300,13 @@
   End Sub
   Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
     If Not bLoaded Then Exit Sub
+    If pChecker IsNot Nothing Then
+      pctKeyState.Tag = IIf(CheckState, 1, 0)
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
     If remoteTest IsNot Nothing Then
+      pctKeyState.Tag = IIf(CheckState, 1, 0)
       remoteTest.Dispose()
       remoteTest = Nothing
     End If
@@ -303,7 +316,7 @@
       pctKeyState.Tag = 0
       pctKeyState.Image = Nothing
       ttConfig.SetTooltip(pctKeyState, String.Empty)
-      cmdSave.Enabled = True
+      cmdSave.Enabled = SettingsChanged()
       DoCheck()
     Else
       KeyCheck()
@@ -320,7 +333,7 @@
     lblHistoryDir.Enabled = Not chkService.Checked
     txtHistoryDir.Enabled = Not chkService.Checked
     cmdHistoryDir.Enabled = Not chkService.Checked
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmdHistoryDir_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistoryDir.Click
     Using dirDlg As New SaveFileDialog With
@@ -348,7 +361,7 @@
     lblOverSize.Enabled = chkOverAlert.Checked
     txtOverTime.Enabled = chkOverAlert.Checked
     lblOverTime.Enabled = chkOverAlert.Checked
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
     Select Case cmbProxyType.SelectedIndex
@@ -398,7 +411,7 @@
         lblProxyDomain.Enabled = False
         txtProxyDomain.Enabled = False
     End Select
-    cmdSave.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
   End Sub
 #End Region
   Private Sub lblPurchaseKey_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblPurchaseKey.LinkClicked
@@ -424,12 +437,13 @@
   Private Sub pctKeyState_Click(sender As System.Object, e As System.EventArgs) Handles pctKeyState.Click
     KeyCheck()
   End Sub
+  Private CheckState As Boolean
   Private Sub KeyCheck()
     pctKeyState.Image = My.Resources.throbber
+    CheckState = pctKeyState.Tag = 1
     pctKeyState.Tag = 0
     ttConfig.SetTooltip(pctKeyState, "Verifying your key...")
     Dim sKeyTest As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    bToSave = True
     cmdSave.Enabled = False
     If pChecker IsNot Nothing Then
       pChecker.Dispose()
@@ -441,6 +455,8 @@
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
     Else
+      Dim bToSave As Boolean = True
+      If Not CheckState Then bToSave = False
       pctKeyState.Tag = 0
       pctKeyState.Image = My.Resources.ico_err
       Dim sErr As String = "There was an error verifying your key!"
@@ -453,6 +469,10 @@
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection."
       End Select
+      If pChecker IsNot Nothing Then
+        pChecker.Dispose()
+        pChecker = Nothing
+      End If
       If remoteTest IsNot Nothing Then
         remoteTest.Dispose()
         remoteTest = Nothing
@@ -466,10 +486,16 @@
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
     Else
+      Dim bToSave As Boolean = True
+      If CheckState Then bToSave = False
       pctKeyState.Tag = 1
       pctKeyState.Image = My.Resources.ico_ok
       ttConfig.SetTooltip(pctKeyState, "Your key has been verified!")
       lblPurchaseKey.Text = LINK_PANEL
+      If pChecker IsNot Nothing Then
+        pChecker.Dispose()
+        pChecker = Nothing
+      End If
       If remoteTest IsNot Nothing Then
         remoteTest.Dispose()
         remoteTest = Nothing
@@ -485,14 +511,16 @@
     frmAlertSelection.AlertStyle = mySettings.AlertStyle
     If frmAlertSelection.ShowDialog(Me) = Windows.Forms.DialogResult.Yes Then
       mySettings.AlertStyle = frmAlertSelection.AlertStyle
-      cmdSave.Enabled = True
+      bHardChange = True
+      cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
   Private Sub cmdColors_Click(sender As System.Object, e As System.EventArgs) Handles cmdColors.Click
     frmCustomColors.mySettings = mySettings
     If frmCustomColors.ShowDialog(Me) = Windows.Forms.DialogResult.Yes Then
       mySettings = frmCustomColors.mySettings
-      cmdSave.Enabled = True
+      bHardChange = True
+      cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
@@ -685,6 +713,7 @@
       cSave.Interval = mySettings.Interval
       cSave.Save()
     End If
+    bHardChange = False
     bSaved = True
     cmdSave.Enabled = False
   End Sub
@@ -692,6 +721,61 @@
     Me.Close()
   End Sub
 #End Region
+  Private Function SettingsChanged() As Boolean
+    If bHardChange Then Return True
+    If Not String.Compare(mySettings.Account, txtAccount.Text, True) = 0 Then Return True
+    If Not mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text) Then Return True
+    Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+    If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
+    If Not mySettings.Interval = txtInterval.Value Then Return True
+    If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
+    If Not mySettings.Timeout = txtTimeout.Value Then Return True
+    If chkStartUp.Checked Xor My.Computer.FileSystem.FileExists(StartupPath) Then Return True
+    If Not mySettings.ScaleScreen = chkScaleScreen.Checked Then Return True
+    If Not mySettings.Service = chkService.Checked Then Return True
+    If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
+    If Not mySettings.HistoryInversion = chkInvert.Checked Then Return True
+    If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
+    If Not mySettings.Overuse = txtOverSize.Value Then Return True
+    If Not mySettings.Overtime = txtOverTime.Value Then Return True
+    If Not mySettings.BetaCheck = chkBeta.Checked Then Return True
+
+    If mySettings.Proxy Is Nothing Then
+      If Not cmbProxyType.SelectedIndex = 0 Then Return True
+    ElseIf mySettings.Proxy Is Net.WebRequest.DefaultWebProxy Then
+      If Not cmbProxyType.SelectedIndex = 1 Then Return True
+    Else
+      If cmbProxyType.SelectedIndex = 0 Then Return True
+      If cmbProxyType.SelectedIndex = 1 Then Return True
+      Dim addr As Uri = CType(mySettings.Proxy, Net.WebProxy).Address
+      Debug.Print(addr.OriginalString)
+      Debug.Print(addr.Host)
+      Debug.Print(addr.Port)
+      If cmbProxyType.SelectedIndex = 2 Then
+        If Not String.Compare(txtProxyAddress.Text, addr.Host) = 0 Then Return True
+        If Not txtProxyPort.Value = addr.Port Then Return True
+      End If
+      If cmbProxyType.SelectedIndex = 3 Then
+        If Not String.Compare(txtProxyAddress.Text, addr.OriginalString) = 0 Then Return True
+      End If
+      If mySettings.Proxy.Credentials Is Nothing Then
+        If Not String.IsNullOrEmpty(txtProxyUser.Text) Then Return True
+        If Not String.IsNullOrEmpty(txtProxyPassword.Text) Then Return True
+        If Not String.IsNullOrEmpty(txtProxyDomain.Text) Then Return True
+      Else
+        If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
+          Return True
+        Else
+          If String.IsNullOrEmpty(txtProxyDomain.Text) Then
+            If mySettings.Proxy.Credentials IsNot New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text) Then Return True
+          Else
+            If mySettings.Proxy.Credentials IsNot New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text, txtProxyDomain.Text) Then Return True
+          End If
+        End If
+      End If
+    End If
+    Return False
+  End Function
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
       If My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
@@ -790,11 +874,5 @@
       End Using
       pctSRT.Image = bmpAnim.Clone
     End Using
-  End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs)
-
-  End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.ScrollEventArgs)
-
   End Sub
 End Class
