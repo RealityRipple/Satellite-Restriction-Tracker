@@ -145,6 +145,8 @@ Partial Class frmWizard
     '
     'pnlWizard
     '
+    Me.pnlWizard.AutoSize = True
+    Me.pnlWizard.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlWizard.ColumnCount = 1
     Me.pnlWizard.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlWizard.Controls.Add(Me.pnlButtons, 0, 2)
@@ -155,8 +157,8 @@ Partial Class frmWizard
     Me.pnlWizard.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlWizard.Name = "pnlWizard"
     Me.pnlWizard.RowCount = 3
-    Me.pnlWizard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35.0!))
-    Me.pnlWizard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlWizard.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlWizard.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlWizard.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlWizard.Size = New System.Drawing.Size(614, 413)
     Me.pnlWizard.TabIndex = 0
@@ -1363,6 +1365,8 @@ Partial Class frmWizard
     Me.AcceptButton = Me.cmdNext
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+    Me.AutoSize = True
+    Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
     Me.ClientSize = New System.Drawing.Size(614, 413)
     Me.Controls.Add(Me.pnlWizard)
@@ -1411,6 +1415,7 @@ Partial Class frmWizard
     Me.pnlFinished.PerformLayout()
     CType(Me.pctHeader, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
+    Me.PerformLayout()
 
   End Sub
   Friend WithEvents pnlWizard As System.Windows.Forms.TableLayoutPanel

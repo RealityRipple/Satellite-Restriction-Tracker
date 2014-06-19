@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblRemoteText.Text" xml:space="preserve">
-    <value>If you need to keep track of your Internet usage more accurately, you can sign up for the Remote Usage Service to get usage data every 15 minutes, whether your Internet is running or not. Using a remote server, your usage will be stored and synchronized regularly to Satellite Restriction Tracker, providing the best possible picture of your usage.</value>
-  </data>
-  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <data name="lblLocalText.Text" xml:space="preserve">
-    <value>If you want to use Satellite Restriction Tracker for free, you are of course welcome to. We also provide a local service which runs on your computer at all times, gathering your usage data even if no users are logged in or your computer is locked.</value>
-  </data>
   <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>116, 17</value>
   </metadata>
@@ -144,15 +132,6 @@ Press Next to begin or Cancel to close this wizard.</value>
   <data name="lblAccountName.Text" xml:space="preserve">
     <value>Please enter your Account name. This is the username you use to log in to the meter site. Usually it's just a username, though it may be an E-Mail Address if you enter an E-Mail Address to log into the website.</value>
   </data>
-  <metadata name="lnAccountSpace2.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnAccountSpace2.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnAccountSpace2.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
   <metadata name="lnAccountSpace2.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>2, 2, 436, 0</value>
   </metadata>
@@ -178,24 +157,6 @@ If you don't know your password, please contact your ViaSat provider to get your
   <metadata name="lnAccountSpace1.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>436, 0</value>
   </metadata>
-  <metadata name="lnAccountSpace1.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnAccountSpace1.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnAccountSpace1.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
-  <metadata name="lnServiceSpace2.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnServiceSpace2.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnServiceSpace2.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
   <metadata name="lnServiceSpace2.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>2, 2, 436, 0</value>
   </metadata>
@@ -214,30 +175,12 @@ If you don't know your password, please contact your ViaSat provider to get your
   <metadata name="lnServiceSpace1.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>436, 0</value>
   </metadata>
-  <metadata name="lnServiceSpace1.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnServiceSpace1.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnServiceSpace1.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
-  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <metadata name="lnDisplaySpace3.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnDisplaySpace3.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnDisplaySpace3.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
+  <data name="lblRemoteText.Text" xml:space="preserve">
+    <value>If you need to keep track of your Internet usage more accurately, you can sign up for the Remote Usage Service to get usage data every 15 minutes, whether your Internet is running or not. Using a remote server, your usage will be stored and synchronized regularly to Satellite Restriction Tracker, providing the best possible picture of your usage.</value>
+  </data>
+  <data name="lblLocalText.Text" xml:space="preserve">
+    <value>If you want to use Satellite Restriction Tracker for free, you are of course welcome to. We also provide a local service which runs on your computer at all times, gathering your usage data even if no users are logged in or your computer is locked.</value>
+  </data>
   <metadata name="lnDisplaySpace3.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>2, 2, 436, 0</value>
   </metadata>
@@ -254,24 +197,6 @@ If you don't know your password, please contact your ViaSat provider to get your
     <value>2, 2</value>
   </metadata>
   <metadata name="lnDisplaySpace2.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
-  <metadata name="lnDisplaySpace2.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnDisplaySpace2.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnDisplaySpace2.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>436, 0</value>
-  </metadata>
-  <metadata name="lnDisplaySpace1.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2, 436, 0</value>
-  </metadata>
-  <metadata name="lnDisplaySpace1.Location" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>2, 2</value>
-  </metadata>
-  <metadata name="lnDisplaySpace1.Size" type="System.Drawing.Size, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>436, 0</value>
   </metadata>
   <metadata name="lnDisplaySpace1.Bounds" type="System.Drawing.Rectangle, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

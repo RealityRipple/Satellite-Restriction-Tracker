@@ -342,6 +342,7 @@
       Me.SuspendLayout()
       If Not pctHeader.BackColor = Color.Black Then
         pctHeader.BackColor = Color.Black
+        pctHeader.Height = 35
         clsGlass.SetGlass(Me, 0, 35, 0, 0)
         Me.Text = Nothing
         Me.ShowIcon = False
@@ -354,6 +355,7 @@
       Me.ResumeLayout()
     Else
       If String.IsNullOrEmpty(Me.Text) Then
+        pctHeader.Height = 0
         pctHeader.BackColor = Color.White
         clsGlass.SetGlass(Me, 0, 0, 0, 0)
         Me.Text = sTitle
