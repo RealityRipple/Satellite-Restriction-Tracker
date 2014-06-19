@@ -113,7 +113,7 @@
           If Not pnlKey.Tag = 1 Then
             tbsWizardPages.SelectedIndex = 2
             optRemote.Focus()
-            MessageBox.Show("Please verify your Remote Usage Service Product Key before continuing.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+            MessageBox.Show("Please verify your Remote Usage Service Product Key before continuing.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             Me.DialogResult = Windows.Forms.DialogResult.None
           End If
         ElseIf optLocal.Checked Then
@@ -472,14 +472,14 @@
       tbsWizardPages.SelectedIndex = 1
       txtAccountUsername.Focus()
       DrawStatus(False)
-      MessageBox.Show("You must enter an Account Username before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("You must enter an Account Username before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Exit Sub
     End If
     If String.IsNullOrEmpty(cmbAccountHost.Text) Then
       tbsWizardPages.SelectedIndex = 1
       cmbAccountHost.Focus()
       DrawStatus(False)
-      MessageBox.Show("You must select a Provider before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("You must select a Provider before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Exit Sub
     End If
     sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
@@ -518,9 +518,9 @@
       End If
       If e.Type = remoteRestrictionTracker.FailureEventArgs.FailType.Network Then
         optNone.Checked = True
-        MessageBox.Show("You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show("You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       Else
-        MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End If
       DrawStatus(False)
       pnlKey.Tag = 0
@@ -586,15 +586,15 @@
       AccountType = localRestrictionTracker.SatHostTypes.Other
       Select Case e.Type
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.ConnectionTimeout
-          MessageBox.Show("Connection to Server Timed Out!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Connection to Server Timed Out!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.LoginFailure
-          MessageBox.Show("Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.FatalLoginFailure
-          MessageBox.Show("Fatal Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Fatal Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.SSLFailureBypass
-          MessageBox.Show("SSL Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("SSL Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
-          MessageBox.Show("Missing account information!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Missing account information!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
           tbsWizardPages.SelectedIndex += 1
       End Select

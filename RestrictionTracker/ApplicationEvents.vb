@@ -1,16 +1,17 @@
 ﻿Namespace My
   Partial Friend Class MyApplication
     Private Sub MyApplication_Startup(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
+      EnableVisualStyles = True
       Dim AppDataWB As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
       Dim AppDataSRT As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
       Dim appRet As TriState = CopyDirectory(AppDataWB, AppDataSRT)
       Select Case appRet
         Case TriState.True
-          If MessageBox.Show(Application.Info.ProductName & " has copied all old Application data." & vbNewLine & "Would you like to delete the old directory?", "Application Data Copied", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.Yes Then
+          If MessageBox.Show(Application.Info.ProductName & " has copied all old Application data." & vbNewLine & "Would you like to delete the old directory?", "Application Data Copied", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
             My.Computer.FileSystem.DeleteDirectory(AppDataWB, FileIO.DeleteDirectoryOption.DeleteAllContents)
           End If
         Case TriState.False
-          If MessageBox.Show(Application.Info.ProductName & " was unable to copy the old Application data." & vbNewLine & "You may copy the data over manually.", "Application Data Copy Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.OK Then
+          If MessageBox.Show(Application.Info.ProductName & " was unable to copy the old Application data." & vbNewLine & "You may copy the data over manually.", "Application Data Copy Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
             Try
               Process.Start("explorer", "/select,""" & AppDataWB & """")
             Catch ex As Exception
@@ -28,11 +29,11 @@
           Dim histRet As TriState = CopyDirectory(oldHistoryDir, cSettings.HistoryDir)
           Select Case histRet
             Case TriState.True
-              If MessageBox.Show(Application.Info.ProductName & " has copied all History data." & vbNewLine & "Would you like to delete the old directory?", "History Data Copied", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.Yes Then
+              If MessageBox.Show(Application.Info.ProductName & " has copied all History data." & vbNewLine & "Would you like to delete the old directory?", "History Data Copied", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
                 My.Computer.FileSystem.DeleteDirectory(oldHistoryDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
               End If
             Case TriState.False
-              If MessageBox.Show(Application.Info.ProductName & " was unable to copy the old History data." & vbNewLine & "You may copy the data over manually.", "History Data Copy Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.OK Then
+              If MessageBox.Show(Application.Info.ProductName & " was unable to copy the old History data." & vbNewLine & "You may copy the data over manually.", "History Data Copy Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
                 Try
                   Process.Start("explorer", "/select,""" & oldHistoryDir & """")
                 Catch ex As Exception
@@ -77,18 +78,18 @@
       End If
       Dim OldDir As String = My.Computer.FileSystem.SpecialDirectories.ProgramFiles & "\" & Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
       If My.Computer.FileSystem.DirectoryExists(OldDir) Then
-        If MessageBox.Show("Would you like to remove the defunct WildBlue Bandwidth Monitor from your computer?" & vbNewLine & "Your settings will be saved for use in the new Satellite Restriction Tracker.", "Uninstall WildBlue Bandwidth Monitor?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.Yes Then
+        If MessageBox.Show("Would you like to remove the defunct WildBlue Bandwidth Monitor from your computer?" & vbNewLine & "Your settings will be saved for use in the new Satellite Restriction Tracker.", "Uninstall WildBlue Bandwidth Monitor?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
           If My.Computer.FileSystem.FileExists(OldDir & "\unins000.exe") Then
             Try
               ShellEx(OldDir & "\unins000.exe", "/silent")
             Catch ex As Exception
-              MessageBox.Show("Unable to run WildBlue Bandwidth Monitor uninstaller. Please uninstall manually.", "Uninstall Failed", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+              MessageBox.Show("Unable to run WildBlue Bandwidth Monitor uninstaller. Please uninstall manually.", "Uninstall Failed", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             End Try
           Else
             Try
               My.Computer.FileSystem.DeleteDirectory(OldDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
             Catch ex As Exception
-              If MessageBox.Show(Application.Info.ProductName & " was unable to delete the old WildBlue Bandwidth Monitor directory." & vbNewLine & "You may delete the folder manually.", "Uninstall Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) = DialogResult.OK Then
+              If MessageBox.Show(Application.Info.ProductName & " was unable to delete the old WildBlue Bandwidth Monitor directory." & vbNewLine & "You may delete the folder manually.", "Uninstall Failed", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
                 Try
                   Process.Start("explorer", "/select,""" & OldDir & """")
                 Catch ex2 As Exception
@@ -111,7 +112,7 @@
     Private Sub MyApplication_UnhandledException(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
       Try
         If e.Exception.Message.Contains("Could not load file or assembly") Then
-          MessageBox.Show("A critical file is missing. Please ensure " & Application.Info.ProductName & " has been fully extracted or installed." & vbNewLine & e.Exception.Message, "Could not load File or Assembly.", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("A critical file is missing. Please ensure " & Application.Info.ProductName & " has been fully extracted or installed." & vbNewLine & e.Exception.Message, "Could not load File or Assembly.", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           e.ExitApplication = True
         Else
           Dim frmError As New Form With
@@ -299,7 +300,7 @@
           End Select
         End If
       Catch ex As Exception
-        MessageBox.Show("There was an error while handling an error..." & vbNewLine & ex.Message & vbNewLine & vbNewLine & "Original Error: " & e.Exception.Message, Application.Info.Title & " Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show("There was an error while handling an error..." & vbNewLine & ex.Message & vbNewLine & vbNewLine & "Original Error: " & e.Exception.Message, Application.Info.Title & " Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End Try
     End Sub
     Private Function DoubleEncode(inString As String) As String
