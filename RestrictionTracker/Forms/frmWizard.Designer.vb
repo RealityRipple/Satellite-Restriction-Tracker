@@ -94,11 +94,11 @@ Partial Class frmWizard
     Me.lnAccountSpace2 = New RestrictionTracker.LineBreak()
     Me.txtSignUp = New RestrictionTracker.LinkLabel()
     Me.lnServiceSpace2 = New RestrictionTracker.LineBreak()
-    Me.ttWizard = New RestrictionTracker.ToolTip(Me.components)
     Me.lnServiceSpace1 = New RestrictionTracker.LineBreak()
     Me.lnDisplaySpace1 = New RestrictionTracker.LineBreak()
     Me.lnDisplaySpace2 = New RestrictionTracker.LineBreak()
     Me.lnDisplaySpace3 = New RestrictionTracker.LineBreak()
+    Me.ttWizard = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlWizard.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     Me.pnlContent.SuspendLayout()
@@ -248,6 +248,7 @@ Partial Class frmWizard
     Me.pctLeftBox.Margin = New System.Windows.Forms.Padding(0)
     Me.pctLeftBox.Name = "pctLeftBox"
     Me.pctLeftBox.Size = New System.Drawing.Size(150, 346)
+    Me.pctLeftBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
     Me.pctLeftBox.TabIndex = 0
     Me.pctLeftBox.TabStop = False
     '

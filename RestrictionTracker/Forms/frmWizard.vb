@@ -205,6 +205,15 @@
         End If
       Case 2
         pctLeftBox.Image = My.Resources.wizService
+        If My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
+          optLocal.Enabled = True
+          lblLocal.Text = "Gather data whenever the computer is online"
+          lblLocal.Enabled = optLocal.Checked
+        Else
+          optLocal.Enabled = False
+          lblLocal.Text = "The Logger Service is not Installed"
+          lblLocal.Enabled = True
+        End If
       Case 3
         pctLeftBox.Image = My.Resources.wizDisplay
       Case 4
