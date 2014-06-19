@@ -90,7 +90,6 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -114,6 +113,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Classes\clsNativeMethods.vb" />
+    <Compile Include="Classes\Visual Elements\clsLineBreak.Designer.vb">
+      <DependentUpon>clsLineBreak.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Visual Elements\clsLineBreak.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Classes\Visual Elements\clsNumericUpDown.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -204,6 +209,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Classes\Visual Elements\clsLineBreak.resx">
+      <DependentUpon>clsLineBreak.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
       <SubType>Designer</SubType>

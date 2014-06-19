@@ -325,6 +325,8 @@
     txtKey3.Enabled = optRemote.Checked
     txtKey4.Enabled = optRemote.Checked
     txtKey5.Enabled = optRemote.Checked
+    lblLocal.Enabled = optLocal.Checked
+    lblNone.Enabled = optNone.Checked
     If optRemote.Checked Then txtKey1.Focus()
   End Sub
 
