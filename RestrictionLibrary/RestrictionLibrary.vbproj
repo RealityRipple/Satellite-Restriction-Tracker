@@ -74,6 +74,7 @@
     <Compile Include="Classes\clsRestrictionTracker.vb" />
     <Compile Include="Classes\clsSettings.vb" />
     <Compile Include="Classes\clsStoredPassword.vb" />
+    <Compile Include="Classes\clsTypeDetermination.vb" />
     <Compile Include="Classes\clsWebClient.vb">
       <SubType>Component</SubType>
     </Compile>

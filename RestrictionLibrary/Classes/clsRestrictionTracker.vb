@@ -231,6 +231,7 @@
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
 #End Region
   Private WithEvents wsData As CookieAwareWebClient
+  Private WithEvents acType As DetermineType
   Private tmrReadTimeout As Threading.Timer
   Private mySettings As AppSettings
   Private Const MBPerGB As Integer = 1000
@@ -255,9 +256,30 @@
   Public Sub Connect()
     ResetTimeout()
     If mySettings.AccountType = SatHostTypes.Other Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
+      If mySettings.Account.Contains("@") Then
+        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), "CONNECT", mySettings.Timeout, mySettings.Proxy)
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
+      End If
     Else
       GetUsage()
+    End If
+  End Sub
+  Private Sub acType_TypeDetermined(UserState As Object, e As DetermineType.TypeDeterminedEventArgs) Handles acType.TypeDetermined
+    If UserState = "CONNECT" Then
+      Select Case e.HostGroup
+        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue
+          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+          GetUsage()
+        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet
+          mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+          GetUsage()
+        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal
+          mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+          GetUsage()
+        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
+      End Select
     End If
   End Sub
   Private Sub InitAccount()
