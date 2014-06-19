@@ -19,7 +19,7 @@ Class SvcSettings
     If InUseChecker(AppDataAll & "\user.config", IO.FileAccess.Write) Then
       xConfig.Save(AppDataAll & "\user.config")
     Else
-      MsgBox("Failed to save Service settings!", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal)
+      MessageBox.Show("Failed to save Service settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
     End If
   End Sub
   Public Sub New()
@@ -893,7 +893,7 @@ Class AppSettings
       MakeBackup()
       xConfig.Save(ConfigFile)
     Else
-      MsgBox("Failed to save settings!", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal)
+      MessageBox.Show("Failed to save settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
     End If
   End Sub
   Private Function ColorToStr(c As Color) As String

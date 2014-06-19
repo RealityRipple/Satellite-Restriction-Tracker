@@ -136,7 +136,7 @@
       Dim sTitle As String = lstStyles.SelectedItem
       If index = 0 Then
         Beep()
-      ElseIf MsgBox("Do you want to remove the """ & sTitle & """ Alert Window Style?", MsgBoxStyle.Question Or MsgBoxStyle.YesNo, "Remove Alert Style?") = MsgBoxResult.Yes Then
+      ElseIf MessageBox.Show("Do you want to remove the """ & sTitle & """ Alert Window Style?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification) = Windows.Forms.DialogResult.Yes Then
         If IO.File.Exists(AppData & "\" & sTitle & ".tar.gz") Then
           lstStyles.SelectedIndex = 0
           IO.File.Delete(AppData & "\" & sTitle & ".tar.gz")
@@ -146,7 +146,7 @@
           IO.File.Delete(AppData & "\" & sTitle & ".tgz")
           lstStyles.Items.RemoveAt(index)
         Else
-          MsgBox("No file by that name was found! Alert Window Style may already be removed.", MsgBoxStyle.Exclamation, "Couldn't Find Alert Style")
+          MessageBox.Show("No file by that name was found! Alert Window Style may already be removed.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
           lstStyles.SelectedIndex = 0
           lstStyles.Items.RemoveAt(index)
         End If

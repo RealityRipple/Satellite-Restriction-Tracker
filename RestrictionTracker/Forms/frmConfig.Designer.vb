@@ -30,6 +30,7 @@ Partial Class frmConfig
     Me.pnlPassword = New System.Windows.Forms.TableLayoutPanel()
     Me.txtPassword = New System.Windows.Forms.TextBox()
     Me.cmdPassDisplay = New System.Windows.Forms.Button()
+    Me.lblPurchaseKey = New RestrictionTracker.LinkLabel()
     Me.lblKey = New System.Windows.Forms.Label()
     Me.lblPassword = New System.Windows.Forms.Label()
     Me.lblAccount = New System.Windows.Forms.Label()
@@ -44,11 +45,14 @@ Partial Class frmConfig
     Me.chkStartUp = New System.Windows.Forms.CheckBox()
     Me.lblTimeout = New System.Windows.Forms.Label()
     Me.pnlTimeout = New System.Windows.Forms.TableLayoutPanel()
+    Me.txtTimeout = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblTimeoutScale = New System.Windows.Forms.Label()
     Me.pnlInterval = New System.Windows.Forms.TableLayoutPanel()
+    Me.txtInterval = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblIntervalScale = New System.Windows.Forms.Label()
     Me.lblAccuracy = New System.Windows.Forms.Label()
     Me.pnlAccuracy = New System.Windows.Forms.TableLayoutPanel()
+    Me.txtAccuracy = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblAccuracyScale = New System.Windows.Forms.Label()
     Me.chkScaleScreen = New System.Windows.Forms.CheckBox()
     Me.chkService = New System.Windows.Forms.CheckBox()
@@ -71,6 +75,7 @@ Partial Class frmConfig
     Me.lblProxyAddr = New System.Windows.Forms.Label()
     Me.txtProxyAddress = New System.Windows.Forms.TextBox()
     Me.lblProxyPort = New System.Windows.Forms.Label()
+    Me.txtProxyPort = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblProxyDomain = New System.Windows.Forms.Label()
     Me.txtProxyDomain = New System.Windows.Forms.TextBox()
     Me.cmbProxyType = New System.Windows.Forms.ComboBox()
@@ -85,33 +90,28 @@ Partial Class frmConfig
     Me.cmdAlertStyle = New System.Windows.Forms.Button()
     Me.fswController = New System.IO.FileSystemWatcher()
     Me.tmrAnim = New System.Windows.Forms.Timer(Me.components)
-    Me.lblPurchaseKey = New RestrictionTracker.LinkLabel()
-    Me.txtTimeout = New RestrictionTracker.NumericUpDownIncrementable()
-    Me.txtInterval = New RestrictionTracker.NumericUpDownIncrementable()
-    Me.txtAccuracy = New RestrictionTracker.NumericUpDownIncrementable()
-    Me.txtProxyPort = New RestrictionTracker.NumericUpDownIncrementable()
     Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlConfig.SuspendLayout()
     Me.pnlPassword.SuspendLayout()
     Me.pnlKey.SuspendLayout()
     CType(Me.pctKeyState, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlTimeout.SuspendLayout()
+    CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlInterval.SuspendLayout()
+    CType(Me.txtInterval, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAccuracy.SuspendLayout()
+    CType(Me.txtAccuracy, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlHistoryDir.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     CType(Me.pctSRT, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.gbProxy.SuspendLayout()
     Me.pnlProxy.SuspendLayout()
+    CType(Me.txtProxyPort, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlOverAlert.SuspendLayout()
     CType(Me.txtOverSize, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.txtOverTime, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlCustom.SuspendLayout()
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.txtInterval, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.txtAccuracy, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.txtProxyPort, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'pnlConfig
@@ -164,7 +164,7 @@ Partial Class frmConfig
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlConfig.Size = New System.Drawing.Size(570, 334)
+    Me.pnlConfig.Size = New System.Drawing.Size(573, 334)
     Me.pnlConfig.TabIndex = 0
     '
     'chkInvert
@@ -209,7 +209,7 @@ Partial Class frmConfig
     Me.pnlPassword.Name = "pnlPassword"
     Me.pnlPassword.RowCount = 1
     Me.pnlPassword.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlPassword.Size = New System.Drawing.Size(230, 28)
+    Me.pnlPassword.Size = New System.Drawing.Size(233, 28)
     Me.pnlPassword.TabIndex = 3
     '
     'txtPassword
@@ -218,7 +218,7 @@ Partial Class frmConfig
     Me.txtPassword.Location = New System.Drawing.Point(3, 4)
     Me.txtPassword.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtPassword.Name = "txtPassword"
-    Me.txtPassword.Size = New System.Drawing.Size(197, 20)
+    Me.txtPassword.Size = New System.Drawing.Size(200, 20)
     Me.txtPassword.TabIndex = 0
     Me.ttConfig.SetTooltip(Me.txtPassword, "The password to your ViaSat account.")
     Me.txtPassword.UseSystemPasswordChar = True
@@ -228,7 +228,7 @@ Partial Class frmConfig
     Me.cmdPassDisplay.AutoSize = True
     Me.cmdPassDisplay.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.cmdPassDisplay.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdPassDisplay.Location = New System.Drawing.Point(202, 3)
+    Me.cmdPassDisplay.Location = New System.Drawing.Point(205, 3)
     Me.cmdPassDisplay.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
     Me.cmdPassDisplay.Name = "cmdPassDisplay"
     Me.cmdPassDisplay.Size = New System.Drawing.Size(25, 22)
@@ -236,6 +236,23 @@ Partial Class frmConfig
     Me.cmdPassDisplay.Text = "*"
     Me.ttConfig.SetTooltip(Me.cmdPassDisplay, "Toggle display of the password.")
     Me.cmdPassDisplay.UseVisualStyleBackColor = True
+    '
+    'lblPurchaseKey
+    '
+    Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblPurchaseKey.AutoSize = True
+    Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
+    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
+    Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
+    Me.lblPurchaseKey.Location = New System.Drawing.Point(330, 59)
+    Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
+    Me.lblPurchaseKey.Name = "lblPurchaseKey"
+    Me.lblPurchaseKey.Size = New System.Drawing.Size(82, 13)
+    Me.lblPurchaseKey.TabIndex = 20
+    Me.lblPurchaseKey.TabStop = True
+    Me.lblPurchaseKey.Text = "Purchase a Key"
+    Me.ttConfig.SetTooltip(Me.lblPurchaseKey, "If you do not have a Product Key for Remote Usage, you can purchase one online fo" & _
+        "r as little as $15.00 a year.")
     '
     'lblKey
     '
@@ -278,7 +295,7 @@ Partial Class frmConfig
     Me.txtAccount.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtAccount.Location = New System.Drawing.Point(97, 3)
     Me.txtAccount.Name = "txtAccount"
-    Me.txtAccount.Size = New System.Drawing.Size(224, 20)
+    Me.txtAccount.Size = New System.Drawing.Size(227, 20)
     Me.txtAccount.TabIndex = 1
     Me.ttConfig.SetTooltip(Me.txtAccount, "Your ViaSat E-Mail address.")
     '
@@ -438,6 +455,20 @@ Partial Class frmConfig
     Me.pnlTimeout.Size = New System.Drawing.Size(128, 26)
     Me.pnlTimeout.TabIndex = 16
     '
+    'txtTimeout
+    '
+    Me.txtTimeout.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtTimeout.LargeIncrement = CType(15UI, UInteger)
+    Me.txtTimeout.Location = New System.Drawing.Point(3, 3)
+    Me.txtTimeout.Maximum = New Decimal(New Integer() {600, 0, 0, 0})
+    Me.txtTimeout.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
+    Me.txtTimeout.Name = "txtTimeout"
+    Me.txtTimeout.Size = New System.Drawing.Size(69, 20)
+    Me.txtTimeout.TabIndex = 0
+    Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetTooltip(Me.txtTimeout, "Number of seconds to wait between network communications.")
+    Me.txtTimeout.Value = New Decimal(New Integer() {60, 0, 0, 0})
+    '
     'lblTimeoutScale
     '
     Me.lblTimeoutScale.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -467,6 +498,20 @@ Partial Class frmConfig
     Me.pnlInterval.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlInterval.Size = New System.Drawing.Size(124, 26)
     Me.pnlInterval.TabIndex = 7
+    '
+    'txtInterval
+    '
+    Me.txtInterval.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtInterval.LargeIncrement = CType(5UI, UInteger)
+    Me.txtInterval.Location = New System.Drawing.Point(3, 3)
+    Me.txtInterval.Maximum = New Decimal(New Integer() {1440, 0, 0, 0})
+    Me.txtInterval.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
+    Me.txtInterval.Name = "txtInterval"
+    Me.txtInterval.Size = New System.Drawing.Size(69, 20)
+    Me.txtInterval.TabIndex = 0
+    Me.txtInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetTooltip(Me.txtInterval, "Interval between meter checks in minutes.")
+    Me.txtInterval.Value = New Decimal(New Integer() {15, 0, 0, 0})
     '
     'lblIntervalScale
     '
@@ -509,6 +554,18 @@ Partial Class frmConfig
     Me.pnlAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAccuracy.Size = New System.Drawing.Size(158, 26)
     Me.pnlAccuracy.TabIndex = 9
+    '
+    'txtAccuracy
+    '
+    Me.txtAccuracy.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtAccuracy.LargeIncrement = CType(1UI, UInteger)
+    Me.txtAccuracy.Location = New System.Drawing.Point(3, 3)
+    Me.txtAccuracy.Maximum = New Decimal(New Integer() {4, 0, 0, 0})
+    Me.txtAccuracy.Name = "txtAccuracy"
+    Me.txtAccuracy.Size = New System.Drawing.Size(69, 20)
+    Me.txtAccuracy.TabIndex = 0
+    Me.txtAccuracy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetTooltip(Me.txtAccuracy, "Number of decimal places to display.")
     '
     'lblAccuracyScale
     '
@@ -578,7 +635,7 @@ Partial Class frmConfig
     Me.pnlHistoryDir.RowCount = 1
     Me.pnlHistoryDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlHistoryDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlHistoryDir.Size = New System.Drawing.Size(230, 28)
+    Me.pnlHistoryDir.Size = New System.Drawing.Size(233, 28)
     Me.pnlHistoryDir.TabIndex = 14
     '
     'txtHistoryDir
@@ -589,7 +646,7 @@ Partial Class frmConfig
     Me.txtHistoryDir.Location = New System.Drawing.Point(3, 4)
     Me.txtHistoryDir.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtHistoryDir.Name = "txtHistoryDir"
-    Me.txtHistoryDir.Size = New System.Drawing.Size(186, 20)
+    Me.txtHistoryDir.Size = New System.Drawing.Size(189, 20)
     Me.txtHistoryDir.TabIndex = 0
     Me.ttConfig.SetTooltip(Me.txtHistoryDir, "Directory used to save History Data.")
     '
@@ -598,7 +655,7 @@ Partial Class frmConfig
     Me.cmdHistoryDir.AutoSize = True
     Me.cmdHistoryDir.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.cmdHistoryDir.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdHistoryDir.Location = New System.Drawing.Point(191, 3)
+    Me.cmdHistoryDir.Location = New System.Drawing.Point(194, 3)
     Me.cmdHistoryDir.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
     Me.cmdHistoryDir.Name = "cmdHistoryDir"
     Me.cmdHistoryDir.Size = New System.Drawing.Size(36, 22)
@@ -632,7 +689,7 @@ Partial Class frmConfig
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(408, 306)
+    Me.pnlButtons.Location = New System.Drawing.Point(411, 306)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -671,7 +728,7 @@ Partial Class frmConfig
     '
     Me.pctSRT.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
     Me.pctSRT.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctSRT.Location = New System.Drawing.Point(327, 3)
+    Me.pctSRT.Location = New System.Drawing.Point(330, 3)
     Me.pctSRT.Name = "pctSRT"
     Me.pnlConfig.SetRowSpan(Me.pctSRT, 2)
     Me.pctSRT.Size = New System.Drawing.Size(240, 48)
@@ -684,7 +741,7 @@ Partial Class frmConfig
     Me.gbProxy.Controls.Add(Me.pnlProxy)
     Me.gbProxy.Dock = System.Windows.Forms.DockStyle.Fill
     Me.gbProxy.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.gbProxy.Location = New System.Drawing.Point(327, 81)
+    Me.gbProxy.Location = New System.Drawing.Point(330, 81)
     Me.gbProxy.Name = "gbProxy"
     Me.pnlConfig.SetRowSpan(Me.gbProxy, 7)
     Me.gbProxy.Size = New System.Drawing.Size(240, 172)
@@ -808,6 +865,20 @@ Partial Class frmConfig
     Me.lblProxyPort.TabIndex = 4
     Me.lblProxyPort.Text = "Port:"
     '
+    'txtProxyPort
+    '
+    Me.txtProxyPort.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.txtProxyPort.LargeIncrement = CType(20UI, UInteger)
+    Me.txtProxyPort.Location = New System.Drawing.Point(120, 45)
+    Me.txtProxyPort.Maximum = New Decimal(New Integer() {65535, 0, 0, 0})
+    Me.txtProxyPort.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+    Me.txtProxyPort.Name = "txtProxyPort"
+    Me.txtProxyPort.Size = New System.Drawing.Size(50, 20)
+    Me.txtProxyPort.TabIndex = 5
+    Me.txtProxyPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetTooltip(Me.txtProxyPort, "Port to connect to HTTP proxy over.")
+    Me.txtProxyPort.Value = New Decimal(New Integer() {8080, 0, 0, 0})
+    '
     'lblProxyDomain
     '
     Me.lblProxyDomain.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -865,7 +936,7 @@ Partial Class frmConfig
     Me.pnlOverAlert.Name = "pnlOverAlert"
     Me.pnlOverAlert.RowCount = 1
     Me.pnlOverAlert.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlOverAlert.Size = New System.Drawing.Size(324, 26)
+    Me.pnlOverAlert.Size = New System.Drawing.Size(327, 26)
     Me.pnlOverAlert.TabIndex = 18
     '
     'chkOverAlert
@@ -875,31 +946,32 @@ Partial Class frmConfig
     Me.chkOverAlert.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkOverAlert.Location = New System.Drawing.Point(3, 4)
     Me.chkOverAlert.Name = "chkOverAlert"
-    Me.chkOverAlert.Size = New System.Drawing.Size(106, 18)
+    Me.chkOverAlert.Size = New System.Drawing.Size(90, 18)
     Me.chkOverAlert.TabIndex = 0
-    Me.chkOverAlert.Text = "Bandwidth Alert"
-    Me.ttConfig.SetTooltip(Me.chkOverAlert, "Check this box to display a balloon alert when you use too much bandwidth.")
+    Me.chkOverAlert.Text = "Usage Alert:"
+    Me.ttConfig.SetTooltip(Me.chkOverAlert, "Check this box to display a balloon alert when you use too much of your allocated" & _
+        " usage.")
     Me.chkOverAlert.UseVisualStyleBackColor = True
     '
     'txtOverSize
     '
     Me.txtOverSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtOverSize.Increment = New Decimal(New Integer() {100, 0, 0, 0})
-    Me.txtOverSize.Location = New System.Drawing.Point(115, 3)
+    Me.txtOverSize.Location = New System.Drawing.Point(99, 3)
     Me.txtOverSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
     Me.txtOverSize.Minimum = New Decimal(New Integer() {25, 0, 0, 0})
     Me.txtOverSize.Name = "txtOverSize"
-    Me.txtOverSize.Size = New System.Drawing.Size(55, 20)
+    Me.txtOverSize.Size = New System.Drawing.Size(65, 20)
     Me.txtOverSize.TabIndex = 1
     Me.txtOverSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtOverSize, "Enter the amount of bandwidth usage to display an alert about (in Megabytes).")
+    Me.ttConfig.SetTooltip(Me.txtOverSize, "Enter the amount of usage to display an alert about (in Megabytes).")
     Me.txtOverSize.Value = New Decimal(New Integer() {100, 0, 0, 0})
     '
     'lblOverSize
     '
     Me.lblOverSize.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblOverSize.AutoSize = True
-    Me.lblOverSize.Location = New System.Drawing.Point(176, 6)
+    Me.lblOverSize.Location = New System.Drawing.Point(170, 6)
     Me.lblOverSize.Name = "lblOverSize"
     Me.lblOverSize.Size = New System.Drawing.Size(34, 13)
     Me.lblOverSize.TabIndex = 2
@@ -909,22 +981,21 @@ Partial Class frmConfig
     '
     Me.txtOverTime.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtOverTime.Increment = New Decimal(New Integer() {15, 0, 0, 0})
-    Me.txtOverTime.Location = New System.Drawing.Point(216, 3)
+    Me.txtOverTime.Location = New System.Drawing.Point(210, 3)
     Me.txtOverTime.Maximum = New Decimal(New Integer() {360, 0, 0, 0})
     Me.txtOverTime.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
     Me.txtOverTime.Name = "txtOverTime"
-    Me.txtOverTime.Size = New System.Drawing.Size(55, 20)
+    Me.txtOverTime.Size = New System.Drawing.Size(65, 20)
     Me.txtOverTime.TabIndex = 3
     Me.txtOverTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtOverTime, "Enter the duration of time to check for the defined bandwidth usage (in minutes)." & _
-        "")
+    Me.ttConfig.SetTooltip(Me.txtOverTime, "Enter the duration of time to check for the defined usage (in minutes).")
     Me.txtOverTime.Value = New Decimal(New Integer() {15, 0, 0, 0})
     '
     'lblOverTime
     '
     Me.lblOverTime.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblOverTime.AutoSize = True
-    Me.lblOverTime.Location = New System.Drawing.Point(277, 6)
+    Me.lblOverTime.Location = New System.Drawing.Point(281, 6)
     Me.lblOverTime.Name = "lblOverTime"
     Me.lblOverTime.Size = New System.Drawing.Size(43, 13)
     Me.lblOverTime.TabIndex = 4
@@ -940,7 +1011,7 @@ Partial Class frmConfig
     Me.pnlCustom.Controls.Add(Me.cmdColors, 0, 0)
     Me.pnlCustom.Controls.Add(Me.cmdAlertStyle, 0, 0)
     Me.pnlCustom.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlCustom.Location = New System.Drawing.Point(324, 256)
+    Me.pnlCustom.Location = New System.Drawing.Point(327, 256)
     Me.pnlCustom.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlCustom.Name = "pnlCustom"
     Me.pnlCustom.RowCount = 1
@@ -972,8 +1043,7 @@ Partial Class frmConfig
     Me.cmdAlertStyle.Size = New System.Drawing.Size(101, 22)
     Me.cmdAlertStyle.TabIndex = 0
     Me.cmdAlertStyle.Text = "Select Alert Style"
-    Me.ttConfig.SetTooltip(Me.cmdAlertStyle, "Choose a style for the Alert Windows used for Bandwidth Alerts and Parse Failures" & _
-        ".")
+    Me.ttConfig.SetTooltip(Me.cmdAlertStyle, "Choose a style for the Alert Windows used for Usage Alerts and Parse Failures.")
     Me.cmdAlertStyle.UseVisualStyleBackColor = True
     '
     'fswController
@@ -983,77 +1053,6 @@ Partial Class frmConfig
     '
     'tmrAnim
     '
-    '
-    'lblPurchaseKey
-    '
-    Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblPurchaseKey.AutoSize = True
-    Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblPurchaseKey.Location = New System.Drawing.Point(327, 59)
-    Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblPurchaseKey.Name = "lblPurchaseKey"
-    Me.lblPurchaseKey.Size = New System.Drawing.Size(82, 13)
-    Me.lblPurchaseKey.TabIndex = 20
-    Me.lblPurchaseKey.TabStop = True
-    Me.lblPurchaseKey.Text = "Purchase a Key"
-    Me.ttConfig.SetTooltip(Me.lblPurchaseKey, "If you do not have a Product Key for Remote Usage, you can purchase one online fo" & _
-        "r as little as $15.00 a year.")
-    '
-    'txtTimeout
-    '
-    Me.txtTimeout.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtTimeout.LargeIncrement = CType(15UI, UInteger)
-    Me.txtTimeout.Location = New System.Drawing.Point(3, 3)
-    Me.txtTimeout.Maximum = New Decimal(New Integer() {600, 0, 0, 0})
-    Me.txtTimeout.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
-    Me.txtTimeout.Name = "txtTimeout"
-    Me.txtTimeout.Size = New System.Drawing.Size(69, 20)
-    Me.txtTimeout.TabIndex = 0
-    Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtTimeout, "Number of seconds to wait between network communications.")
-    Me.txtTimeout.Value = New Decimal(New Integer() {60, 0, 0, 0})
-    '
-    'txtInterval
-    '
-    Me.txtInterval.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtInterval.LargeIncrement = CType(5UI, UInteger)
-    Me.txtInterval.Location = New System.Drawing.Point(3, 3)
-    Me.txtInterval.Maximum = New Decimal(New Integer() {1440, 0, 0, 0})
-    Me.txtInterval.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
-    Me.txtInterval.Name = "txtInterval"
-    Me.txtInterval.Size = New System.Drawing.Size(69, 20)
-    Me.txtInterval.TabIndex = 0
-    Me.txtInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtInterval, "Interval between bandwidth checks in minutes.")
-    Me.txtInterval.Value = New Decimal(New Integer() {15, 0, 0, 0})
-    '
-    'txtAccuracy
-    '
-    Me.txtAccuracy.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtAccuracy.LargeIncrement = CType(1UI, UInteger)
-    Me.txtAccuracy.Location = New System.Drawing.Point(3, 3)
-    Me.txtAccuracy.Maximum = New Decimal(New Integer() {4, 0, 0, 0})
-    Me.txtAccuracy.Name = "txtAccuracy"
-    Me.txtAccuracy.Size = New System.Drawing.Size(69, 20)
-    Me.txtAccuracy.TabIndex = 0
-    Me.txtAccuracy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtAccuracy, "Number of decimal places to display.")
-    '
-    'txtProxyPort
-    '
-    Me.txtProxyPort.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.txtProxyPort.LargeIncrement = CType(20UI, UInteger)
-    Me.txtProxyPort.Location = New System.Drawing.Point(120, 45)
-    Me.txtProxyPort.Maximum = New Decimal(New Integer() {65535, 0, 0, 0})
-    Me.txtProxyPort.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-    Me.txtProxyPort.Name = "txtProxyPort"
-    Me.txtProxyPort.Size = New System.Drawing.Size(50, 20)
-    Me.txtProxyPort.TabIndex = 5
-    Me.txtProxyPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtProxyPort, "Port to connect to HTTP proxy over.")
-    Me.txtProxyPort.Value = New Decimal(New Integer() {8080, 0, 0, 0})
     '
     'ttConfig
     '
@@ -1091,10 +1090,13 @@ Partial Class frmConfig
     CType(Me.pctKeyState, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlTimeout.ResumeLayout(False)
     Me.pnlTimeout.PerformLayout()
+    CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlInterval.ResumeLayout(False)
     Me.pnlInterval.PerformLayout()
+    CType(Me.txtInterval, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAccuracy.ResumeLayout(False)
     Me.pnlAccuracy.PerformLayout()
+    CType(Me.txtAccuracy, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlHistoryDir.ResumeLayout(False)
     Me.pnlHistoryDir.PerformLayout()
     Me.pnlButtons.ResumeLayout(False)
@@ -1104,6 +1106,7 @@ Partial Class frmConfig
     Me.gbProxy.PerformLayout()
     Me.pnlProxy.ResumeLayout(False)
     Me.pnlProxy.PerformLayout()
+    CType(Me.txtProxyPort, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlOverAlert.ResumeLayout(False)
     Me.pnlOverAlert.PerformLayout()
     CType(Me.txtOverSize, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1111,10 +1114,6 @@ Partial Class frmConfig
     Me.pnlCustom.ResumeLayout(False)
     Me.pnlCustom.PerformLayout()
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.txtInterval, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.txtAccuracy, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.txtProxyPort, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
     Me.PerformLayout()
 

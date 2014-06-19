@@ -120,6 +120,9 @@
   <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <data name="chkService.ToolTip" xml:space="preserve">
     <value>Run Satellite Restriction Logger system service when Satellite Restriction Tracker is closed.
 This service will continue running on the system so that logging may continue on any (or no) account.

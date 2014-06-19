@@ -276,7 +276,7 @@ Public Class frmHistory
     End If
     fDB.SetAction("Querying DataBase...", "Reading Rows...")
     If optGraph.Checked Then
-      dgvBandwidth.Visible = False
+      dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
         lItems = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
@@ -289,10 +289,10 @@ Public Class frmHistory
       bClose = False
     Else
       pnlGraph.Visible = False
-      dgvBandwidth.Visible = True
+      dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
         lItems = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
-        dgvBandwidth.Rows.Clear()
+        dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
         ChangeStyle()
         Select Case useStyle
@@ -319,16 +319,16 @@ Public Class frmHistory
             Next
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
               Next lItem
             End If
           Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
             For Each lItem As DataBase.DataRow In lItems
-              dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.DOWNLIM)
+              dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.DOWNLIM)
             Next lItem
           Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
             Dim myDLim As Long = 0
@@ -354,33 +354,33 @@ Public Class frmHistory
             If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD.ToString & " / " & lItem.DOWNLIM.ToString, lItem.UPLOAD.ToString & " / " & lItem.UPLIM.ToString)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD.ToString & " / " & lItem.DOWNLIM.ToString, lItem.UPLOAD.ToString & " / " & lItem.UPLIM.ToString)
               Next lItem
             End If
           Case SatHostTypes.WildBlue_EXEDE
             For Each lItem As DataBase.DataRow In lItems
               If lItem.DOWNLIM = lItem.UPLIM Then
                 If mySettings.HistoryInversion Then
-                  dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
+                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
                 Else
-                  dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
+                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
                 End If
               Else
                 If mySettings.HistoryInversion Then
                   If lItem.DOWNLIM = 0 Then
-                    dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
+                    dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
                   Else
-                    dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.DOWNLIM, lItem.UPLIM)
+                    dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.DOWNLIM, lItem.UPLIM)
                   End If
                 Else
                   If lItem.UPLIM = 0 Then
-                    dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
+                    dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
                   Else
-                    dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.UPLIM, lItem.DOWNLIM)
+                    dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.UPLIM, lItem.DOWNLIM)
                   End If
                 End If
               End If
@@ -408,17 +408,17 @@ Public Class frmHistory
             Next
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvBandwidth.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
               Next lItem
             End If
 
         End Select
       Else
-        dgvBandwidth.Rows.Clear()
+        dgvUsage.Rows.Clear()
       End If
     End If
     If bClose Then
@@ -607,7 +607,7 @@ Public Class frmHistory
     cmdQuery.PerformClick()
   End Sub
   Private Sub cmdImport_Click(sender As System.Object, e As System.EventArgs) Handles cmdImport.Click
-    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MsgBox("The Database has not been loaded yet, please wait.", MsgBoxStyle.Exclamation Or MsgBoxStyle.SystemModal) : Exit Sub
+    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) : Exit Sub
     Dim cdlOpen As New OpenFileDialog With {.AddExtension = True, .CheckFileExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .ShowReadOnly = False, .Title = "Import History Database"}
     If cdlOpen.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       If fDB Is Nothing Then fDB = New frmDBProgress
@@ -632,7 +632,7 @@ Public Class frmHistory
           fDB.Dispose()
           fDB = Nothing
         End If
-        MsgBox(IO.Path.GetFileName(cdlOpen.FileName) & " has been merged into your history database.", MsgBoxStyle.Information Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+        MessageBox.Show(IO.Path.GetFileName(cdlOpen.FileName) & " has been merged into your history database.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
         Application.DoEvents()
         ResetDates()
       Else
@@ -641,13 +641,13 @@ Public Class frmHistory
           fDB.Dispose()
           fDB = Nothing
         End If
-        MsgBox("Could not import " & IO.Path.GetFileName(cdlOpen.FileName), MsgBoxStyle.Exclamation Or MsgBoxStyle.SystemModal)
+        MessageBox.Show("Could not import " & IO.Path.GetFileName(cdlOpen.FileName), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
       End If
       usageTmp = Nothing
     End If
   End Sub
   Private Sub cmdExport_Click(sender As System.Object, e As System.EventArgs) Handles cmdExport.Click
-    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MsgBox("The Database has not been loaded yet, please wait.", MsgBoxStyle.Exclamation Or MsgBoxStyle.SystemModal) : Exit Sub
+    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification) : Exit Sub
     Dim cdlSave As New SaveFileDialog With {.AddExtension = True, .CheckPathExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .Title = "Export History Database"}
     If cdlSave.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       If fDB Is Nothing Then fDB = New frmDBProgress
@@ -672,7 +672,7 @@ Public Class frmHistory
         fDB.Dispose()
         fDB = Nothing
       End If
-      MsgBox("Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName), MsgBoxStyle.Information Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+      MessageBox.Show("Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
     End If
   End Sub
   Private Sub usageTmp_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageTmp.ProgressState
@@ -762,39 +762,39 @@ Public Class frmHistory
         Case SatHostTypes.DishNet_EXEDE
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
-          dgvBandwidth.Columns.Clear()
+          dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Anytime"
           colUPLOAD.HeaderText = "Off-Peak"
-          dgvBandwidth.Columns.Add(colDATETIME)
-          dgvBandwidth.Columns.Add(colDOWNLOAD)
-          dgvBandwidth.Columns.Add(colUPLOAD)
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
         Case SatHostTypes.WildBlue_EXEDE
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
-          dgvBandwidth.Columns.Clear()
+          dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Download, Upload, & Over"
           colUPLOAD.HeaderText = "Limit"
-          dgvBandwidth.Columns.Add(colDATETIME)
-          dgvBandwidth.Columns.Add(colDOWNLOAD)
-          dgvBandwidth.Columns.Add(colUPLOAD)
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
-          dgvBandwidth.Columns.Clear()
+          dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Used"
           colUPLOAD.HeaderText = "Total"
-          dgvBandwidth.Columns.Add(colDATETIME)
-          dgvBandwidth.Columns.Add(colDOWNLOAD)
-          dgvBandwidth.Columns.Add(colUPLOAD)
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
         Case Else
           cmd30Days.Text = "30 Days"
           cmd60Days.Text = "60 Days"
-          dgvBandwidth.Columns.Clear()
+          dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Download"
           colUPLOAD.HeaderText = "Upload"
-          dgvBandwidth.Columns.Add(colDATETIME)
-          dgvBandwidth.Columns.Add(colDOWNLOAD)
-          dgvBandwidth.Columns.Add(colUPLOAD)
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
       End Select
     End If
   End Sub

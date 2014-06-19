@@ -29,7 +29,7 @@ Partial Class frmMain
     Me.cmdHistory = New System.Windows.Forms.Button()
     Me.cmdRefresh = New System.Windows.Forms.Button()
     Me.cmdConfig = New System.Windows.Forms.Button()
-    Me.gbBandwidth = New System.Windows.Forms.GroupBox()
+    Me.gbUsage = New System.Windows.Forms.GroupBox()
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
@@ -108,7 +108,7 @@ Partial Class frmMain
     Me.ttUI = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
-    Me.gbBandwidth.SuspendLayout()
+    Me.gbUsage.SuspendLayout()
     Me.pnlNothing.SuspendLayout()
     Me.pnlWildBlue.SuspendLayout()
     Me.gbUld.SuspendLayout()
@@ -145,7 +145,7 @@ Partial Class frmMain
     Me.pnlDetails.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlDetails.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlDetails.Controls.Add(Me.pnlSettings, 0, 0)
-    Me.pnlDetails.Controls.Add(Me.gbBandwidth, 0, 1)
+    Me.pnlDetails.Controls.Add(Me.gbUsage, 0, 1)
     Me.pnlDetails.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlDetails.Location = New System.Drawing.Point(0, 0)
     Me.pnlDetails.Margin = New System.Windows.Forms.Padding(0)
@@ -204,7 +204,7 @@ Partial Class frmMain
     Me.cmdHistory.Size = New System.Drawing.Size(102, 22)
     Me.cmdHistory.TabIndex = 1
     Me.cmdHistory.Text = "History"
-    Me.ttUI.SetTooltip(Me.cmdHistory, "View your bandwidth history.")
+    Me.ttUI.SetTooltip(Me.cmdHistory, "View your usage history.")
     Me.cmdHistory.UseVisualStyleBackColor = True
     '
     'cmdRefresh
@@ -218,7 +218,7 @@ Partial Class frmMain
     Me.cmdRefresh.Size = New System.Drawing.Size(102, 22)
     Me.cmdRefresh.TabIndex = 0
     Me.cmdRefresh.Text = "Refresh"
-    Me.ttUI.SetTooltip(Me.cmdRefresh, "Reload bandwidth level information immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Hold CTRL to reload database.)")
+    Me.ttUI.SetTooltip(Me.cmdRefresh, "Reload usage level information immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Hold CTRL to reload database.)")
     Me.cmdRefresh.UseVisualStyleBackColor = True
     '
     'cmdConfig
@@ -235,20 +235,20 @@ Partial Class frmMain
     Me.ttUI.SetTooltip(Me.cmdConfig, "Change program settings.")
     Me.cmdConfig.UseVisualStyleBackColor = True
     '
-    'gbBandwidth
+    'gbUsage
     '
-    Me.gbBandwidth.Controls.Add(Me.lblStatus)
-    Me.gbBandwidth.Controls.Add(Me.pnlNothing)
-    Me.gbBandwidth.Controls.Add(Me.pnlWildBlue)
-    Me.gbBandwidth.Controls.Add(Me.pnlExede)
-    Me.gbBandwidth.Controls.Add(Me.pnlRural)
-    Me.gbBandwidth.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.gbBandwidth.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.gbBandwidth.Location = New System.Drawing.Point(3, 31)
-    Me.gbBandwidth.Name = "gbBandwidth"
-    Me.gbBandwidth.Size = New System.Drawing.Size(428, 128)
-    Me.gbBandwidth.TabIndex = 1
-    Me.gbBandwidth.TabStop = False
+    Me.gbUsage.Controls.Add(Me.lblStatus)
+    Me.gbUsage.Controls.Add(Me.pnlNothing)
+    Me.gbUsage.Controls.Add(Me.pnlWildBlue)
+    Me.gbUsage.Controls.Add(Me.pnlExede)
+    Me.gbUsage.Controls.Add(Me.pnlRural)
+    Me.gbUsage.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.gbUsage.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.gbUsage.Location = New System.Drawing.Point(3, 31)
+    Me.gbUsage.Name = "gbUsage"
+    Me.gbUsage.Size = New System.Drawing.Size(428, 128)
+    Me.gbUsage.TabIndex = 1
+    Me.gbUsage.TabStop = False
     '
     'lblStatus
     '
@@ -257,7 +257,7 @@ Partial Class frmMain
     Me.lblStatus.Name = "lblStatus"
     Me.lblStatus.Size = New System.Drawing.Size(91, 13)
     Me.lblStatus.TabIndex = 4
-    Me.lblStatus.Text = "Bandwidth Levels"
+    Me.lblStatus.Text = "Usage Levels"
     '
     'pnlNothing
     '
@@ -938,7 +938,7 @@ Partial Class frmMain
     Me.pctExede.Size = New System.Drawing.Size(330, 109)
     Me.pctExede.TabIndex = 1
     Me.pctExede.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctExede, "Graph representing your bandwidth usage.")
+    Me.ttUI.SetTooltip(Me.pctExede, "Graph representing your usage.")
     '
     'pnlRural
     '
@@ -1088,7 +1088,7 @@ Partial Class frmMain
     Me.pctRural.Size = New System.Drawing.Size(335, 109)
     Me.pctRural.TabIndex = 1
     Me.pctRural.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctRural, "Graph representing your bandwidth usage.")
+    Me.ttUI.SetTooltip(Me.pctRural, "Graph representing your usage.")
     '
     'trayIcon
     '
@@ -1162,8 +1162,8 @@ Partial Class frmMain
     Me.pnlDetails.PerformLayout()
     Me.pnlSettings.ResumeLayout(False)
     Me.pnlSettings.PerformLayout()
-    Me.gbBandwidth.ResumeLayout(False)
-    Me.gbBandwidth.PerformLayout()
+    Me.gbUsage.ResumeLayout(False)
+    Me.gbUsage.PerformLayout()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
     Me.pnlWildBlue.ResumeLayout(False)
@@ -1219,7 +1219,7 @@ Partial Class frmMain
   Friend WithEvents pnlDetails As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pnlSettings As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents cmdHistory As System.Windows.Forms.Button
-  Friend WithEvents gbBandwidth As System.Windows.Forms.GroupBox
+  Friend WithEvents gbUsage As System.Windows.Forms.GroupBox
   Friend WithEvents gbUld As System.Windows.Forms.GroupBox
   Friend WithEvents gbDld As System.Windows.Forms.GroupBox
   Friend WithEvents pnlDld As System.Windows.Forms.TableLayoutPanel

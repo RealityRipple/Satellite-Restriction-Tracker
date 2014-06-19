@@ -162,17 +162,17 @@
           Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
       ElseIf cmdSave.Enabled Then
-        Dim saveRet As MsgBoxResult = MsgBox("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", MsgBoxStyle.Question Or MsgBoxStyle.YesNoCancel, "Save Configuration?")
-        If saveRet = MsgBoxResult.Yes Then
+        Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification)
+        If saveRet = Windows.Forms.DialogResult.Yes Then
           cmdSave.PerformClick()
           If bAccount Then
             Me.DialogResult = Windows.Forms.DialogResult.Yes
           Else
             Me.DialogResult = Windows.Forms.DialogResult.OK
           End If
-        ElseIf saveRet = MsgBoxResult.No Then
+        ElseIf saveRet = Windows.Forms.DialogResult.No Then
           Me.DialogResult = Windows.Forms.DialogResult.No
-        ElseIf saveRet = MsgBoxResult.Cancel Then
+        ElseIf saveRet = Windows.Forms.DialogResult.Cancel Then
           e.Cancel = True
           Me.DialogResult = Windows.Forms.DialogResult.None
           Exit Sub
@@ -527,12 +527,12 @@
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     If Not txtAccount.Text.Contains("@") Or Not txtAccount.Text.Contains(".") Then
-      MsgBox("Please enter your full ViaSat account name." & vbNewLine & "Example: Customer@WildBlue.net", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+      MessageBox.Show("Please enter your full ViaSat account name." & vbNewLine & "Example: Customer@WildBlue.net", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
       txtAccount.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
-      MsgBox("Please enter your ViaSat account password.", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+      MessageBox.Show("Please enter your ViaSat account password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
       txtPassword.Focus()
       Exit Sub
     End If
@@ -541,7 +541,7 @@
     End If
     For Each c As Char In IO.Path.GetInvalidPathChars
       If txtHistoryDir.Text.Contains(c) Then
-        MsgBox("The directory you have entered contains invalid characters. Please choose a different directory.", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+        MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
         txtHistoryDir.Focus()
         Exit Sub
       End If
@@ -592,7 +592,7 @@
         Try
           My.Computer.FileSystem.CreateDirectory(txtHistoryDir.Text)
         Catch ex As Exception
-          MsgBox("The directory you selected could not be created!", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+          MessageBox.Show("The directory you selected could not be created!", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
           txtHistoryDir.Focus()
           Exit Sub
         End Try
@@ -612,7 +612,7 @@
             Next
           Next
           If sOverWrites.Count > 0 Then
-            If MsgBox("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", MsgBoxStyle.Question Or MsgBoxStyle.YesNo Or MsgBoxStyle.SystemModal, "Overwrite Files?") = MsgBoxResult.Yes Then
+            If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification) = Windows.Forms.DialogResult.Yes Then
               Dim sFails As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
                 If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
@@ -621,7 +621,7 @@
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MsgBox("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", MsgBoxStyle.Exclamation, "Permission Failure")
+              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
             Else
               Dim sFails As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
@@ -632,7 +632,7 @@
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MsgBox("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", MsgBoxStyle.Exclamation, "Permission Failure")
+              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
             End If
           Else
             Dim sFails As New Collections.Generic.List(Of String)
@@ -643,7 +643,7 @@
               My.Computer.FileSystem.MoveFile(sFile, sNewFile)
               If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
-            If sFails.Count > 0 Then MsgBox("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", MsgBoxStyle.Exclamation, "Permission Failure")
+            If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
           End If
         Else
           'Move old files
@@ -655,7 +655,7 @@
             My.Computer.FileSystem.MoveFile(sFile, sNewFile)
             If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
-          If sFails.Count > 0 Then MsgBox("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", MsgBoxStyle.Exclamation, "Permission Failure")
+          If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
         End If
       Else
         'Ignore
@@ -676,7 +676,7 @@
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
       Case 2
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MsgBox("Please enter a Proxy address or choose a different option.", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -691,7 +691,7 @@
         End If
       Case 3
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MsgBox("Please enter a Proxy address or choose a different option.", MsgBoxStyle.Critical Or MsgBoxStyle.SystemModal, My.Application.Info.Title)
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
           txtProxyAddress.Focus()
           Exit Sub
         End If

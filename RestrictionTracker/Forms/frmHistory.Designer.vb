@@ -36,7 +36,7 @@ Partial Class frmHistory
     Me.pnlGraph = New System.Windows.Forms.TableLayoutPanel()
     Me.pctUld = New System.Windows.Forms.PictureBox()
     Me.pctDld = New System.Windows.Forms.PictureBox()
-    Me.dgvBandwidth = New System.Windows.Forms.DataGridView()
+    Me.dgvUsage = New System.Windows.Forms.DataGridView()
     Me.colDATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.colDOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.colUPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -60,7 +60,7 @@ Partial Class frmHistory
     Me.pnlGraph.SuspendLayout()
     CType(Me.pctUld, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctDld, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.dgvBandwidth, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.dgvUsage, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAge.SuspendLayout()
     CType(Me.pctErr, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpAge.SuspendLayout()
@@ -187,25 +187,25 @@ Partial Class frmHistory
     Me.pctDld.TabIndex = 4
     Me.pctDld.TabStop = False
     '
-    'dgvBandwidth
+    'dgvUsage
     '
-    Me.dgvBandwidth.AllowUserToAddRows = False
-    Me.dgvBandwidth.AllowUserToDeleteRows = False
-    Me.dgvBandwidth.AllowUserToOrderColumns = True
+    Me.dgvUsage.AllowUserToAddRows = False
+    Me.dgvUsage.AllowUserToDeleteRows = False
+    Me.dgvUsage.AllowUserToOrderColumns = True
     DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveBorder
-    Me.dgvBandwidth.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
-    Me.dgvBandwidth.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-    Me.dgvBandwidth.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-    Me.dgvBandwidth.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colDOWNLOAD, Me.colUPLOAD})
-    Me.dgvBandwidth.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.dgvBandwidth.Location = New System.Drawing.Point(0, 76)
-    Me.dgvBandwidth.Name = "dgvBandwidth"
-    Me.dgvBandwidth.ReadOnly = True
-    Me.dgvBandwidth.RowHeadersVisible = False
-    Me.dgvBandwidth.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-    Me.dgvBandwidth.Size = New System.Drawing.Size(514, 205)
-    Me.dgvBandwidth.TabIndex = 2
-    Me.dgvBandwidth.Visible = False
+    Me.dgvUsage.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+    Me.dgvUsage.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+    Me.dgvUsage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+    Me.dgvUsage.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colDOWNLOAD, Me.colUPLOAD})
+    Me.dgvUsage.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.dgvUsage.Location = New System.Drawing.Point(0, 76)
+    Me.dgvUsage.Name = "dgvUsage"
+    Me.dgvUsage.ReadOnly = True
+    Me.dgvUsage.RowHeadersVisible = False
+    Me.dgvUsage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+    Me.dgvUsage.Size = New System.Drawing.Size(514, 205)
+    Me.dgvUsage.TabIndex = 2
+    Me.dgvUsage.Visible = False
     '
     'colDATETIME
     '
@@ -434,7 +434,7 @@ Partial Class frmHistory
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
     Me.ClientSize = New System.Drawing.Size(514, 312)
     Me.Controls.Add(Me.pnlGraph)
-    Me.Controls.Add(Me.dgvBandwidth)
+    Me.Controls.Add(Me.dgvUsage)
     Me.Controls.Add(Me.grpAge)
     Me.Controls.Add(Me.pnlButtons)
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -448,7 +448,7 @@ Partial Class frmHistory
     Me.pnlGraph.ResumeLayout(False)
     CType(Me.pctUld, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctDld, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.dgvBandwidth, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.dgvUsage, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAge.ResumeLayout(False)
     Me.pnlAge.PerformLayout()
     CType(Me.pctErr, System.ComponentModel.ISupportInitialize).EndInit()
@@ -459,7 +459,7 @@ Partial Class frmHistory
   Friend WithEvents pnlButtons As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents cmdClose As System.Windows.Forms.Button
   Friend WithEvents pnlGraph As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents dgvBandwidth As System.Windows.Forms.DataGridView
+  Friend WithEvents dgvUsage As System.Windows.Forms.DataGridView
   Friend WithEvents DATETIME As System.Windows.Forms.DataGridViewTextBoxColumn
   Friend WithEvents pnlAge As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblFrom As System.Windows.Forms.Label
