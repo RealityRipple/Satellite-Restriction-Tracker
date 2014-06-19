@@ -166,14 +166,16 @@ Public Class DataBase
   Public Sub Add(item As DataRow) Implements System.Collections.Generic.ICollection(Of DataRow).Add
     If data IsNot Nothing Then
       Dim noGood As Boolean = False
-      For Each datum In data
-        If Math.Abs(datum.DATETIME.Subtract(item.DATETIME).TotalMinutes) < 1 Then
+      For I As Integer = 0 To data.Length - 1
+        If Math.Abs(data(I).DATETIME.Subtract(item.DATETIME).TotalMinutes) < 1 Then
           noGood = True
           Exit For
         End If
       Next
       If Not noGood Then
-        Array.Resize(data, data.Length + 1)
+        Dim dLen As Integer = data.Length
+        ReDim Preserve data(dLen)
+        'Array.Resize(data, data.Length + 1)
         data(data.Length - 1) = item
       End If
     Else
