@@ -90,6 +90,7 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -108,6 +109,7 @@
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="Classes\clsBugReport.vb" />
+    <Compile Include="Classes\clsGlass.vb" />
     <Compile Include="Classes\Visual Elements\clsColorDialog.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -176,6 +178,12 @@
     <Compile Include="Forms\frmUpdate.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmWizard.Designer.vb">
+      <DependentUpon>frmWizard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmWizard.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Modules\modCreds.vb" />
     <Compile Include="Modules\modDB.vb" />
     <Compile Include="Modules\modFunctions.vb" />
@@ -225,6 +233,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUpdate.resx">
       <DependentUpon>frmUpdate.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmWizard.resx">
+      <DependentUpon>frmWizard.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -296,6 +307,11 @@
     <Content Include="Resources\tray_16\throbsprite\7.ico" />
     <Content Include="Resources\tray_16\throbsprite\8.ico" />
     <Content Include="Resources\tray_16\throbsprite\9.ico" />
+    <None Include="Resources\wizard\wizService.jpg" />
+    <None Include="Resources\wizard\wizFinished.jpg" />
+    <None Include="Resources\wizard\wizDisplay.jpg" />
+    <None Include="Resources\wizard\wizAccount.jpg" />
+    <None Include="Resources\wizard\wizWelcome.jpg" />
     <None Include="Resources\tray_32\throbsprite\10.ico" />
     <None Include="Resources\tray_32\throbsprite\9.ico" />
     <None Include="Resources\tray_32\throbsprite\8.ico" />

@@ -379,5 +379,55 @@ Namespace My.Resources
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property wizAccount() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wizAccount", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property wizDisplay() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wizDisplay", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property wizFinished() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wizFinished", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property wizService() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wizService", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property wizWelcome() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("wizWelcome", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
     End Module
 End Namespace
