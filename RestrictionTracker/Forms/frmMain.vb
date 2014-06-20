@@ -44,70 +44,11 @@ Public Class frmMain
   Private r_used, r_lim As Long
   Private lastBalloon As Long
 #Region "Server Type Determination"
-  Private Class DetermineType
-    Private Class URLChecker
-      Public Class CheckEventArgs
-        Inherits EventArgs
-        Public Result As Boolean
-        Public Sub New(bRet As Boolean)
-          Result = bRet
-        End Sub
-      End Class
-      Public Event CheckResult(sender As Object, e As CheckEventArgs)
-      Private wRequest As Net.WebRequest
-      Private sAddr As String
-      Public Sub New()
-        wRequest = Nothing
-        sAddr = String.Empty
-      End Sub
-      Public Sub CheckURLAsync(sender As Object, HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy)
-        sAddr = HostAddress
-        If HostAddress.IndexOf("://") < 0 Then HostAddress = "http://" & HostAddress
-        wRequest = System.Net.WebRequest.Create(HostAddress)
-        wRequest.Timeout = iTimeout
-        wRequest.Proxy = pProxy
-        Try
-          wRequest.BeginGetResponse(New AsyncCallback(AddressOf URLCheckResponse), sender)
-        Catch ex As Exception
-          RaiseEvent CheckResult(sender, New CheckEventArgs(False))
-        End Try
-      End Sub
-      Private Sub URLCheckResponse(ar As IAsyncResult)
-        Try
-          Dim wResponse As Net.WebResponse = wRequest.EndGetResponse(ar)
-          If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
-            Dim sData As String = Nothing
-            Using wData As IO.Stream = wResponse.GetResponseStream
-              Using readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(LATIN_1))
-                sData = readStream.ReadToEnd
-              End Using
-            End Using
-            If String.IsNullOrEmpty(sData) Then
-              RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
-            ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
-              RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
-            Else
-              RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(True))
-            End If
-          Else
-            RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
-          End If
-          wResponse.Close()
-          wResponse = Nothing
-        Catch ex As Exception
-          RaiseEvent CheckResult(ar.AsyncState, New CheckEventArgs(False))
-        End Try
-      End Sub
-    End Class
-    Private WithEvents uChecker As URLChecker
+  Private Class DetermineTypeOffline
     Public Event TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs)
     Private sProvider As String
-    Private iTimeout As Integer
-    Private pProxy As Net.IWebProxy
-    Public Sub New(Provider As String, Sender As Object, Timeout As Integer, Proxy As Net.IWebProxy)
+    Public Sub New(Provider As String, Sender As Object)
       Application.DoEvents()
-      iTimeout = Timeout
-      pProxy = Proxy
       Dim testCallback As New ParamaterizedInvoker(AddressOf BeginTest)
       testCallback.BeginInvoke({Provider, Sender}, Nothing, Nothing)
     End Sub
@@ -117,10 +58,7 @@ Public Class frmMain
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
         RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.DishNet_EXEDE))
       Else
-        If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
-        sProvider = Provider & ".ruralportal.net"
-        uChecker = New URLChecker
-        uChecker.CheckURLAsync({"INIT", Sender}, "wildblue.com", iTimeout, pProxy)
+        OfflineCheck(state)
       End If
     End Sub
     Private Sub OfflineStats(ByRef rpP As Single, ByRef exP As Single, ByRef wbP As Single)
@@ -185,43 +123,6 @@ Public Class frmMain
         End If
       End If
     End Sub
-    Private Sub uChecker_CheckResult(sender As Object, e As URLChecker.CheckEventArgs) Handles uChecker.CheckResult
-      Dim Source() As Object = sender
-      Dim sSource As String = Source(0).ToString
-      Select Case sSource
-        Case "INIT"
-          If e.Result Then
-            uChecker.CheckURLAsync({"REQ", Source(1)}, sProvider, iTimeout, pProxy)
-          Else
-            OfflineCheck(Source(1))
-          End If
-        Case Else
-          If e.Result Then
-            RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.RuralPortal_EXEDE))
-          Else
-            Dim rpP, exP, wbP As Single
-            OfflineStats(rpP, exP, wbP)
-            If rpP = 0 And exP = 0 And wbP = 0 Then
-              RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
-            Else
-              If rpP > exP And rpP > wbP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
-              ElseIf exP > rpP And exP > wbP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
-              ElseIf wbP > rpP And wbP > exP Then
-                RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
-              Else
-                Debug.Print("RP: " & FormatPercent(rpP) & ", Ex: " & FormatPercent(exP) & ", WB: " & FormatPercent(wbP))
-                If rpP > wbP And exP > wbP And rpP = exP Then
-                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
-                Else
-                  RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
-                End If
-              End If
-            End If
-          End If
-      End Select
-    End Sub
   End Class
   Private Class TypeDeterminedEventArgs
     Inherits EventArgs
@@ -231,9 +132,64 @@ Public Class frmMain
     End Sub
   End Class
   Private WithEvents TypeDetermination As DetermineType
+  Private WithEvents TypeDeterminationOffline As DetermineTypeOffline
   Private Sub TypeDetermination_TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs) Handles TypeDetermination.TypeDetermined
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf TypeDetermination_TypeDetermined), Sender, e)
+    Else
+      NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
+      If e.HostType = SatHostTypes.Other Then
+        tmrIcon.Enabled = False
+        If IsArray(Sender) Then
+          If localData IsNot Nothing Then
+            localData.Dispose()
+            localData = Nothing
+          End If
+          localData = New localRestrictionTracker(AppData)
+          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
+          connectInvoker.BeginInvoke(Nothing, Nothing)
+        Else
+          Select Case Sender
+            Case "LOAD"
+              TypeDeterminationOffline = New DetermineTypeOffline(sProvider, Sender)
+            Case Else
+              DisplayUsage(True, False)
+          End Select
+        End If
+      Else
+        mySettings.AccountType = e.HostType
+        If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
+        mySettings.Save()
+        If IsArray(Sender) Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Current Connection...", False)
+          If localData IsNot Nothing Then
+            localData.Dispose()
+            localData = Nothing
+          End If
+          localData = New localRestrictionTracker(AppData)
+          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
+          connectInvoker.BeginInvoke(Nothing, Nothing)
+        Else
+          Select Case Sender
+            Case "LOAD"
+              SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
+              If localData IsNot Nothing Then
+                localData.Dispose()
+                localData = Nothing
+              End If
+              localData = New localRestrictionTracker(AppData)
+              Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
+              connectInvoker.BeginInvoke(Nothing, Nothing)
+            Case Else
+              DisplayUsage(True, False)
+          End Select
+        End If
+      End If
+    End If
+  End Sub
+  Private Sub TypeDeterminationOffline_TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs) Handles TypeDeterminationOffline.TypeDetermined
+    If Me.InvokeRequired Then
+      Me.Invoke(New EventHandler(AddressOf TypeDeterminationOffline_TypeDetermined), Sender, e)
     Else
       NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
       If e.HostType = SatHostTypes.Other Then
