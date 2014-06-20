@@ -396,13 +396,13 @@ Module modFunctions
         ElseIf ADDOK Then
           'Bad Child, OK Parent
           If Not OneAlert Then
-            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             OneAlert = True
           End If
         Else
           'Bad Both
           If Not OneAlert Then
-            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             OneAlert = True
           End If
         End If

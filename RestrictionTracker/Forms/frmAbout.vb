@@ -36,7 +36,7 @@
       Try
         If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, "/silent")
       Catch ex As Exception
-        MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try
     Else
       Try

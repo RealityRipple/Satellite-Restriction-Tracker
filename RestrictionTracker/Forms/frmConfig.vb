@@ -162,7 +162,7 @@
           Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
       ElseIf cmdSave.Enabled Then
-        Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification)
+        Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
         If saveRet = Windows.Forms.DialogResult.Yes Then
           cmdSave.PerformClick()
           If bAccount Then
@@ -481,7 +481,7 @@
       ttConfig.SetTooltip(pctKeyState, sErr)
       DoCheck()
       cmdSave.Enabled = bToSave
-      End If
+    End If
   End Sub
   Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
     If Me.InvokeRequired Then
@@ -527,12 +527,12 @@
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     If Not txtAccount.Text.Contains("@") Or Not txtAccount.Text.Contains(".") Then
-      MessageBox.Show("Please enter your full ViaSat account name." & vbNewLine & "Example: Customer@WildBlue.net", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("Please enter your full ViaSat account name." & vbNewLine & "Example: Customer@WildBlue.net", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtAccount.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
-      MessageBox.Show("Please enter your ViaSat account password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("Please enter your ViaSat account password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtPassword.Focus()
       Exit Sub
     End If
@@ -541,7 +541,7 @@
     End If
     For Each c As Char In IO.Path.GetInvalidPathChars
       If txtHistoryDir.Text.Contains(c) Then
-        MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         txtHistoryDir.Focus()
         Exit Sub
       End If
@@ -592,7 +592,7 @@
         Try
           My.Computer.FileSystem.CreateDirectory(txtHistoryDir.Text)
         Catch ex As Exception
-          MessageBox.Show("The directory you selected could not be created!", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("The directory you selected could not be created!", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           txtHistoryDir.Focus()
           Exit Sub
         End Try
@@ -612,7 +612,7 @@
             Next
           Next
           If sOverWrites.Count > 0 Then
-            If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, MessageBoxOptions.ServiceNotification) = Windows.Forms.DialogResult.Yes Then
+            If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
               Dim sFails As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
                 If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
@@ -621,7 +621,7 @@
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             Else
               Dim sFails As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
@@ -632,7 +632,7 @@
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             End If
           Else
             Dim sFails As New Collections.Generic.List(Of String)
@@ -643,7 +643,7 @@
               My.Computer.FileSystem.MoveFile(sFile, sNewFile)
               If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
-            If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+            If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           End If
         Else
           'Move old files
@@ -655,7 +655,7 @@
             My.Computer.FileSystem.MoveFile(sFile, sNewFile)
             If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
-          If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         End If
       Else
         'Ignore
@@ -676,7 +676,7 @@
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
       Case 2
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -691,7 +691,7 @@
         End If
       Case 3
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
           txtProxyAddress.Focus()
           Exit Sub
         End If

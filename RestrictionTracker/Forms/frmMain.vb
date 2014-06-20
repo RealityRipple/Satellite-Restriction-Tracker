@@ -638,7 +638,7 @@ Public Class frmMain
           mnuRestore.Text = "&Focus"
         End If
         cmdConfig.Focus()
-        MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+        MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       Else
         If cmdRefresh.Enabled Then
           cmdRefresh.Enabled = False
@@ -780,7 +780,7 @@ Public Class frmMain
             mnuRestore.Text = "&Focus"
           End If
           cmdConfig.Focus()
-          MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
           SetStatusText("Analyzing Account", "Determining your account type...", False)
           TypeDetermination = New DetermineType(sProvider, "LOAD", mySettings.Timeout, mySettings.Proxy)
@@ -1525,7 +1525,7 @@ Public Class frmMain
         mnuRestore.Text = "&Focus"
       End If
       cmdConfig.Focus()
-      MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Private Sub cmdHistory_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistory.Click
@@ -2019,7 +2019,7 @@ Public Class frmMain
             ShellEx(sEXEPath, "/silent")
             Application.Exit()
           Catch ex As Exception
-            MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+            MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
             NextGrabTick = Long.MinValue
           End Try
@@ -2187,12 +2187,12 @@ Public Class frmMain
           ControllerProps.WindowStyle = ProcessWindowStyle.Hidden
           Process.Start(ControllerProps)
         Else
-          MessageBox.Show("The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please reinstall " & Application.ProductName & ".", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+          MessageBox.Show("The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please reinstall " & Application.ProductName & ".", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           mySettings.Service = False
         End If
       End If
     Catch ex As Exception
-      MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification)
+      MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End Try
   End Sub
   Private Sub SetDefaultColors()
