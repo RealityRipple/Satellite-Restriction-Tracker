@@ -20,23 +20,23 @@
         Result = bRet
       End Sub
     End Class
-    Public Event CheckResult(UserState As Object, e As CheckEventArgs)
+    Public Event CheckResult(AsyncState As Object, e As CheckEventArgs)
     Private wRequest As Net.WebRequest
     Private sAddr As String
     Public Sub New()
       wRequest = Nothing
       sAddr = String.Empty
     End Sub
-    Public Sub CheckURLAsync(UserState As Object, HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy)
+    Public Sub CheckURLAsync(AsyncState As Object, HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy)
       sAddr = HostAddress
       If HostAddress.IndexOf("://") < 0 Then HostAddress = "http://" & HostAddress
       wRequest = System.Net.WebRequest.Create(HostAddress)
       wRequest.Timeout = iTimeout
       wRequest.Proxy = pProxy
       Try
-        wRequest.BeginGetResponse(New AsyncCallback(AddressOf URLCheckResponse), UserState)
+        wRequest.BeginGetResponse(New AsyncCallback(AddressOf URLCheckResponse), AsyncState)
       Catch ex As Exception
-        RaiseEvent CheckResult(UserState, New CheckEventArgs(False))
+        RaiseEvent CheckResult(AsyncState, New CheckEventArgs(False))
       End Try
     End Sub
     Private Sub URLCheckResponse(ar As IAsyncResult)
@@ -67,50 +67,46 @@
     End Sub
   End Class
   Private WithEvents uChecker As URLChecker
-  Public Event TypeDetermined(UserState As Object, e As TypeDeterminedEventArgs)
+  Public Event TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs)
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Private sProvider As String
   Private iTimeout As Integer
   Private pProxy As Net.IWebProxy
-  Public Sub New(Provider As String, UserState As Object, Timeout As Integer, Proxy As Net.IWebProxy)
+  Public Sub New(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy)
     iTimeout = Timeout
     pProxy = Proxy
     Dim testCallback As New ParamaterizedInvoker(AddressOf BeginTest)
-    testCallback.BeginInvoke({Provider, UserState}, Nothing, Nothing)
+    testCallback.BeginInvoke(Provider, Nothing, Nothing)
   End Sub
-  Private Sub BeginTest(state As Object)
-    Dim Provider As String = state(0)
-    Dim UserState As Object = state(1)
+  Private Sub BeginTest(Provider As String)
     If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
-      RaiseEvent TypeDetermined(UserState, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.DishNet))
+      RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.DishNet))
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       sProvider = Provider
       uChecker = New URLChecker
-      uChecker.CheckURLAsync({"NET", UserState}, "wildblue.com", iTimeout, pProxy)
+      uChecker.CheckURLAsync("NET", "wildblue.com", iTimeout, pProxy)
     End If
   End Sub
-  Private Sub uChecker_CheckResult(UserState As Object, e As URLChecker.CheckEventArgs) Handles uChecker.CheckResult
-    Dim Source() As Object = UserState
-    Dim sSource As String = Source(0).ToString
-    Select Case sSource
+  Private Sub uChecker_CheckResult(Sender As Object, e As URLChecker.CheckEventArgs) Handles uChecker.CheckResult
+    Select Case Sender
       Case "NET"
         If e.Result Then
-          uChecker.CheckURLAsync({"RP", Source(1)}, sProvider & ".ruralportal.net", iTimeout, pProxy)
+          uChecker.CheckURLAsync("RP", sProvider & ".ruralportal.net", iTimeout, pProxy)
         Else
-          RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.Other))
+          RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.Other))
         End If
       Case "RP"
         If e.Result Then
-          RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.RuralPortal))
+          RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.RuralPortal))
         Else
-          uChecker.CheckURLAsync({"MYA", Source(1)}, "myaccount." & sProvider & ".net", iTimeout, pProxy)
+          uChecker.CheckURLAsync("MYA", "myaccount." & sProvider & ".net", iTimeout, pProxy)
         End If
       Case "MYA"
         If e.Result Then
-          RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.WildBlue))
+          RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.WildBlue))
         Else
-          RaiseEvent TypeDetermined(Source(1), New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.Other))
+          RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.Other))
         End If
     End Select
   End Sub

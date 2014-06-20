@@ -46,7 +46,6 @@ Public Class frmMain
 #Region "Server Type Determination"
   Private Class DetermineTypeOffline
     Public Event TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs)
-    Private sProvider As String
     Public Sub New(Provider As String, Sender As Object)
       Application.DoEvents()
       Dim testCallback As New ParamaterizedInvoker(AddressOf BeginTest)
@@ -133,57 +132,32 @@ Public Class frmMain
   End Class
   Private WithEvents TypeDetermination As DetermineType
   Private WithEvents TypeDeterminationOffline As DetermineTypeOffline
-  Private Sub TypeDetermination_TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs) Handles TypeDetermination.TypeDetermined
+  Private Sub TypeDetermination_TypeDetermined(Sender As Object, e As DetermineType.TypeDeterminedEventArgs) Handles TypeDetermination.TypeDetermined
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf TypeDetermination_TypeDetermined), Sender, e)
     Else
       NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
-      If e.HostType = SatHostTypes.Other Then
+      If e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other Then
         tmrIcon.Enabled = False
-        If IsArray(Sender) Then
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          localData = New localRestrictionTracker(AppData)
-          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-          connectInvoker.BeginInvoke(Nothing, Nothing)
-        Else
-          Select Case Sender
-            Case "LOAD"
-              TypeDeterminationOffline = New DetermineTypeOffline(sProvider, Sender)
-            Case Else
-              DisplayUsage(True, False)
-          End Select
-        End If
+        TypeDeterminationOffline = New DetermineTypeOffline(sProvider, Sender)
       Else
-        mySettings.AccountType = e.HostType
+        If e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet Then
+          mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+        ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue Then
+          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+        ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal Then
+          mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+        End If
         If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
         mySettings.Save()
-        If IsArray(Sender) Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Current Connection...", False)
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          localData = New localRestrictionTracker(AppData)
-          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-          connectInvoker.BeginInvoke(Nothing, Nothing)
-        Else
-          Select Case Sender
-            Case "LOAD"
-              SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
-              If localData IsNot Nothing Then
-                localData.Dispose()
-                localData = Nothing
-              End If
-              localData = New localRestrictionTracker(AppData)
-              Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-              connectInvoker.BeginInvoke(Nothing, Nothing)
-            Case Else
-              DisplayUsage(True, False)
-          End Select
+        SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
+        If localData IsNot Nothing Then
+          localData.Dispose()
+          localData = Nothing
         End If
+        localData = New localRestrictionTracker(AppData)
+        Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
+        connectInvoker.BeginInvoke(Nothing, Nothing)
       End If
     End If
   End Sub
@@ -194,51 +168,20 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
       If e.HostType = SatHostTypes.Other Then
         tmrIcon.Enabled = False
-        If IsArray(Sender) Then
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          localData = New localRestrictionTracker(AppData)
-          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-          connectInvoker.BeginInvoke(Nothing, Nothing)
-        Else
-          Select Case Sender
-            Case "LOAD"
-              DisplayUsage(False, True)
-              SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
-            Case Else
-              DisplayUsage(True, False)
-          End Select
-        End If
+        DisplayUsage(False, True)
+        SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
       Else
-        mySettings.AccountType = e.HostType
-        If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
-        mySettings.Save()
-        If IsArray(Sender) Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Current Connection...", False)
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          localData = New localRestrictionTracker(AppData)
-          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-          connectInvoker.BeginInvoke(Nothing, Nothing)
-        Else
-          Select Case Sender
-            Case "LOAD"
-              SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
-              If localData IsNot Nothing Then
-                localData.Dispose()
-                localData = Nothing
-              End If
-              localData = New localRestrictionTracker(AppData)
-              Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-              connectInvoker.BeginInvoke(Nothing, Nothing)
-            Case Else
-              DisplayUsage(True, False)
-          End Select
+      mySettings.AccountType = e.HostType
+      If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
+      mySettings.Save()
+        SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
+        If localData IsNot Nothing Then
+          localData.Dispose()
+          localData = Nothing
         End If
+        localData = New localRestrictionTracker(AppData)
+        Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
+        connectInvoker.BeginInvoke(Nothing, Nothing)
       End If
     End If
   End Sub
@@ -565,7 +508,7 @@ Public Class frmMain
     If ClosingTime Then Exit Sub
     If mySettings.AccountType = SatHostTypes.Other Then
       SetStatusText("Analyzing Account", "Determining your account type...", False)
-      TypeDetermination = New DetermineType(sProvider, "LOAD", mySettings.Timeout, mySettings.Proxy)
+      TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
     Else
       tmrIcon.Enabled = False
       SetStatusText("No History", "", False)
@@ -783,7 +726,7 @@ Public Class frmMain
           MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
           SetStatusText("Analyzing Account", "Determining your account type...", False)
-          TypeDetermination = New DetermineType(sProvider, "LOAD", mySettings.Timeout, mySettings.Proxy)
+          TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
       End Select
       If localData IsNot Nothing Then
         localData.Dispose()

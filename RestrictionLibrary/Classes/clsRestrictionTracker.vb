@@ -257,7 +257,7 @@
     ResetTimeout()
     If mySettings.AccountType = SatHostTypes.Other Then
       If mySettings.Account.Contains("@") Then
-        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), "CONNECT", mySettings.Timeout, mySettings.Proxy)
+        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy)
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
       End If
@@ -266,21 +266,19 @@
     End If
   End Sub
   Private Sub acType_TypeDetermined(UserState As Object, e As DetermineType.TypeDeterminedEventArgs) Handles acType.TypeDetermined
-    If UserState = "CONNECT" Then
-      Select Case e.HostGroup
-        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue
-          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
-          GetUsage()
-        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet
-          mySettings.AccountType = SatHostTypes.DishNet_EXEDE
-          GetUsage()
-        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal
-          mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
-          GetUsage()
-        Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
-      End Select
-    End If
+    Select Case e.HostGroup
+      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue
+        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+        GetUsage()
+      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet
+        mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+        GetUsage()
+      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal
+        mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+        GetUsage()
+      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
+    End Select
   End Sub
   Private Sub InitAccount()
     bCancelled = False
