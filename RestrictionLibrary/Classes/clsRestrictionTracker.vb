@@ -27,6 +27,7 @@
     Public Enum FailureType
       UnknownAccountType
       UnknownAccountDetails
+      LoginIssue
       LoginFailure
       FatalLoginFailure
       ConnectionTimeout
@@ -915,7 +916,7 @@
           bReset = True
         ElseIf sRet.ToLower.Contains("confirmchange(msg);") Then
           ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Issue: Your password needs to be changed."))
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Login Issue: Your password needs to be changed."))
           If Not String.IsNullOrEmpty(sProvider) Then
             If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
             Dim uriString As String = String.Format(sRP, sProvider, "login")

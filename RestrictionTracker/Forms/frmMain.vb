@@ -703,6 +703,9 @@ Public Class frmMain
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionFailure), sender, e)
     Else
       Select Case e.Type
+        Case ConnectionFailureEventArgs.FailureType.LoginIssue
+          SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+          Exit Sub
         Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.ConnectionTimeout
           SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
           DisplayUsage(False, False)
