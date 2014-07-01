@@ -92,6 +92,8 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("An exception occurred during a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Received an unexpected EOF or 0 bytes from the transport stream") Then
           Return "Received empty response from server. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: The connection was closed") Then
+          Return "The server closed the connection. Please try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
@@ -99,6 +101,8 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("Error getting response stream") Then
         If ex.InnerException.Message.StartsWith("BeginWrite failure") Then
           Return "Could not write response data. Check your local network."
+        ElseIf ex.Message.Contains("ReadDone1") Then
+          Return "The server closed the connection. Please try again."
         ElseIf ex.Message.Contains("ReadDone2") Then
           Return "Received empty response from server. Please try again."
         Else
@@ -122,8 +126,13 @@ Module modFunctions
           End If
         ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
-            If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.") Then
+            If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
               Return "The server did not respond. Please try again."
+            ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
+              Return "Connection aborted."
+            ElseIf ex.InnerException.Message.Contains("The decryption operation failed, see inner exception") Then
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Decryption failure - " & ex.InnerException.InnerException.Message
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
@@ -168,11 +177,13 @@ Module modFunctions
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
         My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, True)
         If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+        If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
         My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
       End If
     Else
       My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, False)
       If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+      If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
       My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
     End If
     SendSocketErrors(DataPath)
@@ -186,8 +197,9 @@ Module modFunctions
         If Not String.IsNullOrEmpty(ReportBunch) Then
           Dim e, ie As String
           If ReportBunch.Contains(vbNewLine) Then
-            e = Split(ReportBunch, vbNewLine)(0)
-            ie = Split(ReportBunch, vbNewLine)(1)
+            e = Split(ReportBunch, vbNewLine, 2)(0)
+            ie = Split(ReportBunch, vbNewLine, 2)(1)
+            If ie.Contains(vbNewLine) Then ie = ie.Replace(vbNewLine, " - ")
           Else
             e = ReportBunch
             ie = Nothing
