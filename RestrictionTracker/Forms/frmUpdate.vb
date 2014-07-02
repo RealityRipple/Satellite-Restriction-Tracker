@@ -29,7 +29,7 @@
     lblBETA.Visible = BETA
     chkStopBETA.Visible = BETA
   End Sub
-  Private Sub cmdDownload_Click(sender As System.Object, e As System.EventArgs)
+  Private Sub cmdDownload_Click(sender As System.Object, e As System.EventArgs) Handles cmdDownload.Click
     If chkStopBETA.Visible And chkStopBETA.Checked Then
       Me.DialogResult = Windows.Forms.DialogResult.OK
     Else
@@ -38,7 +38,7 @@
     Ret = True
     Me.Close()
   End Sub
-  Private Sub cmdCancel_Click(sender As System.Object, e As System.EventArgs)
+  Private Sub cmdCancel_Click(sender As System.Object, e As System.EventArgs) Handles cmdCancel.Click
     If chkStopBETA.Visible And chkStopBETA.Checked Then
       Me.DialogResult = Windows.Forms.DialogResult.Cancel
     Else

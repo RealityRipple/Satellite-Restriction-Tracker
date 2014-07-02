@@ -34,7 +34,7 @@ Partial Class frmUpdate
     Me.pctThrobber = New System.Windows.Forms.PictureBox()
     Me.chkStopBETA = New System.Windows.Forms.CheckBox()
     Me.lblNewVer = New System.Windows.Forms.Label()
-    Me.ttUpdate = New ToolTip(Me.components)
+    Me.ttUpdate = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlUpdate.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     CType(Me.pctThrobber, System.ComponentModel.ISupportInitialize).BeginInit()
