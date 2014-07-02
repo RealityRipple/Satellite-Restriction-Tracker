@@ -55,7 +55,7 @@
       ToggleSong()
     ElseIf My.Computer.Keyboard.CtrlKeyDown And Not My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
       Err.Raise(vbObjectError + 72, "Error Test", "This is simply a test of the error report system.")
-    ElseIf My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
+    ElseIf Not My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
       If NOTIFIER_STYLE.Background Is Nothing Or NOTIFIER_STYLE.CloseButton Is Nothing Then
         Exit Sub
       End If
@@ -66,6 +66,13 @@
         MakeNotifier(taskNotifier, True)
         taskNotifier.Show("Alert Test", "This is simply a test of the alert notification system.", 200, 10 * 1000, 100)
       End If
+    ElseIf My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
+
+    Else
+      frmDonate.Show()
+      Dim mySettings As New AppSettings
+      mySettings.OneNag = True
+      mySettings.Save()
     End If
   End Sub
   Private Sub taskNotifier_ContentClick(sender As Object, e As System.EventArgs) Handles taskNotifier.ContentClick
@@ -372,4 +379,8 @@
     SetUpdateValue("Downloading Update " & sProgress, True, sStatus)
   End Sub
 #End Region
+
+  Private Sub LogoPictureBox_Click(sender As System.Object, e As System.EventArgs) Handles LogoPictureBox.Click
+
+  End Sub
 End Class

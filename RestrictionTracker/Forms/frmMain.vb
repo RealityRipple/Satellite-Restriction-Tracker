@@ -1926,6 +1926,14 @@ Public Class frmMain
               updateChecker = Nothing
             End If
             NextGrabTick = Long.MinValue
+            Try
+              If Not mySettings.OneNag And String.IsNullOrEmpty(mySettings.RemoteKey) Then
+                frmDonate.Show()
+                mySettings.OneNag = True
+                mySettings.Save()
+              End If
+            Catch
+            End Try
         End Select
       End If
     End If
