@@ -738,7 +738,7 @@
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
     If Not mySettings.HistoryInversion = chkInvert.Checked Then Return True
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
-    If Not mySettings.Overuse = txtOverSize.Value Then Return True
+    If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
     If Not mySettings.BetaCheck = chkBeta.Checked Then Return True
     If mySettings.Proxy Is Nothing Then
