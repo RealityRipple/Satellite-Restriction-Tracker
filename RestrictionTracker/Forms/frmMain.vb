@@ -171,9 +171,9 @@ Public Class frmMain
         DisplayUsage(False, True)
         SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
       Else
-      mySettings.AccountType = e.HostType
-      If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
-      mySettings.Save()
+        mySettings.AccountType = e.HostType
+        If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
+        mySettings.Save()
         SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
         If localData IsNot Nothing Then
           localData.Dispose()
