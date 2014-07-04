@@ -277,7 +277,7 @@
             End Select
           Case clsUpdate.CheckEventArgs.ResultType.NewBeta
             If mySettings.BetaCheck Then
-              SetUpdateValue("New BETA Available", "Click to begin download.")
+              SetUpdateValue("New BETA Available", , "Click to begin download.")
               lblUpdate.Link = True
               Application.DoEvents()
               fUpdate.NewUpdate(e.Version, True)
