@@ -4,7 +4,7 @@
 
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
   Private Const HTCAPTION As Integer = 2
-  Private WithEvents wsHostList As New CookieAwareWebClient(Net.HttpVersion.Version11)
+  Private WithEvents wsHostList As New CookieAwareWebClient()
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
