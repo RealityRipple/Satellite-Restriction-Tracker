@@ -1,4 +1,5 @@
-﻿Public Class LineBreak
+﻿<ToolboxBitmap(GetType(System.Windows.Forms.ToolStripSeparator))>
+Public Class LineBreak
   Public Sub New()
     InitializeComponent()
     Me.TabStop = False

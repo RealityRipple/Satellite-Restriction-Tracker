@@ -1,5 +1,5 @@
 ﻿Imports System.ComponentModel
-<DefaultEvent("LinkClicked"), DefaultProperty("LabelColor")>
+<DefaultEvent("LinkClicked"), DefaultProperty("LabelColor"), ToolboxBitmap(GetType(System.Windows.Forms.LinkLabel))>
 Public Class LinkLabel
   Inherits System.Windows.Forms.Label
   Private c_Hovering As Boolean

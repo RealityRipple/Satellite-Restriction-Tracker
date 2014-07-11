@@ -1,4 +1,5 @@
-﻿Public Class ColorDialog
+﻿<ToolboxBitmap(GetType(System.Windows.Forms.ColorDialog))>
+Public Class ColorDialog
   Inherits System.Windows.Forms.ColorDialog
   Private m_title As String = String.Empty
   Private titleSet As Boolean = False
