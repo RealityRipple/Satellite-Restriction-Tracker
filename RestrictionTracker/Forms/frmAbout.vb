@@ -305,12 +305,12 @@
               lblUpdate.Link = False
               tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
             End If
-            mySettings = Nothing
           Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
             SetUpdateValue("No New Updates")
             lblUpdate.Link = False
             tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
         End Select
+        mySettings = Nothing
       End If
     End If
   End Sub
@@ -379,8 +379,4 @@
     SetUpdateValue("Downloading Update " & sProgress, True, sStatus)
   End Sub
 #End Region
-
-  Private Sub LogoPictureBox_Click(sender As System.Object, e As System.EventArgs) Handles LogoPictureBox.Click
-
-  End Sub
 End Class

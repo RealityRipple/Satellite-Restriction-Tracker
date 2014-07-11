@@ -113,7 +113,7 @@
     Return CheckEventArgs.ResultType.NoUpdate
   End Function
   Public Sub DownloadUpdate(toLocation As String)
-    If DownloadURL IsNot Nothing Then
+    If Not String.IsNullOrEmpty(DownloadURL) Then
       wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
       wsVer.DownloadFileAsync(New Uri(DownloadURL), toLocation, "FILE")
       RaiseEvent DownloadingUpdate(Me, New EventArgs)
