@@ -67,12 +67,9 @@
         taskNotifier.Show("Alert Test", "This is simply a test of the alert notification system.", 200, 10 * 1000, 100)
       End If
     ElseIf My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
-
+      'all
     Else
-      frmDonate.Show()
-      Dim mySettings As New AppSettings
-      mySettings.OneNag = True
-      mySettings.Save()
+      'none
     End If
   End Sub
   Private Sub taskNotifier_ContentClick(sender As Object, e As System.EventArgs) Handles taskNotifier.ContentClick
