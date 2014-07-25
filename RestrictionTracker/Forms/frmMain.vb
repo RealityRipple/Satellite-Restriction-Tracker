@@ -484,7 +484,12 @@ Public Class frmMain
     sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
   End Sub
   Private Sub EnableProgressIcon()
-    tmrIcon.Enabled = True
+    Try
+      If ClosingTime Then Exit Sub
+      tmrIcon.Enabled = True
+    Catch ex As Exception
+
+    End Try
   End Sub
   Private Sub StartTimer()
     If Me.InvokeRequired Then
