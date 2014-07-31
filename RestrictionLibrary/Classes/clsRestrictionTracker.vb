@@ -660,6 +660,7 @@
   End Sub
   Private Sub HandleResponse(ConnState As ConnectionStates, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     iHist += 1
+    ResetTimeout(True)
     Select Case AccountType
       Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
         Select Case ConnState
@@ -1173,6 +1174,7 @@
       Total = Total.Substring(0, Total.IndexOf("</"))
       Dim lUsed As Long = StrToVal(Used, MBPerGB)
       Dim lTotal As Long = StrToVal(Total, MBPerGB)
+      ResetTimeout()
       If lTotal > 0 Then
         RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
       Else

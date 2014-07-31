@@ -229,6 +229,17 @@
     If e.Button = Windows.Forms.MouseButtons.Left Then ClickDrag(Me.Handle)
   End Sub
 
+  Private Sub frmWizard_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    If localTest IsNot Nothing Then
+      localTest.Dispose()
+      localTest = Nothing
+    End If
+    If remoteTest IsNot Nothing Then
+      remoteTest.Dispose()
+      remoteTest = Nothing
+    End If
+  End Sub
+
   Private Sub frmWizard_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Me.Icon = My.Resources.t16_norm
     DrawTitle()

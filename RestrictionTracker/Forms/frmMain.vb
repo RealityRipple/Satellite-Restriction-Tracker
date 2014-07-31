@@ -522,7 +522,7 @@ Public Class frmMain
       TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
     Else
       tmrIcon.Enabled = False
-      SetStatusText("No History", "", False)
+      SetStatusText("No History", String.Empty, False)
       DisplayUsage(True, False)
       Dim TimerInvoker As New MethodInvoker(AddressOf StartTimer)
       TimerInvoker.BeginInvoke(Nothing, Nothing)
@@ -1938,6 +1938,7 @@ Public Class frmMain
               End Select
             End If
           Case Else
+            SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
             If updateChecker IsNot Nothing Then
               updateChecker.Dispose()
               updateChecker = Nothing
