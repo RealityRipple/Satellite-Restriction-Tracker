@@ -154,7 +154,7 @@
         newSettings.Accuracy = 0
       End If
       newSettings.ScaleScreen = chkDisplayScale.Checked
-      newSettings.HistoryInversion = chkDisplayInvert.Checked
+      'newSettings.HistoryInversion = chkDisplayInvert.Checked
       If chkOverAlert.Checked Then
         newSettings.Overuse = txtOverSize.Value
         newSettings.Overtime = txtOverTime.Value
@@ -572,7 +572,7 @@
       DrawStatus(False)
       tbsWizardPages.SelectedIndex += 1
       wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
-      If acct = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then chkDisplayInvert.Checked = True
+      'If acct = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then chkDisplayInvert.Checked = True
     End If
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
@@ -626,13 +626,13 @@
     End Select
   End Sub
   Private Sub localTest_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
-    LocalComplete(AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY)
+    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_LEGACY)
   End Sub
   Private Sub localTest_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
-    LocalComplete(AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION)
+    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION)
   End Sub
-  Private Sub localTest_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPECResultEventArgs) Handles localTest.ConnectionWBXResult
-    LocalComplete(AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
+  Private Sub localTest_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
+    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
   End Sub
 #End Region
 End Class

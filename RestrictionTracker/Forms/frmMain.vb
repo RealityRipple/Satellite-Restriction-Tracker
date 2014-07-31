@@ -12,6 +12,7 @@ Public Class frmMain
   Private WithEvents taskNotifier As TaskbarNotifier
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
+#Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
   Private Const sDISPLAY As String = "Usage Levels (%lt)"
@@ -22,6 +23,7 @@ Public Class frmMain
   Private Const sDISPLAY_TT_ERR As String = "%e" & vbNewLine & "%m"
   Private Const sDISPLAY_TT_T_SOON As String = "a Moment"
   Private Const MBPerGB As Integer = 1000
+#End Region
   Private myState As LoadStates = LoadStates.Loading
   Private sDisp As String = sDISPLAY.Replace("%lt", sDisp_LT)
   Private sDisp_LT As String = sDISPLAY_LT_NONE
@@ -56,6 +58,8 @@ Public Class frmMain
       Dim Sender As Object = state(1)
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
         RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.DishNet_EXEDE))
+      ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
+        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
       Else
         OfflineCheck(state)
       End If
@@ -144,9 +148,11 @@ Public Class frmMain
         If e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet Then
           mySettings.AccountType = SatHostTypes.DishNet_EXEDE
         ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue Then
-          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+          mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
         ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal Then
           mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+        ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede Then
+          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         End If
         If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
         mySettings.Save()
@@ -376,15 +382,15 @@ Public Class frmMain
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
       End If
-    ElseIf myPanel = SatHostTypes.WildBlue_EXEDE Then
-      If e_lim = 0 Then
-        pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, 0, 0, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = MakeIcon(IconName.norm)
-      Else
-        pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, e_down, e_up, e_over, e_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = CreateETrayIcon(e_down, e_up, e_lim)
-      End If
-    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EVOLUTION Then
+      'ElseIf myPanel = SatHostTypes.WildBlue_EXEDE Then
+      '  If e_lim = 0 Then
+      '    pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, 0, 0, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+      '    trayIcon.Icon = MakeIcon(IconName.norm)
+      '  Else
+      '    pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, e_down, e_up, e_over, e_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+      '    trayIcon.Icon = CreateETrayIcon(e_down, e_up, e_lim)
+      '  End If
+    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EVOLUTION Or myPanel = SatHostTypes.WildBlue_EXEDE Then
       If r_lim = 0 Then
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = MakeIcon(IconName.norm)
@@ -457,7 +463,7 @@ Public Class frmMain
     mySettings = New AppSettings
     If mySettings.Colors.MainDownA.A = 0 Then SetDefaultColors()
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
-    mnuGraphInvert.Checked = mySettings.HistoryInversion
+    'mnuGraphInvert.Checked = mySettings.HistoryInversion
   End Sub
   Private Sub ReInit()
     If localData IsNot Nothing Then
@@ -659,12 +665,12 @@ Public Class frmMain
         Dim lULim As Long
         LOG_Get(LOG_GetCount() - 1, dtDate, lDown, lDLim, lUp, lULim)
         If bStatusText Then SetStatusText(dtDate.ToString("g"), String.Empty, False)
-        If mySettings.HistoryInversion Then
-          DisplayResults(lUp, lULim, lDown, lDLim)
-        Else
-          DisplayResults(lDown, lDLim, lUp, lULim)
-        End If
-      End If
+        'If mySettings.HistoryInversion Then
+        '  DisplayResults(lUp, lULim, lDown, lDLim)
+        'Else
+        DisplayResults(lDown, lDLim, lUp, lULim)
+        'End If
+    End If
     End If
   End Sub
   Private Sub SetNextLoginTime(Optional MinutesAhead As Integer = -1)
@@ -814,13 +820,13 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionWBXResult(sender As Object, e As localRestrictionTracker.TYPECResultEventArgs) Handles localData.ConnectionWBXResult
+  Private Sub localData_ConnectionWBXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
     Else
       SetStatusText(e.Update.ToString("g"), "Saving History...", False)
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-      LOG_Add(e.Update, e.Download, e.Limit + e.BuyMore, e.Upload, e.Over, True)
+      LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True) ' e.Download, e.Limit + e.BuyMore, e.Upload, e.Over, True)
       myPanel = SatHostTypes.WildBlue_EXEDE
       mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       mySettings.Save()
@@ -1113,7 +1119,8 @@ Public Class frmMain
       If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        '                                                               'mySettings.HistoryInversion
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
           If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
             Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
@@ -1202,7 +1209,8 @@ Public Class frmMain
       If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        '                                                                mySettings.HistoryInversion
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
           If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
             Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
@@ -1279,7 +1287,8 @@ Public Class frmMain
       If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        '                                                                mySettings.HistoryInversion
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         Dim DownTotal As Long = lDown + lOver
         Dim UpTotal As Long = lUp + lOver
         For I As Integer = lItems.Count - 2 To 0 Step -1
@@ -1390,7 +1399,8 @@ Public Class frmMain
       If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(mySettings.HistoryInversion), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        '                                                                mySettings.HistoryInversion
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
           If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
             Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
@@ -1417,25 +1427,25 @@ Public Class frmMain
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.DishNet_EXEDE : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.WildBlue_EXEDE
-          If mySettings.HistoryInversion Then
-            DisplayEResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-          Else
-            DisplayEResults(lDown, lUpLim, lUp, lDownLim, sLastUpdate)
-          End If
+          'Case SatHostTypes.WildBlue_EXEDE
+          '  If mySettings.HistoryInversion Then
+          '    DisplayEResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+          '  Else
+          '    DisplayEResults(lDown, lUpLim, lUp, lDownLim, sLastUpdate)
+          '  End If
         Case Else
-          If lDownLim = lUpLim Or lUpLim = 0 Then
-            If mySettings.HistoryInversion Then
-              DisplayEResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-            Else
-              DisplayEResults(lDown, lUpLim, lUp, lDownLim, sLastUpdate)
-            End If
-          Else
-            DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-          End If
+          'If lDownLim = lUpLim Or lUpLim = 0 Then
+          '  If mySettings.HistoryInversion Then
+          '    DisplayEResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+          '  Else
+          '    DisplayEResults(lDown, lUpLim, lUp, lDownLim, sLastUpdate)
+          '  End If
+          'Else
+          DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+          'End If
       End Select
     Else
       pnlWildBlue.Visible = False
@@ -1505,6 +1515,7 @@ Public Class frmMain
     Using dlgConfig As New frmConfig
       dRet = dlgConfig.ShowDialog(Me)
     End Using
+    Dim WaitTime As Long = TickCount() + 2000
     If Not myState = LoadStates.Loaded Then
       If Not myState = LoadStates.Lookup Then
         Dim lookupInvoker As New MethodInvoker(AddressOf LookupProvider)
@@ -1513,6 +1524,7 @@ Public Class frmMain
       Do Until myState = LoadStates.Loaded
         Application.DoEvents()
         Threading.Thread.Sleep(1)
+        If TickCount() > WaitTime Then Exit Do
       Loop
     End If
     Select Case dRet
@@ -1599,18 +1611,18 @@ Public Class frmMain
   Private Sub mnuGraphRefresh_Click(sender As System.Object, e As System.EventArgs) Handles mnuGraphRefresh.Click
     cmdRefresh.PerformClick()
   End Sub
-  Private Sub mnuGraphInvert_Click(sender As System.Object, e As System.EventArgs) Handles mnuGraphInvert.Click
-    If mySettings IsNot Nothing Then
-      mySettings.HistoryInversion = Not mySettings.HistoryInversion
-      mnuGraphInvert.Checked = mySettings.HistoryInversion
-      mySettings.Save()
-      DisplayUsage(True, False)
-      If frmHistory.Visible Then
-        frmHistory.mySettings = New AppSettings
-        frmHistory.cmdQuery.PerformClick()
-      End If
-    End If
-  End Sub
+  'Private Sub mnuGraphInvert_Click(sender As System.Object, e As System.EventArgs) Handles mnuGraphInvert.Click
+  '  If mySettings IsNot Nothing Then
+  '    mySettings.HistoryInversion = Not mySettings.HistoryInversion
+  '    mnuGraphInvert.Checked = mySettings.HistoryInversion
+  '    mySettings.Save()
+  '    DisplayUsage(True, False)
+  '    If frmHistory.Visible Then
+  '      frmHistory.mySettings = New AppSettings
+  '      frmHistory.cmdQuery.PerformClick()
+  '    End If
+  '  End If
+  'End Sub
   Private Sub mnuGraphColors_Click(sender As System.Object, e As System.EventArgs) Handles mnuGraphColors.Click
     frmCustomColors.mySettings = mySettings
     If frmCustomColors.ShowDialog(Me) = Windows.Forms.DialogResult.Yes Then
@@ -2178,35 +2190,35 @@ Public Class frmMain
           mySettings.Colors.HistoryUpMax = Color.Yellow
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
-        Case SatHostTypes.WildBlue_EXEDE
-          mySettings.Colors.MainDownA = Color.Orange
-          mySettings.Colors.MainDownB = Color.Transparent
-          mySettings.Colors.MainDownC = Color.Red
-          mySettings.Colors.MainUpA = Color.Blue
-          mySettings.Colors.MainUpB = Color.Transparent
-          mySettings.Colors.MainUpC = Color.Violet
-          mySettings.Colors.MainText = Color.White
-          mySettings.Colors.MainBackground = Color.Black
+          'Case SatHostTypes.WildBlue_EXEDE
+          '  mySettings.Colors.MainDownA = Color.Orange
+          '  mySettings.Colors.MainDownB = Color.Transparent
+          '  mySettings.Colors.MainDownC = Color.Red
+          '  mySettings.Colors.MainUpA = Color.Blue
+          '  mySettings.Colors.MainUpB = Color.Transparent
+          '  mySettings.Colors.MainUpC = Color.Violet
+          '  mySettings.Colors.MainText = Color.White
+          '  mySettings.Colors.MainBackground = Color.Black
 
-          mySettings.Colors.TrayDownA = Color.Orange
-          mySettings.Colors.TrayDownB = Color.Transparent
-          mySettings.Colors.TrayDownC = Color.Red
-          mySettings.Colors.TrayUpA = Color.Blue
-          mySettings.Colors.TrayUpB = Color.Transparent
-          mySettings.Colors.TrayUpC = Color.Violet
+          '  mySettings.Colors.TrayDownA = Color.Orange
+          '  mySettings.Colors.TrayDownB = Color.Transparent
+          '  mySettings.Colors.TrayDownC = Color.Red
+          '  mySettings.Colors.TrayUpA = Color.Blue
+          '  mySettings.Colors.TrayUpB = Color.Transparent
+          '  mySettings.Colors.TrayUpC = Color.Violet
 
-          mySettings.Colors.HistoryDownA = Color.Orange
-          mySettings.Colors.HistoryDownB = Color.Transparent
-          mySettings.Colors.HistoryDownC = Color.Red
-          mySettings.Colors.HistoryDownMax = Color.Yellow
-          mySettings.Colors.HistoryUpA = Color.Blue
-          mySettings.Colors.HistoryUpB = Color.Transparent
-          mySettings.Colors.HistoryUpC = Color.Violet
-          mySettings.Colors.HistoryUpMax = Color.Yellow
-          mySettings.Colors.HistoryText = Color.Black
-          mySettings.Colors.HistoryBackground = Color.White
+          '  mySettings.Colors.HistoryDownA = Color.Orange
+          '  mySettings.Colors.HistoryDownB = Color.Transparent
+          '  mySettings.Colors.HistoryDownC = Color.Red
+          '  mySettings.Colors.HistoryDownMax = Color.Yellow
+          '  mySettings.Colors.HistoryUpA = Color.Blue
+          '  mySettings.Colors.HistoryUpB = Color.Transparent
+          '  mySettings.Colors.HistoryUpC = Color.Violet
+          '  mySettings.Colors.HistoryUpMax = Color.Yellow
+          '  mySettings.Colors.HistoryText = Color.Black
+          '  mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red

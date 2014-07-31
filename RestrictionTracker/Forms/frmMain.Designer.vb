@@ -255,7 +255,7 @@ Partial Class frmMain
     Me.lblStatus.AutoSize = True
     Me.lblStatus.Location = New System.Drawing.Point(6, 0)
     Me.lblStatus.Name = "lblStatus"
-    Me.lblStatus.Size = New System.Drawing.Size(91, 13)
+    Me.lblStatus.Size = New System.Drawing.Size(72, 13)
     Me.lblStatus.TabIndex = 4
     Me.lblStatus.Text = "Usage Levels"
     '
@@ -378,6 +378,7 @@ Partial Class frmMain
     '
     Me.mnuGraphInvert.Index = 2
     Me.mnuGraphInvert.Text = "Invert &Numbers"
+    Me.mnuGraphInvert.Visible = False
     '
     'mnuGraphColors
     '

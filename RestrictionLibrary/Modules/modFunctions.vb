@@ -19,6 +19,36 @@ Module modFunctions
     Do While sVal.Length < Length : sVal = "0" & sVal : Loop
     Return sVal
   End Function
+  Public Function HexDecode(inString As String) As String
+    Dim sRet As String = String.Empty
+    If String.IsNullOrEmpty(inString) Then Return inString
+    For I As Integer = 0 To inString.Length - 1
+      If inString(I) = "&" Then
+        If inString.Length - I > 1 AndAlso inString(I + 1) = "#" Then
+          If inString.Length - I > 2 AndAlso inString(I + 2) = "x" Then
+            If inString.Length - I > 4 AndAlso inString(I + 4) = ";" Then
+              Dim hVal As String = inString(I + 3)
+              sRet &= Chr(Convert.ToByte(hVal, 16))
+              I += 4
+            ElseIf inString.Length - I > 5 AndAlso inString(I + 5) = ";" Then
+              Dim hVal As String = inString(I + 3) & inString(I + 4)
+              sRet &= Chr(Convert.ToByte(hVal, 16))
+              I += 5
+            Else
+              sRet &= inString(I)
+            End If
+          Else
+            sRet &= inString(I)
+          End If
+        Else
+          sRet &= inString(I)
+        End If
+      Else
+        sRet &= inString(I)
+      End If
+    Next
+    Return sRet
+  End Function
   Public Function NetworkErrorToString(ex As System.Exception, sDataPath As String)
     Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
     If ex.InnerException Is Nothing Then

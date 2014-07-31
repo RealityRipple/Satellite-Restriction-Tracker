@@ -5,6 +5,7 @@
       DishNet
       RuralPortal
       WildBlue
+      Exede
       Other
     End Enum
     Public HostGroup As SatHostGroup
@@ -81,6 +82,8 @@
   Private Sub BeginTest(Provider As String)
     If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
       RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.DishNet))
+    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
+      RaiseEvent TypeDetermined(Me, New TypeDeterminedEventArgs(TypeDeterminedEventArgs.SatHostGroup.Exede))
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       sProvider = Provider

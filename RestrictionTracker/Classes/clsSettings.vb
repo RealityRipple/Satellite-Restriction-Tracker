@@ -160,7 +160,7 @@ Class AppSettings
   Private m_Ago As UInteger
   Private m_Service As Boolean
   Private m_HistoryDir As String
-  Private m_HistoryInvert As Boolean
+  'Private m_HistoryInvert As Boolean
   Private m_BetaCheck As Boolean
   Private m_ScaleScreen As Boolean
   Private m_MainSize As Size
@@ -313,16 +313,16 @@ Class AppSettings
           m_HistoryDir = Nothing
         End Try
       End If
-      Dim xHistoryInvert As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "HistoryInversion")
-      If xHistoryInvert Is Nothing Then
-        m_HistoryInvert = False
-      Else
-        Try
-          m_HistoryInvert = xHistoryInvert.Element("value").Value = "True"
-        Catch ex As Exception
-          m_HistoryInvert = False
-        End Try
-      End If
+      'Dim xHistoryInvert As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "HistoryInversion")
+      'If xHistoryInvert Is Nothing Then
+      '  m_HistoryInvert = False
+      'Else
+      '  Try
+      '    m_HistoryInvert = xHistoryInvert.Element("value").Value = "True"
+      '  Catch ex As Exception
+      '    m_HistoryInvert = False
+      '  End Try
+      'End If
       Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
       If xBetaCheck Is Nothing Then
         m_BetaCheck = True
@@ -778,7 +778,7 @@ Class AppSettings
     m_Ago = 30
     m_Service = False
     m_HistoryDir = Nothing
-    m_HistoryInvert = False
+    'm_HistoryInvert = False
     m_BetaCheck = True
     m_ScaleScreen = False
     m_MainSize = New Size(450, 200)
@@ -830,6 +830,7 @@ Class AppSettings
   End Sub
   Public Sub Save()
     Dim sAccountType As String = HostTypeToString(m_AccountType)
+    'New XElement("setting", New XAttribute("name", "HistoryInversion"), New XElement("value", IIf(m_HistoryInvert, "True", "False"))),
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
@@ -843,7 +844,6 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Ago"), New XElement("value", m_Ago)),
                                                           New XElement("setting", New XAttribute("name", "Service"), New XElement("value", IIf(m_Service, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "HistoryDir"), New XElement("value", m_HistoryDir)),
-                                                          New XElement("setting", New XAttribute("name", "HistoryInversion"), New XElement("value", IIf(m_HistoryInvert, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "BetaCheck"), New XElement("value", IIf(m_BetaCheck, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "ScaleScreen"), New XElement("value", IIf(m_ScaleScreen, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "MainSize"), New XElement("value", m_MainSize.Width & "," & m_MainSize.Height)),
@@ -1065,14 +1065,14 @@ Class AppSettings
       m_HistoryDir = value
     End Set
   End Property
-  Public Property HistoryInversion As Boolean
-    Get
-      Return m_HistoryInvert
-    End Get
-    Set(value As Boolean)
-      m_HistoryInvert = value
-    End Set
-  End Property
+  'Public Property HistoryInversion As Boolean
+  '  Get
+  '    Return m_HistoryInvert
+  '  End Get
+  '  Set(value As Boolean)
+  '    m_HistoryInvert = value
+  '  End Set
+  'End Property
   Public Property BetaCheck As Boolean
     Get
       Return m_BetaCheck

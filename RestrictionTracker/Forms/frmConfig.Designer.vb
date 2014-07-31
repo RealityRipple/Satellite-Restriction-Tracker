@@ -25,7 +25,6 @@ Partial Class frmConfig
     Me.components = New System.ComponentModel.Container()
     Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConfig))
     Me.pnlConfig = New System.Windows.Forms.TableLayoutPanel()
-    Me.chkInvert = New System.Windows.Forms.CheckBox()
     Me.lblInterval = New System.Windows.Forms.Label()
     Me.pnlPassword = New System.Windows.Forms.TableLayoutPanel()
     Me.txtPassword = New System.Windows.Forms.TextBox()
@@ -122,7 +121,6 @@ Partial Class frmConfig
     Me.pnlConfig.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlConfig.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlConfig.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlConfig.Controls.Add(Me.chkInvert, 0, 10)
     Me.pnlConfig.Controls.Add(Me.lblInterval, 0, 3)
     Me.pnlConfig.Controls.Add(Me.pnlPassword, 1, 1)
     Me.pnlConfig.Controls.Add(Me.lblPurchaseKey, 2, 2)
@@ -141,16 +139,16 @@ Partial Class frmConfig
     Me.pnlConfig.Controls.Add(Me.chkService, 0, 7)
     Me.pnlConfig.Controls.Add(Me.lblHistoryDir, 0, 8)
     Me.pnlConfig.Controls.Add(Me.pnlHistoryDir, 1, 8)
-    Me.pnlConfig.Controls.Add(Me.chkBeta, 0, 12)
-    Me.pnlConfig.Controls.Add(Me.pnlButtons, 2, 12)
+    Me.pnlConfig.Controls.Add(Me.chkBeta, 0, 11)
+    Me.pnlConfig.Controls.Add(Me.pnlButtons, 2, 11)
     Me.pnlConfig.Controls.Add(Me.pctSRT, 2, 0)
     Me.pnlConfig.Controls.Add(Me.gbProxy, 2, 3)
-    Me.pnlConfig.Controls.Add(Me.pnlOverAlert, 0, 11)
+    Me.pnlConfig.Controls.Add(Me.pnlOverAlert, 0, 10)
     Me.pnlConfig.Controls.Add(Me.pnlCustom, 2, 10)
     Me.pnlConfig.Location = New System.Drawing.Point(0, 0)
     Me.pnlConfig.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlConfig.Name = "pnlConfig"
-    Me.pnlConfig.RowCount = 13
+    Me.pnlConfig.RowCount = 12
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -163,24 +161,9 @@ Partial Class frmConfig
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlConfig.Size = New System.Drawing.Size(573, 334)
+    Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlConfig.Size = New System.Drawing.Size(573, 312)
     Me.pnlConfig.TabIndex = 0
-    '
-    'chkInvert
-    '
-    Me.chkInvert.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.chkInvert.AutoSize = True
-    Me.pnlConfig.SetColumnSpan(Me.chkInvert, 2)
-    Me.chkInvert.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkInvert.Location = New System.Drawing.Point(3, 259)
-    Me.chkInvert.Name = "chkInvert"
-    Me.chkInvert.Size = New System.Drawing.Size(192, 18)
-    Me.chkInvert.TabIndex = 17
-    Me.chkInvert.Text = "Invert Upload/Download numbers"
-    Me.ttConfig.SetTooltip(Me.chkInvert, "If your Upload and Download numbers appear to be swapped, check this box to inver" & _
-        "t their display.")
-    Me.chkInvert.UseVisualStyleBackColor = True
     '
     'lblInterval
     '
@@ -242,7 +225,7 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblPurchaseKey.AutoSize = True
     Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
+    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblPurchaseKey.Location = New System.Drawing.Point(330, 59)
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
@@ -670,7 +653,7 @@ Partial Class frmConfig
     Me.chkBeta.AutoSize = True
     Me.pnlConfig.SetColumnSpan(Me.chkBeta, 2)
     Me.chkBeta.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkBeta.Location = New System.Drawing.Point(3, 311)
+    Me.chkBeta.Location = New System.Drawing.Point(3, 289)
     Me.chkBeta.Name = "chkBeta"
     Me.chkBeta.Size = New System.Drawing.Size(150, 18)
     Me.chkBeta.TabIndex = 19
@@ -689,7 +672,7 @@ Partial Class frmConfig
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(411, 306)
+    Me.pnlButtons.Location = New System.Drawing.Point(411, 284)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -931,7 +914,7 @@ Partial Class frmConfig
     Me.pnlOverAlert.Controls.Add(Me.lblOverSize, 2, 0)
     Me.pnlOverAlert.Controls.Add(Me.txtOverTime, 3, 0)
     Me.pnlOverAlert.Controls.Add(Me.lblOverTime, 4, 0)
-    Me.pnlOverAlert.Location = New System.Drawing.Point(0, 280)
+    Me.pnlOverAlert.Location = New System.Drawing.Point(0, 257)
     Me.pnlOverAlert.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlOverAlert.Name = "pnlOverAlert"
     Me.pnlOverAlert.RowCount = 1
@@ -1015,9 +998,8 @@ Partial Class frmConfig
     Me.pnlCustom.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlCustom.Name = "pnlCustom"
     Me.pnlCustom.RowCount = 1
-    Me.pnlConfig.SetRowSpan(Me.pnlCustom, 2)
     Me.pnlCustom.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlCustom.Size = New System.Drawing.Size(246, 50)
+    Me.pnlCustom.Size = New System.Drawing.Size(246, 28)
     Me.pnlCustom.TabIndex = 22
     '
     'cmdColors
@@ -1025,7 +1007,7 @@ Partial Class frmConfig
     Me.cmdColors.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.cmdColors.AutoSize = True
     Me.cmdColors.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdColors.Location = New System.Drawing.Point(110, 14)
+    Me.cmdColors.Location = New System.Drawing.Point(110, 3)
     Me.cmdColors.Name = "cmdColors"
     Me.cmdColors.Size = New System.Drawing.Size(133, 22)
     Me.cmdColors.TabIndex = 1
@@ -1038,7 +1020,7 @@ Partial Class frmConfig
     Me.cmdAlertStyle.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.cmdAlertStyle.AutoSize = True
     Me.cmdAlertStyle.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdAlertStyle.Location = New System.Drawing.Point(3, 14)
+    Me.cmdAlertStyle.Location = New System.Drawing.Point(3, 3)
     Me.cmdAlertStyle.Name = "cmdAlertStyle"
     Me.cmdAlertStyle.Size = New System.Drawing.Size(101, 22)
     Me.cmdAlertStyle.TabIndex = 0
@@ -1069,7 +1051,7 @@ Partial Class frmConfig
     Me.AutoSize = True
     Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(578, 343)
+    Me.ClientSize = New System.Drawing.Size(578, 319)
     Me.Controls.Add(Me.pnlConfig)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -1175,7 +1157,6 @@ Partial Class frmConfig
   Friend WithEvents cmdClose As System.Windows.Forms.Button
   Friend WithEvents pctSRT As System.Windows.Forms.PictureBox
   Friend WithEvents tmrAnim As System.Windows.Forms.Timer
-  Friend WithEvents chkInvert As System.Windows.Forms.CheckBox
   Friend WithEvents pnlOverAlert As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents chkOverAlert As System.Windows.Forms.CheckBox
   Friend WithEvents txtOverSize As System.Windows.Forms.NumericUpDown

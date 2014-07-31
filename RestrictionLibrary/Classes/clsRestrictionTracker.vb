@@ -2,7 +2,7 @@
   Implements IDisposable
   Public Enum SatHostTypes
     WildBlue_LEGACY    ' Down, Up, DownLim, UpLim     [TYPEA]
-    WildBlue_EXEDE     ' Down, Up, Over, Limit, More  [TYPEC]
+    WildBlue_EXEDE     ' Used, Limit                  [TYPEB]
     WildBlue_EVOLUTION ' Used, Limit                  [TYPEB]
     RuralPortal_LEGACY ' Down, Up, DownLim, UpLim     [TYPEA]
     RuralPortal_EXEDE  ' Used, Limit                  [TYPEB]
@@ -164,55 +164,55 @@
       End Get
     End Property
   End Class
-  Public Class TYPECResultEventArgs
-    Inherits EventArgs
-    Private m_Down As Long
-    Private m_Up As Long
-    Private m_Over As Long
-    Private m_Limit As Long
-    Private m_More As Long
-    Private m_Update As Date
-    Public Sub New(lDown As Long, lUp As Long, lOver As Long, lLimit As Long, lMore As Long, dUpdate As Date)
-      m_Down = lDown
-      m_Up = lUp
-      m_Over = lOver
-      m_Limit = lLimit
-      m_More = lMore
-      m_Update = dUpdate
-    End Sub
-    Public ReadOnly Property Download As Long
-      Get
-        Return m_Down
-      End Get
-    End Property
-    Public ReadOnly Property Upload As Long
-      Get
-        Return m_Up
-      End Get
-    End Property
-    Public ReadOnly Property Over As Long
-      Get
-        Return m_Over
-      End Get
-    End Property
-    Public ReadOnly Property Limit As Long
-      Get
-        Return m_Limit
-      End Get
-    End Property
-    Public ReadOnly Property BuyMore As Long
-      Get
-        Return m_More
-      End Get
-    End Property
-    Public ReadOnly Property Update As Date
-      Get
-        Return m_Update
-      End Get
-    End Property
-  End Class
+  'Public Class TYPECResultEventArgs
+  '  Inherits EventArgs
+  '  Private m_Down As Long
+  '  Private m_Up As Long
+  '  Private m_Over As Long
+  '  Private m_Limit As Long
+  '  Private m_More As Long
+  '  Private m_Update As Date
+  '  Public Sub New(lDown As Long, lUp As Long, lOver As Long, lLimit As Long, lMore As Long, dUpdate As Date)
+  '    m_Down = lDown
+  '    m_Up = lUp
+  '    m_Over = lOver
+  '    m_Limit = lLimit
+  '    m_More = lMore
+  '    m_Update = dUpdate
+  '  End Sub
+  '  Public ReadOnly Property Download As Long
+  '    Get
+  '      Return m_Down
+  '    End Get
+  '  End Property
+  '  Public ReadOnly Property Upload As Long
+  '    Get
+  '      Return m_Up
+  '    End Get
+  '  End Property
+  '  Public ReadOnly Property Over As Long
+  '    Get
+  '      Return m_Over
+  '    End Get
+  '  End Property
+  '  Public ReadOnly Property Limit As Long
+  '    Get
+  '      Return m_Limit
+  '    End Get
+  '  End Property
+  '  Public ReadOnly Property BuyMore As Long
+  '    Get
+  '      Return m_More
+  '    End Get
+  '  End Property
+  '  Public ReadOnly Property Update As Date
+  '    Get
+  '      Return m_Update
+  '    End Get
+  '  End Property
+  'End Class
   Public Event ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs)
-  Public Event ConnectionWBXResult(sender As Object, e As TYPECResultEventArgs)
+  Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
   Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
   Public Event ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs)
   Public Event ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs)
@@ -269,13 +269,16 @@
   Private Sub acType_TypeDetermined(UserState As Object, e As DetermineType.TypeDeterminedEventArgs) Handles acType.TypeDetermined
     Select Case e.HostGroup
       Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue
-        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+        mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
         GetUsage()
       Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet
         mySettings.AccountType = SatHostTypes.DishNet_EXEDE
         GetUsage()
       Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal
         mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+        GetUsage()
+      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede
+        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         GetUsage()
       Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
@@ -362,7 +365,8 @@
   Private Sub ContinueLogin(sUID As String, sPass As String)
     PrepareLogin()
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION : ContinueLoginWB(sUID, sPass)
+      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION : ContinueLoginWB(sUID, sPass)
+      Case SatHostTypes.WildBlue_EXEDE : ContinueLoginExede(sUID, sPass)
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : ContinueLoginRP(sUID, sPass)
       Case SatHostTypes.DishNet_EXEDE : ContinueLoginDN(sUID, sPass)
     End Select
@@ -387,6 +391,31 @@
       Try
         Dim sSend As String = "uid=" & PercentEncode(sUID) & "&userPassword=" & PercentEncode(sPass)
         wsData.UploadStringAsync(uriURL, "POST", sSend, ConnectionStates.Login)
+      Catch ex As Exception
+        ResetTimeout()
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
+      End Try
+    End If
+  End Sub
+  Private Sub ContinueLoginExede(sUID As String, sPass As String)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
+    Dim uriString As String = "https://myexede.force.com/login?startURL=%2Fdashboard"
+    sAttemptedURL = uriString
+    AttemptedTag = ConnectionStates.Prepare
+    myUID = sUID
+    myPass = sPass
+    Dim uriURL As Uri = Nothing
+    Try
+      uriURL = New Uri(uriString)
+    Catch ex As Exception
+      uriURL = Nothing
+    End Try
+    If uriURL Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
+    Else
+      Try
+        wsData.DownloadStringAsync(uriURL, ConnectionStates.Prepare)
       Catch ex As Exception
         ResetTimeout()
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
@@ -632,12 +661,30 @@
   Private Sub HandleResponse(ConnState As ConnectionStates, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     iHist += 1
     Select Case AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
         Select Case ConnState
           Case ConnectionStates.Login
             LoginWB(sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.TableDownload
             GetUsageWB(sHost, sRet, sErrMsg, sFailText, bReset)
+          Case Else
+            sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
+            bReset = True
+        End Select
+      Case SatHostTypes.WildBlue_EXEDE
+        Select Case ConnState
+          Case ConnectionStates.Prepare
+            PrepareEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+          Case ConnectionStates.Login
+            LoginEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+          Case ConnectionStates.Authenticate
+            AuthenticateEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+          Case ConnectionStates.FirstBookend
+            DashboardEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+          Case ConnectionStates.LastBookend
+            AjaxEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+          Case ConnectionStates.TableDownload
+            GetUsageEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
           Case Else
             sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
             bReset = True
@@ -685,7 +732,7 @@
     PrepareLogin()
     wsData.CookieJar = cJar
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
         Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
         sAttemptedURL = uriString
         AttemptedTag = ConnectionStates.TableDownload
@@ -703,7 +750,8 @@
   Private Sub ReadUsage(Table As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION : ReadUsageWB(Table)
+      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION : ReadUsageWB(Table)
+      Case SatHostTypes.WildBlue_EXEDE : ReadUsageEX(Table)
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : ReadUsageRP(Table)
       Case SatHostTypes.DishNet_EXEDE : ReadUsageDN(Table)
     End Select
@@ -835,42 +883,43 @@
     ElseIf Table.Contains("allowance") Then
       Dim sPlusT As String = String.Empty
       If Table.Contains("loaded:") Then
-        For I As Integer = 0 To sRows.Length - 1
-          If Not String.IsNullOrEmpty(sRows(I)) Then
-            If sRows(I).Contains("<strong>") Then
-              If String.IsNullOrEmpty(sDownT) Then
-                sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-              ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</span>") And String.IsNullOrEmpty(sUpT) Then
-                If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-                  sUpT = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
-                End If
-              ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-                If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
-                  sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                  sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-                End If
-              End If
-            ElseIf sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-              If sRows(I).Contains("loaded:") Then
-                If String.IsNullOrEmpty(sDown) Then
-                  sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-                ElseIf String.IsNullOrEmpty(sUp) Then
-                  sUp = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
-                End If
-              End If
-            End If
-          End If
-        Next
-        ResetTimeout()
-        If String.IsNullOrEmpty(sDownT) Then
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-        Else
-          RaiseEvent ConnectionWBXResult(Me, New TYPECResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sUp, MBPerGB), StrToVal(sUpT, MBPerGB), StrToVal(sDownT, MBPerGB), StrToVal(sPlusT, MBPerGB), Now))
-        End If
+        'For I As Integer = 0 To sRows.Length - 1
+        '  If Not String.IsNullOrEmpty(sRows(I)) Then
+        '    If sRows(I).Contains("<strong>") Then
+        '      If String.IsNullOrEmpty(sDownT) Then
+        '        sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+        '        sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
+        '      ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</span>") And String.IsNullOrEmpty(sUpT) Then
+        '        If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+        '          sUpT = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+        '          sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
+        '        End If
+        '      ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
+        '        If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+        '          sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+        '          sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
+        '        End If
+        '      End If
+        '    ElseIf sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+        '      If sRows(I).Contains("loaded:") Then
+        '        If String.IsNullOrEmpty(sDown) Then
+        '          sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+        '          sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
+        '        ElseIf String.IsNullOrEmpty(sUp) Then
+        '          sUp = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+        '          sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
+        '        End If
+        '      End If
+        '    End If
+        '  End If
+        'Next
+        'ResetTimeout()
+        'If String.IsNullOrEmpty(sDownT) Then
+        '  RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+        'Else
+        '  RaiseEvent ConnectionWBXResult(Me, New TYPECResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sUp, MBPerGB), StrToVal(sUpT, MBPerGB), StrToVal(sDownT, MBPerGB), StrToVal(sPlusT, MBPerGB), Now))
+        'End If
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Old Exede method detected!", Table))
       Else
         For I As Integer = 0 To sRows.Length - 1
           If Not String.IsNullOrEmpty(sRows(I)) Then
@@ -901,6 +950,237 @@
       End If
     End If
   End Sub
+#End Region
+#Region "EX"
+  Private Sub PrepareEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "mysso.exede.net" Then
+      sErrMsg = "Prepare Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/federation/ssoredirect/metaalias/idp" Then
+      If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
+        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login""")) ' "https://mysso.exede.net/federation/UI/Login"
+        sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
+        sURI = sURI.Substring(0, sURI.IndexOf(""""))
+        If sURI.StartsWith("/") Then sURI = "https://" & sHost & sURI
+        Dim sGOTO As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""goto"" value="""))
+        sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
+        sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+        Dim sSQPS As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
+        sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
+        sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+        Dim sSend As String = "realm=" & PercentEncode("/") &
+                             "&IDToken1=" & PercentEncode(myUID) &
+                             "&IDToken2=" & PercentEncode(myPass) &
+                             "&IDButton=Sign+in" &
+                             "&goto=" & PercentEncode(sGOTO) &
+                             "&SunQueryParamsString=" & PercentEncode(sSQPS) &
+                             "&encoded=true" &
+                             "&gx_charset=UTF-8"
+        sAttemptedURL = sURI
+        AttemptedTag = ConnectionStates.Login
+        RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
+        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Login)
+        myUID = Nothing
+        myPass = Nothing
+      Else
+        sErrMsg = "Prepare Failed: Login form not found."
+        sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
+    Else
+      sErrMsg = "Prepare Failed: Could not understand response."
+      sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub LoginEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "mysso.exede.net" Then
+      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/federation/ui/login" Then
+      If sRet.Contains("Access rights validated") Then
+        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        Dim sURI As String = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
+        sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
+        sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+        sURI = HexDecode(sURI)
+        Dim sSAMLResponse As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
+        sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
+        sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+        Dim sRelay As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
+        sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
+        sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+        Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(sSAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(sRelay))
+        sAttemptedURL = sURI
+        AttemptedTag = ConnectionStates.Authenticate
+        RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Authenticate))
+        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Authenticate)
+      Else
+        sErrMsg = "Could not log in."
+        sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
+    Else
+      sErrMsg = "Login Failed: Could not understand response."
+      sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub AuthenticateEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "myexede.force.com" Then
+      sErrMsg = "Authentication Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/secur/frontdoor.jsp" Then
+      Dim sURI As String = "https://myexede.force.com/dashboard"
+      sAttemptedURL = sURI
+      AttemptedTag = ConnectionStates.FirstBookend
+      RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.FirstBookend))
+      wsData.DownloadStringAsync(New Uri(sURI), ConnectionStates.FirstBookend)
+    Else
+      sErrMsg = "Authentication Failed: Could not understand response."
+      sFailText = "Exede Authentication Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub DashboardEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "myexede.force.com" Then
+      sErrMsg = "Dashboard Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/dashboard" Then
+      If sRet.Contains("<span id=""ajax-view-state""") Then
+        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
+        AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
+        Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
+        sViewState = sViewState.Substring(sViewState.IndexOf("value=""") + 7)
+        sViewState = sViewState.Substring(0, sViewState.IndexOf(""" />"))
+        Dim sVSVersion As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateVersion"""))
+        sVSVersion = sVSVersion.Substring(sVSVersion.IndexOf("value=""") + 7)
+        sVSVersion = sVSVersion.Substring(0, sVSVersion.IndexOf(""" />"))
+        Dim sVSMAC As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateMAC"""))
+        sVSMAC = sVSMAC.Substring(sVSMAC.IndexOf("value=""") + 7)
+        sVSMAC = sVSMAC.Substring(0, sVSMAC.IndexOf(""" />"))
+        Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
+        sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
+        sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
+        Dim sSend As String = "AJAXREQUEST=_viewRoot" &
+               "&j_id0%3AidForm=j_id0%3AidForm" &
+               "&com.salesforce.visualforce.ViewState=" & PercentEncode(sViewState) &
+               "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
+               "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
+               "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
+               "&j_id0%3AidForm%3Aj_id2=j_id0%3AidForm%3Aj_id2"
+        Dim sURI As String = "https://myexede.force.com/dashboard?refURL=https%3A%2F%2Fmyexede.force.com%2Fdashboard"
+        sAttemptedURL = sURI
+        AttemptedTag = ConnectionStates.LastBookend
+        RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.LastBookend))
+        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.LastBookend)
+      Else
+        sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
+        sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
+    Else
+      sErrMsg = "Dashboard Load Failed: Could not understand response."
+      sFailText = "Exede Dashboard Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub AjaxEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "myexede.force.com" Then
+      sErrMsg = "ViewState Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/dashboard" Then
+      If sRet.Contains("<span id=""ajax-view-state""") Then
+        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
+        AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
+        Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
+        sViewState = sViewState.Substring(sViewState.IndexOf("value=""") + 7)
+        sViewState = sViewState.Substring(0, sViewState.IndexOf(""" />"))
+        Dim sVSVersion As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateVersion"""))
+        sVSVersion = sVSVersion.Substring(sVSVersion.IndexOf("value=""") + 7)
+        sVSVersion = sVSVersion.Substring(0, sVSVersion.IndexOf(""" />"))
+        Dim sVSMAC As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateMAC"""))
+        sVSMAC = sVSMAC.Substring(sVSMAC.IndexOf("value=""") + 7)
+        sVSMAC = sVSMAC.Substring(0, sVSMAC.IndexOf(""" />"))
+        Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
+        sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
+        sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
+        Dim sSend As String = "AJAXREQUEST=_viewRoot" &
+               "&j_id0%3AidForm=j_id0%3AidForm" &
+               "&com.salesforce.visualforce.ViewState=" & PercentEncode(sViewState) &
+               "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
+               "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
+               "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
+               "&j_id0%3AidForm%3Aj_id3=j_id0%3AidForm%3Aj_id3"
+        Dim sURI As String = "https://myexede.force.com/dashboard?refURL=https%3A%2F%2Fmyexede.force.com%2Fdashboard"
+        sAttemptedURL = sURI
+        AttemptedTag = ConnectionStates.TableDownload
+        RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload))
+        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.TableDownload)
+      Else
+        sErrMsg = "ViewState Load Failed: Could not find AJAX ViewState variables."
+        sFailText = "Exede AJAX Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
+    Else
+      sErrMsg = "ViewState Load Failed: Could not understand response."
+      sFailText = "Exede AJAX Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub GetUsageEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If Not sHost = "myexede.force.com" Then
+      sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
+      bReset = False
+    ElseIf sPath = "/dashboard" Then
+      If sRet.Contains("amount-used") Then
+        Dim sTable As String = sRet.Substring(sRet.LastIndexOf("<div class=""amount-used"">"))
+        sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
+        ReadUsage(sTable)
+      Else
+        sErrMsg = "ViewState Load Failed: Could not find AJAX ViewState variables."
+        sFailText = "Exede AJAX Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
+    Else
+      sErrMsg = "ViewState Load Failed: Could not understand response."
+      sFailText = "Exede AJAX Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
+    End If
+  End Sub
+
+  Private Sub ReadUsageEX(Table As String)
+    If Not Table.Contains("amount-used") Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed", Table))
+    Else
+      Dim Used As String = Table.Substring(Table.IndexOf("amount-used"))
+      Used = Used.Substring(Used.IndexOf(""">") + 2)
+      Used = Used.Substring(0, Used.IndexOf("</"))
+      Dim Total As String = Table.Substring(Table.IndexOf("<strong>") + 8)
+      Total = Total.Substring(0, Total.IndexOf("</"))
+      Dim lUsed As Long = StrToVal(Used, MBPerGB)
+      Dim lTotal As Long = StrToVal(Total, MBPerGB)
+      If lTotal > 0 Then
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed", Table))
+      End If
+    End If
+  End Sub
+
 #End Region
 #Region "RP"
   Private Sub LoginRP(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
@@ -1114,12 +1394,12 @@
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.FirstBookend))
         wsData.DownloadStringAsync(New Uri(sURI), ConnectionStates.FirstBookend)
       Else
-        sErrMsg = "Prrepare Failed: AuthState is missing!"
+        sErrMsg = "Prepare Failed: AuthState is missing!"
         bReset = True
       End If
     Else
       sErrMsg = "Prepare Failed: Could not understand response."
-      sFailText = "DishNet Prerpare Error = " & sErrMsg & vbNewLine & sRet
+      sFailText = "DishNet Prerpare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
       bReset = True
     End If
   End Sub
@@ -1460,6 +1740,8 @@
         End If
         If lDownT > 0 Then
           RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
+        Else
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
         End If
       End If
     End If

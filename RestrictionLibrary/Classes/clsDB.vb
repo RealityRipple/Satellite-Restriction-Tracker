@@ -204,17 +204,17 @@ Public Class DataBase
     System.Array.Copy(data, 0, array, arrayIndex, array.Length - arrayIndex)
     Sort()
   End Sub
-  Public Function ToArray(Invert As Boolean) As DataRow()
-    If Invert Then
-      Dim aRet(data.Length - 1) As DataRow
-      For I As Integer = 0 To data.Length - 1
-        aRet(I) = New DataRow(data(I).DATETIME, data(I).UPLOAD, data(I).UPLIM, data(I).DOWNLOAD, data(I).DOWNLIM)
-      Next
-      Return aRet
-    Else
-      Return data
-    End If
-  End Function
+  'Public Function ToArray(Invert As Boolean) As DataRow()
+  '  If Invert Then
+  '    Dim aRet(data.Length - 1) As DataRow
+  '    For I As Integer = 0 To data.Length - 1
+  '      aRet(I) = New DataRow(data(I).DATETIME, data(I).UPLOAD, data(I).UPLIM, data(I).DOWNLOAD, data(I).DOWNLIM)
+  '    Next
+  '    Return aRet
+  '  Else
+  '    Return data
+  '  End If
+  'End Function
   Public ReadOnly Property Count As Integer Implements System.Collections.Generic.ICollection(Of DataRow).Count
     Get
       If data Is Nothing Then Return 0

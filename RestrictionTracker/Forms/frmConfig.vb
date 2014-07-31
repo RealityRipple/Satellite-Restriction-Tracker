@@ -72,7 +72,7 @@
     lblHistoryDir.Enabled = Not chkService.Checked
     txtHistoryDir.Enabled = Not chkService.Checked
     cmdHistoryDir.Enabled = Not chkService.Checked
-    chkInvert.Checked = mySettings.HistoryInversion
+    'chkInvert.Checked = mySettings.HistoryInversion
 
     If mySettings.Overuse = 0 Then
       chkOverAlert.Checked = False
@@ -207,7 +207,7 @@
       e.Handled = True
     End If
   End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkInvert.CheckedChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
+  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged 'chkInvert.CheckedChanged,
     If mySettings Is Nothing Then Exit Sub
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -663,7 +663,7 @@
       mySettings.HistoryDir = txtHistoryDir.Text
       bAccount = True
     End If
-    mySettings.HistoryInversion = chkInvert.Checked
+    'mySettings.HistoryInversion = chkInvert.Checked
     If chkOverAlert.Checked Then
       mySettings.Overuse = txtOverSize.Value
     Else
@@ -736,7 +736,7 @@
     If Not mySettings.ScaleScreen = chkScaleScreen.Checked Then Return True
     If Not mySettings.Service = chkService.Checked Then Return True
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
-    If Not mySettings.HistoryInversion = chkInvert.Checked Then Return True
+    'If Not mySettings.HistoryInversion = chkInvert.Checked Then Return True
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
