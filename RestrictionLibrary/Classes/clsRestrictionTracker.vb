@@ -164,53 +164,6 @@
       End Get
     End Property
   End Class
-  'Public Class TYPECResultEventArgs
-  '  Inherits EventArgs
-  '  Private m_Down As Long
-  '  Private m_Up As Long
-  '  Private m_Over As Long
-  '  Private m_Limit As Long
-  '  Private m_More As Long
-  '  Private m_Update As Date
-  '  Public Sub New(lDown As Long, lUp As Long, lOver As Long, lLimit As Long, lMore As Long, dUpdate As Date)
-  '    m_Down = lDown
-  '    m_Up = lUp
-  '    m_Over = lOver
-  '    m_Limit = lLimit
-  '    m_More = lMore
-  '    m_Update = dUpdate
-  '  End Sub
-  '  Public ReadOnly Property Download As Long
-  '    Get
-  '      Return m_Down
-  '    End Get
-  '  End Property
-  '  Public ReadOnly Property Upload As Long
-  '    Get
-  '      Return m_Up
-  '    End Get
-  '  End Property
-  '  Public ReadOnly Property Over As Long
-  '    Get
-  '      Return m_Over
-  '    End Get
-  '  End Property
-  '  Public ReadOnly Property Limit As Long
-  '    Get
-  '      Return m_Limit
-  '    End Get
-  '  End Property
-  '  Public ReadOnly Property BuyMore As Long
-  '    Get
-  '      Return m_More
-  '    End Get
-  '  End Property
-  '  Public ReadOnly Property Update As Date
-  '    Get
-  '      Return m_Update
-  '    End Get
-  '  End Property
-  'End Class
   Public Event ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs)
   Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
   Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
@@ -515,6 +468,7 @@
     End If
     PrepareLogin()
     Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
+    ResetTimeout()
     GetUsage()
   End Sub
 #End Region
@@ -777,6 +731,11 @@
         sFailText = "WB DIV Error = " & sErrMsg & vbNewLine & sRet
         bReset = True
       End If
+    ElseIf sRet.Contains("https://my.exede.net/usage") Then
+      sErrMsg = "Login Redirect: Exede account detected."
+      mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+      ResetTimeout()
+      GetUsage()
     Else
       sErrMsg = "Login Failed: Could not understand response."
       sFailText = "WB Parse Error = " & sErrMsg & vbNewLine & sRet
@@ -884,42 +843,6 @@
     ElseIf Table.Contains("allowance") Then
       Dim sPlusT As String = String.Empty
       If Table.Contains("loaded:") Then
-        'For I As Integer = 0 To sRows.Length - 1
-        '  If Not String.IsNullOrEmpty(sRows(I)) Then
-        '    If sRows(I).Contains("<strong>") Then
-        '      If String.IsNullOrEmpty(sDownT) Then
-        '        sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-        '        sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-        '      ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</span>") And String.IsNullOrEmpty(sUpT) Then
-        '        If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-        '          sUpT = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-        '          sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
-        '        End If
-        '      ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-        '        If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
-        '          sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-        '          sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-        '        End If
-        '      End If
-        '    ElseIf sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-        '      If sRows(I).Contains("loaded:") Then
-        '        If String.IsNullOrEmpty(sDown) Then
-        '          sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-        '          sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-        '        ElseIf String.IsNullOrEmpty(sUp) Then
-        '          sUp = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-        '          sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
-        '        End If
-        '      End If
-        '    End If
-        '  End If
-        'Next
-        'ResetTimeout()
-        'If String.IsNullOrEmpty(sDownT) Then
-        '  RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-        'Else
-        '  RaiseEvent ConnectionWBXResult(Me, New TYPECResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sUp, MBPerGB), StrToVal(sUpT, MBPerGB), StrToVal(sDownT, MBPerGB), StrToVal(sPlusT, MBPerGB), Now))
-        'End If
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Old Exede method detected!", Table))
       Else
         For I As Integer = 0 To sRows.Length - 1
@@ -961,7 +884,7 @@
       If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
         wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login""")) ' "https://mysso.exede.net/federation/UI/Login"
+        Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login"""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
         sURI = sURI.Substring(0, sURI.IndexOf(""""))
         If sURI.StartsWith("/") Then sURI = "https://" & sHost & sURI
@@ -1020,6 +943,15 @@
         AttemptedTag = ConnectionStates.Authenticate
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Authenticate))
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Authenticate)
+      ElseIf sRet.Contains("login-error-alert") Then
+        If sRet.Contains("Your Username and/or Password are incorrect.") Then
+          sErrMsg = "Login Failed: Incorrect Password"
+          bReset = False
+        Else
+          sErrMsg = "Unknown Login Error."
+          sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+          bReset = False
+        End If
       Else
         sErrMsg = "Could not log in."
         sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
