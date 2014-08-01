@@ -1,5 +1,6 @@
 ﻿Public Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
+  Private WithEvents wsHostList As CookieAwareWebClient
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
@@ -11,7 +12,11 @@
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
-    txtAccount.Text = mySettings.Account
+    Dim sUsername As String = mySettings.Account.Substring(0, mySettings.Account.LastIndexOf("@"))
+    Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+    txtAccount.Text = sUsername
+    UseDefaultHostList()
+    cmbProvider.Text = sProvider
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
@@ -133,15 +138,21 @@
     fswController.EnableRaisingEvents = True
     DrawTitle()
     bLoaded = True
+    Dim popInvoker As New MethodInvoker(AddressOf PopulateHostList)
+    popInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub RunAccountTest(sKey As String)
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
     Else
-      Exit Sub
+      If pChecker IsNot Nothing Then
+        pChecker.Dispose()
+        pChecker = Nothing
+      Else
+        Exit Sub
+      End If
+      remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
     End If
-    remoteTest = New remoteRestrictionTracker(txtAccount.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then
@@ -200,7 +211,7 @@
   End Sub
 #End Region
 #Region "Inputs"
-  Private Sub txtVal_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtAccount.KeyDown, txtPassword.KeyDown
+  Private Sub txtVal_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtAccount.KeyDown, txtPassword.KeyDown, cmbProvider.KeyDown
     If e.Control And e.KeyCode = Keys.V Then
       CType(sender, TextBox).SelectedText = Clipboard.GetText.Trim
       e.SuppressKeyPress = True
@@ -211,7 +222,7 @@
     If mySettings Is Nothing Then Exit Sub
     cmdSave.Enabled = SettingsChanged()
   End Sub
-  Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged
+  Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged, cmbProvider.KeyPress, cmbProvider.TextChanged, cmbProvider.SelectedIndexChanged
     If Not bLoaded Then Exit Sub
     If pChecker IsNot Nothing Then
       pctKeyState.Tag = IIf(CheckState, 1, 0)
@@ -413,6 +424,53 @@
     End Select
     cmdSave.Enabled = SettingsChanged()
   End Sub
+  Private Sub PopulateHostList()
+    If Me.InvokeRequired Then
+      Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
+    Else
+      If wsHostList IsNot Nothing Then
+        wsHostList.Dispose()
+        wsHostList = Nothing
+      End If
+      wsHostList = New CookieAwareWebClient
+      wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
+    End If
+  End Sub
+  Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
+    If e.UserState = "GRAB" Then
+      If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
+        Try
+          If e.Result.Contains(vbLf) Then
+            Dim HostList() As String = Split(e.Result, vbLf)
+            cmbProvider.Items.Clear()
+            cmbProvider.Items.AddRange(HostList)
+            Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+            cmbProvider.Text = sProvider
+          End If
+        Catch ex As Exception
+        End Try
+      End If
+    End If
+  End Sub
+  Private Sub UseDefaultHostList()
+    cmbProvider.Items.Clear()
+    cmbProvider.Items.Add("wildblue.net")
+    cmbProvider.Items.Add("exede.net")
+    cmbProvider.Items.Add("dishmail.net")
+    cmbProvider.Items.Add("dish.net")
+  End Sub
+  Private Sub SaveToHostList(Provider As String)
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New Threading.ContextCallback(AddressOf SaveToHostList), Provider)
+    Else
+      If wsHostList IsNot Nothing Then
+        wsHostList.Dispose()
+        wsHostList = Nothing
+      End If
+      wsHostList = New CookieAwareWebClient
+      wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & Provider), "UPDATE")
+    End If
+  End Sub
 #End Region
   Private Sub lblPurchaseKey_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblPurchaseKey.LinkClicked
     If lblPurchaseKey.Text = LINK_PURCHASE Then
@@ -425,7 +483,7 @@
       End Try
     ElseIf lblPurchaseKey.Text = LINK_PANEL Then
       Try
-        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
+        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "@" & cmbProvider.Text & "&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
       Catch ex As Exception
         Dim taskNotifier As TaskbarNotifier = Nothing
         MakeNotifier(taskNotifier, False)
@@ -435,7 +493,7 @@
   End Sub
 #Region "Remote Service Results"
   Private Sub pctKeyState_Click(sender As System.Object, e As System.EventArgs) Handles pctKeyState.Click
-    KeyCheck()
+    If Not String.IsNullOrEmpty(txtKey1.Text) And Not String.IsNullOrEmpty(txtKey2.Text) And Not String.IsNullOrEmpty(txtKey3.Text) And Not String.IsNullOrEmpty(txtKey4.Text) And Not String.IsNullOrEmpty(txtKey5.Text) Then KeyCheck()
   End Sub
   Private CheckState As Boolean
   Private Sub KeyCheck()
@@ -526,13 +584,18 @@
     End If
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
-    If Not txtAccount.Text.Contains("@") Or Not txtAccount.Text.Contains(".") Then
-      MessageBox.Show("Please enter your full ViaSat account name." & vbNewLine & "Example: Customer@WildBlue.net", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+    If String.IsNullOrEmpty(txtAccount.Text) Then
+      MessageBox.Show("Please enter your ViaSat account Username.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtAccount.Focus()
       Exit Sub
     End If
+    If String.IsNullOrEmpty(cmbProvider.Text) Then
+      MessageBox.Show("Please enter your ViaSat Provider address or select one from the list.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      cmbProvider.Focus()
+      Exit Sub
+    End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
-      MessageBox.Show("Please enter your ViaSat account password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MessageBox.Show("Please enter your ViaSat account Password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtPassword.Focus()
       Exit Sub
     End If
@@ -546,8 +609,8 @@
         Exit Sub
       End If
     Next
-    If String.Compare(mySettings.Account, txtAccount.Text, True) <> 0 Then
-      mySettings.Account = txtAccount.Text
+    If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
+      mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
     End If
     If String.Compare(StoredPassword.DecryptApp(mySettings.PassCrypt), txtPassword.Text, False) <> 0 Then
@@ -718,6 +781,7 @@
     bHardChange = False
     bSaved = True
     cmdSave.Enabled = False
+    SaveToHostList(cmbProvider.Text)
   End Sub
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click
     Me.Close()
@@ -725,9 +789,10 @@
 #End Region
   Private Function SettingsChanged() As Boolean
     If bHardChange Then Return True
-    If Not String.Compare(mySettings.Account, txtAccount.Text, True) = 0 Then Return True
+    If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) = 0 Then Return True
     If Not mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text) Then Return True
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+    If sKey.Contains("--") Then sKey = ""
     If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
