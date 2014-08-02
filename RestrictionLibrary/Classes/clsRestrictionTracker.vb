@@ -631,7 +631,7 @@
           Case ConnectionStates.Prepare
             PrepareEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.Login
-            LoginEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+            LoginEX(sURI, sHost, sPath, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.Authenticate
             AuthenticateEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.FirstBookend
@@ -888,12 +888,30 @@
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
         sURI = sURI.Substring(0, sURI.IndexOf(""""))
         If sURI.StartsWith("/") Then sURI = "https://" & sHost & sURI
-        Dim sGOTO As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""goto"" value="""))
-        sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
-        sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
-        Dim sSQPS As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
-        sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
-        sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+        Dim sGOTO As String = Nothing
+        If sRet.Contains("<input type=""hidden"" name=""goto"" value=""") Then
+          sGOTO = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""goto"" value="""))
+          sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
+          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+        End If
+        If String.IsNullOrEmpty(sGOTO) Then
+          sErrMsg = "Prepare Failed: GOTO value not found."
+          sFailText = sRet
+          bReset = False
+          Exit Sub
+        End If
+        Dim sSQPS As String = Nothing
+        If sRet.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
+          sSQPS = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
+          sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
+          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+        End If
+        If String.IsNullOrEmpty(sSQPS) Then
+          sErrMsg = "Prepare Failed: SunQueryParamsString value not found."
+          sFailText = sRet
+          bReset = False
+          Exit Sub
+        End If
         Dim sSend As String = "realm=" & PercentEncode("/") &
                              "&IDToken1=" & PercentEncode(myUID) &
                              "&IDToken2=" & PercentEncode(myPass) &
@@ -908,19 +926,18 @@
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Login)
         myUID = Nothing
         myPass = Nothing
-      Else
-        sErrMsg = "Prepare Failed: Login form not found."
-        sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
-        bReset = False
-      End If
     Else
-      sErrMsg = "Prepare Failed: Could not understand response."
-      sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+      sErrMsg = "Prepare Failed: Login form not found."
+      sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
+      bReset = False
     End If
+      Else
+        sErrMsg = "Prepare Failed: Could not understand response."
+        sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+        bReset = True
+      End If
   End Sub
-
-  Private Sub LoginEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+  Private Sub LoginEX(sURL As String, sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "mysso.exede.net" Then
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
@@ -928,16 +945,38 @@
       If sRet.Contains("Access rights validated") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
         wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sURI As String = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
-        sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-        sURI = sURI.Substring(0, sURI.IndexOf(""">"))
-        sURI = HexDecode(sURI)
-        Dim sSAMLResponse As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
-        sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
-        sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
-        Dim sRelay As String = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
-        sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-        sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+        Dim sURI As String = Nothing
+        If sRet.Contains("<form method=""post"" action=""") Then
+          sURI = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
+          sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
+          sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+          sURI = HexDecode(sURI)
+        End If
+        If String.IsNullOrEmpty(sURI) Then sURI = sURL
+        Dim sSAMLResponse As String = Nothing
+        If sRet.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
+          sSAMLResponse = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
+          sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
+          sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+        End If
+        If String.IsNullOrEmpty(sSAMLResponse) Then
+          sErrMsg = "Login Failed: SAML Response value not found."
+          sFailText = sRet
+          bReset = False
+          Exit Sub
+        End If
+        Dim sRelay As String = Nothing
+        If sRet.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
+          sRelay = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
+          sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
+          sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+        End If
+        If String.IsNullOrEmpty(sRelay) Then
+          sErrMsg = "Login Failed: Relay State value not found."
+          sFailText = sRet
+          bReset = False
+          Exit Sub
+        End If
         Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(sSAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(sRelay))
         sAttemptedURL = sURI
         AttemptedTag = ConnectionStates.Authenticate
@@ -963,7 +1002,6 @@
       bReset = True
     End If
   End Sub
-
   Private Sub AuthenticateEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "myexede.force.com" Then
       sErrMsg = "Authentication Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
@@ -980,7 +1018,6 @@
       bReset = True
     End If
   End Sub
-
   Private Sub DashboardEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "myexede.force.com" Then
       sErrMsg = "Dashboard Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
@@ -1026,7 +1063,6 @@
       bReset = True
     End If
   End Sub
-
   Private Sub AjaxEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "myexede.force.com" Then
       sErrMsg = "ViewState Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
@@ -1072,7 +1108,6 @@
       bReset = True
     End If
   End Sub
-
   Private Sub GetUsageEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "myexede.force.com" Then
       sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
@@ -1083,7 +1118,7 @@
         sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
         ReadUsage(sTable)
       Else
-        sErrMsg = "ViewState Load Failed: Could not find AJAX ViewState variables."
+        sErrMsg = "ViewState Load Failed: Could not find usage data."
         sFailText = "Exede AJAX Page Error = " & sErrMsg & vbNewLine & sRet
         bReset = False
       End If
@@ -1093,7 +1128,6 @@
       bReset = True
     End If
   End Sub
-
   Private Sub ReadUsageEX(Table As String)
     If Not Table.Contains("amount-used") Then
       ResetTimeout()
@@ -1102,8 +1136,11 @@
       Dim Used As String = Table.Substring(Table.IndexOf("amount-used"))
       Used = Used.Substring(Used.IndexOf(""">") + 2)
       Used = Used.Substring(0, Used.IndexOf("</"))
-      Dim Total As String = Table.Substring(Table.IndexOf("<strong>") + 8)
-      Total = Total.Substring(0, Total.IndexOf("</"))
+      Dim Total As String = Nothing
+      If Table.Contains("<strong>") Then
+        Total = Table.Substring(Table.IndexOf("<strong>") + 8)
+        Total = Total.Substring(0, Total.IndexOf("</"))
+      End If
       Dim lUsed As Long = StrToVal(Used, MBPerGB)
       Dim lTotal As Long = StrToVal(Total, MBPerGB)
       ResetTimeout()
@@ -1114,7 +1151,6 @@
       End If
     End If
   End Sub
-
 #End Region
 #Region "RP"
   Private Sub LoginRP(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
