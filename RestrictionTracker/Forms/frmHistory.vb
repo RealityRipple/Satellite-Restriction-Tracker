@@ -70,7 +70,8 @@ Public Class frmHistory
       fDB.Dispose()
       fDB = Nothing
     End If
-    Dim SetAgo As UInt32 = mySettings.Ago
+    Dim SetAgo As UInt32 = 30
+    If mySettings IsNot Nothing Then SetAgo = mySettings.Ago
     mySettings = New AppSettings
     mySettings.Ago = SetAgo
     mySettings.Gr = IIf(optGraph.Checked, "aph", "id")
