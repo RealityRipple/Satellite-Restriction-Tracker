@@ -866,6 +866,8 @@ Public Class frmMain
     Else
       Dim sErr As String = "There was an error verifying your Product Key."
       Select Case e.Type
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin
+          sErr = "There was a server error. Please try again later."
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadPassword
           sErr = "Your Password is incorrect."
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct

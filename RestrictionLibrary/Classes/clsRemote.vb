@@ -26,6 +26,7 @@ Public Class remoteRestrictionTracker
       BadProduct
       BadServer
       BadPassword
+      BadLogin
       NoData
       NoPassword
       Network
@@ -273,7 +274,9 @@ Public Class remoteRestrictionTracker
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
             ElseIf sRet = "NOPASS" Then
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoPassword))
-            ElseIf sRet = "Bad Login" Or sRet = "Bad Password" Then
+            ElseIf sRet = "Bad Login" Then
+              RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadLogin))
+            ElseIf sRet = "Bad Password" Then
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadPassword))
             ElseIf sRet = "BADKEY" Then
               RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadProduct))
@@ -295,14 +298,6 @@ Public Class remoteRestrictionTracker
                   End If
                   Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
                   Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-                  'If sData.Length = 5 Then
-                  '  If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-                  '  rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
-                  '            StrToVal(sData(0), 1000),
-                  '            StrToVal(sData(1), 1000) + (StrToVal(sData(4), 1000)),
-                  '            StrToVal(sData(2), 1000),
-                  '            StrToVal(sData(3), 1000)))
-                  'Else
                   If sData.Length = 4 Then
                     If dish Then
                       If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
