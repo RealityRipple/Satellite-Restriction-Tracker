@@ -158,7 +158,8 @@ Class AppSettings
         Select Case pType.ToLower
           Case "ip"
             Dim pIP As String = myProxySettings(1)
-            Dim pPort As Integer = Replace(myProxySettings(2), "/", String.Empty)
+            Dim pPort As Integer = 80
+            If myProxySettings.Length > 2 Then pPort = Replace(myProxySettings(2), "/", String.Empty)
             If myProxySettings.Length > 3 Then
               Dim pUser As String = myProxySettings(3)
               Dim pPass As String = myProxySettings(4)
