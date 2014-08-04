@@ -896,7 +896,7 @@
     ElseIf sPath = "/federation/ssoredirect/metaalias/idp" Then
       If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
         Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login"""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
         sURI = sURI.Substring(0, sURI.IndexOf(""""))
@@ -957,7 +957,7 @@
     ElseIf sPath = "/federation/ui/login" Then
       If sRet.Contains("Access rights validated") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
         Dim sURI As String = Nothing
         If sRet.Contains("<form method=""post"" action=""") Then
           sURI = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
@@ -1044,7 +1044,7 @@
     ElseIf sPath = "/dashboard" Then
       If sRet.Contains("<span id=""ajax-view-state""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
         Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
         AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
         Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
@@ -1089,7 +1089,7 @@
     ElseIf sPath = "/dashboard" Then
       If sRet.Contains("<span id=""ajax-view-state""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
         Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
         AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
         Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
