@@ -493,6 +493,7 @@
       MessageBox.Show("You must select a Provider before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Exit Sub
     End If
+    If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
     sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
     pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
   End Sub
