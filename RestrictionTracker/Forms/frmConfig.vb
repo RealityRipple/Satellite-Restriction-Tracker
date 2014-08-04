@@ -77,8 +77,6 @@
     lblHistoryDir.Enabled = Not chkService.Checked
     txtHistoryDir.Enabled = Not chkService.Checked
     cmdHistoryDir.Enabled = Not chkService.Checked
-    'chkInvert.Checked = mySettings.HistoryInversion
-
     If mySettings.Overuse = 0 Then
       chkOverAlert.Checked = False
       txtOverSize.Value = 100
@@ -218,7 +216,7 @@
       e.Handled = True
     End If
   End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged 'chkInvert.CheckedChanged,
+  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
     If mySettings Is Nothing Then Exit Sub
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -425,30 +423,28 @@
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub PopulateHostList()
-    If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
-    Else
-      If wsHostList IsNot Nothing Then
-        wsHostList.Dispose()
-        wsHostList = Nothing
-      End If
-      wsHostList = New CookieAwareWebClient
-      wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
-    End If
+    wsHostList = New CookieAwareWebClient
+    wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
   End Sub
   Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
     If e.UserState = "GRAB" Then
-      If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
-        Try
-          If e.Result.Contains(vbLf) Then
-            Dim HostList() As String = Split(e.Result, vbLf)
-            cmbProvider.Items.Clear()
-            cmbProvider.Items.AddRange(HostList)
-            Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
-            cmbProvider.Text = sProvider
-          End If
-        Catch ex As Exception
-        End Try
+      If Me.InvokeRequired Then
+        Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsHostList_DownloadStringCompleted), sender, e)
+      Else
+        If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
+          Try
+            If e.Result.Contains(vbLf) Then
+              Dim HostList() As String = Split(e.Result, vbLf)
+              bLoaded = False
+              cmbProvider.Items.Clear()
+              cmbProvider.Items.AddRange(HostList)
+              Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+              cmbProvider.Text = sProvider
+              bLoaded = True
+            End If
+          Catch ex As Exception
+          End Try
+        End If
       End If
     End If
   End Sub
@@ -727,7 +723,6 @@
       mySettings.HistoryDir = txtHistoryDir.Text
       bAccount = True
     End If
-    'mySettings.HistoryInversion = chkInvert.Checked
     If chkOverAlert.Checked Then
       mySettings.Overuse = txtOverSize.Value
     Else
@@ -802,7 +797,6 @@
     If Not mySettings.ScaleScreen = chkScaleScreen.Checked Then Return True
     If Not mySettings.Service = chkService.Checked Then Return True
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
-    'If Not mySettings.HistoryInversion = chkInvert.Checked Then Return True
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
