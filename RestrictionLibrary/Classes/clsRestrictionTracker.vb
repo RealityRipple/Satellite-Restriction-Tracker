@@ -298,14 +298,12 @@
   End Function
   Private Sub PrepareLogin()
     iHist = 0
-    If wsData Is Nothing Then
-      wsData = New CookieAwareWebClient
-    Else
+    If wsData IsNot Nothing Then
       If wsData.IsBusy Then wsData.CancelAsync()
       wsData.Dispose()
       wsData = Nothing
-      wsData = New CookieAwareWebClient
     End If
+    wsData = New CookieAwareWebClient
     If mySettings IsNot Nothing Then
       wsData.Timeout = mySettings.Timeout
       wsData.Proxy = mySettings.Proxy
@@ -615,6 +613,7 @@
   Private Sub HandleResponse(ConnState As ConnectionStates, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     iHist += 1
     ResetTimeout(True)
+    Dim CloseSocket As Boolean = False
     Select Case AccountType
       Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
         Select Case ConnState
@@ -622,6 +621,7 @@
             LoginWB(sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.TableDownload
             GetUsageWB(sHost, sRet, sErrMsg, sFailText, bReset)
+            CloseSocket = True
           Case Else
             sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
             bReset = True
@@ -640,6 +640,7 @@
             AjaxEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.TableDownload
             GetUsageEX(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
+            CloseSocket = True
           Case Else
             sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
             bReset = True
@@ -652,6 +653,7 @@
             LoginRetryRP(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.TableDownload
             GetUsageRP(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
+            CloseSocket = True
           Case Else
             sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
             bReset = True
@@ -672,6 +674,7 @@
             GetUsageDN(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
           Case ConnectionStates.TableDownloadRetry
             GetUsageRetryDN(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
+            CloseSocket = True
           Case Else
             sErrMsg = "Login Failed. Unknown User State: " & ConnState.ToString & " loading " & sAttemptedURL
             bReset = True
@@ -680,6 +683,13 @@
         sErrMsg = "Login Failed: Host Type not determined (" & AccountType.ToString & ")!"
         bReset = True
     End Select
+    If CloseSocket Then
+      If wsData IsNot Nothing Then
+        wsData.CancelAsync()
+        wsData.Dispose()
+        wsData = Nothing
+      End If
+    End If
   End Sub
   Private Sub LoadUsage(File As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload))
@@ -880,6 +890,9 @@
     If Not sHost = "mysso.exede.net" Then
       sErrMsg = "Prepare Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
+    ElseIf sRet.ToLower.Contains("unable to process request") Then
+      sErrMsg = "Login Failed: The server may be down."
+      bReset = False
     ElseIf sPath = "/federation/ssoredirect/metaalias/idp" Then
       If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
@@ -926,11 +939,11 @@
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Login)
         myUID = Nothing
         myPass = Nothing
-    Else
-      sErrMsg = "Prepare Failed: Login form not found."
-      sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
-      bReset = False
-    End If
+      Else
+        sErrMsg = "Prepare Failed: Login form not found."
+        sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
+      End If
       Else
         sErrMsg = "Prepare Failed: Could not understand response."
         sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
@@ -983,7 +996,7 @@
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Authenticate))
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Authenticate)
       ElseIf sRet.Contains("login-error-alert") Then
-        If sRet.Contains("Your Username and/or Password are incorrect.") Then
+        If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
           sErrMsg = "Login Failed: Incorrect Password"
           bReset = False
         Else
@@ -991,6 +1004,9 @@
           sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
           bReset = False
         End If
+      ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
+        sErrMsg = "Login Failed: The server may be down."
+        bReset = False
       Else
         sErrMsg = "Could not log in."
         sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
@@ -1012,6 +1028,9 @@
       AttemptedTag = ConnectionStates.FirstBookend
       RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.FirstBookend))
       wsData.DownloadStringAsync(New Uri(sURI), ConnectionStates.FirstBookend)
+    ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Then
+      sErrMsg = "Authentication Failed: The server may be down."
+      bReset = True
     Else
       sErrMsg = "Authentication Failed: Could not understand response."
       sFailText = "Exede Authentication Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
