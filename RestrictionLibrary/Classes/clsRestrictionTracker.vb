@@ -1005,8 +1005,7 @@
           bReset = False
         End If
       ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-        sErrMsg = "Login Failed: Sent Back to Home. Please check your account information."
-        sFailText = "Exede Login Error = Sent Back to Home." & vbNewLine & sPath & vbNewLine & sRet
+        sErrMsg = "Login Failed: Please check your account information and try again."
         bReset = False
       Else
         sErrMsg = "Could not log in."
