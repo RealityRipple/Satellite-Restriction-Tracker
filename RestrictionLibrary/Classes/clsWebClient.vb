@@ -8,6 +8,7 @@
     Me.CookieJar = c
     c_Timeout = 60
     c_HTVer = Net.HttpVersion.Version10
+    c_ErrorBypass = False
   End Sub
   Sub New(v As Version)
     Me.New(New Net.CookieContainer)
@@ -39,6 +40,15 @@
       c_HTVer = value
     End Set
   End Property
+  Private c_ErrorBypass As Boolean
+  Public Property ErrorBypass As Boolean
+    Get
+      Return c_ErrorBypass
+    End Get
+    Set(value As Boolean)
+      c_ErrorBypass = value
+    End Set
+  End Property
   Public Event Failure(sender As Object, e As ErrorEventArgs)
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
@@ -50,7 +60,6 @@
         CType(request, Net.HttpWebRequest).CookieContainer = Me.CookieJar
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = True
         CType(request, Net.HttpWebRequest).KeepAlive = False
-        'CType(request, Net.HttpWebRequest).Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
       End If
       Return request
@@ -66,6 +75,11 @@
       ResponseURI = response.ResponseUri
       Return response
     Catch ex As Net.WebException
+      If c_ErrorBypass Then
+        Dim response As Net.WebResponse = ex.Response
+        ResponseURI = response.ResponseUri
+        Return response
+      End If
       MyBase.CancelAsync()
       RaiseEvent Failure(Me, New ErrorEventArgs(ex))
       Return Nothing
@@ -77,6 +91,11 @@
       ResponseURI = response.ResponseUri
       Return response
     Catch ex As Net.WebException
+      If c_ErrorBypass Then
+        Dim response As Net.WebResponse = ex.Response
+        ResponseURI = response.ResponseUri
+        Return response
+      End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       RaiseEvent Failure(Me, New ErrorEventArgs(ex))
