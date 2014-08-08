@@ -527,13 +527,21 @@
         sErrMsg = "Login Failed: No Response URI!"
         bReset = True
       ElseIf String.IsNullOrEmpty(sRet) Then
+        For Each Key In wsData.ResponseHeaders.AllKeys
+          If Key.ToLower = "location" Then
+            Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
+            wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+            wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
+            Exit Sub
+          End If
+        Next
         sErrMsg = "Login Error: Empty Content!"
         bReset = True
       Else
         HandleResponse(e.UserState, mySettings.AccountType, wsData.ResponseURI.AbsoluteUri, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
       End If
     End If
-    If Not String.IsNullOrEmpty(sErrMsg.Trim) Then
+    If Not String.IsNullOrEmpty(Trim(sErrMsg)) Then
       ResetTimeout()
       If bReset Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, sErrMsg, sFailText))
@@ -595,13 +603,21 @@
         sErrMsg = "Login Failed: No Response URI!"
         bReset = True
       ElseIf String.IsNullOrEmpty(sRet) Then
+        For Each Key In wsData.ResponseHeaders.AllKeys
+          If Key.ToLower = "location" Then
+            Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
+            wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+            wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
+            Exit Sub
+          End If
+        Next
         sErrMsg = "Login Error: Empty Content!"
         bReset = True
       Else
         HandleResponse(e.UserState, mySettings.AccountType, wsData.ResponseURI.AbsoluteUri, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
       End If
     End If
-    If Not String.IsNullOrEmpty(sErrMsg.Trim) Then
+    If Not String.IsNullOrEmpty(Trim(sErrMsg)) Then
       ResetTimeout()
       If bReset Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, sErrMsg, sFailText))
@@ -896,7 +912,7 @@
     ElseIf sPath = "/federation/ssoredirect/metaalias/idp" Then
       If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
         Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login"""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
         sURI = sURI.Substring(0, sURI.IndexOf(""""))
@@ -936,6 +952,7 @@
         sAttemptedURL = sURI
         AttemptedTag = ConnectionStates.Login
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
+        wsData.ErrorBypass = True
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Login)
         myUID = Nothing
         myPass = Nothing
@@ -944,20 +961,20 @@
         sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
         bReset = False
       End If
-      Else
-        sErrMsg = "Prepare Failed: Could not understand response."
-        sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-        bReset = True
+    Else
+      sErrMsg = "Prepare Failed: Could not understand response."
+      sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+      bReset = True
       End If
   End Sub
   Private Sub LoginEX(sURL As String, sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "mysso.exede.net" Then
+    If Not sHost = "mysso.exede.net" And Not sHost = "my.exede.net" Then
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
-    ElseIf sPath = "/federation/ui/login" Then
+    ElseIf sPath = "/federation/ui/login" Or sPath = "/federation/ssoredirect/metaalias/idp" Then
       If sRet.Contains("Access rights validated") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
         Dim sURI As String = Nothing
         If sRet.Contains("<form method=""post"" action=""") Then
           sURI = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
@@ -1013,9 +1030,23 @@
         bReset = False
       End If
     Else
-      sErrMsg = "Login Failed: Could not understand response."
-      sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+      If sRet.Contains("window.location.href") Then
+        wsData.ErrorBypass = False
+        Dim sURI As String = Nothing
+        sURI = sRet.Substring(sRet.IndexOf("window.location.href"))
+        sURI = sURI.Substring(sURI.IndexOf("'") + 1)
+        sURI = sURI.Substring(0, sURI.IndexOf("'"))
+        If sURI = "/" Then
+          sURI = sURL.Substring(0, sURL.IndexOf("/", sURL.IndexOf("//") + 2))
+        End If
+        sAttemptedURL = sURI
+        AttemptedTag = ConnectionStates.Login
+        wsData.DownloadStringAsync(New Uri(sURI), ConnectionStates.Login)
+      Else
+        sErrMsg = "Login Failed: Could not understand response."
+        sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+        bReset = True
+      End If
     End If
   End Sub
   Private Sub AuthenticateEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
@@ -1044,7 +1075,7 @@
     ElseIf sPath = "/dashboard" Then
       If sRet.Contains("<span id=""ajax-view-state""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
         Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
         AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
         Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
@@ -1089,7 +1120,7 @@
     ElseIf sPath = "/dashboard" Then
       If sRet.Contains("<span id=""ajax-view-state""") Then
         wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("utf-8")
+        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
         Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
         AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
         Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
