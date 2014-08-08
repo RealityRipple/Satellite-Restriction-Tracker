@@ -7,7 +7,7 @@ Module modFunctions
     For I As Integer = inString.Length - 1 To 0 Step -1
       Dim iChar As Integer = Convert.ToInt32(inString(I))
       Select Case iChar
-        Case 48 To 57, 65 To 90, 97 To 122 : sRet = inString(I).ToString & sRet
+        Case 45, 46, 48 To 57, 65 To 90, 95, 97 To 122 : sRet = inString(I).ToString & sRet
         Case 32 : sRet = "+" & sRet
         Case Else : sRet = "%" & PadHex(iChar, 2) & sRet
       End Select
@@ -206,14 +206,18 @@ Module modFunctions
     If IO.File.Exists(ReportList) Then
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
         My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, True)
-        If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
-        If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
+        If ex.InnerException IsNot Nothing Then
+          My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+          If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
+        End If
         My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
       End If
     Else
       My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, False)
-      If ex.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
-      If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
+      If ex.InnerException IsNot Nothing Then
+        My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
+        If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
+      End If
       My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
     End If
     SendSocketErrors(DataPath)
