@@ -365,6 +365,7 @@
       ResetTimeout()
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
     Else
+      wsData.ManualRedirect = True
       Try
         wsData.DownloadStringAsync(uriURL, ConnectionStates.Prepare)
       Catch ex As Exception
@@ -531,6 +532,7 @@
           If Key.ToLower = "location" Then
             Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
             wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+            ResetTimeout()
             wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
             Exit Sub
           End If
@@ -607,6 +609,7 @@
           If Key.ToLower = "location" Then
             Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
             wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
+            ResetTimeout()
             wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
             Exit Sub
           End If
@@ -1042,6 +1045,8 @@
         sAttemptedURL = sURI
         AttemptedTag = ConnectionStates.Login
         wsData.DownloadStringAsync(New Uri(sURI), ConnectionStates.Login)
+      ElseIf sRet.Contains("maintenance") Then
+        sErrMsg = "Login Failed: Server Down for Maintenance."
       Else
         sErrMsg = "Login Failed: Could not understand response."
         sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet

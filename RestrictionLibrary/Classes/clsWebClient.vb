@@ -9,6 +9,7 @@
     c_Timeout = 60
     c_HTVer = Net.HttpVersion.Version10
     c_ErrorBypass = False
+    c_ManualRedirect = False
   End Sub
   Sub New(v As Version)
     Me.New(New Net.CookieContainer)
@@ -49,6 +50,15 @@
       c_ErrorBypass = value
     End Set
   End Property
+  Private c_ManualRedirect As Boolean
+  Public Property ManualRedirect As Boolean
+    Get
+      Return c_ManualRedirect
+    End Get
+    Set(value As Boolean)
+      c_ManualRedirect = value
+    End Set
+  End Property
   Public Event Failure(sender As Object, e As ErrorEventArgs)
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
@@ -58,7 +68,7 @@
         CType(request, Net.HttpWebRequest).ReadWriteTimeout = c_Timeout * 1000
         CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
         CType(request, Net.HttpWebRequest).CookieContainer = Me.CookieJar
-        CType(request, Net.HttpWebRequest).AllowAutoRedirect = True
+        CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
         CType(request, Net.HttpWebRequest).KeepAlive = False
         CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
       End If

@@ -606,7 +606,11 @@
         Exit Sub
       End If
     Next
-    If cmbProvider.Text.ToLower.Contains("excede") Or cmbProvider.Text.ToLower.Contains("force") Then cmbProvider.Text = "exede.net"
+    If cmbProvider.Text.ToLower.Contains("excede") Or
+       cmbProvider.Text.ToLower.Contains("force") Or
+       cmbProvider.Text.ToLower.Contains("mysso") Or
+       cmbProvider.Text.ToLower.Contains("myexede") Or
+       cmbProvider.Text.ToLower.Contains("my.exede") Then cmbProvider.Text = "exede.net"
     If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
