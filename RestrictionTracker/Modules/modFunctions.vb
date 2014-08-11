@@ -724,8 +724,9 @@ Module modFunctions
         ftpStream.Write(bHTTP, 0, bHTTP.Length)
         ftpStream.Close()
       End Using
+      frmMain.FailResponse(True)
     Catch ex As Exception
-      'failed, whatever...
+      frmMain.FailResponse(False)
     End Try
   End Sub
   Public Function PercentEncode(inString As String) As String

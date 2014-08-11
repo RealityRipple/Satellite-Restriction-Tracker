@@ -2058,7 +2058,21 @@ Public Class frmMain
     result = Trim(result)
   End Sub
 #Region "Failure Reports"
-  Private Sub FailFile(sFail)
+  Public Sub FailResponse(sRet As Boolean)
+    If Me.InvokeRequired Then
+      Me.Invoke(New ParamaterizedInvoker(AddressOf FailResponse), sRet)
+    Else
+      MakeNotifier(taskNotifier, False)
+      If taskNotifier IsNot Nothing Then
+        If sRet Then
+          taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & Application.ProductName & "!", 200, 15 * 1000, 100)
+        Else
+          taskNotifier.Show("Error Reporting Error", Application.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 60 * 1000, 100)
+        End If
+      End If
+    End If
+  End Sub
+  Private Sub FailFile(sFail As String)
     If clsUpdate.QuickCheckVersion = clsUpdate.CheckEventArgs.ResultType.NoUpdate Then
       sFailTray = sFail
       MakeNotifier(taskNotifier, True)
