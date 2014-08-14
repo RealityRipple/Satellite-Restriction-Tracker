@@ -64,6 +64,9 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
           Return "The server did not like the request. Please try again."
+        ElseIf ex.Message.Contains("401") Then
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "The server did not like the login. Please check your provider."
         ElseIf ex.Message.Contains("404") Then
           Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
         ElseIf ex.Message.Contains("405") Then
@@ -115,6 +118,8 @@ Module modFunctions
           Return "Too many connections open. Check your network activity or restart your computer."
         ElseIf ex.InnerException.Message.StartsWith("An established connection was aborted by the software in your host machine") Then
           Return "Connection aborted."
+        ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "The server did not respond. Please try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
@@ -177,6 +182,13 @@ Module modFunctions
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Server security could not be established - " & ex.InnerException.Message
+          End If
+        ElseIf ex.Message.Contains("Unable to connect to the remote server") Then
+          If ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
+            Return "The server is busy with other requests. Please try again later."
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Can't connect to the server - " & ex.InnerException.Message
           End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
