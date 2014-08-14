@@ -118,10 +118,6 @@ Public Class frmHistory
         Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax)
         If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bGraph, Nothing)
-        'Case 2
-        '  Dim bGraph As Bitmap = DrawEGraph(graphData, mySettings.HistoryInversion, downSize, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryUpA, mySettings.Colors.HistoryUpB, mySettings.Colors.HistoryUpC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax)
-        '  If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
-        '  Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bGraph, Nothing)
     End Select
   End Sub
   Friend Sub DoResize(Optional ByVal Forced As Boolean = False)
@@ -163,13 +159,6 @@ Public Class frmHistory
                 pctDld.Image = ResizingNote(pctDld.Size)
                 GraphInvoker.BeginInvoke({1, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
                 bDisplayed = True
-                'Case SatHostTypes.WildBlue_EXEDE
-                '  pnlGraph.RowStyles(0).Height = 100
-                '  pnlGraph.RowStyles(1).Height = 0
-                '  lastRect = Me.Bounds
-                '  pctDld.Image = ResizingNote(pctDld.Size)
-                '  GraphInvoker.BeginInvoke({2, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
-                '  bDisplayed = True
               Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
                 pnlGraph.RowStyles(0).Height = 50
                 pnlGraph.RowStyles(1).Height = 50
@@ -181,29 +170,19 @@ Public Class frmHistory
             End Select
             If Not bDisplayed Then
               If usageDB.GetLast.DOWNLIM = usageDB.GetLast.UPLIM Then
-                'If usageDB.GetLast.DOWNLOAD = usageDB.GetLast.UPLOAD Then
-                'RuralPortal
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds
                 pctDld.Image = ResizingNote(pctDld.Size)
                 GraphInvoker.BeginInvoke({1, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
-              'Else
-              '  'Exede
-              '  pnlGraph.RowStyles(0).Height = 100
-              '  pnlGraph.RowStyles(1).Height = 0
-              '  lastRect = Me.Bounds
-              '  pctDld.Image = ResizingNote(pctDld.Size)
-              '  GraphInvoker.BeginInvoke({2, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
-              'End If
-            Else
-              pnlGraph.RowStyles(0).Height = 50
-              pnlGraph.RowStyles(1).Height = 50
-              lastRect = Me.Bounds
-              pctDld.Image = ResizingNote(pctDld.Size)
-              pctUld.Image = ResizingNote(pctUld.Size)
-              GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
-            End If
+              Else
+                pnlGraph.RowStyles(0).Height = 50
+                pnlGraph.RowStyles(1).Height = 50
+                lastRect = Me.Bounds
+                pctDld.Image = ResizingNote(pctDld.Size)
+                pctUld.Image = ResizingNote(pctUld.Size)
+                GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
+              End If
             End If
           End If
         End If
@@ -218,25 +197,6 @@ Public Class frmHistory
       Dim gShow = GetGraphData(dNow, True)
       Dim showTime As String = gShow.DATETIME.ToString("g")
       Dim Show As String = showTime & " : " & gShow.DOWNLOAD & " MB / " & gShow.UPLIM & " MB"
-      'If useStyle = SatHostTypes.WildBlue_EXEDE Then
-      '  If mySettings.HistoryInversion Then
-      '    If gShow.DOWNLIM > 0 And Not gShow.UPLIM = gShow.DOWNLIM Then
-      '      Show = showTime & " : " & (gShow.DOWNLOAD + gShow.UPLOAD + gShow.DOWNLIM) & " MB / " & gShow.UPLIM & " MB" & vbNewLine &
-      '             Space(showTime.Length * 2 + 2) & gShow.DOWNLOAD & " MB ↓, " & gShow.UPLOAD & " MB ↑, " & gShow.DOWNLIM & " MB Over"
-      '    Else
-      '      Show = showTime & " : " & (gShow.DOWNLOAD + gShow.UPLOAD) & " MB / " & gShow.UPLIM & " MB" & vbNewLine &
-      '             Space(showTime.Length * 2 + 2) & gShow.DOWNLOAD & " MB ↓, " & gShow.UPLOAD & " MB ↑"
-      '    End If
-      '  Else
-      '    If gShow.UPLIM > 0 And Not gShow.UPLIM = gShow.DOWNLIM Then
-      '      Show = showTime & " : " & (gShow.DOWNLOAD + gShow.UPLOAD + gShow.UPLIM) & " MB / " & gShow.DOWNLIM & " MB" & vbNewLine &
-      '             Space(showTime.Length * 2 + 2) & gShow.DOWNLOAD & " MB ↓, " & gShow.UPLOAD & " MB ↑, " & gShow.UPLIM & " MB Over"
-      '    Else
-      '      Show = showTime & " : " & (gShow.DOWNLOAD + gShow.UPLOAD) & " MB / " & gShow.DOWNLIM & " MB" & vbNewLine &
-      '             Space(showTime.Length * 2 + 2) & gShow.DOWNLOAD & " MB ↓, " & gShow.UPLOAD & " MB ↑"
-      '    End If
-      '  End If
-      'End If
       If lastShow = Show Then Exit Sub
       lastShow = Show
       ttHistory.Show(Show, pctDld, e.X + 16, e.Y + 32)
@@ -280,7 +240,6 @@ Public Class frmHistory
       dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        '                                      mySettings.HistoryInversion
         lItems = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
         pnlGraph.Tag = lItems
         DoResize(True)
@@ -293,7 +252,6 @@ Public Class frmHistory
       pnlGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        '                                      mySettings.HistoryInversion
         lItems = Array.FindAll(usageDB.ToArray(), Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
         dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
@@ -364,30 +322,6 @@ Public Class frmHistory
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD.ToString & " / " & lItem.DOWNLIM.ToString, lItem.UPLOAD.ToString & " / " & lItem.UPLIM.ToString)
               Next lItem
             End If
-            'Case SatHostTypes.WildBlue_EXEDE
-            '  For Each lItem As DataBase.DataRow In lItems
-            '    If lItem.DOWNLIM = lItem.UPLIM Then
-            '      If mySettings.HistoryInversion Then
-            '        dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
-            '      Else
-            '        dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
-            '      End If
-            '    Else
-            '      If mySettings.HistoryInversion Then
-            '        If lItem.DOWNLIM = 0 Then
-            '          dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.UPLIM)
-            '        Else
-            '          dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.DOWNLIM, lItem.UPLIM)
-            '        End If
-            '      Else
-            '        If lItem.UPLIM = 0 Then
-            '          dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD, lItem.DOWNLIM)
-            '        Else
-            '          dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " + " & lItem.UPLOAD & " + " & lItem.UPLIM, lItem.DOWNLIM)
-            '        End If
-            '      End If
-            '    End If
-            '  Next lItem
           Case Else
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
@@ -749,10 +683,8 @@ Public Class frmHistory
     If ImgSize.Width = 0 Or ImgSize.Height = 0 Then Return Nothing
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
-    'Const sNote As String = "Collecting data, estimating and resizing..." & vbNewLine & "This may take some time. Please wait."
     g.Clear(SystemColors.ButtonFace)
     g.FillRectangle(New Drawing2D.LinearGradientBrush(New Rectangle(0, 0, ImgSize.Width, ImgSize.Height), Color.White, Color.MidnightBlue, Drawing2D.LinearGradientMode.Vertical), New Rectangle(0, 0, ImgSize.Width, ImgSize.Height))
-    'g.DrawString(sNote, SystemFonts.DefaultFont, SystemBrushes.ControlText, (ImgSize.Width / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Width / 2), (ImgSize.Height / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Height / 2))
     g.Dispose()
     Return iPic
   End Function
@@ -771,15 +703,6 @@ Public Class frmHistory
           dgvUsage.Columns.Add(colDATETIME)
           dgvUsage.Columns.Add(colDOWNLOAD)
           dgvUsage.Columns.Add(colUPLOAD)
-          'Case SatHostTypes.WildBlue_EXEDE
-          '  cmd30Days.Text = "This Period"
-          '  cmd60Days.Text = "Last Period"
-          '  dgvUsage.Columns.Clear()
-          '  colDOWNLOAD.HeaderText = "Download, Upload, & Over"
-          '  colUPLOAD.HeaderText = "Limit"
-          '  dgvUsage.Columns.Add(colDATETIME)
-          '  dgvUsage.Columns.Add(colDOWNLOAD)
-          '  dgvUsage.Columns.Add(colUPLOAD)
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
@@ -833,34 +756,6 @@ Public Class frmHistory
           mySettings.Colors.HistoryUpMax = Color.Yellow
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
-
-          'Case SatHostTypes.WildBlue_EXEDE
-          '  mySettings.Colors.MainDownA = Color.Orange
-          '  mySettings.Colors.MainDownB = Color.Transparent
-          '  mySettings.Colors.MainDownC = Color.Red
-          '  mySettings.Colors.MainUpA = Color.Blue
-          '  mySettings.Colors.MainUpB = Color.Transparent
-          '  mySettings.Colors.MainUpC = Color.Violet
-          '  mySettings.Colors.MainText = Color.White
-          '  mySettings.Colors.MainBackground = Color.Black
-
-          '  mySettings.Colors.TrayDownA = Color.Orange
-          '  mySettings.Colors.TrayDownB = Color.Transparent
-          '  mySettings.Colors.TrayDownC = Color.Red
-          '  mySettings.Colors.TrayUpA = Color.Blue
-          '  mySettings.Colors.TrayUpB = Color.Transparent
-          '  mySettings.Colors.TrayUpC = Color.Violet
-
-          '  mySettings.Colors.HistoryDownA = Color.Orange
-          '  mySettings.Colors.HistoryDownB = Color.Transparent
-          '  mySettings.Colors.HistoryDownC = Color.Red
-          '  mySettings.Colors.HistoryDownMax = Color.Yellow
-          '  mySettings.Colors.HistoryUpA = Color.Blue
-          '  mySettings.Colors.HistoryUpB = Color.Transparent
-          '  mySettings.Colors.HistoryUpC = Color.Violet
-          '  mySettings.Colors.HistoryUpMax = Color.Yellow
-          '  mySettings.Colors.HistoryText = Color.Black
-          '  mySettings.Colors.HistoryBackground = Color.White
 
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
           mySettings.Colors.MainDownA = Color.Orange
