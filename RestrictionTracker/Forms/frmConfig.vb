@@ -70,7 +70,6 @@
     txtTimeout.Value = mySettings.Timeout
     txtTimeout.LargeIncrement = 15
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
-    chkScaleScreen.Checked = mySettings.ScaleScreen
     DoCheck()
     txtHistoryDir.Text = mySettings.HistoryDir
     If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir
@@ -216,7 +215,7 @@
       e.Handled = True
     End If
   End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, chkScaleScreen.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
+  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
     If mySettings Is Nothing Then Exit Sub
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -645,7 +644,6 @@
     Else
       If My.Computer.FileSystem.FileExists(StartupPath) Then My.Computer.FileSystem.DeleteFile(StartupPath)
     End If
-    mySettings.ScaleScreen = chkScaleScreen.Checked
     If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir
     mySettings.Service = chkService.Checked
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
@@ -799,7 +797,6 @@
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
     If Not mySettings.Timeout = txtTimeout.Value Then Return True
     If chkStartUp.Checked Xor My.Computer.FileSystem.FileExists(StartupPath) Then Return True
-    If Not mySettings.ScaleScreen = chkScaleScreen.Checked Then Return True
     If Not mySettings.Service = chkService.Checked Then Return True
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
