@@ -12,8 +12,15 @@
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
-    Dim sUsername As String = mySettings.Account.Substring(0, mySettings.Account.LastIndexOf("@"))
-    Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+    Dim sAccount As String = mySettings.Account
+    Dim sUsername, sProvider As String
+    If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
+      sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))
+      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1)
+    Else
+      sUsername = sAccount
+      sProvider = ""
+    End If
     txtAccount.Text = sUsername
     UseDefaultHostList()
     cmbProvider.Text = sProvider
@@ -437,8 +444,10 @@
               bLoaded = False
               cmbProvider.Items.Clear()
               cmbProvider.Items.AddRange(HostList)
-              Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
-              cmbProvider.Text = sProvider
+              If mySettings.Account.Contains("@") Then
+                Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+                cmbProvider.Text = sProvider
+              End If
               bLoaded = True
             End If
           Catch ex As Exception
