@@ -2008,7 +2008,7 @@ Public Class frmMain
         If sRet Then
           taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & Application.ProductName & "!", 200, 15 * 1000, 100)
         Else
-          taskNotifier.Show("Error Reporting Error", Application.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 60 * 1000, 100)
+          taskNotifier.Show("Error Reporting Error", Application.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 1000, 100)
         End If
       End If
     End If
