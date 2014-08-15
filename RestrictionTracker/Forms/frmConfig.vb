@@ -497,7 +497,7 @@
   End Sub
 #Region "Remote Service Results"
   Private Sub pctKeyState_Click(sender As System.Object, e As System.EventArgs) Handles pctKeyState.Click
-    If Not String.IsNullOrEmpty(txtKey1.Text) And Not String.IsNullOrEmpty(txtKey2.Text) And Not String.IsNullOrEmpty(txtKey3.Text) And Not String.IsNullOrEmpty(txtKey4.Text) And Not String.IsNullOrEmpty(txtKey5.Text) Then KeyCheck()
+    If txtKey1.TextLength = 6 And txtKey2.TextLength = 4 And txtKey3.TextLength = 4 And txtKey4.TextLength = 4 And txtKey5.TextLength = 6 Then KeyCheck()
   End Sub
   Private CheckState As Boolean
   Private Sub KeyCheck()
