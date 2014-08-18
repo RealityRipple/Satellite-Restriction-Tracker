@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>116, 17</value>
-  </metadata>
-  <data name="lblWelcomeText.Text" xml:space="preserve">
-    <value>Since this is your first time using Satellite Restriction Tracker, we'd like to help you get set up. Simply follow the on-screen instructions and you'll be tracking your ViaSat Internet usage in no time!
-
-You will need your WildBlue or Exede account information ready to set up Satellite Restriction Tracker. If you do not have this information, please contact your ViaSat reseller.
-
-For best results, please make sure you're connected to the Internet before you begin.
-
-Press Next to begin or Cancel to close this wizard.</value>
-  </data>
   <data name="lblAccountName.Text" xml:space="preserve">
     <value>Please enter your Account name. This is the username you use to log in to the meter site. Usually it's just a username, though it may be an E-Mail Address if you enter an E-Mail Address to log into the website.</value>
   </data>
@@ -142,8 +130,23 @@ If you don't know your password, please contact your ViaSat provider to get your
   <data name="lblRemoteText.Text" xml:space="preserve">
     <value>If you need to keep track of your Internet usage more accurately, you can sign up for the Remote Usage Service to get usage data every 15 minutes, whether your Internet is running or not. Using a remote server, your usage will be stored and synchronized regularly to Satellite Restriction Tracker, providing the best possible picture of your usage.</value>
   </data>
+  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>116, 17</value>
+  </metadata>
   <data name="lblLocalText.Text" xml:space="preserve">
     <value>If you want to use Satellite Restriction Tracker for free, you are of course welcome to. We also provide a local service which runs on your computer at all times, gathering your usage data even if no users are logged in or your computer is locked.</value>
+  </data>
+  <metadata name="ttWizard.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>116, 17</value>
+  </metadata>
+  <data name="lblWelcomeText.Text" xml:space="preserve">
+    <value>Since this is your first time using Satellite Restriction Tracker, we'd like to help you get set up. Simply follow the on-screen instructions and you'll be tracking your ViaSat Internet usage in no time!
+
+You will need your WildBlue or Exede account information ready to set up Satellite Restriction Tracker. If you do not have this information, please contact your ViaSat reseller.
+
+For best results, please make sure you're connected to the Internet before you begin.
+
+Press Next to begin or Cancel to close this wizard.</value>
   </data>
   <data name="lblFinishedText.Text" xml:space="preserve">
     <value>Satellite Restriction Tracker has been configured and is ready to begin collecting your usage statistics. If you need to change your settings later, you can use the Configuration window to improve your experience.

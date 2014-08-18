@@ -171,7 +171,7 @@ Partial Class frmWizard
     Me.cmdFAQ.Name = "cmdFAQ"
     Me.cmdFAQ.Size = New System.Drawing.Size(75, 23)
     Me.cmdFAQ.TabIndex = 1
-    Me.cmdFAQ.Text = "F. A. Q."
+    Me.cmdFAQ.Text = "F. A. &Q."
     Me.ttWizard.SetTooltip(Me.cmdFAQ, "View the Frequently Asked Questions on the Satellite Restriction Tracker Website." & _
         "")
     Me.cmdFAQ.UseVisualStyleBackColor = True
@@ -207,7 +207,7 @@ Partial Class frmWizard
     Me.cmdPrevious.Name = "cmdPrevious"
     Me.cmdPrevious.Size = New System.Drawing.Size(75, 23)
     Me.cmdPrevious.TabIndex = 2
-    Me.cmdPrevious.Text = "<< Previous"
+    Me.cmdPrevious.Text = "<< &Previous"
     Me.ttWizard.SetTooltip(Me.cmdPrevious, "Return to the previous screen.")
     Me.cmdPrevious.UseVisualStyleBackColor = True
     '
@@ -398,7 +398,7 @@ Partial Class frmWizard
     Me.lblAccountHost.Name = "lblAccountHost"
     Me.lblAccountHost.Size = New System.Drawing.Size(65, 17)
     Me.lblAccountHost.TabIndex = 1
-    Me.lblAccountHost.Text = "Provider:"
+    Me.lblAccountHost.Text = "P&rovider:"
     Me.lblAccountHost.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
     'txtAccountUsername
@@ -443,7 +443,7 @@ Partial Class frmWizard
     Me.lblAccountPass.Name = "lblAccountPass"
     Me.lblAccountPass.Size = New System.Drawing.Size(69, 17)
     Me.lblAccountPass.TabIndex = 7
-    Me.lblAccountPass.Text = "Password:"
+    Me.lblAccountPass.Text = "Pass&word:"
     Me.lblAccountPass.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
     'lblAccountUsername
@@ -456,7 +456,7 @@ Partial Class frmWizard
     Me.lblAccountUsername.Name = "lblAccountUsername"
     Me.lblAccountUsername.Size = New System.Drawing.Size(75, 17)
     Me.lblAccountUsername.TabIndex = 4
-    Me.lblAccountUsername.Text = "Username:"
+    Me.lblAccountUsername.Text = "&Username:"
     Me.lblAccountUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
     'cmbAccountHost
@@ -595,7 +595,7 @@ Partial Class frmWizard
     Me.optRemote.Name = "optRemote"
     Me.optRemote.Size = New System.Drawing.Size(129, 22)
     Me.optRemote.TabIndex = 3
-    Me.optRemote.Text = "Remote Service"
+    Me.optRemote.Text = "&Remote Service"
     Me.ttWizard.SetTooltip(Me.optRemote, "Use the Remote Usage Service to keep track of your usage 24/7, for only $15 per y" & _
         "ear!")
     Me.optRemote.UseVisualStyleBackColor = True
@@ -723,7 +723,7 @@ Partial Class frmWizard
     Me.optLocal.Name = "optLocal"
     Me.optLocal.Size = New System.Drawing.Size(114, 22)
     Me.optLocal.TabIndex = 7
-    Me.optLocal.Text = "Local Service"
+    Me.optLocal.Text = "&Local Service"
     Me.ttWizard.SetTooltip(Me.optLocal, "Use the Restriction Logger Service to keep track of your usage whenever you are o" & _
         "nline.")
     Me.optLocal.UseVisualStyleBackColor = True
@@ -738,7 +738,7 @@ Partial Class frmWizard
     Me.optNone.Name = "optNone"
     Me.optNone.Size = New System.Drawing.Size(118, 22)
     Me.optNone.TabIndex = 0
-    Me.optNone.Text = "No Thank You"
+    Me.optNone.Text = "&No Thank You"
     Me.ttWizard.SetTooltip(Me.optNone, "Satellite Restriction Tracker will only gather usage data when the program is run" & _
         "ning.")
     Me.optNone.UseVisualStyleBackColor = True
@@ -780,7 +780,7 @@ Partial Class frmWizard
     Me.txtSignUp.Name = "txtSignUp"
     Me.txtSignUp.Size = New System.Drawing.Size(81, 13)
     Me.txtSignUp.TabIndex = 14
-    Me.txtSignUp.Text = "Sign Up Today!"
+    Me.txtSignUp.Text = "&Sign Up Today!"
     Me.ttWizard.SetTooltip(Me.txtSignUp, "Sign up for the Remote Usage Service on the Satellite Restriction Tracker website" & _
         ".")
     '
@@ -883,7 +883,7 @@ Partial Class frmWizard
     Me.chkOverAlert.Name = "chkOverAlert"
     Me.chkOverAlert.Size = New System.Drawing.Size(109, 22)
     Me.chkOverAlert.TabIndex = 0
-    Me.chkOverAlert.Text = "Usage Alert:"
+    Me.chkOverAlert.Text = "Usage &Alert:"
     Me.ttWizard.SetTooltip(Me.chkOverAlert, "Display an alert when your usage exceeds a certain amount in a specified duration" & _
         ". (Off by Default)")
     Me.chkOverAlert.UseVisualStyleBackColor = True
@@ -1068,7 +1068,7 @@ Partial Class frmWizard
     Me.chkDisplayScale.Name = "chkDisplayScale"
     Me.chkDisplayScale.Size = New System.Drawing.Size(441, 22)
     Me.chkDisplayScale.TabIndex = 16
-    Me.chkDisplayScale.Text = "Set the size of the Main Window's text to fit the size of the Main Window"
+    Me.chkDisplayScale.Text = "Set the size of the &Main Window's text to fit the size of the Main Window"
     Me.ttWizard.SetTooltip(Me.chkDisplayScale, "Scale text in the Main Window when the window is resized or maximized. (Off by De" & _
         "fault)")
     Me.chkDisplayScale.UseVisualStyleBackColor = True

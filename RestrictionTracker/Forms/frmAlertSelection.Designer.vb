@@ -136,7 +136,7 @@ Partial Class frmAlertSelection
     Me.lblMore.Name = "lblMore"
     Me.lblMore.Size = New System.Drawing.Size(82, 13)
     Me.lblMore.TabIndex = 3
-    Me.lblMore.Text = "Get More Styles"
+    Me.lblMore.Text = "Get &More Styles"
     Me.ttStyle.SetToolTip(Me.lblMore, "Download new Alert Window Styles from RealityRipple.com.")
     '
     'frmAlertSelection

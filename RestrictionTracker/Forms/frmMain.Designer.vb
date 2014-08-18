@@ -189,7 +189,7 @@ Partial Class frmMain
     Me.cmdAbout.Name = "cmdAbout"
     Me.cmdAbout.Size = New System.Drawing.Size(104, 22)
     Me.cmdAbout.TabIndex = 3
-    Me.cmdAbout.Text = "About"
+    Me.cmdAbout.Text = "&About"
     Me.ttUI.SetTooltip(Me.cmdAbout, "View information about Satellite Restriction Tracker and check for updates.")
     Me.cmdAbout.UseVisualStyleBackColor = True
     '
@@ -203,7 +203,7 @@ Partial Class frmMain
     Me.cmdHistory.Name = "cmdHistory"
     Me.cmdHistory.Size = New System.Drawing.Size(102, 22)
     Me.cmdHistory.TabIndex = 1
-    Me.cmdHistory.Text = "History"
+    Me.cmdHistory.Text = "&History"
     Me.ttUI.SetTooltip(Me.cmdHistory, "View your usage history.")
     Me.cmdHistory.UseVisualStyleBackColor = True
     '
@@ -217,7 +217,7 @@ Partial Class frmMain
     Me.cmdRefresh.Name = "cmdRefresh"
     Me.cmdRefresh.Size = New System.Drawing.Size(102, 22)
     Me.cmdRefresh.TabIndex = 0
-    Me.cmdRefresh.Text = "Refresh"
+    Me.cmdRefresh.Text = "&Refresh"
     Me.ttUI.SetTooltip(Me.cmdRefresh, "Reload usage level information immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Hold CTRL to reload database.)")
     Me.cmdRefresh.UseVisualStyleBackColor = True
     '
@@ -231,7 +231,7 @@ Partial Class frmMain
     Me.cmdConfig.Name = "cmdConfig"
     Me.cmdConfig.Size = New System.Drawing.Size(102, 22)
     Me.cmdConfig.TabIndex = 2
-    Me.cmdConfig.Text = "Configuration"
+    Me.cmdConfig.Text = "&Configuration"
     Me.ttUI.SetTooltip(Me.cmdConfig, "Change program settings.")
     Me.cmdConfig.UseVisualStyleBackColor = True
     '

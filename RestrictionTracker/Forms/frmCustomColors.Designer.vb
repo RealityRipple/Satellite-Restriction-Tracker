@@ -240,7 +240,7 @@ Partial Class frmCustomColors
     Me.grpTray.Size = New System.Drawing.Size(310, 122)
     Me.grpTray.TabIndex = 12
     Me.grpTray.TabStop = False
-    Me.grpTray.Text = "Tray Icon Curent Usage Graph Overlay"
+    Me.grpTray.Text = "&Tray Icon Curent Usage Graph Overlay"
     '
     'pnlTray
     '
@@ -477,7 +477,7 @@ Partial Class frmCustomColors
     Me.grpHistory.Size = New System.Drawing.Size(310, 174)
     Me.grpHistory.TabIndex = 13
     Me.grpHistory.TabStop = False
-    Me.grpHistory.Text = "History Window Graphs"
+    Me.grpHistory.Text = "&History Window Graphs"
     '
     'pnlHistory
     '
@@ -843,7 +843,7 @@ Partial Class frmCustomColors
     Me.grpMain.Size = New System.Drawing.Size(310, 148)
     Me.grpMain.TabIndex = 11
     Me.grpMain.TabStop = False
-    Me.grpMain.Text = "Main Window Current Usage Graphs"
+    Me.grpMain.Text = "&Main Window Current Usage Graphs"
     '
     'pnlMain
     '

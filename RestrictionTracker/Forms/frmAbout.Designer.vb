@@ -96,7 +96,7 @@ Partial Class frmAbout
     Me.lblProduct.TabStop = True
     Me.lblProduct.Text = "Product Name"
     Me.lblProduct.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetToolTip(Me.lblProduct, "Visit the Satellite Restriction Tracker webpage.")
+    Me.ttAbout.SetTooltip(Me.lblProduct, "Visit the Satellite Restriction Tracker webpage.")
     '
     'lblVersion
     '
@@ -114,7 +114,7 @@ Partial Class frmAbout
     Me.lblVersion.TabStop = True
     Me.lblVersion.Text = "Version"
     Me.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetToolTip(Me.lblVersion, "View the Satellite Restriction Tracker version history.")
+    Me.ttAbout.SetTooltip(Me.lblVersion, "View the Satellite Restriction Tracker version history.")
     '
     'lblUpdate
     '
@@ -151,7 +151,7 @@ Partial Class frmAbout
     Me.lblCompany.TabStop = True
     Me.lblCompany.Text = "Company Name"
     Me.lblCompany.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetToolTip(Me.lblCompany, "Visit RealityRipple Software.")
+    Me.ttAbout.SetTooltip(Me.lblCompany, "Visit RealityRipple Software.")
     '
     'txtDescription
     '
@@ -179,7 +179,7 @@ Partial Class frmAbout
     Me.cmdOK.Size = New System.Drawing.Size(75, 25)
     Me.cmdOK.TabIndex = 0
     Me.cmdOK.Text = "OK"
-    Me.ttAbout.SetToolTip(Me.cmdOK, "Close.")
+    Me.ttAbout.SetTooltip(Me.cmdOK, "Close.")
     '
     'cmdDonate
     '
@@ -190,8 +190,8 @@ Partial Class frmAbout
     Me.cmdDonate.Name = "cmdDonate"
     Me.cmdDonate.Size = New System.Drawing.Size(110, 25)
     Me.cmdDonate.TabIndex = 1
-    Me.cmdDonate.Text = "Make a Donation"
-    Me.ttAbout.SetToolTip(Me.cmdDonate, "Donate to RealityRipple Software to keep Satellite Restriction Tracker alive.")
+    Me.cmdDonate.Text = "Make a &Donation"
+    Me.ttAbout.SetTooltip(Me.cmdDonate, "Donate to RealityRipple Software to keep Satellite Restriction Tracker alive.")
     Me.cmdDonate.UseVisualStyleBackColor = True
     '
     'tmrSpeed
@@ -212,6 +212,7 @@ Partial Class frmAbout
     '
     'frmAbout
     '
+    Me.AcceptButton = Me.cmdOK
     Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.AutoSize = True

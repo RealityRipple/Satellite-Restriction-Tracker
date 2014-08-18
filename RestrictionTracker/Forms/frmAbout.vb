@@ -20,7 +20,7 @@
     pnlAbout.Controls.Remove(lblUpdate)
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
     cmdUpdate.Visible = True
-    cmdUpdate.Text = "Check for Updates"
+    cmdUpdate.Text = "Check for &Updates"
     ttAbout.SetTooltip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
   End Sub
   Private Sub frmAbout_FormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
@@ -125,7 +125,7 @@
 #End Region
 #Region "Updates"
   Private Sub cmdUpdate_Click(sender As Object, e As System.EventArgs) Handles cmdUpdate.Click
-    If cmdUpdate.Text = "Check for Updates" Then
+    If cmdUpdate.Text = "Check for &Updates" Then
       cmdUpdate.Visible = False
       pnlAbout.Controls.Remove(cmdUpdate)
       pnlAbout.Controls.Add(lblUpdate, 1, 2)
@@ -147,7 +147,7 @@
         tReset = Nothing
       End If
       tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-    ElseIf cmdUpdate.Text = "Apply Update" Then
+    ElseIf cmdUpdate.Text = "Apply &Update" Then
       Try
         Application.Exit()
       Catch ex As Exception
@@ -168,7 +168,7 @@
       pnlAbout.Controls.Remove(lblUpdate)
       pnlAbout.Controls.Add(cmdUpdate, 1, 2)
       cmdUpdate.Visible = True
-      cmdUpdate.Text = "Check for Updates"
+      cmdUpdate.Text = "Check for &Updates"
       ttAbout.SetTooltip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
     End If
   End Sub
@@ -186,7 +186,7 @@
       pnlAbout.Controls.Remove(lblUpdate)
       pnlAbout.Controls.Add(cmdUpdate, 1, 2)
       cmdUpdate.Visible = True
-      cmdUpdate.Text = "Apply Update"
+      cmdUpdate.Text = "Apply &Update"
       ttAbout.SetTooltip(cmdUpdate, Application.ProductName & " must restart before the update can be applied.")
     End If
   End Sub
