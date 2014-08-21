@@ -1016,21 +1016,24 @@
         RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Authenticate))
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, ConnectionStates.Authenticate)
       ElseIf sRet.Contains("login-error-alert") Then
-        If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
-          sErrMsg = "Login Failed: Incorrect Password"
-          bReset = False
-        Else
-          sErrMsg = "Unknown Login Error."
-          sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-          bReset = False
-        End If
+        TryWBAfterE()
+        'If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
+        '  sErrMsg = "Login Failed: Incorrect Password"
+        '  bReset = False
+        'Else
+        '  sErrMsg = "Unknown Login Error."
+        '  sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+        '  bReset = False
+        'End If
       ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-        sErrMsg = "Login Failed: Please check your account information and try again."
-        bReset = False
+        TryWBAfterE()
+        'sErrMsg = "Login Failed: Please check your account information and try again."
+        'bReset = False
       Else
-        sErrMsg = "Could not log in."
-        sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-        bReset = False
+        TryWBAfterE()
+        'sErrMsg = "Could not log in."
+        'sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+        'bReset = False
       End If
     Else
       If sRet.Contains("window.location.href") Then
@@ -1048,11 +1051,18 @@
       ElseIf sRet.Contains("maintenance") Then
         sErrMsg = "Login Failed: Server Down for Maintenance."
       Else
-        sErrMsg = "Login Failed: Could not understand response."
-        sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-        bReset = True
+        TryWBAfterE()
+        'sErrMsg = "Login Failed: Could not understand response."
+        'sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+        'bReset = True
       End If
     End If
+  End Sub
+  Private Sub TryWBAfterE()
+    mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
+    PrepareLogin()
+    ResetTimeout()
+    GetUsage()
   End Sub
   Private Sub AuthenticateEX(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "myexede.force.com" Then
