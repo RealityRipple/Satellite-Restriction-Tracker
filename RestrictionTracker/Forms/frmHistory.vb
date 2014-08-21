@@ -429,7 +429,7 @@ Public Class frmHistory
               End If
             End If
           Next
-        Else
+        ElseIf usageDB.Count > 0 Then
           If usageDB(0).DATETIME > dtpFrom.MaxDate Then
             From30DaysAgo = dtpFrom.MaxDate
           ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
@@ -437,6 +437,8 @@ Public Class frmHistory
           Else
             From30DaysAgo = usageDB(0).DATETIME
           End If
+        Else
+          From30DaysAgo = dtpFrom.MinDate
         End If
       Else
         From30DaysAgo = dtpFrom.MinDate
@@ -504,7 +506,7 @@ Public Class frmHistory
             End If
           Next
           If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
-        Else
+        ElseIf usageDB.Count > 0 Then
           If usageDB(0).DATETIME > dtpFrom.MaxDate Then
             From60DaysAgo = dtpFrom.MaxDate
           ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
@@ -512,6 +514,8 @@ Public Class frmHistory
           Else
             From60DaysAgo = usageDB(0).DATETIME
           End If
+        Else
+          From60DaysAgo = dtpFrom.MinDate
         End If
       Else
         From60DaysAgo = dtpFrom.MinDate
