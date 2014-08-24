@@ -792,6 +792,16 @@
           sFailText = "WildBlue Parse Error = " & sErrMsg & vbNewLine & sRet
           bReset = True
         End If
+      ElseIf sFind.Contains("FREEDOM") AndAlso sFind.Contains("Current Usage<strong>:") Then
+        sFind = sFind.Substring(sFind.IndexOf("FREEDOM"))
+        If sFind.Contains("</td>") Then
+          sFind = sFind.Substring(0, sFind.IndexOf("</td>"))
+          ReadUsage(sFind)
+        Else
+          sErrMsg = "Usage Failed: Could not parse usage meter."
+          sFailText = "Exede Freedom Parse Error = " & sErrMsg & vbNewLine & sRet
+          bReset = False
+        End If
       ElseIf sFind.Contains("At this time, your usage is not being counted toward your data allowance.") Then
         imFree = True
         sErrMsg = "Your usage is not being metered at this time!"
@@ -900,6 +910,15 @@
         Else
           RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
         End If
+      End If
+    ElseIf Table.Contains("FREEDOM") Then
+      If Table.Contains("Current Usage<strong>:") Then
+        Table = Table.Substring(Table.IndexOf("Current Usage<strong>:") + 23)
+        sDown = Table.Substring(0, Table.IndexOf("</strong>"))
+        CleanupResult(sDown)
+        RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), 150000, Now))
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
     End If
   End Sub
