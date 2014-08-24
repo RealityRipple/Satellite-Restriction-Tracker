@@ -54,110 +54,114 @@ Public Class DataBase
     StopNew = False
     If IO.File.Exists(sPath) Then
       Dim isNew As Boolean = data Is Nothing
-      If LCase(IO.Path.GetExtension(sPath)).CompareTo(".xml") = 0 Then
-        Dim m_xmld As New XmlDocument
-        m_xmld.Load(sPath)
-        Dim m_nodelist As XmlNodeList = m_xmld.ChildNodes(1).ChildNodes
-        Dim I As Integer = 0
-        Dim iMax As Integer = m_nodelist.Count
-        If isNew Then ReDim data(m_nodelist.Count - 1)
-        For Each m_node As XmlNode In m_nodelist
-          I += 1
-          If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, iMax))
-          Dim sDT, sD, sDL, sU, sUL As String : sDT = "0" : sD = "0" : sDL = "0" : sU = "0" : sUL = "0"
-          For Each m_child As XmlNode In m_node.ChildNodes
-            Select Case m_child.Name
-              Case "DATETIME" : sDT = m_child.InnerText
-              Case "DOWNLOAD" : sD = m_child.InnerText
-              Case "DOWNLIM" : sDL = m_child.InnerText
-              Case "UPLOAD" : sU = m_child.InnerText
-              Case "UPLIM" : sUL = m_child.InnerText
-            End Select
-          Next
-          Dim DT As Date = Xml.XmlConvert.ToDateTime(sDT, Xml.XmlDateTimeSerializationMode.RoundtripKind)
-          Dim Down As Long = Long.Parse(sD)
-          Dim DownLim As Long = Long.Parse(sDL)
-          Dim Up As Long = Long.Parse(sU)
-          Dim UpLim As Long = Long.Parse(sUL)
-          If isNew Then
-            data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-          Else
-            Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-          End If
-          If StopNew Then Exit Sub
-        Next
-        m_xmld = Nothing
-      ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".wb") = 0 Then
-        Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-          Using nIn As New IO.BinaryReader(nRead)
-            Dim uRows As UInt64 = LOAD_ReadULong(nIn)
-            If isNew Then ReDim data(uRows - 1)
-            For I As UInt64 = 1 To uRows
-              If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
-              Dim DT As Date = LOAD_ReadDate(nIn)
-              Dim Down As Long = LOAD_ReadLong(nIn)
-              Dim DownLim As Long = LOAD_ReadLong(nIn)
-              Dim Up As Long = LOAD_ReadLong(nIn)
-              Dim UpLim As Long = LOAD_ReadLong(nIn)
-              If isNew Then
-                data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-              Else
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              End If
-              If StopNew Then Exit Sub
+      Try
+        If LCase(IO.Path.GetExtension(sPath)).CompareTo(".xml") = 0 Then
+          Dim m_xmld As New XmlDocument
+          m_xmld.Load(sPath)
+          Dim m_nodelist As XmlNodeList = m_xmld.ChildNodes(1).ChildNodes
+          Dim I As Integer = 0
+          Dim iMax As Integer = m_nodelist.Count
+          If isNew Then ReDim data(m_nodelist.Count - 1)
+          For Each m_node As XmlNode In m_nodelist
+            I += 1
+            If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, iMax))
+            Dim sDT, sD, sDL, sU, sUL As String : sDT = "0" : sD = "0" : sDL = "0" : sU = "0" : sUL = "0"
+            For Each m_child As XmlNode In m_node.ChildNodes
+              Select Case m_child.Name
+                Case "DATETIME" : sDT = m_child.InnerText
+                Case "DOWNLOAD" : sD = m_child.InnerText
+                Case "DOWNLIM" : sDL = m_child.InnerText
+                Case "UPLOAD" : sU = m_child.InnerText
+                Case "UPLIM" : sUL = m_child.InnerText
+              End Select
             Next
-            nIn.Close()
-          End Using
-        End Using
-      ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".csv") = 0 Then
-        Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-          Using nIn As New IO.StreamReader(nRead)
-            Dim firstLine As String = nIn.ReadLine
-            If String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", True) = 0 Then
-              'ignore
+            Dim DT As Date = Xml.XmlConvert.ToDateTime(sDT, Xml.XmlDateTimeSerializationMode.RoundtripKind)
+            Dim Down As Long = Long.Parse(sD)
+            Dim DownLim As Long = Long.Parse(sDL)
+            Dim Up As Long = Long.Parse(sU)
+            Dim UpLim As Long = Long.Parse(sUL)
+            If isNew Then
+              data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
             Else
-              Dim firstData() As String = Split(firstLine, ",")
-              Dim DT As Date = Date.Parse(firstData(0))
-              Dim Down As Long = firstData(1)
-              Dim DownLim As Long = firstData(2)
-              Dim Up As Long = firstData(3)
-              Dim UpLim As Long = firstData(4)
-              If isNew Then
-                If data Is Nothing Then
-                  ReDim data(0)
-                  data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                Else
-                  ReDim Preserve data(data.Length)
-                  data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                End If
-              Else
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              End If
+              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
             End If
-            Do Until nIn.EndOfStream
-              Dim rowData() As String = Split(nIn.ReadLine, ",")
-              Dim DT As Date = Date.Parse(rowData(0))
-              Dim Down As Long = rowData(1)
-              Dim DownLim As Long = rowData(2)
-              Dim Up As Long = rowData(3)
-              Dim UpLim As Long = rowData(4)
-              If isNew Then
-                If data Is Nothing Then
-                  ReDim data(0)
-                  data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
+            If StopNew Then Exit Sub
+          Next
+          m_xmld = Nothing
+        ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".wb") = 0 Then
+          Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            Using nIn As New IO.BinaryReader(nRead)
+              Dim uRows As UInt64 = LOAD_ReadULong(nIn)
+              If isNew Then ReDim data(uRows - 1)
+              For I As UInt64 = 1 To uRows
+                If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
+                Dim DT As Date = LOAD_ReadDate(nIn)
+                Dim Down As Long = LOAD_ReadLong(nIn)
+                Dim DownLim As Long = LOAD_ReadLong(nIn)
+                Dim Up As Long = LOAD_ReadLong(nIn)
+                Dim UpLim As Long = LOAD_ReadLong(nIn)
+                If isNew Then
+                  data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
                 Else
-                  ReDim Preserve data(data.Length)
-                  data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
+                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
                 End If
-              Else
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              End If
-              If StopNew Then Exit Sub
-            Loop
-            nIn.Close()
+                If StopNew Then Exit Sub
+              Next
+              nIn.Close()
+            End Using
           End Using
-        End Using
-      End If
+        ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".csv") = 0 Then
+          Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            Using nIn As New IO.StreamReader(nRead)
+              Dim firstLine As String = nIn.ReadLine
+              If String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", True) = 0 Then
+                'ignore
+              Else
+                Dim firstData() As String = Split(firstLine, ",")
+                Dim DT As Date = Date.Parse(firstData(0))
+                Dim Down As Long = firstData(1)
+                Dim DownLim As Long = firstData(2)
+                Dim Up As Long = firstData(3)
+                Dim UpLim As Long = firstData(4)
+                If isNew Then
+                  If data Is Nothing Then
+                    ReDim data(0)
+                    data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
+                  Else
+                    ReDim Preserve data(data.Length)
+                    data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
+                  End If
+                Else
+                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+                End If
+              End If
+              Do Until nIn.EndOfStream
+                Dim rowData() As String = Split(nIn.ReadLine, ",")
+                Dim DT As Date = Date.Parse(rowData(0))
+                Dim Down As Long = rowData(1)
+                Dim DownLim As Long = rowData(2)
+                Dim Up As Long = rowData(3)
+                Dim UpLim As Long = rowData(4)
+                If isNew Then
+                  If data Is Nothing Then
+                    ReDim data(0)
+                    data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
+                  Else
+                    ReDim Preserve data(data.Length)
+                    data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
+                  End If
+                Else
+                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+                End If
+                If StopNew Then Exit Sub
+              Loop
+              nIn.Close()
+            End Using
+          End Using
+        End If
+      Catch ex As Exception
+        Erase data
+      End Try
     End If
   End Sub
   Public Sub Sort()
