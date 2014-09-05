@@ -943,7 +943,13 @@
         If sRet.Contains("<input type=""hidden"" name=""goto"" value=""") Then
           sGOTO = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""goto"" value="""))
           sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
-          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+          If sGOTO.Contains(""" />") Then
+            sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+          ElseIf sGOTO.Contains("""") Then
+            sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
+          Else
+            sGOTO = Nothing
+          End If
         End If
         If String.IsNullOrEmpty(sGOTO) Then
           sErrMsg = "Prepare Failed: GOTO value not found."
@@ -955,7 +961,13 @@
         If sRet.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
           sSQPS = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
           sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
-          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+          If sSQPS.Contains(""" />") Then
+            sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+          ElseIf sSQPS.Contains("""") Then
+            sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
+          Else
+            sSQPS = Nothing
+          End If
         End If
         If String.IsNullOrEmpty(sSQPS) Then
           sErrMsg = "Prepare Failed: SunQueryParamsString value not found."
@@ -987,7 +999,7 @@
       sErrMsg = "Prepare Failed: Could not understand response."
       sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
       bReset = True
-      End If
+    End If
   End Sub
   Private Sub LoginEX(sURL As String, sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If Not sHost = "mysso.exede.net" And Not sHost = "my.exede.net" Then
