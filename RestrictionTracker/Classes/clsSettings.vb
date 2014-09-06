@@ -946,7 +946,7 @@ Class AppSettings
   Private Function StrToColor(s As String) As Color
     Dim iColor As Integer
     If Integer.TryParse(s, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.CurrentCulture, iColor) Then
-      Return Color.FromArgb(iColor)
+      Return Color.FromArgb(&HFF000000 Or iColor)
     Else
       Return Color.Transparent
     End If
