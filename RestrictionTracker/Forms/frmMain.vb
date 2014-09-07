@@ -454,6 +454,17 @@ Public Class frmMain
     mySettings = New AppSettings
     If mySettings.Colors.MainDownA.A = 0 Then SetDefaultColors()
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
+    Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
+    If mySettings.TopMost Then
+      NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
+    Else
+      NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
+    End If
+    If mySettings.ScaleScreen Then
+      NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
+    Else
+      NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
+    End If
   End Sub
   Private Sub ReInit()
     If localData IsNot Nothing Then
@@ -842,8 +853,6 @@ Public Class frmMain
       End If
     End If
   End Sub
-
-
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
