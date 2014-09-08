@@ -53,19 +53,6 @@ Public Class frmCustomColors
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.WildBlue_LEGACY
-        'Case SatHostTypes.WildBlue_EXEDE
-        '  grpMainDown.Text = "Download Colors"
-        '  grpMainUp.Text = "Upload Colors"
-        '  grpMainUp.Visible = True
-        '  grpTrayDown.Text = "Download Colors"
-        '  grpTrayUp.Text = "Upload Colors"
-        '  grpTrayUp.Visible = True
-        '  grpHistoryDown.Text = "Download Colors"
-        '  grpHistoryUp.Text = "Upload Colors"
-        '  grpHistoryUp.Visible = True
-        '  lblHistoryUpMax.Visible = False
-        '  pctHistoryUpMax.Visible = False
-        '  DisplayAs = SatHostTypes.WildBlue_EXEDE
       Case SatHostTypes.DishNet_EXEDE
         grpMainDown.Text = "Anytime Colors"
         grpMainUp.Text = "Off-Peak Colors"
@@ -206,8 +193,6 @@ Public Class frmCustomColors
       End If
     ElseIf e.Button = Windows.Forms.MouseButtons.Middle Then
       If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        '  DisplayAs = SatHostTypes.WildBlue_EXEDE
-        'ElseIf DisplayAs = SatHostTypes.WildBlue_EXEDE Then
         DisplayAs = SatHostTypes.RuralPortal_EXEDE
       ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
         DisplayAs = SatHostTypes.DishNet_EXEDE
@@ -237,8 +222,6 @@ Public Class frmCustomColors
       End If
     ElseIf e.Button = Windows.Forms.MouseButtons.Middle Then
       If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        '  DisplayAs = SatHostTypes.WildBlue_EXEDE
-        'ElseIf DisplayAs = SatHostTypes.WildBlue_EXEDE Then
         DisplayAs = SatHostTypes.RuralPortal_EXEDE
       ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
         DisplayAs = SatHostTypes.DishNet_EXEDE
@@ -252,8 +235,6 @@ Public Class frmCustomColors
   Private Sub pctHistory_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctHistory.MouseDown
     If e.Button = Windows.Forms.MouseButtons.Middle Then
       If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        '  DisplayAs = SatHostTypes.WildBlue_EXEDE
-        'ElseIf DisplayAs = SatHostTypes.WildBlue_EXEDE Then
         DisplayAs = SatHostTypes.RuralPortal_EXEDE
       ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
         DisplayAs = SatHostTypes.DishNet_EXEDE
@@ -447,35 +428,6 @@ Public Class frmCustomColors
           Case pctHistoryText.Name : Return Color.Black
           Case pctHistoryBG.Name : Return Color.White
         End Select
-        'Case SatHostTypes.WildBlue_EXEDE
-        '  Select Case Element
-        '    Case pctMainDownA.Name : Return Color.Orange
-        '    Case pctMainDownB.Name : Return Color.Transparent
-        '    Case pctMainDownC.Name : Return Color.Red
-        '    Case pctMainUpA.Name : Return Color.Blue
-        '    Case pctMainUpB.Name : Return Color.Transparent
-        '    Case pctMainUpC.Name : Return Color.Violet
-        '    Case pctMainText.Name : Return Color.White
-        '    Case pctMainBG.Name : Return Color.Black
-
-        '    Case pctTrayDownA.Name : Return Color.Orange
-        '    Case pctTrayDownB.Name : Return Color.Transparent
-        '    Case pctTrayDownC.Name : Return Color.Red
-        '    Case pctTrayUpA.Name : Return Color.Blue
-        '    Case pctTrayUpB.Name : Return Color.Transparent
-        '    Case pctTrayUpC.Name : Return Color.Violet
-
-        '    Case pctHistoryDownA.Name : Return Color.Orange
-        '    Case pctHistoryDownB.Name : Return Color.Transparent
-        '    Case pctHistoryDownC.Name : Return Color.Red
-        '    Case pctHistoryDownMax.Name : Return Color.Yellow
-        '    Case pctHistoryUpA.Name : Return Color.Blue
-        '    Case pctHistoryUpB.Name : Return Color.Transparent
-        '    Case pctHistoryUpC.Name : Return Color.Violet
-        '    Case pctHistoryUpMax.Name : Return Color.Yellow
-        '    Case pctHistoryText.Name : Return Color.Black
-        '    Case pctHistoryBG.Name : Return Color.White
-        '  End Select
       Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
         Select Case Element
           Case pctMainDownA.Name : Return Color.Orange
@@ -593,22 +545,6 @@ Public Class frmCustomColors
         End If
         FakeData.Add(dRow)
       Next
-      'ElseIf DisplayAs = SatHostTypes.WildBlue_EXEDE Then
-      '  For I As Integer = 1 To 90
-      '    Dim dRow As New DataBase.DataRow(startDate, startDown, 10000, startUp, 10000)
-      '    Dim DownUsed As Integer = RandSel(50, 450)
-      '    Dim UpUsed As Integer = RandSel(10, 120)
-      '    DownList.Add(DownUsed)
-      '    UpList.Add(UpUsed)
-      '    startDown += DownUsed
-      '    startUp += UpUsed
-      '    startDate = startDate.AddDays(1)
-      '    If I Mod 30 = 0 Then
-      '      startDown = 0
-      '      startUp = 0
-      '    End If
-      '    FakeData.Add(dRow)
-      '  Next
     ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
       For I As Integer = 1 To 90
         Dim dRow As New DataBase.DataRow(startDate, startDown, 15000, startDown, 15000)
@@ -663,19 +599,6 @@ Public Class frmCustomColors
           g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
         pctMain.Image = fakeI
-        'Case SatHostTypes.WildBlue_EXEDE
-        '  Dim FakeMRect As New Rectangle(0, 0, iSize * 2, iSize * 1.5)
-        '  Dim FakeE As Image = DisplayEProgress(FakeMRect.Size, lDown, lUp, 0, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        '  Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        '  Using g As Graphics = Graphics.FromImage(fakeI)
-        '    g.Clear(Color.Black)
-        '    g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-        '    g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-        '    g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-        '    Dim MRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
-        '    g.DrawImage(FakeE, MRect, FakeMRect, GraphicsUnit.Pixel)
-        '  End Using
-        '  pctMain.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
         pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
       Case SatHostTypes.DishNet_EXEDE
@@ -714,13 +637,6 @@ Public Class frmCustomColors
           End If
           CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
           CreateTrayIcon_Right(g, lUp, lUpLim, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
-          'Case SatHostTypes.WildBlue_EXEDE
-          '  If lDown + lUp >= lUpLim Then
-          '    g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
-          '  Else
-          '    g.DrawIconUnstretched(My.Resources.t16_norm, New Rectangle(0, 0, traySquare, traySquare))
-          '  End If
-          '  CreateTrayIcon_Dual(g, lDown, lUp, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, pctTrayUpA.BackColor, pctTrayUpB.BackColor, pctTrayUpC.BackColor, traySquare, traySquare)
         Case SatHostTypes.RuralPortal_EXEDE
           If lDown >= lDownLim Then
             g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
@@ -765,18 +681,6 @@ Public Class frmCustomColors
           g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
         pctHistory.Image = fakeI
-        'Case SatHostTypes.WildBlue_EXEDE
-        '  Dim FakeE As Image = DrawEGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        '  Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
-        '  Using g As Graphics = Graphics.FromImage(fakeI)
-        '    g.Clear(Color.Black)
-        '    g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-        '    g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-        '    g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-        '    Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
-        '    g.DrawImage(FakeE, dRect, FakeHRect, GraphicsUnit.Pixel)
-        '  End Using
-        '  pctHistory.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
         Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
