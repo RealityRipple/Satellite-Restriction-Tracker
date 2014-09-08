@@ -898,15 +898,19 @@ Class AppSettings
   End Sub
   Private Function ColorToStr(c As Color) As String
     Dim sA As String
-    If c.A > 0 Then
-      sA = Hex(c.A)
-      If sA.Length = 0 Then
-        sA = "00"
-      ElseIf sA.Length = 1 Then
-        sA = "0" & sA
-      End If
-    Else
+    If c = Color.Transparent Then
       sA = "00"
+    Else
+      If c.A > 0 Then
+        sA = Hex(c.A)
+        If sA.Length = 0 Then
+          sA = "FF"
+        ElseIf sA.Length = 1 Then
+          sA = "0" & sA
+        End If
+      Else
+        sA = "FF"
+      End If
     End If
     Dim sR As String
     If c.R > 0 Then
@@ -946,7 +950,7 @@ Class AppSettings
   Private Function StrToColor(s As String) As Color
     Dim iColor As Integer
     If Integer.TryParse(s, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.CurrentCulture, iColor) Then
-      Return Color.FromArgb(&HFF000000 Or iColor)
+      Return Color.FromArgb(iColor)
     Else
       Return Color.Transparent
     End If
