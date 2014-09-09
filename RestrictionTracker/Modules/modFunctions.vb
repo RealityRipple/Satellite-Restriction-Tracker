@@ -1471,7 +1471,7 @@ Module modFunctions
       Return New Drawing2D.LinearGradientBrush(point1, New Point(point2.X, point2.Y + 1), ColorC, ColorA)
     End If
     Dim tBrush As Drawing2D.LinearGradientBrush
-    If ColorB.A = 0 Then
+    If ColorB = Color.Transparent Then
       tBrush = New Drawing2D.LinearGradientBrush(point1, point2, ColorC, ColorA)
     Else
       tBrush = New Drawing2D.LinearGradientBrush(point1, point2, Color.Black, Color.Black)
@@ -1488,7 +1488,7 @@ Module modFunctions
   Public Sub CreateTrayIcon_Left(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim fillBrush As Drawing2D.LinearGradientBrush
-    If cB.A = 0 Then
+    If cB = Color.Transparent Then
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
     Else
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
@@ -1505,7 +1505,7 @@ Module modFunctions
   Public Sub CreateTrayIcon_Right(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim fillBrush As Drawing2D.LinearGradientBrush
-    If cB.A = 0 Then
+    If cB = Color.Transparent Then
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
     Else
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
@@ -1522,7 +1522,7 @@ Module modFunctions
   Public Sub CreateTrayIcon_Dual(ByRef g As Graphics, lDown As Long, lUp As Long, lLim As Long, cDA As Color, cDB As Color, cDC As Color, cUA As Color, cUB As Color, cUC As Color, icoX As Integer, icoY As Integer)
     If lLim = 0 Then Exit Sub
     Dim upBrush As Drawing2D.LinearGradientBrush
-    If cUB.A = 0 Then
+    If cUB = Color.Transparent Then
       upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUA))
     Else
       upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
@@ -1532,7 +1532,7 @@ Module modFunctions
       upBrush.InterpolationColors = cBlend
     End If
     Dim downBrush As Drawing2D.LinearGradientBrush
-    If cDB.A = 0 Then
+    If cDB = Color.Transparent Then
       downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDA))
     Else
       downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)

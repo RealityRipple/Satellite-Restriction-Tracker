@@ -90,7 +90,7 @@ Public Class frmCustomColors
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.Other
     End Select
-    If mySettings.Colors.MainDownA.A = 0 Then
+    If mySettings.Colors.MainDownA = Color.Transparent Then
       mnuAllDefault_Click(mnuAllDefault, New EventArgs)
     Else
       SetElColor(pctMainDownA, mySettings.Colors.MainDownA)
@@ -252,7 +252,7 @@ Public Class frmCustomColors
     If chkThis.Checked Then
       pctThis.Enabled = True
       If pctThis.Tag Is Nothing Then
-        If pctThis.BackColor.A = 0 Then
+        If pctThis.BackColor = Color.Transparent Then
           pctThis.BackColor = Color.White
         End If
       Else
@@ -393,7 +393,7 @@ Public Class frmCustomColors
     pctColor.BackColor = color
     Dim chkThis As CheckBox = getControlFromName(Me, pctColor.Name.Replace("pct", "chk"))
     If chkThis IsNot Nothing Then
-      chkThis.Checked = Not pctColor.BackColor.A = 0
+      chkThis.Checked = Not pctColor.BackColor = color.Transparent
     End If
     pctColor.Tag = Nothing
   End Sub

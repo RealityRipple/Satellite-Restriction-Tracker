@@ -15,7 +15,7 @@ Public Class frmHistory
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
     useStyle = mySettings.AccountType
-    If mySettings.Colors.HistoryDownA.A = 0 Then SetDefaultColors()
+    If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
     ResetDates()
     dtpFrom.Value = dtpFrom.MinDate
     dtpTo.Value = dtpTo.MaxDate
