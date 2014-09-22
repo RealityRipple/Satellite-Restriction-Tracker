@@ -1024,6 +1024,7 @@ Public Class frmMain
     Dim tmpVal As Long = 0
     If lblTemp.Text.Length > 3 And lblTemp.Text.Contains(" ") Then
       Dim tmpStr As String = lblTemp.Text.Substring(0, lblTemp.Text.LastIndexOf(" "))
+      If tmpStr.Contains(",") Then tmpStr = tmpStr.Replace(",", "")
       If IsNumeric(tmpStr) Then
         tmpVal = Long.Parse(tmpStr)
       Else
@@ -1046,16 +1047,16 @@ Public Class frmMain
       End Select
       If tmpVal > toVal Then
         tmpVal -= majorDif
-        lblTemp.Text = tmpVal & " MB"
+        lblTemp.Text = tmpVal.ToString("N0") & " MB"
       ElseIf tmpVal < toVal Then
         tmpVal += majorDif
-        lblTemp.Text = tmpVal & " MB"
+        lblTemp.Text = tmpVal.ToString("N0") & " MB"
       Else
-        lblTemp.Text = toVal & " MB"
+        lblTemp.Text = toVal.ToString("N0") & " MB"
         toVal = 0
       End If
     Else
-      lblTemp.Text = toVal & " MB"
+      lblTemp.Text = toVal.ToString("N0") & " MB"
       toVal = 0
     End If
   End Sub

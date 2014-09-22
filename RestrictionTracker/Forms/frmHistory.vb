@@ -195,8 +195,8 @@ Public Class frmHistory
       Dim dNow As Date = CalculateNow(graphSpaceD, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
       Dim gShow = GetGraphData(dNow, True)
-      Dim showTime As String = gShow.DATETIME.ToString("g")
-      Dim Show As String = showTime & " : " & gShow.DOWNLOAD & " MB / " & gShow.UPLIM & " MB"
+      Dim showTime As String = gShow.sDATETIME
+      Dim Show As String = showTime & " : " & gShow.sDOWNLOAD & " MB / " & gShow.sDOWNLIM & " MB"
       If lastShow = Show Then Exit Sub
       lastShow = Show
       ttHistory.Show(Show, pctDld, e.X + 16, e.Y + 32)
@@ -210,7 +210,7 @@ Public Class frmHistory
       Dim dNow As Date = CalculateNow(graphSpaceU, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
       Dim gShow = GetGraphData(dNow, False)
-      Dim Show As String = gShow.DATETIME.ToString("g") & " : " & gShow.UPLOAD & " MB / " & gShow.UPLIM & " MB"
+      Dim Show As String = gShow.sDATETIME & " : " & gShow.sUPLOAD & " MB / " & gShow.sUPLIM & " MB"
       If lastShow = Show Then Exit Sub
       lastShow = Show
       ttHistory.Show(Show, pctUld, e.X + 16, e.Y + 32)
@@ -280,16 +280,16 @@ Public Class frmHistory
             Next
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
           Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
             For Each lItem As DataBase.DataRow In lItems
-              dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.DOWNLIM)
+              dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)
             Next lItem
           Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
             Dim myDLim As Long = 0
@@ -315,11 +315,11 @@ Public Class frmHistory
             If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD.ToString & " / " & lItem.DOWNLIM.ToString, lItem.UPLOAD.ToString & " / " & lItem.UPLIM.ToString)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
           Case Else
@@ -345,11 +345,11 @@ Public Class frmHistory
             Next
             If SameLim Then
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD, lItem.UPLOAD)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
               Next lItem
             Else
               For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.DOWNLOAD & " / " & lItem.DOWNLIM, lItem.UPLOAD & " / " & lItem.UPLIM)
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
 

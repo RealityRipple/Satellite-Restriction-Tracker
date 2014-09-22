@@ -3,11 +3,11 @@ Imports System.Xml
 Public Class DataBase
   Implements ICollection(Of DataRow)
   Public Structure DataRow
-    Dim DATETIME As Date
-    Dim DOWNLOAD As Long
-    Dim DOWNLIM As Long
-    Dim UPLOAD As Long
-    Dim UPLIM As Long
+    Public DATETIME As Date
+    Public DOWNLOAD As Long
+    Public DOWNLIM As Long
+    Public UPLOAD As Long
+    Public UPLIM As Long
     Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
       DATETIME = dTime
       DOWNLOAD = lDown
@@ -15,8 +15,41 @@ Public Class DataBase
       UPLOAD = lUp
       UPLIM = lUpLim
     End Sub
+    Public ReadOnly Property sDATETIME As String
+      Get
+        Return DATETIME.ToString("g")
+      End Get
+    End Property
+    Public ReadOnly Property sDOWNLOAD As String
+      Get
+        Return DOWNLOAD.ToString("N0")
+      End Get
+    End Property
+    Public ReadOnly Property sDOWNLIM As String
+      Get
+        Return DOWNLIM.ToString("N0")
+      End Get
+    End Property
+    Public ReadOnly Property sUPLOAD As String
+      Get
+        Return UPLOAD.ToString("N0")
+      End Get
+    End Property
+    Public ReadOnly Property sUPLIM As String
+      Get
+        Return UPLIM.ToString("N0")
+      End Get
+    End Property
     Public Overrides Function ToString() As String
-      Return DATETIME.ToString("g") & " Down: " & DOWNLOAD.ToString & "/" & DOWNLIM.ToString & ", Up: " & UPLOAD.ToString & "/" & UPLIM.ToString
+      Dim sRet As String = sDATETIME
+      If DOWNLOAD > 0 Or DOWNLIM > 0 Then
+        sRet &= " Down: " & sDOWNLOAD & "/" & sDOWNLIM
+      End If
+      If UPLOAD > 0 Or UPLIM > 0 Then
+        If sRet.Contains(" Down: ") Then sRet &= ","
+        sRet &= " Up: " & sUPLOAD & "/" & sUPLIM
+      End If
+      Return sRet
     End Function
   End Structure
   Private data() As DataRow

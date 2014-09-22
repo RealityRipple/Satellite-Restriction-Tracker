@@ -23,10 +23,10 @@ Partial Class frmHistory
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
-    Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-    Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-    Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-    Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+    Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+    Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+    Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+    Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
     Me.pnlButtons = New System.Windows.Forms.TableLayoutPanel()
     Me.cmdClose = New System.Windows.Forms.Button()
     Me.cmdImport = New System.Windows.Forms.Button()
@@ -97,7 +97,7 @@ Partial Class frmHistory
     Me.cmdClose.Size = New System.Drawing.Size(75, 23)
     Me.cmdClose.TabIndex = 11
     Me.cmdClose.Text = "Close"
-    Me.ttHistory.SetTooltip(Me.cmdClose, "Close the History window.")
+    Me.ttHistory.SetToolTip(Me.cmdClose, "Close the History window.")
     Me.cmdClose.UseVisualStyleBackColor = True
     '
     'cmdImport
@@ -112,7 +112,7 @@ Partial Class frmHistory
     Me.cmdImport.Size = New System.Drawing.Size(99, 23)
     Me.cmdImport.TabIndex = 12
     Me.cmdImport.Text = "&Import Database"
-    Me.ttHistory.SetTooltip(Me.cmdImport, "Read a DataBase, XML, or CSV file into the history.")
+    Me.ttHistory.SetToolTip(Me.cmdImport, "Read a DataBase, XML, or CSV file into the history.")
     Me.cmdImport.UseVisualStyleBackColor = True
     '
     'cmdExport
@@ -127,7 +127,7 @@ Partial Class frmHistory
     Me.cmdExport.Size = New System.Drawing.Size(100, 23)
     Me.cmdExport.TabIndex = 13
     Me.cmdExport.Text = "&Export Database"
-    Me.ttHistory.SetTooltip(Me.cmdExport, "Make a backup DataBase, XML, or CSV file.")
+    Me.ttHistory.SetToolTip(Me.cmdExport, "Make a backup DataBase, XML, or CSV file.")
     Me.cmdExport.UseVisualStyleBackColor = True
     '
     'lblBackup
@@ -149,7 +149,7 @@ Partial Class frmHistory
     Me.chkExportRange.Size = New System.Drawing.Size(136, 17)
     Me.chkExportRange.TabIndex = 15
     Me.chkExportRange.Text = "Export Selected &Range"
-    Me.ttHistory.SetTooltip(Me.chkExportRange, "Export only the data within the Age Parameters range.")
+    Me.ttHistory.SetToolTip(Me.chkExportRange, "Export only the data within the Age Parameters range.")
     Me.chkExportRange.UseVisualStyleBackColor = True
     '
     'pnlGraph
@@ -193,8 +193,8 @@ Partial Class frmHistory
     Me.dgvUsage.AllowUserToAddRows = False
     Me.dgvUsage.AllowUserToDeleteRows = False
     Me.dgvUsage.AllowUserToOrderColumns = True
-    DataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.InactiveBorder
-    Me.dgvUsage.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle5
+    DataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveBorder
+    Me.dgvUsage.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
     Me.dgvUsage.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
     Me.dgvUsage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
     Me.dgvUsage.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colDOWNLOAD, Me.colUPLOAD})
@@ -210,24 +210,24 @@ Partial Class frmHistory
     '
     'colDATETIME
     '
-    DataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-    Me.colDATETIME.DefaultCellStyle = DataGridViewCellStyle6
+    DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+    Me.colDATETIME.DefaultCellStyle = DataGridViewCellStyle2
     Me.colDATETIME.HeaderText = "Date and Time"
     Me.colDATETIME.Name = "colDATETIME"
     Me.colDATETIME.ReadOnly = True
     '
     'colDOWNLOAD
     '
-    DataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle7
+    DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
     Me.colDOWNLOAD.HeaderText = "Download"
     Me.colDOWNLOAD.Name = "colDOWNLOAD"
     Me.colDOWNLOAD.ReadOnly = True
     '
     'colUPLOAD
     '
-    DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle8
+    DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle4
     Me.colUPLOAD.HeaderText = "Upload"
     Me.colUPLOAD.Name = "colUPLOAD"
     Me.colUPLOAD.ReadOnly = True
@@ -289,7 +289,7 @@ Partial Class frmHistory
     Me.dtpFrom.Name = "dtpFrom"
     Me.dtpFrom.Size = New System.Drawing.Size(195, 20)
     Me.dtpFrom.TabIndex = 1
-    Me.ttHistory.SetTooltip(Me.dtpFrom, "Oldest date to display records from.")
+    Me.ttHistory.SetToolTip(Me.dtpFrom, "Oldest date to display records from.")
     Me.dtpFrom.Value = New Date(2010, 9, 23, 0, 0, 0, 0)
     '
     'lblTo
@@ -312,7 +312,7 @@ Partial Class frmHistory
     Me.dtpTo.Name = "dtpTo"
     Me.dtpTo.Size = New System.Drawing.Size(195, 20)
     Me.dtpTo.TabIndex = 3
-    Me.ttHistory.SetTooltip(Me.dtpTo, "Most recent date to display records from.")
+    Me.ttHistory.SetToolTip(Me.dtpTo, "Most recent date to display records from.")
     Me.dtpTo.Value = New Date(2010, 9, 23, 0, 0, 0, 0)
     '
     'optGrid
@@ -326,7 +326,7 @@ Partial Class frmHistory
     Me.optGrid.TabIndex = 5
     Me.optGrid.TabStop = True
     Me.optGrid.Text = "Gri&d"
-    Me.ttHistory.SetTooltip(Me.optGrid, "Display history in a grid.")
+    Me.ttHistory.SetToolTip(Me.optGrid, "Display history in a grid.")
     Me.optGrid.UseVisualStyleBackColor = True
     '
     'optGraph
@@ -340,7 +340,7 @@ Partial Class frmHistory
     Me.optGraph.TabIndex = 4
     Me.optGraph.TabStop = True
     Me.optGraph.Text = "&Graph"
-    Me.ttHistory.SetTooltip(Me.optGraph, "Display history in a line graph.")
+    Me.ttHistory.SetToolTip(Me.optGraph, "Display history in a line graph.")
     Me.optGraph.UseVisualStyleBackColor = True
     '
     'cmdAllTime
@@ -352,7 +352,7 @@ Partial Class frmHistory
     Me.cmdAllTime.Size = New System.Drawing.Size(62, 22)
     Me.cmdAllTime.TabIndex = 10
     Me.cmdAllTime.Text = "&All Time"
-    Me.ttHistory.SetTooltip(Me.cmdAllTime, "Query the database to get the entire history.")
+    Me.ttHistory.SetToolTip(Me.cmdAllTime, "Query the database to get the entire history.")
     Me.cmdAllTime.UseVisualStyleBackColor = True
     '
     'cmd60Days
@@ -364,7 +364,7 @@ Partial Class frmHistory
     Me.cmd60Days.Size = New System.Drawing.Size(62, 22)
     Me.cmd60Days.TabIndex = 9
     Me.cmd60Days.Text = "&60 Days"
-    Me.ttHistory.SetTooltip(Me.cmd60Days, "Query the database to get the last 60 days' history.")
+    Me.ttHistory.SetToolTip(Me.cmd60Days, "Query the database to get the last 60 days' history.")
     Me.cmd60Days.UseVisualStyleBackColor = True
     '
     'cmd30Days
@@ -376,7 +376,7 @@ Partial Class frmHistory
     Me.cmd30Days.Size = New System.Drawing.Size(61, 22)
     Me.cmd30Days.TabIndex = 8
     Me.cmd30Days.Text = "&30 Days"
-    Me.ttHistory.SetTooltip(Me.cmd30Days, "Query the database to get the last 30 days' history.")
+    Me.ttHistory.SetToolTip(Me.cmd30Days, "Query the database to get the last 30 days' history.")
     Me.cmd30Days.UseVisualStyleBackColor = True
     '
     'cmdToday
@@ -388,7 +388,7 @@ Partial Class frmHistory
     Me.cmdToday.Size = New System.Drawing.Size(61, 22)
     Me.cmdToday.TabIndex = 7
     Me.cmdToday.Text = "T&oday"
-    Me.ttHistory.SetTooltip(Me.cmdToday, "Query the database to get today's history.")
+    Me.ttHistory.SetToolTip(Me.cmdToday, "Query the database to get today's history.")
     Me.cmdToday.UseVisualStyleBackColor = True
     '
     'cmdQuery
@@ -400,7 +400,7 @@ Partial Class frmHistory
     Me.cmdQuery.Size = New System.Drawing.Size(61, 22)
     Me.cmdQuery.TabIndex = 6
     Me.cmdQuery.Text = "&Query"
-    Me.ttHistory.SetTooltip(Me.cmdQuery, "Query the database to get your requested history.")
+    Me.ttHistory.SetToolTip(Me.cmdQuery, "Query the database to get your requested history.")
     Me.cmdQuery.UseVisualStyleBackColor = True
     '
     'pctErr
