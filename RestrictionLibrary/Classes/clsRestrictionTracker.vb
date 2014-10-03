@@ -24,8 +24,8 @@
     AuthenticateRetry
     Verify
     LoadHome
-    LoadAjax1
-    LoadAjax2
+    LoadAJAX1
+    LoadAJAX2
     LoadTable
     LoadTableRetry
   End Enum

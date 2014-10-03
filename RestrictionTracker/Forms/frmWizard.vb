@@ -629,7 +629,7 @@ Public Class frmWizard
   Private Sub localTest_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
     Select Case e.Status
       Case ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection...")
-      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing Login...")
+      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In...")
       Case ConnectionStates.Login
         Select Case e.SubState
           Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
@@ -642,8 +642,8 @@ Public Class frmWizard
       Case ConnectionStates.TableDownload
         Select Case e.SubState
           Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page...")
-          Case ConnectionSubStates.LoadAjax1 : DrawStatus(True, "Downloading Ajax Page 1 of 2...")
-          Case ConnectionSubStates.LoadAjax2 : DrawStatus(True, "Downloading Ajax Page 2 of 2...")
+          Case ConnectionSubStates.LoadAjax1 : DrawStatus(True, "Downloading AJAX Page 1 of 2...")
+          Case ConnectionSubStates.LoadAjax2 : DrawStatus(True, "Downloading AJAX Page 2 of 2...")
           Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
           Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
           Case Else : DrawStatus(True, "Downloading Usage Table...")
