@@ -938,7 +938,7 @@ Module modFunctions
     Dim dCompInter As Double = lLineWidth / lMaxTime
     For I As Long = 0 To lMaxTime Step lInterval
       Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      g.DrawLine(SystemPens.GrayText, lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
+      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
     Next I
     Dim lastI As Long = lYWidth + (lMaxTime * dCompInter)
     If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
@@ -1133,7 +1133,7 @@ Module modFunctions
     Dim dCompInter As Double = lLineWidth / lMaxTime
     For I As Long = 0 To lMaxTime Step lInterval
       Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      g.DrawLine(SystemPens.GrayText, lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
+      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
     Next I
     Dim lastI As Long = lYWidth + (lMaxTime * dCompInter)
     If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
