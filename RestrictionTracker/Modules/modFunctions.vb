@@ -957,13 +957,12 @@ Module modFunctions
         g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
         Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - g.MeasureString(sDisp, tFont).Width, ImgSize.Height - lXHeight + 5)
-        If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
       Else
         g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
         Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - (g.MeasureString(sDisp, tFont).Width / 2), ImgSize.Height - lXHeight + 5)
-        If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
       End If
+      If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
     Next I
     If lastI > -1 Then
       g.DrawLine(New Pen(ColorText), lastI, ImgSize.Height - (lXHeight - 5), lastI, ImgSize.Height - lXHeight)
@@ -1152,13 +1151,12 @@ Module modFunctions
         g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
         Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - g.MeasureString(sDisp, tFont).Width, ImgSize.Height - lXHeight + 5)
-        If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
       Else
         g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
         Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - (g.MeasureString(sDisp, tFont).Width / 2), ImgSize.Height - lXHeight + 5)
-        If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
       End If
+      If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
     Next I
     If lastI > -1 Then
       g.DrawLine(New Pen(ColorText), lastI, ImgSize.Height - (lXHeight - 5), lastI, ImgSize.Height - lXHeight)
