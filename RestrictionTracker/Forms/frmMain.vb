@@ -687,26 +687,37 @@ Public Class frmMain
   End Sub
 #End Region
 #Region "Local Usage Events"
-  Private Sub localData_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles localData.ConnectionStatus
+  Private Sub localData_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localData.ConnectionStatus
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionStatus), sender, e)
     Else
       NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
       Select Case e.Status
         Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection...", False)
-        Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing Login...", False)
-        Case ConnectionStates.FirstBookend : SetStatusText(LOG_GetLast.ToString("g"), "Setting Initial Coefficient...", False)
-        Case ConnectionStates.Login : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
-        Case ConnectionStates.LoginRetry : SetStatusText(LOG_GetLast.ToString("g"), "Attempting Second Login...", False)
-        Case ConnectionStates.LastBookend : SetStatusText(LOG_GetLast.ToString("g"), "Setting Final Coefficient...", False)
-        Case ConnectionStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
-        Case ConnectionStates.TableDownload : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
-        Case ConnectionStates.TableDownloadRetry : SetStatusText(LOG_GetLast.ToString("g"), "Attempting Second Usage Table Download...", False)
+        Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In...", False)
+        Case ConnectionStates.Login
+          Select Case e.SubState
+            Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page...", False)
+            Case ConnectionSubStates.AuthPrepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing Authentication...", False)
+            Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
+            Case ConnectionSubStates.AuthenticateRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating...", False)
+            Case ConnectionSubStates.Verify : SetStatusText(LOG_GetLast.ToString("g"), "Verifying Authentication...", False)
+            Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
+          End Select
+        Case ConnectionStates.TableDownload
+          Select Case e.SubState
+            Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
+            Case ConnectionSubStates.LoadAjax1 : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Ajax Page 1 of 2...", False)
+            Case ConnectionSubStates.LoadAjax2 : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Ajax Page 2 of 2...", False)
+            Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
+            Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
+            Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
+          End Select
         Case ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table...", False)
       End Select
     End If
   End Sub
-  Private Sub localData_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles localData.ConnectionFailure
+  Private Sub localData_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localData.ConnectionFailure
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionFailure), sender, e)
     Else
@@ -714,28 +725,28 @@ Public Class frmMain
         Case ConnectionFailureEventArgs.FailureType.LoginIssue
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
           Exit Sub
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.ConnectionTimeout
+        Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
           SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
           DisplayUsage(False, False)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.LoginFailure
+        Case ConnectionFailureEventArgs.FailureType.LoginFailure
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, True)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.FatalLoginFailure
+        Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
           mySettings.AccountType = SatHostTypes.Other
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, False)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.SSLFailureBypass
+        Case ConnectionFailureEventArgs.FailureType.SSLFailureBypass
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, False)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+        Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
           If Me.WindowState = FormWindowState.Minimized Then
             Me.WindowState = FormWindowState.Normal
             mnuRestore.Text = "&Focus"
           End If
           cmdConfig.Focus()
           MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
+        Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
           SetStatusText("Analyzing Account", "Determining your account type...", False)
           TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
       End Select
@@ -745,7 +756,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionDNXResult(sender As Object, e As localRestrictionTracker.TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
+  Private Sub localData_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionDNXResult), sender, e)
     Else
@@ -763,7 +774,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionRPXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
+  Private Sub localData_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPXResult), sender, e)
     Else
@@ -781,7 +792,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionRPLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
+  Private Sub localData_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionRPLResult), sender, e)
     Else
@@ -799,7 +810,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionWBLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
+  Private Sub localData_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBLResult), sender, e)
     Else
@@ -817,7 +828,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionWBXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
+  Private Sub localData_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
     Else
@@ -835,7 +846,7 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionWBVResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
+  Private Sub localData_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
     If Me.InvokeRequired Then
       Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBVResult), sender, e)
     Else

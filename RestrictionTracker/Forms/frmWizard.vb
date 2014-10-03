@@ -1,4 +1,6 @@
-﻿Public Class frmWizard
+﻿Imports RestrictionLibrary.localRestrictionTracker
+
+Public Class frmWizard
   Private Declare Sub ReleaseCapture Lib "user32" ()
   Private Declare Sub SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As IntPtr, ByVal wMsg As Integer, ByVal wParam As Integer, ByVal lParam As Integer)
 
@@ -8,7 +10,7 @@
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
-  Private AccountType As RestrictionLibrary.localRestrictionTracker.SatHostTypes = localRestrictionTracker.SatHostTypes.Other
+  Private AccountType As SatHostTypes = SatHostTypes.Other
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
 
   Public Sub ClickDrag(hWnd As IntPtr)
@@ -46,7 +48,7 @@
           Beep()
           Exit Sub
         End If
-        If AccountType = localRestrictionTracker.SatHostTypes.Other Then
+        If AccountType = SatHostTypes.Other Then
           DrawStatus(True, "Determining your Account Type...")
           UsageTest()
           Exit Sub
@@ -246,15 +248,15 @@
   End Sub
 
   Private Sub cmbAccountHost_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbAccountHost.SelectedIndexChanged
-    AccountType = localRestrictionTracker.SatHostTypes.Other
+    AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
   Private Sub txtAccountUsername_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountUsername.TextChanged
-    AccountType = localRestrictionTracker.SatHostTypes.Other
+    AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
   Private Sub txtAccountPass_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountPass.TextChanged
-    AccountType = localRestrictionTracker.SatHostTypes.Other
+    AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
 
@@ -564,7 +566,7 @@
     End If
 
     Dim newSettings As New AppSettings
-    newSettings.AccountType = Global.RestrictionLibrary.localRestrictionTracker.SatHostTypes.Other
+    newSettings.AccountType = SatHostTypes.Other
     newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
     newSettings.PassCrypt = StoredPassword.EncryptApp(txtAccountPass.Text)
     newSettings.Service = False
@@ -576,7 +578,7 @@
     Dim connectInvoker As New MethodInvoker(AddressOf localTest.Connect)
     connectInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub LocalComplete(acct As localRestrictionTracker.SatHostTypes)
+  Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
       Me.BeginInvoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
     Else
@@ -585,30 +587,30 @@
       DrawStatus(False)
       tbsWizardPages.SelectedIndex += 1
       wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
-      'If acct = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then chkDisplayInvert.Checked = True
+      'If acct = SatHostTypes.WildBlue_EXEDE Then chkDisplayInvert.Checked = True
     End If
   End Sub
-  Private Sub localTest_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.DishNet_EXEDE)
+  Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
+    LocalComplete(SatHostTypes.DishNet_EXEDE)
   End Sub
-  Private Sub localTest_ConnectionFailure(sender As Object, e As RestrictionLibrary.localRestrictionTracker.ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
+  Private Sub localTest_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New localRestrictionTracker.ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
+      Me.BeginInvoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
     Else
       If IO.File.Exists(AppData & "\user.config") Then IO.File.Delete(AppData & "\user.config")
-      AccountType = localRestrictionTracker.SatHostTypes.Other
+      AccountType = SatHostTypes.Other
       Select Case e.Type
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.ConnectionTimeout
+        Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
           MessageBox.Show("Connection to Server Timed Out!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.LoginFailure
+        Case ConnectionFailureEventArgs.FailureType.LoginFailure
           MessageBox.Show("Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.FatalLoginFailure
+        Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
           MessageBox.Show("Fatal Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.SSLFailureBypass
+        Case ConnectionFailureEventArgs.FailureType.SSLFailureBypass
           MessageBox.Show("SSL Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+        Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
           MessageBox.Show("Missing account information!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
+        Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
           tbsWizardPages.SelectedIndex += 1
       End Select
       If localTest IsNot Nothing Then
@@ -618,34 +620,46 @@
       DrawStatus(False)
     End If
   End Sub
-  Private Sub localTest_ConnectionRPLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY)
+  Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
+    LocalComplete(SatHostTypes.RuralPortal_LEGACY)
   End Sub
-  Private Sub localTest_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles localTest.ConnectionRPXResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE)
+  Private Sub localTest_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionRPXResult
+    LocalComplete(SatHostTypes.RuralPortal_EXEDE)
   End Sub
-  Private Sub localTest_ConnectionStatus(sender As Object, e As RestrictionLibrary.localRestrictionTracker.ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
+  Private Sub localTest_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
     Select Case e.Status
-      Case localRestrictionTracker.ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection...")
-      Case localRestrictionTracker.ConnectionStates.Prepare : DrawStatus(True, "Preparing Login...")
-      Case localRestrictionTracker.ConnectionStates.FirstBookend : DrawStatus(True, "Setting Initial Coefficient...")
-      Case localRestrictionTracker.ConnectionStates.Login : DrawStatus(True, "Logging In...")
-      Case localRestrictionTracker.ConnectionStates.LoginRetry : DrawStatus(True, "Attempting Second Login...")
-      Case localRestrictionTracker.ConnectionStates.LastBookend : DrawStatus(True, "Setting Final Coefficient...")
-      Case localRestrictionTracker.ConnectionStates.Authenticate : DrawStatus(True, "Authenticating...")
-      Case localRestrictionTracker.ConnectionStates.TableDownload : DrawStatus(True, "Determining Meter Type...")
-      Case localRestrictionTracker.ConnectionStates.TableDownloadRetry : DrawStatus(True, "Attempting Second Meter Type Determination...")
-      Case localRestrictionTracker.ConnectionStates.TableRead : DrawStatus(True, "Complete!")
+      Case ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection...")
+      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing Login...")
+      Case ConnectionStates.Login
+        Select Case e.SubState
+          Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
+          Case ConnectionSubStates.AuthPrepare : DrawStatus(True, "Preparing Authentication...")
+          Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating...")
+          Case ConnectionSubStates.AuthenticateRetry : DrawStatus(True, "Re-Authenticating...")
+          Case ConnectionSubStates.Verify : DrawStatus(True, "Verifying Authentication...")
+          Case Else : DrawStatus(True, "Logging In...")
+        End Select
+      Case ConnectionStates.TableDownload
+        Select Case e.SubState
+          Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page...")
+          Case ConnectionSubStates.LoadAjax1 : DrawStatus(True, "Downloading Ajax Page 1 of 2...")
+          Case ConnectionSubStates.LoadAjax2 : DrawStatus(True, "Downloading Ajax Page 2 of 2...")
+          Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
+          Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
+          Case Else : DrawStatus(True, "Downloading Usage Table...")
+        End Select
+
+      Case ConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
   End Sub
-  Private Sub localTest_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_LEGACY)
+  Private Sub localTest_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
+    LocalComplete(SatHostTypes.WildBlue_LEGACY)
   End Sub
-  Private Sub localTest_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION)
+  Private Sub localTest_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
+    LocalComplete(SatHostTypes.WildBlue_EVOLUTION)
   End Sub
-  Private Sub localTest_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
-    LocalComplete(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
+  Private Sub localTest_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
+    LocalComplete(SatHostTypes.WildBlue_EXEDE)
   End Sub
 #End Region
 End Class
