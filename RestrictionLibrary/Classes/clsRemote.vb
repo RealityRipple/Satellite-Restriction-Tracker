@@ -298,7 +298,14 @@ Public Class remoteRestrictionTracker
                   End If
                   Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
                   Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-                  If sData.Length = 4 Then
+                  If sData.Length = 5 Then
+                    If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+                    rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
+                              StrToVal(sData(0), 1000),
+                              StrToVal(sData(1), 1000) + (StrToVal(sData(4), 1000)),
+                              StrToVal(sData(2), 1000),
+                              StrToVal(sData(3), 1000)))
+                  ElseIf sData.Length = 4 Then
                     If dish Then
                       If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
                       rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
@@ -340,7 +347,14 @@ Public Class remoteRestrictionTracker
               End If
               Dim sData() As String = Split(Split(sRet, ":", 2)(1), "|")
               Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-              If sData.Length = 4 Then
+              If sData.Length = 5 Then
+                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
+                          StrToVal(sData(0), 1000),
+                          StrToVal(sData(1), 1000) + (StrToVal(sData(4), 1000)),
+                          StrToVal(sData(2), 1000),
+                          StrToVal(sData(3), 1000)))
+              ElseIf sData.Length = 4 Then
                 If dish Then
                   If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
                   rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
