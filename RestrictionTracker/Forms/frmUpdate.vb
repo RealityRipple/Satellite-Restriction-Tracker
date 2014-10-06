@@ -11,7 +11,7 @@
     End If
     If Not Ret Then Me.DialogResult = Windows.Forms.DialogResult.No
   End Sub
-  Public Sub NewUpdate(Version As String, BETA As Boolean)
+  Public Sub NewUpdate(Version As String, BETA As Boolean, UACIcon As Boolean)
     If BETA Then
       Me.Text = "New BETA Version Available - " & Application.ProductName
       lblTitle.Text = Application.ProductName & " BETA Update"
@@ -28,6 +28,7 @@
     txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
     lblBETA.Visible = BETA
     chkStopBETA.Visible = BETA
+    If UACIcon Then NativeMethods.SendMessage(cmdDownload.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
   End Sub
   Private Sub cmdDownload_Click(sender As System.Object, e As System.EventArgs) Handles cmdDownload.Click
     If chkStopBETA.Visible And chkStopBETA.Checked Then

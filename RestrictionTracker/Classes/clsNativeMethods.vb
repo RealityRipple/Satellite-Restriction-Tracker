@@ -118,6 +118,7 @@ Public NotInheritable Class NativeMethods
     SM_CONVERTIBLESLATEMODE = &H2003
     SM_SYSTEMDOCKED = &H2004
   End Enum
+  Public Const BCM_SETSHIELD As Integer = &H160C
   <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
   Public Shared Function GetSystemMenu(hWnd As IntPtr, bRevert As Boolean) As IntPtr
   End Function
@@ -153,5 +154,8 @@ Public NotInheritable Class NativeMethods
   End Function
   <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
   Public Shared Function DestroyIcon(ByVal hWnd As IntPtr) As Boolean
+  End Function
+  <Runtime.InteropServices.DllImport("user32", CharSet:=Runtime.InteropServices.CharSet.Auto, setlasterror:=True)>
+  Public Shared Function SendMessage(hWnd As IntPtr, msg As UInt32, wParam As UInt32, lParam As UInt32) As UInt32
   End Function
 End Class

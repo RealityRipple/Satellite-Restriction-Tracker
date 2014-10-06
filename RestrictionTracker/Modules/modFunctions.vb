@@ -815,6 +815,11 @@ Module modFunctions
       Return TriState.UseDefault
     End If
   End Function
+  Public Function isAdmin() As Boolean
+    Dim id As Security.Principal.WindowsIdentity = Security.Principal.WindowsIdentity.GetCurrent
+    Dim p As New Security.Principal.WindowsPrincipal(id)
+    Return p.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator)
+  End Function
 #Region "Graphs"
 #Region "History"
   Private dGraph, uGraph As Rectangle

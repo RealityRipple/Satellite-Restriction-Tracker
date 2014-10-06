@@ -203,6 +203,7 @@ Partial Class frmAbout
     Me.cmdUpdate.AutoSize = True
     Me.cmdUpdate.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.cmdUpdate.Location = New System.Drawing.Point(0, 0)
+    Me.cmdUpdate.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
     Me.cmdUpdate.Name = "cmdUpdate"
     Me.cmdUpdate.Padding = New System.Windows.Forms.Padding(6, 0, 3, 0)
     Me.cmdUpdate.Size = New System.Drawing.Size(120, 25)

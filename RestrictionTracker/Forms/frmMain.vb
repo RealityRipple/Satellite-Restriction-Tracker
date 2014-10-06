@@ -1824,7 +1824,7 @@ Public Class frmMain
         Dim fUpdate As New frmUpdate
         Select Case e.Result
           Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-            fUpdate.NewUpdate(e.Version, False)
+            fUpdate.NewUpdate(e.Version, False, Not isAdmin())
             Select Case fUpdate.ShowDialog()
               Case Windows.Forms.DialogResult.Yes
                 If remoteData IsNot Nothing Then
@@ -1869,7 +1869,7 @@ Public Class frmMain
             End Select
           Case clsUpdate.CheckEventArgs.ResultType.NewBeta
             If mySettings.BetaCheck Then
-              fUpdate.NewUpdate(e.Version, True)
+              fUpdate.NewUpdate(e.Version, True, Not isAdmin())
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
                   If remoteData IsNot Nothing Then

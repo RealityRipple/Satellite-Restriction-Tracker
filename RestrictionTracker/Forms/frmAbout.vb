@@ -188,6 +188,7 @@
       cmdUpdate.Visible = True
       cmdUpdate.Text = "Apply &Update"
       ttAbout.SetTooltip(cmdUpdate, Application.ProductName & " must restart before the update can be applied.")
+      If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
     End If
   End Sub
   Private Sub BeginCheck()
@@ -254,7 +255,7 @@
             SetUpdateValue("New Update Available", , "Click to begin download.")
             lblUpdate.Link = True
             Application.DoEvents()
-            fUpdate.NewUpdate(e.Version, False)
+            fUpdate.NewUpdate(e.Version, False, False)
             Select Case fUpdate.ShowDialog()
               Case Windows.Forms.DialogResult.Yes
                 lblUpdate.Link = False
@@ -277,7 +278,7 @@
               SetUpdateValue("New BETA Available", , "Click to begin download.")
               lblUpdate.Link = True
               Application.DoEvents()
-              fUpdate.NewUpdate(e.Version, True)
+              fUpdate.NewUpdate(e.Version, True, False)
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
                   lblUpdate.Link = False
