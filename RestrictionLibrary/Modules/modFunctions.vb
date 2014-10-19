@@ -57,6 +57,8 @@ Module modFunctions
       ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
         If ex.Message.Contains("The connection was closed unexpectedly") Then
           Return "Connection to server dropped. Please try again."
+        ElseIf ex.Message.Contains("A connection that was expected to be kept alive was closed by the server") Then
+          Return "Connection to server closed. Please try again."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection to server closed - " & ex.InnerException.Message
@@ -89,11 +91,29 @@ Module modFunctions
             Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(":") + 1).Trim
           End If
         End If
-      ElseIf ex.Message = "The request timed out" Then
+      ElseIf ex.Message.StartsWith("The request timed out") Then
         Return "Connection to the server timed out. Please try again."
+      ElseIf ex.Message.StartsWith("The operation has timed out") Then
+        Return "Connection to the server timed out. Please try again."
+      ElseIf ex.Message.StartsWith("The request was aborted:") Then
+        If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
+          Return "Unable to create secure connection. Please check your Certificate Store and try again."
+        ElseIf ex.Message.Contains("The request was canceled") Then
+          Return "Connection aborted."
+        Else
+          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          Return "Connection aborted - " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
+        End If
       ElseIf ex.Message.StartsWith("Error:") Then
         If ex.Message.Contains("NameResolutionFailure") Then
           Return "Could not connect to your DNS. Check your Internet connection."
+        ElseIf ex.Message.Contains("ConnectFailure") Then
+          If ex.Message.Contains("Network is unreachable") Then
+            Return "The network is unreachable. Check your Internet connection."
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Connection Error - " & ex.Message
+          End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error - " & ex.Message
@@ -120,6 +140,8 @@ Module modFunctions
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
           Return "The server did not respond. Please try again."
+        ElseIf ex.InnerException.Message.Contains("An operation was attempted on something that is not a socket") Then
+          Return "Unable to connect. Check your local network and firewall settings."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
@@ -168,6 +190,8 @@ Module modFunctions
             ElseIf ex.InnerException.Message.Contains("The decryption operation failed, see inner exception") Then
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
+            ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
+              Return "The server closed the connection. Please try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
@@ -198,6 +222,8 @@ Module modFunctions
         If ex.Message.Contains("ConnectFailure") Then
           If ex.InnerException.Message.Contains("No route to host") Then
             Return "Could not connect to the server. Check your Internet connection."
+          ElseIf ex.InnerException.Message.Contains("Network is unreachable") Then
+            Return "The network is unreachable. Check your Internet connection."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message

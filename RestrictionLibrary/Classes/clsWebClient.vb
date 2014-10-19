@@ -90,6 +90,7 @@
         ResponseURI = response.ResponseUri
         Return response
       End If
+      If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       RaiseEvent Failure(Me, New ErrorEventArgs(ex))
       Return Nothing
