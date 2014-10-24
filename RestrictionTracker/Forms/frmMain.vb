@@ -42,7 +42,6 @@ Public Class frmMain
   Private sFailTray As String
   Private bAlert As TriState
   Private wb_down, wb_up, wb_dlim, wb_ulim As Long
-  Private e_down, e_up, e_over, e_lim As Long
   Private r_used, r_lim As Long
   Private lastBalloon As Long
 #Region "Server Type Determination"
@@ -990,21 +989,6 @@ Public Class frmMain
           End If
           ResizePanels()
           If lUsed = 0 And lLim = 0 And lRemain = 0 Then Exit Sub
-        Case "EXEDE"
-          Dim lDown As Long = e_down
-          Dim lUp As Long = e_up
-          Dim lTotal As Long = lDown + lUp + e_over
-          Dim lLim As Long = e_lim
-          Dim lRemain As Long = lLim - lTotal
-          If lDown > 0 Or lUp > 0 Or lLim > 0 Or lTotal > 0 Or lRemain <> 0 Then
-            DoChange(lblExedeDownVal, lDown)
-            DoChange(lblExedeUpVal, lUp)
-            DoChange(lblExedeTotalVal, lTotal)
-            DoChange(lblExedeRemainVal, lRemain)
-            DoChange(lblExedeAllowedVal, lLim)
-          End If
-          ResizePanels()
-          If lDown = 0 And lUp = 0 And lTotal = 0 And lRemain = 0 And lLim = 0 Then Exit Sub
         Case "WB"
           Dim lDown As Long = wb_down
           Dim lDLim As Long = wb_dlim
@@ -1228,98 +1212,6 @@ Public Class frmMain
             Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
             MakeNotifier(taskNotifier, False)
             If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", Application.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          End If
-        Next
-      End If
-    End If
-  End Sub
-  Private Sub DisplayEResults(lDown As Long, lOver As Long, lUp As Long, lLimit As Long, sLastUpdate As String)
-    Dim sTTT As String = Me.Text
-    If lOver = lLimit Then lOver = 0
-    Dim lUsed As Long = lDown + lUp + lOver
-    If lUsed >= lLimit Then imSlowed = True
-    If lUsed < lLimit * 0.7 Then imSlowed = False
-    pnlWildBlue.Visible = False
-    pnlExede.Visible = True
-    pnlRural.Visible = False
-    pnlNothing.Visible = False
-    e_down = lDown
-    e_up = lUp
-    e_over = lOver
-    e_lim = lLimit
-    If tmrChanges IsNot Nothing Then
-      tmrChanges.Dispose()
-      tmrChanges = Nothing
-    End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "EXEDE", 75, System.Threading.Timeout.Infinite)
-    If imSlowed Then
-      lblExedeTotalVal.ForeColor = Color.Red
-    Else
-      lblExedeTotal.ForeColor = SystemColors.ControlText
-    End If
-    pctExede.Image = DisplayEProgress(pctExede.DisplayRectangle.Size, lDown, lUp, lOver, lLimit, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    Dim sFree As String
-    If lLimit > lUsed Then
-      sFree = vbCr & "Free: " & MBorGB(lLimit - lUsed)
-    ElseIf lLimit < lUsed Then
-      sFree = vbCr & "Over: " & MBorGB(lUsed - lLimit)
-    Else
-      sFree = String.Empty
-    End If
-    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
-           "Updated " & sLastUpdate & vbCr &
-           "Down: " & MBorGB(lDown) & " " & vbCr &
-           "Up: " & MBorGB(lUp) & " " & vbCr &
-           "Total: " & AccuratePercent(lUsed / lLimit) & sFree
-    If sTTT.Length > ttLimit Then
-      If lLimit > lUsed Then
-        sFree = vbCr & MBorGB(lLimit - lUsed) & " Free"
-      ElseIf lLimit < lUsed Then
-        sFree = vbCr & MBorGB(lUsed - lLimit) & " Over"
-      Else
-        sFree = String.Empty
-      End If
-      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-             AccuratePercent(lUsed / lLimit) & sFree
-    End If
-    tmrIcon.Enabled = False
-    trayIcon.Icon = CreateETrayIcon(lDown, lUp, lLimit)
-    SetNotifyIconText(trayIcon, sTTT)
-    If mySettings.Overuse > 0 Then
-      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
-      Dim TimeCheck As Integer = -mySettings.Overtime
-      If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
-        Dim DownTotal As Long = lDown + lOver
-        Dim UpTotal As Long = lUp + lOver
-        For I As Integer = lItems.Count - 2 To 0 Step -1
-          Dim DownThis As Long = lItems(I).DOWNLOAD
-          Dim UpThis As Long = lItems(I).UPLOAD
-          Dim OverThis As Long = 0
-          If Not lItems(I).DOWNLIM = lItems(I).UPLIM Then OverThis = lItems(I).UPLIM
-          DownThis += OverThis
-          UpThis += OverThis
-          If DownTotal - DownThis >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(DownTotal - DownThis)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", Application.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          ElseIf UpTotal - UpThis >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(UpTotal - UpThis)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", Application.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          ElseIf lOver - OverThis >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lOver - lItems(I).UPLIM)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged an over-the-limit usage of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
             lastBalloon = TickCount()
             Exit For
           End If
@@ -1735,31 +1627,6 @@ Public Class frmMain
         g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
         CreateTrayIcon_Left(g, lDown, lDownLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, icoX, icoY)
         CreateTrayIcon_Right(g, lUp, lUpLim, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC, icoX, icoY)
-      End If
-    End Using
-    Try
-      Dim hIcon As IntPtr = imgTray.GetHicon()
-      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
-      NativeMethods.DestroyIcon(hIcon)
-      Return iIcon
-    Catch ex As Exception
-      Return MakeIcon(IconName.norm, icoX, icoY)
-    End Try
-  End Function
-  Private Function CreateETrayIcon(lDown As Long, lUp As Long, lLim As Long) As Icon
-    Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
-    Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
-    Dim imgTray As New Bitmap(icoX, icoY)
-    Using g As Graphics = Graphics.FromImage(imgTray)
-      g.Clear(Color.Transparent)
-      If imSlowed Then
-        g.DrawIconUnstretched(MakeIcon(IconName.restricted, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-        CreateTrayIcon_Dual(g, lDown, lUp, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC, icoX, icoY)
-      ElseIf imFree Then
-        g.DrawIconUnstretched(MakeIcon(IconName.free, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-      Else
-        g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-        CreateTrayIcon_Dual(g, lDown, lUp, lLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC, icoX, icoY)
       End If
     End Using
     Try
