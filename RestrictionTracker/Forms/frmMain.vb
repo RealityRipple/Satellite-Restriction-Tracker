@@ -707,8 +707,7 @@ Public Class frmMain
         Case ConnectionStates.TableDownload
           Select Case e.SubState
             Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
-            Case ConnectionSubStates.LoadAJAX1 : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Page 1 of 2...", False)
-            Case ConnectionSubStates.LoadAJAX2 : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Page 2 of 2...", False)
+            Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & FormatPercent(e.SubPercentage, 0, TriState.False, TriState.False, TriState.False) & ")...", False)
             Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
             Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
             Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
