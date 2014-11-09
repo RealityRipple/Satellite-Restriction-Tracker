@@ -380,7 +380,7 @@ Public Class frmMain
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
       End If
-    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EVOLUTION Or myPanel = SatHostTypes.WildBlue_EXEDE Then
+    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Then
       If r_lim = 0 Then
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcon.Icon = MakeIcon(IconName.norm)
@@ -844,24 +844,24 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub localData_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
-    If Me.InvokeRequired Then
-      Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBVResult), sender, e)
-    Else
-      SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-      LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-      myPanel = SatHostTypes.WildBlue_EVOLUTION
-      mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
-      mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
-      DisplayUsage(True, True)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-    End If
-  End Sub
+  'Private Sub localData_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
+  '  If Me.InvokeRequired Then
+  '    Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBVResult), sender, e)
+  '  Else
+  '    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+  '    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+  '    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
+  '    myPanel = SatHostTypes.WildBlue_EVOLUTION
+  '    mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
+  '    mySettings.Save()
+  '    If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+  '    DisplayUsage(True, True)
+  '    If localData IsNot Nothing Then
+  '      localData.Dispose()
+  '      localData = Nothing
+  '    End If
+  '  End If
+  'End Sub
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
@@ -1321,7 +1321,7 @@ Public Class frmMain
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.DishNet_EXEDE : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case Else : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
@@ -2036,7 +2036,7 @@ Public Class frmMain
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red

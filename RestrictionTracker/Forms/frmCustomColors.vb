@@ -66,7 +66,7 @@ Public Class frmCustomColors
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.DishNet_EXEDE
-      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
         grpMainDown.Text = "Usage Colors"
         grpMainUp.Visible = False
         grpTrayDown.Text = "Usage Colors"
@@ -428,7 +428,7 @@ Public Class frmCustomColors
           Case pctHistoryText.Name : Return Color.Black
           Case pctHistoryBG.Name : Return Color.White
         End Select
-      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
         Select Case Element
           Case pctMainDownA.Name : Return Color.Orange
           Case pctMainDownB.Name : Return Color.Transparent

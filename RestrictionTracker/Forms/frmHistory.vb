@@ -152,7 +152,7 @@ Public Class frmHistory
                 pctUld.Image = ResizingNote(pctUld.Size)
                 GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
                 bDisplayed = True
-              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds
@@ -287,7 +287,7 @@ Public Class frmHistory
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
-          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
             For Each lItem As DataBase.DataRow In lItems
               dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)
             Next lItem
@@ -415,7 +415,10 @@ Public Class frmHistory
           End If
           fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
           For I As Integer = usageDB.Count - 1 To 1 Step -1
-            fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            Try
+              fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            Catch
+            End Try
             If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
                 If usageDB(I).DATETIME > dtpFrom.MaxDate Then
@@ -488,7 +491,10 @@ Public Class frmHistory
           fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
           Dim Finds As Integer = 0
           For I As Integer = usageDB.Count - 1 To 1 Step -1
-            fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            Try
+              fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+            Catch
+            End Try
             If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
                 Finds += 1
@@ -707,7 +713,7 @@ Public Class frmHistory
           dgvUsage.Columns.Add(colDATETIME)
           dgvUsage.Columns.Add(colDOWNLOAD)
           dgvUsage.Columns.Add(colUPLOAD)
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
           cmd30Days.Text = "This Period"
           cmd60Days.Text = "Last Period"
           dgvUsage.Columns.Clear()
@@ -761,7 +767,7 @@ Public Class frmHistory
           mySettings.Colors.HistoryText = Color.Black
           mySettings.Colors.HistoryBackground = Color.White
 
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EVOLUTION
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
           mySettings.Colors.MainDownA = Color.Orange
           mySettings.Colors.MainDownB = Color.Transparent
           mySettings.Colors.MainDownC = Color.Red

@@ -4,7 +4,6 @@ Module modFunctions
     Select Case ht
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION : Return "WBV"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
       Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : Return "DNX"
@@ -14,8 +13,7 @@ Module modFunctions
   Public Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
     Select Case st.ToUpper
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "WBX" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+      Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE

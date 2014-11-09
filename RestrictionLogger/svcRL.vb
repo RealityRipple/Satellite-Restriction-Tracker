@@ -221,10 +221,10 @@ Public Class svcRL
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-  Private Sub tracker_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBVResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
-    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
-  End Sub
+  'Private Sub tracker_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBVResult
+  '  MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+  '  LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
+  'End Sub
   Private Sub tracker_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit) ' e.Download, e.Limit + e.BuyMore, e.Upload, e.Over)

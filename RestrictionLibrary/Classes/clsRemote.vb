@@ -48,10 +48,24 @@ Public Class remoteRestrictionTracker
       Public DownMax As Integer
       Public Up As Integer
       Public UpMax As Integer
+      Private Ditto As Boolean
       Public Overrides Function ToString() As String
-        Return Time.ToString("G") & ":" & Down & "/" & DownMax & ", " & Up & "/" & UpMax
+        If Ditto Then
+          Return Time.ToString("G") & ":" & Down & "/" & DownMax
+        Else
+          Return Time.ToString("G") & ":" & Down & "/" & DownMax & ", " & Up & "/" & UpMax
+        End If
       End Function
+      Public Sub New(AtTime As DateTime, iUsed As Integer, iMax As Integer)
+        Ditto = True
+        Time = AtTime
+        Down = iUsed
+        Up = iUsed
+        DownMax = iMax
+        UpMax = iMax
+      End Sub
       Public Sub New(AtTime As DateTime, iDown As Integer, iDownMax As Integer, iUp As Integer, iUpMax As Integer)
+        Ditto = False
         Time = AtTime
         Down = iDown
         Up = iUp
@@ -299,12 +313,10 @@ Public Class remoteRestrictionTracker
                   Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
                   Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
                   If sData.Length = 5 Then
-                    If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
-                    rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
-                              StrToVal(sData(0), 1000),
-                              StrToVal(sData(1), 1000) + (StrToVal(sData(4), 1000)),
-                              StrToVal(sData(2), 1000),
-                              StrToVal(sData(3), 1000)))
+                    If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+                    Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
+                    Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
+                    rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
                   ElseIf sData.Length = 4 Then
                     If dish Then
                       If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
@@ -315,18 +327,12 @@ Public Class remoteRestrictionTracker
                     End If
                   ElseIf sData.Length = 3 Then
                     If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-                    rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
-                              StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000)),
-                              StrToVal(sData(2), 1000),
-                              StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000)),
-                              StrToVal(sData(2), 1000)))
+                    Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
+                    Dim iTotal As Integer = StrToVal(sData(2), 1000)
+                    rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
                   ElseIf sData.Length = 2 Then
                     If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-                    rData.Add(New SuccessEventArgs.Result(tTime,
-                              StrToVal(sData(0), 1000),
-                              StrToVal(sData(1), 1000),
-                              StrToVal(sData(0), 1000),
-                              StrToVal(sData(1), 1000)))
+                    rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
                   End If
                 End If
               Next
@@ -348,12 +354,10 @@ Public Class remoteRestrictionTracker
               Dim sData() As String = Split(Split(sRet, ":", 2)(1), "|")
               Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
               If sData.Length = 5 Then
-                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
-                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
-                          StrToVal(sData(0), 1000),
-                          StrToVal(sData(1), 1000) + (StrToVal(sData(4), 1000)),
-                          StrToVal(sData(2), 1000),
-                          StrToVal(sData(3), 1000)))
+                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+                Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
+                Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
+                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
               ElseIf sData.Length = 4 Then
                 If dish Then
                   If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
@@ -364,18 +368,12 @@ Public Class remoteRestrictionTracker
                 End If
               ElseIf sData.Length = 3 Then
                 If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime,
-                          StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000)),
-                          StrToVal(sData(2), 1000),
-                          StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000)),
-                          StrToVal(sData(2), 1000)))
+                Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
+                Dim iTotal As Integer = StrToVal(sData(2), 1000)
+                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
               ElseIf sData.Length = 2 Then
                 If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-                rData.Add(New SuccessEventArgs.Result(tTime,
-                          StrToVal(sData(0), 1000),
-                          StrToVal(sData(1), 1000),
-                          StrToVal(sData(0), 1000),
-                          StrToVal(sData(1), 1000)))
+                rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
               End If
               If rData.Count > 0 Then
                 RaiseEvent Success(Me, New SuccessEventArgs(iProv, rData.ToArray))

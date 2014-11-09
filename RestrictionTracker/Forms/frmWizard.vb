@@ -654,9 +654,9 @@ Public Class frmWizard
   Private Sub localTest_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
     LocalComplete(SatHostTypes.WildBlue_LEGACY)
   End Sub
-  Private Sub localTest_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
-    LocalComplete(SatHostTypes.WildBlue_EVOLUTION)
-  End Sub
+  'Private Sub localTest_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
+  '  LocalComplete(SatHostTypes.WildBlue_EVOLUTION)
+  'End Sub
   Private Sub localTest_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
     LocalComplete(SatHostTypes.WildBlue_EXEDE)
   End Sub

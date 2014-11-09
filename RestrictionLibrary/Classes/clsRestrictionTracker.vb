@@ -3,7 +3,6 @@
   Public Enum SatHostTypes
     WildBlue_LEGACY    ' Down, Up, DownLim, UpLim     [TYPEA]
     WildBlue_EXEDE     ' Used, Limit                  [TYPEB]
-    WildBlue_EVOLUTION ' Used, Limit                  [TYPEB]
     RuralPortal_LEGACY ' Down, Up, DownLim, UpLim     [TYPEA]
     RuralPortal_EXEDE  ' Used, Limit                  [TYPEB]
     DishNet_EXEDE      ' AnyTime, AnyTimeLim, OffPeak, OffPeakLim [TYPEA2]
@@ -175,7 +174,6 @@
   Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
   Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
   Public Event ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs)
-  Public Event ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs)
   Public Event ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs)
   Public Class ConnectionStatusEventArgs
     Inherits EventArgs
@@ -226,6 +224,7 @@
   Private sDataPath As String
 #Region "Initialization Functions"
   Public Sub New(ConfigPath As String)
+    Net.ServicePointManager.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
     InitAccount()
@@ -339,7 +338,7 @@
   Private Sub ContinueLogin(sUID As String, sPass As String)
     PrepareLogin()
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION : ContinueLoginWB(sUID, sPass)
+      Case SatHostTypes.WildBlue_LEGACY : ContinueLoginWB(sUID, sPass)
       Case SatHostTypes.WildBlue_EXEDE : ContinueLoginExede(sUID, sPass)
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : ContinueLoginRP(sUID, sPass)
       Case SatHostTypes.DishNet_EXEDE : ContinueLoginDN(sUID, sPass)
@@ -653,7 +652,7 @@
     ResetTimeout(True)
     Dim CloseSocket As Boolean = False
     Select Case AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.WildBlue_LEGACY
         Select Case LoginState
           Case ConnectionStates.Login
             WB_Login_Authenticate(sRet, sErrMsg, sFailText, bReset)
@@ -766,7 +765,7 @@
     PrepareLogin()
     wsData.CookieJar = cJar
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION
+      Case SatHostTypes.WildBlue_LEGACY
         Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
         Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
         wsData.DownloadStringAsync(New Uri(uriString), aState)
@@ -782,7 +781,7 @@
   Private Sub ReadUsage(Table As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.WildBlue_EVOLUTION : WB_Read_Table(Table)
+      Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
       Case SatHostTypes.WildBlue_EXEDE : EX_Read_Table(Table)
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
       Case SatHostTypes.DishNet_EXEDE : DN_Read_Table(Table)
@@ -927,47 +926,47 @@
       Else
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
-    ElseIf Table.Contains("allowance") Then
-      Dim sPlusT As String = String.Empty
-      If Table.Contains("loaded:") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Old Exede method detected!", Table))
-      Else
-        For I As Integer = 0 To sRows.Length - 1
-          If Not String.IsNullOrEmpty(sRows(I)) Then
-            If sRows(I).Contains("<strong>") Then
-              If String.IsNullOrEmpty(sDownT) Then
-                sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-              ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
-                If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-                  sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-                End If
-              ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-                If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
-                  sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                  sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-                End If
-              End If
-            End If
-          End If
-        Next
-        ResetTimeout()
-        If String.IsNullOrEmpty(sDownT) Then
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-        Else
-          RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
-        End If
-      End If
-    ElseIf Table.Contains("FREEDOM") Then
-      If Table.Contains("Current Usage<strong>:") Then
-        Table = Table.Substring(Table.IndexOf("Current Usage<strong>:") + 23)
-        sDown = Table.Substring(0, Table.IndexOf("</strong>"))
-        CleanupResult(sDown)
-        RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), 150000, Now))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      End If
+      'ElseIf Table.Contains("allowance") Then
+      '  Dim sPlusT As String = String.Empty
+      '  If Table.Contains("loaded:") Then
+      '    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Old Exede method detected!", Table))
+      '  Else
+      '    For I As Integer = 0 To sRows.Length - 1
+      '      If Not String.IsNullOrEmpty(sRows(I)) Then
+      '        If sRows(I).Contains("<strong>") Then
+      '          If String.IsNullOrEmpty(sDownT) Then
+      '            sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+      '            sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
+      '          ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
+      '            If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+      '              sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+      '              sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
+      '            End If
+      '          ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
+      '            If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+      '              sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+      '              sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
+      '            End If
+      '          End If
+      '        End If
+      '      End If
+      '    Next
+      '    ResetTimeout()
+      '    If String.IsNullOrEmpty(sDownT) Then
+      '      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      '    Else
+      '      RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
+      '    End If
+      '  End If
+      'ElseIf Table.Contains("FREEDOM") Then
+      '  If Table.Contains("Current Usage<strong>:") Then
+      '    Table = Table.Substring(Table.IndexOf("Current Usage<strong>:") + 23)
+      '    sDown = Table.Substring(0, Table.IndexOf("</strong>"))
+      '    CleanupResult(sDown)
+      '    RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), 150000, Now))
+      '  Else
+      '    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      '  End If
     End If
   End Sub
 #End Region
@@ -1091,24 +1090,21 @@
         Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
       ElseIf sRet.Contains("login-error-alert") Then
-        TryWBAfterE()
-        'If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
-        '  sErrMsg = "Login Failed: Incorrect Password"
-        '  bReset = False
-        'Else
-        '  sErrMsg = "Unknown Login Error."
-        '  sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-        '  bReset = False
-        'End If
+        If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
+          sErrMsg = "Login Failed: Incorrect Password"
+          bReset = False
+        Else
+          sErrMsg = "Unknown Login Error."
+          sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+          bReset = False
+        End If
       ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-        TryWBAfterE()
-        'sErrMsg = "Login Failed: Please check your account information and try again."
-        'bReset = False
+        sErrMsg = "Login Failed: Please check your account information and try again."
+        bReset = False
       Else
-        TryWBAfterE()
-        'sErrMsg = "Could not log in."
-        'sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-        'bReset = False
+        sErrMsg = "Could not log in."
+        sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
+        bReset = False
       End If
     Else
       If sRet.Contains("window.location.href") Then
@@ -1125,10 +1121,9 @@
       ElseIf sRet.Contains("maintenance") Then
         sErrMsg = "Login Failed: Server Down for Maintenance."
       Else
-        TryWBAfterE()
-        'sErrMsg = "Login Failed: Could not understand response."
-        'sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-        'bReset = True
+        sErrMsg = "Login Failed: Could not understand response."
+        sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
+        bReset = True
       End If
     End If
   End Sub
@@ -1255,12 +1250,6 @@
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed", Table))
       End If
     End If
-  End Sub
-  Private Sub TryWBAfterE()
-    mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
-    PrepareLogin()
-    ResetTimeout()
-    GetUsage()
   End Sub
 #End Region
 #Region "RP"

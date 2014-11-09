@@ -195,8 +195,7 @@
   Private Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
     Select Case st.ToUpper
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "WBX" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
+      Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
