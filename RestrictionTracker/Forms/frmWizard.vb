@@ -1,10 +1,27 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
+Imports System.Runtime.InteropServices
 
 Public Class frmWizard
   Private Declare Sub ReleaseCapture Lib "user32" ()
   Private Declare Sub SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As IntPtr, ByVal wMsg As Integer, ByVal wParam As Integer, ByVal lParam As Integer)
 
+  <StructLayout(LayoutKind.Explicit)>
+  Private Structure DWord
+    <FieldOffset(0)> Public LongValue As Integer
+    <FieldOffset(0)> Public LoWord As Short
+    <FieldOffset(2)> Public HiWord As Short
+    Public Sub New(lo As Integer, hi As Integer)
+      LoWord = CShort(lo)
+      HiWord = CShort(hi)
+    End Sub
+  End Structure
+
+  Private Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
+    Return (New DWord(LoWord, HiWord)).LongValue
+  End Function
+
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
+  Private Const WM_GETSYSMENU As Integer = &H313
   Private Const HTCAPTION As Integer = 2
   Private WithEvents wsHostList As New CookieAwareWebClient()
   Private WithEvents remoteTest As remoteRestrictionTracker
@@ -231,6 +248,14 @@ Public Class frmWizard
     If e.Button = Windows.Forms.MouseButtons.Left Then ClickDrag(Me.Handle)
   End Sub
 
+  Private Sub pctIcon_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctIcon.MouseDown
+    If e.X >= 6 And e.X <= 6 + 16 And e.Y >= 8 And e.Y <= 8 + 16 Then
+      If e.Button = Windows.Forms.MouseButtons.Left Or e.Button = Windows.Forms.MouseButtons.Right Then SendMessage(Me.Handle, WM_GETSYSMENU, 0, (New DWord(Cursor.Position.X, Cursor.Position.Y)).LongValue)
+    ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
+      ClickDrag(Me.Handle)
+    End If
+  End Sub
+
   Private Sub frmWizard_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If localTest IsNot Nothing Then
       localTest.Dispose()
@@ -251,10 +276,12 @@ Public Class frmWizard
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
+
   Private Sub txtAccountUsername_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountUsername.TextChanged
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
+
   Private Sub txtAccountPass_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountPass.TextChanged
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
@@ -327,6 +354,7 @@ Public Class frmWizard
       End If
     End If
   End Sub
+
   Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
     pnlKey.Tag = 0
   End Sub
@@ -365,6 +393,8 @@ Public Class frmWizard
     If clsGlass.IsCompositionEnabled Then
       Me.SuspendLayout()
       If Not pctHeader.BackColor = Color.Black Then
+        pctIcon.BackColor = Color.Black
+        pctIcon.Height = 35
         pctHeader.BackColor = Color.Black
         pctHeader.Height = 35
         clsGlass.SetGlass(Me, 0, 35, 0, 0)
@@ -372,13 +402,15 @@ Public Class frmWizard
         Me.ShowIcon = False
       End If
       Dim TextFont As New Drawing.Font(Drawing.SystemFonts.CaptionFont.Name, 9)
-      clsGlass.DrawTextOnGlass(pctHeader.Handle, sTitle, TextFont, New Rectangle(16, -4, 600, 40), 12, 12)
-      Using g As Graphics = Graphics.FromHwnd(pctHeader.Handle)
+      clsGlass.DrawTextOnGlass(pctHeader.Handle, sTitle, TextFont, New Rectangle(0, -4, 600, 40), 12, 12)
+      Using g As Graphics = Graphics.FromHwnd(pctIcon.Handle)
         g.DrawImageUnscaled(My.Resources.t16_norm.ToBitmap, New Rectangle(6, 8, 16, 16))
       End Using
       Me.ResumeLayout()
     Else
       If String.IsNullOrEmpty(Me.Text) Then
+        pctIcon.Height = 0
+        pctIcon.BackColor = Color.White
         pctHeader.Height = 0
         pctHeader.BackColor = Color.White
         clsGlass.SetGlass(Me, 0, 0, 0, 0)
