@@ -70,9 +70,9 @@ Partial Class frmConfig
     Me.txtProxyDomain = New System.Windows.Forms.TextBox()
     Me.cmbProxyType = New System.Windows.Forms.ComboBox()
     Me.pnlOverAlert = New System.Windows.Forms.TableLayoutPanel()
-    Me.txtOverSize = New System.Windows.Forms.NumericUpDown()
+    Me.txtOverSize = New NumericUpDownIncrementable()
     Me.lblOverSize = New System.Windows.Forms.Label()
-    Me.txtOverTime = New System.Windows.Forms.NumericUpDown()
+    Me.txtOverTime = New NumericUpDownIncrementable()
     Me.lblOverTime = New System.Windows.Forms.Label()
     Me.lblProvider = New System.Windows.Forms.Label()
     Me.cmbProvider = New System.Windows.Forms.ComboBox()
@@ -1148,9 +1148,9 @@ Partial Class frmConfig
   Friend WithEvents pctSRT As System.Windows.Forms.PictureBox
   Friend WithEvents tmrAnim As System.Windows.Forms.Timer
   Friend WithEvents pnlOverAlert As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents txtOverSize As System.Windows.Forms.NumericUpDown
+  Friend WithEvents txtOverSize As NumericUpDownIncrementable
   Friend WithEvents lblOverSize As System.Windows.Forms.Label
-  Friend WithEvents txtOverTime As System.Windows.Forms.NumericUpDown
+  Friend WithEvents txtOverTime As NumericUpDownIncrementable
   Friend WithEvents lblOverTime As System.Windows.Forms.Label
   Friend WithEvents cmdAlertStyle As System.Windows.Forms.Button
   Friend WithEvents lblProvider As System.Windows.Forms.Label
