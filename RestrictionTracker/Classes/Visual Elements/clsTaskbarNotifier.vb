@@ -361,6 +361,7 @@ Public Class TaskbarNotifier
     Width = BackgroundBitmap.Width
     Height = BackgroundBitmap.Height
     Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
+    If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
   End Sub
 
   ''' <summary>
@@ -373,6 +374,7 @@ Public Class TaskbarNotifier
     Width = BackgroundBitmap.Width
     Height = BackgroundBitmap.Height
     Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
+    If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
   End Sub
 
   ''' <summary>
@@ -386,6 +388,7 @@ Public Class TaskbarNotifier
     CloseBitmap.MakeTransparent(transparencyColor)
     CloseBitmapSize = New Size(CloseBitmap.Width \ 3, CloseBitmap.Height)
     CloseBitmapLocation = position
+    If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultBitmaps()
   End Sub
 
   ''' <summary>
@@ -399,6 +402,28 @@ Public Class TaskbarNotifier
     CloseBitmap.MakeTransparent(transparencyColor)
     CloseBitmapSize = New Size(CloseBitmap.Width \ 3, CloseBitmap.Height)
     CloseBitmapLocation = position
+    If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultBitmaps()
+  End Sub
+
+  Private Sub SetDefaultBitmaps()
+    SetDefaultBackgroundBitmap()
+    SetDefaultCloseBitmap()
+  End Sub
+
+  Private Sub SetDefaultBackgroundBitmap()
+    BackgroundBitmap = My.Resources.default_alert
+    Width = BackgroundBitmap.Width
+    Height = BackgroundBitmap.Height
+    Region = BitmapToRegion(BackgroundBitmap, Color.Fuchsia)
+    TitleRectangle = New Rectangle(7, 3, 188, 24)
+    ContentRectangle = New Rectangle(9, 31, 227, 66)
+  End Sub
+
+  Private Sub SetDefaultCloseBitmap()
+    CloseBitmap = My.Resources.default_close
+    CloseBitmap.MakeTransparent(Color.Fuchsia)
+    CloseBitmapSize = New Size(CloseBitmap.Width \ 3, CloseBitmap.Height)
+    CloseBitmapLocation = New Point(190, 0)
   End Sub
 #End Region
 #Region "TaskbarNotifier Protected Methods"
