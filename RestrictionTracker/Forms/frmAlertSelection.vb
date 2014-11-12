@@ -19,7 +19,7 @@
         sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
         sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
       Loop
-      If (sExt = ".tgz") Or (sExt = ".tar.gz") Then
+      If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
         Dim iItem As Integer = lstStyles.Items.Add(sTitle)
         If sTitle.ToLower = AlertStyle.ToLower Then
           lstStyles.SelectedIndex = iItem
@@ -53,7 +53,7 @@
           sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
           sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
         Loop
-        If (sExt = ".tgz") Or (sExt = ".tar.gz") Then
+        If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
           IO.File.Copy(StylePath, AppData & "\" & sTitle & sExt, True)
           Dim iItem As Integer = -1
           If lstStyles.Items.Contains(sTitle) Then
@@ -73,7 +73,7 @@
             sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
             sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
           Loop
-          If (sExt = ".tgz") Or (sExt = ".tar.gz") Then
+          If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
             IO.File.Copy(StylePath, AppData & "\" & sTitle & sExt, True)
             If Not lstStyles.Items.Contains(sTitle) Then lstStyles.Items.Add(sTitle)
           End If
@@ -99,7 +99,7 @@
           sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
           sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
         Loop
-        If (sExt = ".tgz") Or (sExt = ".tar.gz") Then
+        If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
           e.Effect = DragDropEffects.Link
         Else
           e.Effect = DragDropEffects.None
@@ -113,7 +113,7 @@
             sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
             sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
           Loop
-          If (sExt = ".tgz") Or (sExt = ".tar.gz") Then
+          If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
             hasTar = True
             Exit For
           End If
@@ -144,6 +144,10 @@
         ElseIf IO.File.Exists(AppData & "\" & sTitle & ".tgz") Then
           lstStyles.SelectedIndex = 0
           IO.File.Delete(AppData & "\" & sTitle & ".tgz")
+          lstStyles.Items.RemoveAt(index)
+        ElseIf IO.File.Exists(AppData & "\" & sTitle & ".tar") Then
+          lstStyles.SelectedIndex = 0
+          IO.File.Delete(AppData & "\" & sTitle & ".tar")
           lstStyles.Items.RemoveAt(index)
         Else
           MessageBox.Show("No file by that name was found! Alert Window Style may already be removed.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)

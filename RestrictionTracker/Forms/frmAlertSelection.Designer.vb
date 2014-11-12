@@ -68,7 +68,7 @@ Partial Class frmAlertSelection
     Me.lstStyles.Size = New System.Drawing.Size(100, 50)
     Me.lstStyles.TabIndex = 0
     Me.ttStyle.SetToolTip(Me.lstStyles, "Select the Alert Window Style you want to use." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Drag and Drop: Add an Alert Style" & _
-        " from a GZipped TAR (*.tar.gz, *.tgz)." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Delete: Remove an Alert Style from the l" & _
+        " from a Tarball or GZipped TAR (*.tar, *.tar.gz, *.tgz)." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Delete: Remove an Alert Style from the l" & _
         "ist.")
     '
     'pctPreview

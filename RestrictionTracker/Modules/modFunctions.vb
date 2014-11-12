@@ -191,15 +191,25 @@ Module modFunctions
       Path = AppData & "\" & Path & ".tgz"
     ElseIf My.Computer.FileSystem.FileExists(AppData & "\" & Path & ".tar.gz") Then
       Path = AppData & "\" & Path & ".tar.gz"
+    ElseIf My.Computer.FileSystem.FileExists(AppData & "\" & Path & ".tar") Then
+      Path = AppData & "\" & Path & ".tar"
     Else
       Return New NotifierStyle
     End If
     Try
       Dim TempAlertDir As String = AppData & "\notifier\"
       Dim TempAlertTAR As String = AppData & "\notifier.tar"
-      ExtractGZ(Path, TempAlertTAR)
-      ExtractTar(TempAlertTAR, TempAlertDir)
-      My.Computer.FileSystem.DeleteFile(TempAlertTAR)
+      If Path.EndsWith(".tar") Then
+        ExtractTar(Path, TempAlertDir)
+      Else
+        Try
+          ExtractGZ(Path, TempAlertTAR)
+          ExtractTar(TempAlertTAR, TempAlertDir)
+          My.Computer.FileSystem.DeleteFile(TempAlertTAR)
+        Catch ex As Exception
+          ExtractTar(Path, TempAlertDir)
+        End Try
+      End If
       Dim ns As New NotifierStyle(TempAlertDir & "alert.png", TempAlertDir & "close.png", TempAlertDir & "loc")
       My.Computer.FileSystem.DeleteDirectory(TempAlertDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
       Return ns
