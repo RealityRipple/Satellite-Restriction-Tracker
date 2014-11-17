@@ -375,10 +375,16 @@ Module modFunctions
   Public ReadOnly Property AppData As String
     Get
       Static sTmp As String
-      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
-      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName)
-      If String.IsNullOrEmpty(sTmp) Then
-        sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName
+      If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
+        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
+        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName)
+        If String.IsNullOrEmpty(sTmp) Then
+          sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName
+        End If
+      Else
+        If String.IsNullOrEmpty(sTmp) Then
+          sTmp = Application.StartupPath & "\Config\"
+        End If
       End If
       Return sTmp
     End Get
