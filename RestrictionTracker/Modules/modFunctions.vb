@@ -427,16 +427,20 @@ Module modFunctions
   Public ReadOnly Property MySaveDir As String
     Get
       Dim mySettings As New AppSettings
-      If String.IsNullOrEmpty(mySettings.HistoryDir) Then
-        If My.Computer.FileSystem.DirectoryExists(AppData) Then
-          If Array.Exists(My.Computer.FileSystem.GetFiles(AppData).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
-            mySettings.HistoryDir = AppData
+      If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
+        If String.IsNullOrEmpty(mySettings.HistoryDir) Then
+          If My.Computer.FileSystem.DirectoryExists(AppData) Then
+            If Array.Exists(My.Computer.FileSystem.GetFiles(AppData).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
+              mySettings.HistoryDir = AppData
+            Else
+              mySettings.HistoryDir = AppDataAll
+            End If
           Else
             mySettings.HistoryDir = AppDataAll
           End If
-        Else
-          mySettings.HistoryDir = AppDataAll
         End If
+      Else
+        mySettings.HistoryDir = Application.StartupPath & "\Config\"
       End If
       Try
         If Not My.Computer.FileSystem.DirectoryExists(mySettings.HistoryDir) Then My.Computer.FileSystem.CreateDirectory(mySettings.HistoryDir)
