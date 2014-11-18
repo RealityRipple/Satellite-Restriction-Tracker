@@ -70,9 +70,9 @@ Partial Class frmConfig
     Me.txtProxyDomain = New System.Windows.Forms.TextBox()
     Me.cmbProxyType = New System.Windows.Forms.ComboBox()
     Me.pnlOverAlert = New System.Windows.Forms.TableLayoutPanel()
-    Me.txtOverSize = New NumericUpDownIncrementable()
+    Me.txtOverSize = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblOverSize = New System.Windows.Forms.Label()
-    Me.txtOverTime = New NumericUpDownIncrementable()
+    Me.txtOverTime = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblOverTime = New System.Windows.Forms.Label()
     Me.lblProvider = New System.Windows.Forms.Label()
     Me.cmbProvider = New System.Windows.Forms.ComboBox()
@@ -785,6 +785,7 @@ Partial Class frmConfig
     '
     Me.txtOverSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtOverSize.Increment = New Decimal(New Integer() {100, 0, 0, 0})
+    Me.txtOverSize.LargeIncrement = CType(100UI, UInteger)
     Me.txtOverSize.Location = New System.Drawing.Point(3, 3)
     Me.txtOverSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
     Me.txtOverSize.Minimum = New Decimal(New Integer() {25, 0, 0, 0})
@@ -809,6 +810,7 @@ Partial Class frmConfig
     '
     Me.txtOverTime.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtOverTime.Increment = New Decimal(New Integer() {15, 0, 0, 0})
+    Me.txtOverTime.LargeIncrement = CType(5UI, UInteger)
     Me.txtOverTime.Location = New System.Drawing.Point(115, 3)
     Me.txtOverTime.Maximum = New Decimal(New Integer() {360, 0, 0, 0})
     Me.txtOverTime.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
