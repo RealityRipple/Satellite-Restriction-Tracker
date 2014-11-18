@@ -968,6 +968,7 @@
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""
     If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
+    If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
     If Not mySettings.Timeout = txtTimeout.Value Then Return True
