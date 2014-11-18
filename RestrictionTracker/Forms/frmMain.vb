@@ -557,7 +557,7 @@ Public Class frmMain
         If NextGrabTick - TickCount() < mySettings.StartWait * 60 * 1000 Then NextGrabTick = TickCount() + (mySettings.StartWait * 60 * 1000)
       End If
       If TickCount() >= NextGrabTick Then
-        If Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
+        If mySettings.UpdateType > 0 AndAlso Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
           CheckForUpdates()
         Else
           If Not String.IsNullOrEmpty(sAccount) Then
