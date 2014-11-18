@@ -451,6 +451,7 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
+    If AppData = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
@@ -553,10 +554,10 @@ Public Class frmMain
         Else
           NextGrabTick = TickCount()
         End If
-        If NextGrabTick - TickCount() < 5 * 60 * 1000 Then NextGrabTick = TickCount() + (5 * 60 * 1000)
+        If NextGrabTick - TickCount() < mySettings.StartWait * 60 * 1000 Then NextGrabTick = TickCount() + (mySettings.StartWait * 60 * 1000)
       End If
       If TickCount() >= NextGrabTick Then
-        If Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > 6 Then
+        If Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
           CheckForUpdates()
         Else
           If Not String.IsNullOrEmpty(sAccount) Then
@@ -1391,9 +1392,15 @@ Public Class frmMain
     mySettings.Save()
     NextGrabTick = Long.MaxValue
     Dim dRet As DialogResult
-    Using dlgConfig As New frmConfig
-      dRet = dlgConfig.ShowDialog(Me)
-    End Using
+    If My.Computer.Keyboard.ShiftKeyDown Then
+      Using dlgConfig As New frmNewConfig
+        dRet = dlgConfig.ShowDialog(Me)
+      End Using
+    Else
+      Using dlgConfig As New frmConfig
+        dRet = dlgConfig.ShowDialog(Me)
+      End Using
+    End If
     Dim WaitTime As Long = TickCount() + 2000
     If Not myState = LoadStates.Loaded Then
       If Not myState = LoadStates.Lookup Then
@@ -1427,6 +1434,7 @@ Public Class frmMain
         sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
+          If AppData = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
           frmHistory.DoResize(True)
         End If
       Case Windows.Forms.DialogResult.Abort
@@ -1499,6 +1507,7 @@ Public Class frmMain
       sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
+        If AppData = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
         frmHistory.DoResize(True)
       End If
     End If
@@ -1716,10 +1725,10 @@ Public Class frmMain
                   localData = Nothing
                 End If
                 updateChecker.DownloadUpdate(sEXEPath)
-                mySettings.BetaCheck = False
+                mySettings.UpdateType = 1
                 mySettings.Save()
               Case Windows.Forms.DialogResult.Cancel
-                mySettings.BetaCheck = False
+                mySettings.UpdateType = 1
                 mySettings.Save()
                 If updateChecker IsNot Nothing Then
                   updateChecker.Dispose()
@@ -1734,7 +1743,7 @@ Public Class frmMain
                 NextGrabTick = Long.MinValue
             End Select
           Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-            If mySettings.BetaCheck Then
+            If mySettings.UpdateType = 2 Then
               fUpdate.NewUpdate(e.Version, True, Not isAdmin())
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
@@ -1761,10 +1770,10 @@ Public Class frmMain
                     localData = Nothing
                   End If
                   updateChecker.DownloadUpdate(sEXEPath)
-                  mySettings.BetaCheck = False
+                  mySettings.UpdateType = 1
                   mySettings.Save()
                 Case Windows.Forms.DialogResult.Cancel
-                  mySettings.BetaCheck = False
+                  mySettings.UpdateType = 1
                   mySettings.Save()
                   If updateChecker IsNot Nothing Then
                     updateChecker.Dispose()
@@ -1882,7 +1891,7 @@ Public Class frmMain
       ReLoadSettings()
       cmdRefresh.Enabled = True
       DisplayUsage(False, False)
-      SetNextLoginTime(5)
+      SetNextLoginTime(mySettings.StartWait)
     End If
   End Sub
 #Region "Failure Reports"

@@ -152,6 +152,7 @@ End Class
 Class AppSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
+  Private m_StartWait As Integer
   Private m_Interval As Integer
   Private m_Gr As String
   Private m_LastUpdate As Date
@@ -161,7 +162,8 @@ Class AppSettings
   Private m_Service As Boolean
   Private m_HistoryDir As String
   'Private m_HistoryInvert As Boolean
-  Private m_BetaCheck As Boolean
+  Private m_UpdateType As Byte '0 = Off, 1 = On, 2 = Beta
+  Private m_UpdateTime As Byte
   Private m_ScaleScreen As Boolean
   Private m_MainSize As Size
   Private m_RemoteKey As String
@@ -231,6 +233,16 @@ Class AppSettings
           End If
         Catch ex As Exception
           m_AccountType = SatHostTypes.Other
+        End Try
+      End If
+      Dim xStartWait As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "StartWait")
+      If xStartWait Is Nothing Then
+        m_StartWait = 5
+      Else
+        Try
+          m_StartWait = xStartWait.Element("value").Value
+        Catch ex As Exception
+          m_StartWait = 5
         End Try
       End If
       Dim xInterval As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Interval")
@@ -313,24 +325,42 @@ Class AppSettings
           m_HistoryDir = Nothing
         End Try
       End If
-      'Dim xHistoryInvert As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "HistoryInversion")
-      'If xHistoryInvert Is Nothing Then
-      '  m_HistoryInvert = False
-      'Else
-      '  Try
-      '    m_HistoryInvert = xHistoryInvert.Element("value").Value = "True"
-      '  Catch ex As Exception
-      '    m_HistoryInvert = False
-      '  End Try
-      'End If
-      Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
-      If xBetaCheck Is Nothing Then
-        m_BetaCheck = True
+      Dim xUpdateType As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateType")
+      If xUpdateType Is Nothing Then
+        Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
+        If xBetaCheck Is Nothing Then
+          m_UpdateType = 1
+        Else
+          Try
+            m_UpdateType = IIf(xBetaCheck.Element("value").Value = "True", 2, 1)
+          Catch ex As Exception
+            m_UpdateType = 1
+          End Try
+        End If
       Else
         Try
-          m_BetaCheck = xBetaCheck.Element("value").Value = "True"
+          Dim sUpdateType As String = xUpdateType.Element("value").Value
+          If sUpdateType = "BETA" Then
+            m_UpdateType = 2
+          ElseIf sUpdateType = "Release" Then
+            m_UpdateType = 1
+          ElseIf sUpdateType = "None" Then
+            m_UpdateType = 0
+          Else
+            m_UpdateType = 1
+          End If
         Catch ex As Exception
-          m_BetaCheck = True
+          m_UpdateType = 1
+        End Try
+      End If
+      Dim xUpdateTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateTime")
+      If xUpdateTime Is Nothing Then
+        m_UpdateTime = 15
+      Else
+        Try
+          m_UpdateTime = xAgo.Element("value").Value
+        Catch ex As Exception
+          m_UpdateTime = 15
         End Try
       End If
       Dim xScaleScreen As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "ScaleScreen")
@@ -770,6 +800,7 @@ Class AppSettings
   Private Sub Reset()
     m_Account = Nothing
     m_AccountType = SatHostTypes.Other
+    m_StartWait = 5
     m_Interval = 15
     m_Gr = "aph"
     m_LastUpdate = New Date(2000, 1, 1)
@@ -778,8 +809,8 @@ Class AppSettings
     m_Ago = 30
     m_Service = False
     m_HistoryDir = Nothing
-    'm_HistoryInvert = False
-    m_BetaCheck = True
+    m_UpdateType = 1
+    m_UpdateTime = 15
     m_ScaleScreen = False
     m_MainSize = New Size(450, 200)
     m_RemoteKey = Nothing
@@ -830,12 +861,19 @@ Class AppSettings
   End Sub
   Public Sub Save()
     Dim sAccountType As String = HostTypeToString(m_AccountType)
+    Dim sUpdateType As String = "Release"
+    If m_UpdateType = 0 Then
+      sUpdateType = "None"
+    ElseIf m_UpdateType = 2 Then
+      sUpdateType = "BETA"
+    End If
     'New XElement("setting", New XAttribute("name", "HistoryInversion"), New XElement("value", IIf(m_HistoryInvert, "True", "False"))),
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
                                                           New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
+                                                          New XElement("setting", New XAttribute("name", "StartWait"), New XElement("value", m_StartWait)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Gr"), New XElement("value", m_Gr)),
                                                           New XElement("setting", New XAttribute("name", "LastUpdate"), New XElement("value", m_LastUpdate.ToBinary)),
@@ -844,7 +882,8 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Ago"), New XElement("value", m_Ago)),
                                                           New XElement("setting", New XAttribute("name", "Service"), New XElement("value", IIf(m_Service, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "HistoryDir"), New XElement("value", m_HistoryDir)),
-                                                          New XElement("setting", New XAttribute("name", "BetaCheck"), New XElement("value", IIf(m_BetaCheck, "True", "False"))),
+                                                          New XElement("setting", New XAttribute("name", "UpdateType"), New XElement("value", sUpdateType)),
+                                                          New XElement("setting", New XAttribute("name", "UpdateTime"), New XElement("value", m_UpdateTime)),
                                                           New XElement("setting", New XAttribute("name", "ScaleScreen"), New XElement("value", IIf(m_ScaleScreen, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "MainSize"), New XElement("value", m_MainSize.Width & "," & m_MainSize.Height)),
                                                           New XElement("setting", New XAttribute("name", "RemoteKey"), New XElement("value", m_RemoteKey)),
@@ -1006,6 +1045,14 @@ Class AppSettings
       m_PassCrypt = value
     End Set
   End Property
+  Public Property StartWait As Integer
+    Get
+      Return m_StartWait
+    End Get
+    Set(value As Integer)
+      m_StartWait = value
+    End Set
+  End Property
   Public Property Interval As Integer
     Get
       Return m_Interval
@@ -1070,20 +1117,20 @@ Class AppSettings
       m_HistoryDir = value
     End Set
   End Property
-  'Public Property HistoryInversion As Boolean
-  '  Get
-  '    Return m_HistoryInvert
-  '  End Get
-  '  Set(value As Boolean)
-  '    m_HistoryInvert = value
-  '  End Set
-  'End Property
-  Public Property BetaCheck As Boolean
+  Public Property UpdateType As Byte
     Get
-      Return m_BetaCheck
+      Return m_UpdateType
     End Get
-    Set(value As Boolean)
-      m_BetaCheck = value
+    Set(value As Byte)
+      m_UpdateType = value
+    End Set
+  End Property
+  Public Property UpdateTime As Byte
+    Get
+      Return m_UpdateTime
+    End Get
+    Set(value As Byte)
+      m_UpdateTime = value
     End Set
   End Property
   Public Property ScaleScreen As Boolean

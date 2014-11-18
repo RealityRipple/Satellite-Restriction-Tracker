@@ -118,6 +118,48 @@ Public NotInheritable Class NativeMethods
     SM_CONVERTIBLESLATEMODE = &H2003
     SM_SYSTEMDOCKED = &H2004
   End Enum
+
+  Public Const WM_DEVICECHANGE As Integer = &H219
+  Public Const DBT_DEVICEARRIVAL As Integer = &H8000
+  Public Const DBT_DEVICEREMOVECOMPLETE As Integer = &H8004
+  Public Const DBT_DEVTYP_VOLUME As Integer = &H2
+  Public Structure DEV_BROADCAST_HDR
+    Public dbch_size As UInt32
+    Public dbch_devicetype As UInt32
+    Public dbch_reserved As UInt32
+  End Structure
+  Public Structure DEV_BROADCAST_VOLUME
+    Public dbcv_size As UInt32
+    Public dbcv_devicetype As UInt32
+    Public dbcv_reserved As UInt32
+    Public dbcv_unitmask As UInt32
+    Public dbcv_flags As UInt16
+  End Structure
+  Private Shared Function GetDriveLetterFromMask(Unit As UInt32) As String
+    Dim i As Integer
+    For i = 0 To 25
+      If (Unit And 1) = 1 Then Exit For
+      Unit = Unit >> 1
+    Next
+    If i = 26 Then Return ""
+    Return Chr(i + Asc("A"))
+  End Function
+  Public Shared Function GetDriveLetter(ByRef lParam As IntPtr) As String
+    Dim DeviceInfo As DEV_BROADCAST_HDR = CType(Marshal.PtrToStructure(lParam, GetType(DEV_BROADCAST_HDR)), DEV_BROADCAST_HDR)
+    If DeviceInfo.dbch_devicetype = DBT_DEVTYP_VOLUME Then
+      Dim Volume As DEV_BROADCAST_VOLUME = CType(Marshal.PtrToStructure(lParam, GetType(DEV_BROADCAST_VOLUME)), DEV_BROADCAST_VOLUME)
+      If Volume.dbcv_devicetype = DBT_DEVTYP_VOLUME Then
+        Dim DriveLetter As String = GetDriveLetterFromMask(Volume.dbcv_unitmask)
+        If String.IsNullOrEmpty(DriveLetter) Then Return ""
+        Return DriveLetter & ":\"
+      Else
+        Return ""
+      End If
+    Else
+      Return ""
+    End If
+  End Function
+
   Public Const BCM_SETSHIELD As Integer = &H160C
   <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
   Public Shared Function GetSystemMenu(hWnd As IntPtr, bRevert As Boolean) As IntPtr

@@ -100,7 +100,7 @@
         If CompareVersions(sVMU(0)) Then
           mySettings = Nothing
           Return CheckEventArgs.ResultType.NewUpdate
-        ElseIf mySettings.BetaCheck And Not String.IsNullOrEmpty(sVL(1)) Then
+        ElseIf mySettings.UpdateType = 2 And Not String.IsNullOrEmpty(sVL(1)) Then
           Dim sVBU() As String = sVL(1).Split("|"c)
           If CompareVersions(sVBU(0)) Then
             mySettings = Nothing
@@ -159,7 +159,7 @@
               rRet = CheckEventArgs.ResultType.NewUpdate
               DownloadURL = sVMU(1)
               sVer = sVMU(0)
-            ElseIf mySettings.BetaCheck And Not String.IsNullOrEmpty(sVL(1)) Then
+            ElseIf mySettings.UpdateType = 2 And Not String.IsNullOrEmpty(sVL(1)) Then
               Dim sVBU() As String = sVL(1).Split("|"c)
               If CompareVersions(sVBU(0)) Then
                 rRet = CheckEventArgs.ResultType.NewBeta

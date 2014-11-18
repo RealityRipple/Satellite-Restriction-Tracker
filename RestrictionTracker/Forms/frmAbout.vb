@@ -265,16 +265,16 @@
               Case Windows.Forms.DialogResult.OK
                 lblUpdate.Link = False
                 updateChecker.DownloadUpdate(sEXEPath)
-                mySettings.BetaCheck = False
+                mySettings.UpdateType = 1
                 mySettings.Save()
               Case Windows.Forms.DialogResult.Cancel
-                mySettings.BetaCheck = False
+                mySettings.UpdateType = 1
                 mySettings.Save()
               Case Else
 
             End Select
           Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-            If mySettings.BetaCheck Then
+            If mySettings.UpdateType = 2 Then
               SetUpdateValue("New BETA Available", , "Click to begin download.")
               lblUpdate.Link = True
               Application.DoEvents()
@@ -288,10 +288,10 @@
                 Case Windows.Forms.DialogResult.OK
                   lblUpdate.Link = False
                   updateChecker.DownloadUpdate(sEXEPath)
-                  mySettings.BetaCheck = False
+                  mySettings.UpdateType = 1
                   mySettings.Save()
                 Case Windows.Forms.DialogResult.Cancel
-                  mySettings.BetaCheck = False
+                  mySettings.UpdateType = 1
                   mySettings.Save()
                   SetUpdateValue("No New Updates")
                   lblUpdate.Link = False
