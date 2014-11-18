@@ -109,6 +109,7 @@
       cmbPortableDrive.Enabled = False
       chkPortableAutoRun.Enabled = False
       cmdMakePortable.Enabled = False
+      tbsConfig.TabPages.Remove(tabAdvanced)
     ElseIf mySettings.HistoryDir = AppDataAllPath Then
       optHistoryProgramData.Checked = True
     ElseIf mySettings.HistoryDir = AppDataPath Then
