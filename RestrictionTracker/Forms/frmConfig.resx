@@ -118,17 +118,49 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
+    <value>141, 17</value>
   </metadata>
-  <data name="chkService.ToolTip" xml:space="preserve">
-    <value>Run Satellite Restriction Logger system service when Satellite Restriction Tracker is closed.
-This service will continue running on the system so that logging may continue on any (or no) account.
-Requires admin privilege prompt when the Restriction Tracker is run or closed, and the Data Directory may not be customized.</value>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="pctPassDisplay.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAAAkAAAAQCAYAAADESFVDAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAFxSURBVChTYwCBY1N8JA73ejTt7nY+vqvb+ff2DofbC8ocmzY12SjAFRzscl9zdpbn/69XC///
+        e1ny//OVgv+bJvn+70m3mrOoWF+B4WCH66QLcz3//3pc+39eq+//9vSQ/3MqQ/5/2R/6cFWP9//aaJNW
+        hj3NNs9/XYr/35Lu+x9sNBQcnBDw/+HusP8Zfjb3GXY32/z5eSzm/5quHAz862rq/+wAqz8MO+osHv48
+        GP7/5/bg///eTf7/703//89bQv//e9z7/9GuoP95gea3GDY2WPueaDf5/31X6P+fh0CKff//vpb9/8Uy
+        j//p/vb/m0OEzMD2LyjSCzsOVPjhQNz/f6eD/9/dHPI/M8D+f22goCNYAQxMSFZ0O16n/v/PvcL/DdHW
+        IAWmUClUAFZ0PRqsCCqECUCK/j4KIazo4kLn/6WhtpVQIUwAtu6i1//2eCv8Jl1a4EiESWc98Ju0M1Yi
+        t87f6H+Cl2MSVAgIGBgAnATd95OJfH4AAAAASUVORK5CYII=
+</value>
   </data>
-  <metadata name="fswController.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>113, 17</value>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
   </metadata>
-  <metadata name="tmrAnim.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>237, 17</value>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>141, 17</value>
+  </metadata>
+  <metadata name="fswController.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
   </metadata>
 </root>

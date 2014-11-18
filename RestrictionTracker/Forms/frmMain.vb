@@ -845,24 +845,6 @@ Public Class frmMain
       End If
     End If
   End Sub
-  'Private Sub localData_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBVResult
-  '  If Me.InvokeRequired Then
-  '    Me.BeginInvoke(New EventHandler(AddressOf localData_ConnectionWBVResult), sender, e)
-  '  Else
-  '    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-  '    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
-  '    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-  '    myPanel = SatHostTypes.WildBlue_EVOLUTION
-  '    mySettings.AccountType = SatHostTypes.WildBlue_EVOLUTION
-  '    mySettings.Save()
-  '    If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
-  '    DisplayUsage(True, True)
-  '    If localData IsNot Nothing Then
-  '      localData.Dispose()
-  '      localData = Nothing
-  '    End If
-  '  End If
-  'End Sub
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
@@ -1416,15 +1398,9 @@ Public Class frmMain
     mySettings.Save()
     NextGrabTick = Long.MaxValue
     Dim dRet As DialogResult
-    If My.Computer.Keyboard.ShiftKeyDown Then
-      Using dlgConfig As New frmNewConfig
-        dRet = dlgConfig.ShowDialog(Me)
-      End Using
-    Else
-      Using dlgConfig As New frmConfig
-        dRet = dlgConfig.ShowDialog(Me)
-      End Using
-    End If
+    Using dlgConfig As New frmConfig
+      dRet = dlgConfig.ShowDialog(Me)
+    End Using
     Dim WaitTime As Long = TickCount() + 2000
     If Not myState = LoadStates.Loaded Then
       If Not myState = LoadStates.Lookup Then

@@ -1,18 +1,20 @@
 ﻿Public Class frmConfig
+
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents wsHostList As CookieAwareWebClient
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
-  Private Const LINK_PURCHASE As String = "Purchase a Key"
+  Private Const LINK_PURCHASE As String = "Purchase a Remote Usage Service Subscription"
   Private Const LINK_PURCHASE_TT As String = "If you do not have a Product Key for the Remote Usage Service, you can purchase one online for as little as $15.00 a year."
-  Private Const LINK_PANEL As String = "User Panel"
-  Private Const LINK_PANEL_TT As String = "Manage your Remote Usage Service account online."
+  Private Const LINK_PANEL As String = "Visit the Remote Usage Service User Panel Page"
+  Private Const LINK_PANEL_TT As String = "Manage your Remote Usage Service account online, chat with other users, and contact support directly, all from one page."
 #Region "Form Events"
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
     If AppData = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    RepadAllItems(Me)
     Dim sAccount As String = mySettings.Account
     Dim sUsername, sProvider As String
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
@@ -29,6 +31,16 @@
       txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
     txtPassword.UseSystemPasswordChar = True
+
+    Select Case mySettings.AccountType
+      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
+      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
+      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : optAccountTypeDNX.Checked = True
+      Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
+      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
+    End Select
+    chkAccountTypeAuto.Checked = True
+
     Dim sKey As String = mySettings.RemoteKey
     If sKey.Contains("-") Then
       Dim sKeys() As String = Split(sKey, "-")
@@ -65,6 +77,10 @@
       lblPurchaseKey.Text = LINK_PANEL
       ttConfig.SetTooltip(lblPurchaseKey, LINK_PANEL_TT)
     End If
+    If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
+    If mySettings.StartWait < txtStartWait.Minimum Then mySettings.StartWait = txtStartWait.Minimum
+    txtStartWait.Value = mySettings.StartWait
+    txtStartWait.LargeIncrement = 1
     If mySettings.Interval > txtInterval.Maximum Then mySettings.Interval = txtInterval.Maximum
     If mySettings.Interval < txtInterval.Minimum Then mySettings.Interval = txtInterval.Minimum
     txtInterval.Value = mySettings.Interval
@@ -79,11 +95,34 @@
     txtTimeout.LargeIncrement = 15
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     DoCheck()
+    Dim DisableHistory As Boolean = False
+    If chkService.Checked Then
+      optHistoryProgramData.Checked = False
+      DisableHistory = True
+    ElseIf AppData = Application.StartupPath & "\Config\" Then
+      optHistoryProgramData.Checked = False
+      optHistoryAppData.Checked = False
+      optHistoryCustom.Checked = False
+      mySettings.HistoryDir = Application.StartupPath & "\Config\"
+      DisableHistory = True
+      lblPortableDrive.Enabled = False
+      cmbPortableDrive.Enabled = False
+      chkPortableAutoRun.Enabled = False
+      cmdMakePortable.Enabled = False
+    ElseIf mySettings.HistoryDir = AppDataAllPath Then
+      optHistoryProgramData.Checked = True
+    ElseIf mySettings.HistoryDir = AppDataPath Then
+      optHistoryAppData.Checked = True
+    Else
+      optHistoryCustom.Checked = True
+    End If
     txtHistoryDir.Text = mySettings.HistoryDir
     If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir
-    lblHistoryDir.Enabled = Not chkService.Checked
-    txtHistoryDir.Enabled = Not chkService.Checked
-    cmdHistoryDir.Enabled = Not chkService.Checked
+    optHistoryAppData.Enabled = Not DisableHistory
+    optHistoryProgramData.Enabled = Not DisableHistory
+    optHistoryCustom.Enabled = Not DisableHistory
+    txtHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
+    cmdHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
     If mySettings.Overuse = 0 Then
       chkOverAlert.Checked = False
       txtOverSize.Value = 100
@@ -93,7 +132,7 @@
     End If
     chkOverAlert_CheckedChanged(New Object, New EventArgs)
     txtOverTime.Value = mySettings.Overtime
-    chkBeta.Checked = (mySettings.UpdateType = 2)
+
     If mySettings.Proxy Is Nothing Then
       cmbProxyType.SelectedIndex = 0
       txtProxyAddress.Text = String.Empty
@@ -134,6 +173,31 @@
         txtProxyDomain.Text = String.Empty
       End If
     End If
+    Select Case mySettings.UpdateType
+      Case 0 : optUpdateNone.Checked = True
+      Case 1 : optUpdateRelease.Checked = True
+      Case 2 : optUpdateBETA.Checked = True
+    End Select
+    Select Case mySettings.UpdateTime
+      Case 1 : cmbUpdateInterval.SelectedIndex = 0
+      Case 3 : cmbUpdateInterval.SelectedIndex = 1
+      Case 7 : cmbUpdateInterval.SelectedIndex = 2
+      Case 15 : cmbUpdateInterval.SelectedIndex = 3
+      Case 30 : cmbUpdateInterval.SelectedIndex = 4
+      Case Else : cmbUpdateInterval.SelectedIndex = 3
+    End Select
+    For Each drive In My.Computer.FileSystem.Drives
+      If drive.DriveType = IO.DriveType.Removable AndAlso drive.IsReady AndAlso drive.AvailableFreeSpace > 0 Then
+        cmbPortableDrive.Items.Add(drive.RootDirectory.FullName)
+      End If
+    Next
+    If cmbPortableDrive.Items.Count = 0 Then
+      cmbPortableDrive.Enabled = False
+      pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
+    Else
+      cmbPortableDrive.SelectedIndex = 0
+      pctAdvancedPortableIcon.Image = My.Resources.advanced_portable
+    End If
     cmdSave.Enabled = False
     bSaved = False
     bAccount = False
@@ -141,7 +205,6 @@
     fswController.Filter = "RestrictionController.exe"
     fswController.NotifyFilter = IO.NotifyFilters.Attributes Or IO.NotifyFilters.CreationTime Or IO.NotifyFilters.DirectoryName Or IO.NotifyFilters.FileName Or IO.NotifyFilters.LastAccess Or IO.NotifyFilters.LastWrite Or IO.NotifyFilters.Security Or IO.NotifyFilters.Size
     fswController.EnableRaisingEvents = True
-    DrawTitle()
     bLoaded = True
     Dim popInvoker As New MethodInvoker(AddressOf PopulateHostList)
     popInvoker.BeginInvoke(Nothing, Nothing)
@@ -199,8 +262,50 @@
     End If
     e.Cancel = False
   End Sub
+  Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+
+    If m.Msg = NativeMethods.WM_DEVICECHANGE Then
+      If m.WParam = NativeMethods.DBT_DEVICEARRIVAL Then
+        Dim DriveLetter As String = NativeMethods.GetDriveLetter(m.LParam)
+        If String.IsNullOrEmpty(DriveLetter) Then Exit Sub
+        If Not cmbPortableDrive.Items.Contains(DriveLetter) Then
+          cmbPortableDrive.Items.Add(DriveLetter)
+          If cmbPortableDrive.Items.Count > 0 Then
+            cmbPortableDrive.Enabled = lblPortableDrive.Enabled
+            pctAdvancedPortableIcon.Image = My.Resources.advanced_portable
+            If cmbPortableDrive.SelectedIndex < 0 Then cmbPortableDrive.SelectedIndex = 0
+          End If
+        End If
+      ElseIf m.WParam = NativeMethods.DBT_DEVICEREMOVECOMPLETE Then
+        Dim DriveLetter As String = NativeMethods.GetDriveLetter(m.LParam)
+        If String.IsNullOrEmpty(DriveLetter) Then Exit Sub
+        If cmbPortableDrive.Items.Contains(DriveLetter) Then
+          cmbPortableDrive.Items.Remove(DriveLetter)
+          If cmbPortableDrive.Items.Count = 0 Then
+            pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
+            cmbPortableDrive.Enabled = False
+            chkPortableAutoRun.Enabled = False
+            cmdMakePortable.Enabled = False
+          End If
+        End If
+      End If
+    End If
+    MyBase.WndProc(m)
+  End Sub
   Private isShown As Boolean = False
-  Private Sub Panel_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pnlConfig.MouseMove, pnlAccuracy.MouseMove, pnlButtons.MouseMove, pnlHistoryDir.MouseMove, pnlInterval.MouseMove, pnlKey.MouseMove
+  Private Sub Panel_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pnlAccount.MouseMove,
+    pnlAccountViaSat.MouseMove, pnlAccountViaSatInput.MouseMove,
+    pnlAccountProvider.MouseMove, pnlAccountTypes.MouseMove,
+    pnlAccountKey.MouseMove, pnlKey.MouseMove,
+    pnlPrefs.MouseMove,
+    pnlPrefStart.MouseMove, pnlPrefStartInput.MouseMove,
+    pnlPrefAccuracy.MouseMove, pnlPrefAccuracyInput.MouseMove,
+    pnlPrefAlert.MouseMove, pnlPrefColor.MouseMove,
+    pnlNetwork.MouseMove,
+    pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
+    pnlAdvanced.MouseMove,
+    pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
+    pnlButtons.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -223,8 +328,20 @@
       e.Handled = True
     End If
   End Sub
-  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged, txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged, txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged, txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress, chkStartUp.CheckedChanged, txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, txtOverSize.ValueChanged, txtOverTime.ValueChanged, chkBeta.CheckedChanged, txtProxyAddress.TextChanged, txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress, txtProxyUser.TextChanged, txtProxyPassword.TextChanged, txtProxyDomain.TextChanged
-    If mySettings Is Nothing Then Exit Sub
+  Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged,
+                                                                             txtStartWait.KeyPress, txtStartWait.Scroll, txtStartWait.ValueChanged,
+                                                                             txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged,
+                                                                             txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged,
+                                                                             txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress,
+                                                                             chkStartUp.CheckedChanged,
+                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged,
+                                                                             txtOverSize.ValueChanged, txtOverTime.ValueChanged,
+                                                                             txtProxyAddress.TextChanged,
+                                                                             txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress,
+                                                                             txtProxyUser.TextChanged,
+                                                                             txtProxyPassword.TextChanged,
+                                                                             txtProxyDomain.TextChanged,
+                                                                             cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged, cmbProvider.KeyPress, cmbProvider.TextChanged, cmbProvider.SelectedIndexChanged
@@ -346,7 +463,10 @@
       txtHistoryDir.Text = txtHistoryDir.Tag
       txtHistoryDir.Tag = Nothing
     End If
-    lblHistoryDir.Enabled = Not chkService.Checked
+    optHistoryAppData.Enabled = Not chkService.Checked
+    optHistoryProgramData.Enabled = Not chkService.Checked
+    optHistoryCustom.Enabled = Not chkService.Checked
+    If chkService.Checked Then optHistoryProgramData.Checked = True
     txtHistoryDir.Enabled = Not chkService.Checked
     cmdHistoryDir.Enabled = Not chkService.Checked
     cmdSave.Enabled = SettingsChanged()
@@ -369,14 +489,14 @@
       If dirDlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then txtHistoryDir.Text = IO.Path.GetDirectoryName(dirDlg.FileName) & "\"
     End Using
   End Sub
-  Private Sub cmdPassDisplay_Click(sender As System.Object, e As System.EventArgs) Handles cmdPassDisplay.Click
-    txtPassword.UseSystemPasswordChar = Not txtPassword.UseSystemPasswordChar
-  End Sub
   Private Sub chkOverAlert_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkOverAlert.CheckedChanged
+    lblOverSize1.Enabled = chkOverAlert.Checked
     txtOverSize.Enabled = chkOverAlert.Checked
-    lblOverSize.Enabled = chkOverAlert.Checked
+    lblOverSize2.Enabled = chkOverAlert.Checked
+    lblOverTime1.Enabled = chkOverAlert.Checked
     txtOverTime.Enabled = chkOverAlert.Checked
-    lblOverTime.Enabled = chkOverAlert.Checked
+    lblOverTime2.Enabled = chkOverAlert.Checked
+    cmdAlertStyle.Enabled = chkOverAlert.Checked
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
@@ -599,14 +719,14 @@
       txtAccount.Focus()
       Exit Sub
     End If
-    If String.IsNullOrEmpty(cmbProvider.Text) Then
-      MessageBox.Show("Please enter your ViaSat Provider address or select one from the list.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
-      cmbProvider.Focus()
-      Exit Sub
-    End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
       MessageBox.Show("Please enter your ViaSat account Password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtPassword.Focus()
+      Exit Sub
+    End If
+    If String.IsNullOrEmpty(cmbProvider.Text) Then
+      MessageBox.Show("Please enter your ViaSat Provider address or select one from the list.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      cmbProvider.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtHistoryDir.Text) Then
@@ -624,6 +744,8 @@
        cmbProvider.Text.ToLower.Contains("mysso") Or
        cmbProvider.Text.ToLower.Contains("myexede") Or
        cmbProvider.Text.ToLower.Contains("my.exede") Then cmbProvider.Text = "exede.net"
+
+    'Account Tab
     If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
@@ -631,6 +753,19 @@
     If String.Compare(StoredPassword.DecryptApp(mySettings.PassCrypt), txtPassword.Text, False) <> 0 Then
       mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text)
       bAccount = True
+    End If
+    If Not chkAccountTypeAuto.Checked Then
+      If optAccountTypeWBL.Checked Then
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+      ElseIf optAccountTypeWBX.Checked Then
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      ElseIf optAccountTypeDNX.Checked Then
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      ElseIf optAccountTypeRPL.Checked Then
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+      ElseIf optAccountTypeRPX.Checked Then
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+      End If
     End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If String.Compare(mySettings.RemoteKey, sKey, True) <> 0 Then
@@ -642,9 +777,8 @@
         bAccount = True
       End If
     End If
-    mySettings.Interval = txtInterval.Value
-    mySettings.Accuracy = txtAccuracy.Value
-    mySettings.Timeout = txtTimeout.Value
+
+    'Preferences Tab
     If chkStartUp.Checked Then
       If Not My.Computer.FileSystem.FileExists(StartupPath) Then
         Using link As New ShellLink
@@ -658,6 +792,13 @@
     Else
       If My.Computer.FileSystem.FileExists(StartupPath) Then My.Computer.FileSystem.DeleteFile(StartupPath)
     End If
+
+    mySettings.StartWait = txtStartWait.Value
+
+    mySettings.Interval = txtInterval.Value
+    mySettings.Accuracy = txtAccuracy.Value
+    mySettings.Timeout = txtTimeout.Value
+
     If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir
     mySettings.Service = chkService.Checked
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
@@ -670,6 +811,8 @@
           My.Computer.FileSystem.CreateDirectory(txtHistoryDir.Text)
         Catch ex As Exception
           MessageBox.Show("The directory you selected could not be created!", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          optHistoryCustom.Checked = True
+          txtHistoryDir.Enabled = True
           txtHistoryDir.Focus()
           Exit Sub
         End Try
@@ -746,7 +889,21 @@
       mySettings.Overuse = 0
     End If
     mySettings.Overtime = txtOverTime.Value
-    mySettings.UpdateType = IIf(chkBeta.Checked, 2, 1)
+    If optUpdateBETA.Checked Then
+      mySettings.UpdateType = 2
+    ElseIf optUpdateRelease.Checked Then
+      mySettings.UpdateType = 1
+    ElseIf optUpdateNone.Checked Then
+      mySettings.UpdateType = 0
+    End If
+    Select Case cmbUpdateInterval.SelectedIndex
+      Case 0 : mySettings.UpdateTime = 1
+      Case 1 : mySettings.UpdateTime = 3
+      Case 2 : mySettings.UpdateTime = 7
+      Case 3 : mySettings.UpdateTime = 15
+      Case 4 : mySettings.UpdateTime = 30
+      Case Else : mySettings.UpdateTime = 15
+    End Select
     Select Case cmbProxyType.SelectedIndex
       Case 0 : mySettings.Proxy = Nothing
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
@@ -801,12 +958,14 @@
   End Sub
 #End Region
   Private Function SettingsChanged() As Boolean
+    If mySettings Is Nothing Then Return False
     If bHardChange Then Return True
     If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) = 0 Then Return True
     If Not mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text) Then Return True
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""
     If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
+    If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
     If Not mySettings.Timeout = txtTimeout.Value Then Return True
@@ -816,7 +975,16 @@
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
-    If Not (mySettings.UpdateType = 2) = chkBeta.Checked Then Return True
+    If optUpdateNone.Checked And Not mySettings.UpdateType = 0 Then Return True
+    If optUpdateRelease.Checked And Not mySettings.UpdateType = 1 Then Return True
+    If optUpdateBETA.Checked And Not mySettings.UpdateType = 2 Then Return True
+    Select Case cmbUpdateInterval.SelectedIndex
+      Case 0 : If Not mySettings.UpdateTime = 1 Then Return True
+      Case 1 : If Not mySettings.UpdateTime = 3 Then Return True
+      Case 2 : If Not mySettings.UpdateTime = 7 Then Return True
+      Case 3 : If Not mySettings.UpdateTime = 15 Then Return True
+      Case 4 : If Not mySettings.UpdateTime = 30 Then Return True
+    End Select
     If mySettings.Proxy Is Nothing Then
       If Not cmbProxyType.SelectedIndex = 0 Then Return True
     ElseIf mySettings.Proxy Is Net.WebRequest.DefaultWebProxy Then
@@ -875,78 +1043,187 @@
     DoCheck()
   End Sub
 #End Region
-  Private Sub tmrAnim_Tick(sender As System.Object, e As System.EventArgs) Handles tmrAnim.Tick
-    Dim imgSize As Size = pctSRT.DisplayRectangle.Size
-    Dim iPos As Integer = tmrAnim.Tag
-    If iPos >= imgSize.Width Then
-      DrawTitle()
-      Exit Sub
-    Else
-      iPos += 2
-    End If
-    Using bmpAnim As New Bitmap(imgSize.Width, imgSize.Height)
-      Using g As Graphics = Graphics.FromImage(bmpAnim)
-        g.Clear(Color.Black)
-        g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-        g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-        g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-        g.FillRectangle(New Drawing2D.LinearGradientBrush(New Rectangle(0, 0, imgSize.Width, imgSize.Height), Color.Black, Color.DeepSkyBlue, Drawing2D.LinearGradientMode.Vertical), 0, 0, imgSize.Width, imgSize.Height)
-        Try
-          Dim a12 As New Font("Arial", 12)
-          Dim a8 As New Font("Arial", 8)
-          Dim appSize As SizeF = g.MeasureString("@" & My.Application.Info.Title & "@", a12)
-          Dim cmpSize As SizeF = g.MeasureString("@" & My.Application.Info.CompanyName & "#", a8)
-          g.DrawString("              Restriction", a12, Brushes.Black, New RectangleF(5, 7, appSize.Width, appSize.Height))
-          g.DrawString("              Restriction", a12, Brushes.White, New RectangleF(4, 6, appSize.Width, appSize.Height))
-          g.DrawIconUnstretched(My.Resources.sat, New Rectangle(iPos, (imgSize.Height / 2) - 16, 32, 32))
-          g.DrawString("Satellite                      Tracker", a12, Brushes.Black, New RectangleF(5, 7, appSize.Width, appSize.Height))
-          g.DrawString("Satellite                      Tracker", a12, Brushes.White, New RectangleF(4, 6, appSize.Width, appSize.Height))
-          g.DrawString("by " & My.Application.Info.CompanyName, a8, Brushes.RoyalBlue, New RectangleF(imgSize.Width - cmpSize.Width - 3, imgSize.Height - cmpSize.Height - 3, cmpSize.Width + 4, cmpSize.Height + 4))
-          g.DrawString("by " & My.Application.Info.CompanyName, a8, Brushes.White, New RectangleF(imgSize.Width - cmpSize.Width - 4, imgSize.Height - cmpSize.Height - 4, cmpSize.Width + 4, cmpSize.Height + 4))
-        Catch ex As Exception
-          g.DrawIconUnstretched(My.Resources.sat, New Rectangle(iPos, (imgSize.Height / 2) - 16, 32, 32))
-        End Try
-      End Using
-      pctSRT.Image = bmpAnim.Clone
-    End Using
-    tmrAnim.Tag = iPos
-  End Sub
-  Private Sub pctSRT_DoubleClick(sender As Object, e As System.EventArgs) Handles pctSRT.DoubleClick
-    If My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And Not My.Computer.Keyboard.ShiftKeyDown Then
-      ToggleSong()
-    End If
-  End Sub
-  Private Sub pctSRT_MouseEnter(sender As Object, e As System.EventArgs) Handles pctSRT.MouseEnter
-    tmrAnim.Enabled = True
-  End Sub
-  Private Sub DrawTitle()
-    tmrAnim.Tag = -32
-    tmrAnim.Interval = 75
-    tmrAnim.Enabled = False
-    Dim imgSize As Size = pctSRT.DisplayRectangle.Size
-    Using bmpAnim As New Bitmap(imgSize.Width, imgSize.Height)
-      Using g As Graphics = Graphics.FromImage(bmpAnim)
-        g.Clear(Color.Black)
-        g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-        g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-        g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-        g.FillRectangle(New Drawing2D.LinearGradientBrush(New Rectangle(0, 0, imgSize.Width, imgSize.Height), Color.Black, Color.DeepSkyBlue, Drawing2D.LinearGradientMode.Vertical), 0, 0, imgSize.Width, imgSize.Height)
-        Try
-          Dim a12 As New Font("Arial", 12)
-          Dim a8 As New Font("Arial", 8)
-          Dim appSize As SizeF = g.MeasureString("@" & My.Application.Info.Title & "@", a12)
-          Dim cmpSize As SizeF = g.MeasureString("@" & My.Application.Info.CompanyName & "#", a8)
-          g.DrawString("              Restriction", a12, Brushes.Black, New RectangleF(5, 7, appSize.Width, appSize.Height))
-          g.DrawString("              Restriction", a12, Brushes.White, New RectangleF(4, 6, appSize.Width, appSize.Height))
-          g.DrawString("Satellite                      Tracker", a12, Brushes.Black, New RectangleF(5, 7, appSize.Width, appSize.Height))
-          g.DrawString("Satellite                      Tracker", a12, Brushes.White, New RectangleF(4, 6, appSize.Width, appSize.Height))
-          g.DrawString("by " & My.Application.Info.CompanyName, a8, Brushes.RoyalBlue, New RectangleF(imgSize.Width - cmpSize.Width - 3, imgSize.Height - cmpSize.Height - 3, cmpSize.Width + 4, cmpSize.Height + 4))
-          g.DrawString("by " & My.Application.Info.CompanyName, a8, Brushes.White, New RectangleF(imgSize.Width - cmpSize.Width - 4, imgSize.Height - cmpSize.Height - 4, cmpSize.Width + 4, cmpSize.Height + 4))
-        Catch ex As Exception
 
-        End Try
-      End Using
-      pctSRT.Image = bmpAnim.Clone
-    End Using
+  Private Sub RepadAllItems(Parent As Object)
+    For Each ctl As Control In Parent.Controls
+      If ctl.HasChildren Then
+        RepadAllItems(ctl)
+      End If
+      If ctl.GetType = GetType(TextBox) Then
+        If ctl.Name = txtPassword.Name Then
+          ctl.Margin = New Padding(3, 3, 1, 3)
+        ElseIf ctl.Name.StartsWith("txtKey") Then
+          ctl.Margin = New Padding(1, 3, 1, 3)
+        Else
+          ctl.Margin = New Padding(3)
+        End If
+      ElseIf ctl.GetType = GetType(ComboBox) Then
+        ctl.Margin = New Padding(3)
+      ElseIf ctl.GetType = GetType(NumericUpDown) Then
+        ctl.Margin = New Padding(3)
+      ElseIf ctl.GetType = GetType(Button) Then
+        If ctl.Name = cmdColors.Name Or ctl.Name = cmdAlertStyle.Name Then
+          ctl.Margin = New Padding(3, 3, 10, 3)
+        Else
+          ctl.Margin = New Padding(3)
+        End If
+      ElseIf ctl.GetType = GetType(PictureBox) Then
+        If ctl.Name = pctPassDisplay.Name Then
+          ctl.Margin = New Padding(1, 3, 3, 3)
+        ElseIf ctl.Name = pctKeyState.Name Then
+          ctl.Margin = New Padding(1, 3, 3, 3)
+        Else
+          ctl.Margin = New Padding(21, 3, 3, 3)
+          ctl.Height = ctl.Width
+        End If
+      End If
+    Next
+  End Sub
+
+  Private Sub chkAccountTypeAuto_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkAccountTypeAuto.CheckedChanged
+    optAccountTypeWBL.Enabled = Not chkAccountTypeAuto.Checked
+    optAccountTypeDNX.Enabled = Not chkAccountTypeAuto.Checked
+    optAccountTypeWBX.Enabled = Not chkAccountTypeAuto.Checked
+    optAccountTypeRPL.Enabled = Not chkAccountTypeAuto.Checked
+    optAccountTypeRPX.Enabled = Not chkAccountTypeAuto.Checked
+  End Sub
+
+  Private Sub pctPassDisplay_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctPassDisplay.MouseDown
+    If e.Button = Windows.Forms.MouseButtons.Left Then txtPassword.UseSystemPasswordChar = False
+  End Sub
+
+  Private Sub pctPassDisplay_MouseUp(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctPassDisplay.MouseUp
+    If e.Button = Windows.Forms.MouseButtons.Left Then txtPassword.UseSystemPasswordChar = True
+  End Sub
+
+  Private Sub optUpdateRelease_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateRelease.CheckedChanged
+    pctNetworkUpdateIcon.Image = My.Resources.net_update_good
+    lblUpdateInterval.Enabled = True
+    cmbUpdateInterval.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub optUpdateBETA_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateBETA.CheckedChanged
+    pctNetworkUpdateIcon.Image = My.Resources.net_update_warn
+    lblUpdateInterval.Enabled = True
+    cmbUpdateInterval.Enabled = True
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub optUpdateNone_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateNone.CheckedChanged
+    pctNetworkUpdateIcon.Image = My.Resources.net_update_bad
+    lblUpdateInterval.Enabled = False
+    cmbUpdateInterval.Enabled = False
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub cmbPortableDrive_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbPortableDrive.SelectedIndexChanged
+    cmdMakePortable.Enabled = cmbPortableDrive.Enabled
+    cmdMakePortable.Text = "&Copy to Removable Drive (" & cmbPortableDrive.SelectedItem & ")"
+    If My.Computer.FileSystem.FileExists(cmbPortableDrive.SelectedItem & "AUTORUN.INF") Then
+      chkPortableAutoRun.Enabled = False
+      chkPortableAutoRun.Checked = False
+    Else
+      chkPortableAutoRun.Enabled = cmbPortableDrive.Enabled
+    End If
+  End Sub
+
+  Private Sub optHistoryProgramData_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optHistoryProgramData.CheckedChanged
+    txtHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    cmdHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    txtHistoryDir.Text = AppDataAllPath
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub optHistoryAppData_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optHistoryAppData.CheckedChanged
+    txtHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    cmdHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    txtHistoryDir.Text = AppDataPath
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub optHistoryCustom_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optHistoryCustom.CheckedChanged
+    txtHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    cmdHistoryDir.Enabled = optHistoryCustom.Checked And Not chkService.Checked
+    txtHistoryDir.Text = MySaveDir
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+
+  Private Sub cmdHistoryDirOpen_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistoryDirOpen.Click
+    If optHistoryProgramData.Checked Then
+      Process.Start(AppDataAllPath)
+    ElseIf optHistoryAppData.Checked Then
+      Process.Start(AppDataPath)
+    Else
+      Process.Start(txtHistoryDir.Text)
+    End If
+  End Sub
+
+  Private Sub cmdMakePortable_Click(sender As System.Object, e As System.EventArgs) Handles cmdMakePortable.Click
+    If String.IsNullOrEmpty(cmbPortableDrive.SelectedItem) Then
+      cmbPortableDrive.Focus()
+      Exit Sub
+    End If
+    Dim sDrive As String = cmbPortableDrive.SelectedItem
+    Try
+      Dim drive As IO.DriveInfo = My.Computer.FileSystem.GetDriveInfo(sDrive)
+      If Not drive.IsReady Then
+        cmbPortableDrive.Focus()
+        MsgBox("Drive " & sDrive & " is not ready!", MsgBoxStyle.Critical, "Drive Not Ready")
+        Exit Sub
+      End If
+      Dim reqSpace As Long = 1024L * 1024L * 500L
+      reqSpace = New IO.FileInfo(Application.ExecutablePath).Length
+      reqSpace = New IO.FileInfo(Application.StartupPath & "\RestrictionTrackerLib.dll").Length
+      For Each file In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
+        reqSpace += file.Length
+      Next
+      If Not AppDataPath = MySaveDir Then
+        For Each file In New IO.DirectoryInfo(MySaveDir).EnumerateFiles
+          reqSpace += file.Length
+        Next
+      End If
+      reqSpace += 1024L * 1024L 'extra MB
+      If drive.AvailableFreeSpace < reqSpace Then
+        cmbPortableDrive.Focus()
+        MsgBox("Drive " & sDrive & " does not have enough free space for " & Application.ProductName & "!" & vbNewLine & "Please free up " & ByteSize(reqSpace) & " before retrying.", MsgBoxStyle.Critical, "Drive Full")
+        Exit Sub
+      End If
+      IO.Directory.CreateDirectory(sDrive(0) & ":\SRT\")
+      IO.File.Copy(Application.ExecutablePath, sDrive(0) & ":\SRT\RestrictionTracker.exe", True)
+      IO.File.Copy(Application.StartupPath & "\RestrictionTrackerLib.dll", sDrive(0) & ":\SRT\RestrictionTrackerLib.dll", True)
+      IO.Directory.CreateDirectory(sDrive(0) & ":\SRT\Config\")
+      For Each file In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
+        If file.Name = "user.config" Or file.Name = "backup.config" Then
+          Dim sConfig As String = My.Computer.FileSystem.ReadAllText(file.FullName, System.Text.Encoding.GetEncoding(LATIN_1))
+          If sConfig.Contains("<setting name=""HistoryDir"">") Then
+            Dim sHistory As String = sConfig.Substring(sConfig.IndexOf("<setting name=""HistoryDir"">"))
+            sHistory = sHistory.Substring(0, sHistory.IndexOf("</setting>") + 10)
+            Dim sNewHistory As String = "<setting name=""HistoryDir"">" & vbNewLine & "        <value></value>" & vbNewLine & "      </setting>"
+            sConfig = sConfig.Replace(sHistory, sNewHistory)
+          End If
+          My.Computer.FileSystem.WriteAllText(sDrive(0) & ":\SRT\Config\" & file.Name, sConfig, False, System.Text.Encoding.GetEncoding(LATIN_1))
+        Else
+          file.CopyTo(sDrive(0) & ":\SRT\Config\" & file.Name, True)
+        End If
+      Next
+      If Not AppDataPath = MySaveDir Then
+        For Each file In New IO.DirectoryInfo(MySaveDir).EnumerateFiles
+          file.CopyTo(sDrive(0) & ":\SRT\Config\" & file.Name, True)
+        Next
+      End If
+      If chkPortableAutoRun.Checked Then
+        My.Computer.FileSystem.WriteAllText(sDrive & "AUTORUN.INF", "[AutoRun]" & vbNewLine &
+                                                                    "open=SRT\RestrictionTracker.exe" & vbNewLine &
+                                                                    "icon=SRT\RestrictionTracker.exe,0" & vbNewLine &
+                                                                    "label=Satellite Restriction Tracker", False, System.Text.Encoding.GetEncoding(LATIN_1))
+        drive.VolumeLabel = "SRT"
+      End If
+      MsgBox(Application.ProductName & " has been ported to Drive " & sDrive & "!", MsgBoxStyle.Information, "Files Copied!")
+    Catch ex As Exception
+      cmbPortableDrive.Focus()
+      MsgBox("There was an error trying to create a portable install on Drive " & sDrive & "!" & vbNewLine & ex.Message, MsgBoxStyle.Critical, "Drive Error")
+      Exit Sub
+    End Try
   End Sub
 End Class
