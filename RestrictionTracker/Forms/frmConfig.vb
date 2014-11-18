@@ -435,7 +435,11 @@
   Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
     If e.UserState = "GRAB" Then
       If Me.InvokeRequired Then
-        Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsHostList_DownloadStringCompleted), sender, e)
+        Try
+          Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsHostList_DownloadStringCompleted), sender, e)
+        Catch ex As Exception
+
+        End Try
       Else
         If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
           Try
