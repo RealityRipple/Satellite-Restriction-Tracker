@@ -122,7 +122,7 @@ Partial Class frmConfig
     Me.optUpdateRelease = New System.Windows.Forms.RadioButton()
     Me.optUpdateBETA = New System.Windows.Forms.RadioButton()
     Me.optUpdateNone = New System.Windows.Forms.RadioButton()
-    Me.TableLayoutPanel30 = New System.Windows.Forms.TableLayoutPanel()
+    Me.pnlNetworkUpdateTime = New System.Windows.Forms.TableLayoutPanel()
     Me.lblUpdateInterval = New System.Windows.Forms.Label()
     Me.cmbUpdateInterval = New System.Windows.Forms.ComboBox()
     Me.pnlNetworkProxy = New System.Windows.Forms.TableLayoutPanel()
@@ -230,7 +230,7 @@ Partial Class frmConfig
     Me.pnlNetwork.SuspendLayout()
     Me.pnlNetworkUpdate.SuspendLayout()
     CType(Me.pctNetworkUpdateIcon, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.TableLayoutPanel30.SuspendLayout()
+    Me.pnlNetworkUpdateTime.SuspendLayout()
     Me.pnlNetworkProxy.SuspendLayout()
     Me.pnlProxy.SuspendLayout()
     CType(Me.txtProxyPort, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -450,7 +450,7 @@ Partial Class frmConfig
     Me.lblAccount.Location = New System.Drawing.Point(3, 25)
     Me.lblAccount.Name = "lblAccount"
     Me.lblAccount.Size = New System.Drawing.Size(58, 13)
-    Me.lblAccount.TabIndex = 0
+    Me.lblAccount.TabIndex = 1
     Me.lblAccount.Text = "&Username:"
     '
     'lblPassword
@@ -460,7 +460,7 @@ Partial Class frmConfig
     Me.lblPassword.Location = New System.Drawing.Point(3, 51)
     Me.lblPassword.Name = "lblPassword"
     Me.lblPassword.Size = New System.Drawing.Size(56, 13)
-    Me.lblPassword.TabIndex = 1
+    Me.lblPassword.TabIndex = 3
     Me.lblPassword.Text = "&Password:"
     '
     'txtAccount
@@ -480,7 +480,7 @@ Partial Class frmConfig
     Me.txtPassword.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtPassword.Name = "txtPassword"
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
-    Me.txtPassword.TabIndex = 3
+    Me.txtPassword.TabIndex = 4
     Me.ttConfig.SetTooltip(Me.txtPassword, "The password to your ViaSat account.")
     Me.txtPassword.UseSystemPasswordChar = True
     '
@@ -494,7 +494,7 @@ Partial Class frmConfig
     Me.lblAccountViaSatDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountViaSatDescription.Name = "lblAccountViaSatDescription"
     Me.lblAccountViaSatDescription.Size = New System.Drawing.Size(296, 13)
-    Me.lblAccountViaSatDescription.TabIndex = 4
+    Me.lblAccountViaSatDescription.TabIndex = 0
     Me.lblAccountViaSatDescription.Text = "This account information should match your meter page login."
     '
     'pctPassDisplay
@@ -586,7 +586,7 @@ Partial Class frmConfig
     Me.chkAccountTypeAuto.Location = New System.Drawing.Point(160, 49)
     Me.chkAccountTypeAuto.Name = "chkAccountTypeAuto"
     Me.chkAccountTypeAuto.Size = New System.Drawing.Size(170, 18)
-    Me.chkAccountTypeAuto.TabIndex = 0
+    Me.chkAccountTypeAuto.TabIndex = 4
     Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
     Me.ttConfig.SetTooltip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
         "onnection. If you'd like to choose a type manually, you can uncheck this box and" & _
@@ -613,7 +613,7 @@ Partial Class frmConfig
     Me.cmbProvider.Location = New System.Drawing.Point(142, 22)
     Me.cmbProvider.Name = "cmbProvider"
     Me.cmbProvider.Size = New System.Drawing.Size(150, 21)
-    Me.cmbProvider.TabIndex = 0
+    Me.cmbProvider.TabIndex = 2
     Me.ttConfig.SetTooltip(Me.cmbProvider, "Your ViaSat Provider domain. If you were given an E-Mail address, this is everyth" & _
         "ing after the @ symbol. You can choose a domain from the dropdown or enter your " & _
         "own to add it to the list.")
@@ -635,7 +635,7 @@ Partial Class frmConfig
     Me.lblAccountType.Margin = New System.Windows.Forms.Padding(3, 6, 3, 0)
     Me.lblAccountType.Name = "lblAccountType"
     Me.lblAccountType.Size = New System.Drawing.Size(77, 13)
-    Me.lblAccountType.TabIndex = 2
+    Me.lblAccountType.TabIndex = 3
     Me.lblAccountType.Text = "&Account Type:"
     '
     'pnlAccountTypes
@@ -661,7 +661,7 @@ Partial Class frmConfig
     Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.32836!))
     Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.32836!))
     Me.pnlAccountTypes.Size = New System.Drawing.Size(222, 77)
-    Me.pnlAccountTypes.TabIndex = 3
+    Me.pnlAccountTypes.TabIndex = 5
     '
     'optAccountTypeWBL
     '
@@ -672,7 +672,7 @@ Partial Class frmConfig
     Me.optAccountTypeWBL.Location = New System.Drawing.Point(3, 3)
     Me.optAccountTypeWBL.Name = "optAccountTypeWBL"
     Me.optAccountTypeWBL.Size = New System.Drawing.Size(73, 18)
-    Me.optAccountTypeWBL.TabIndex = 1
+    Me.optAccountTypeWBL.TabIndex = 0
     Me.optAccountTypeWBL.Text = "WildBlue"
     Me.ttConfig.SetTooltip(Me.optAccountTypeWBL, "Legacy WildBlue packages.")
     Me.optAccountTypeWBL.UseVisualStyleBackColor = True
@@ -686,7 +686,7 @@ Partial Class frmConfig
     Me.optAccountTypeWBX.Location = New System.Drawing.Point(3, 28)
     Me.optAccountTypeWBX.Name = "optAccountTypeWBX"
     Me.optAccountTypeWBX.Size = New System.Drawing.Size(61, 18)
-    Me.optAccountTypeWBX.TabIndex = 2
+    Me.optAccountTypeWBX.TabIndex = 1
     Me.optAccountTypeWBX.Text = "Exede"
     Me.ttConfig.SetTooltip(Me.optAccountTypeWBX, "Exede, Exede Evolution, and Exede Freedom packages.")
     Me.optAccountTypeWBX.UseVisualStyleBackColor = True
@@ -700,7 +700,7 @@ Partial Class frmConfig
     Me.optAccountTypeRPX.Location = New System.Drawing.Point(82, 28)
     Me.optAccountTypeRPX.Name = "optAccountTypeRPX"
     Me.optAccountTypeRPX.Size = New System.Drawing.Size(122, 18)
-    Me.optAccountTypeRPX.TabIndex = 5
+    Me.optAccountTypeRPX.TabIndex = 4
     Me.optAccountTypeRPX.Text = "RuralPortal (Exede)"
     Me.ttConfig.SetTooltip(Me.optAccountTypeRPX, "Exede packages through a RuralPortal provider.")
     Me.optAccountTypeRPX.UseVisualStyleBackColor = True
@@ -714,7 +714,7 @@ Partial Class frmConfig
     Me.optAccountTypeRPL.Location = New System.Drawing.Point(82, 3)
     Me.optAccountTypeRPL.Name = "optAccountTypeRPL"
     Me.optAccountTypeRPL.Size = New System.Drawing.Size(137, 18)
-    Me.optAccountTypeRPL.TabIndex = 4
+    Me.optAccountTypeRPL.TabIndex = 3
     Me.optAccountTypeRPL.Text = "Rural Portal (WildBlue)"
     Me.ttConfig.SetTooltip(Me.optAccountTypeRPL, "Legacy WildBlue packages through a RuralPortal provider.")
     Me.optAccountTypeRPL.UseVisualStyleBackColor = True
@@ -728,7 +728,7 @@ Partial Class frmConfig
     Me.optAccountTypeDNX.Location = New System.Drawing.Point(3, 54)
     Me.optAccountTypeDNX.Name = "optAccountTypeDNX"
     Me.optAccountTypeDNX.Size = New System.Drawing.Size(69, 18)
-    Me.optAccountTypeDNX.TabIndex = 3
+    Me.optAccountTypeDNX.TabIndex = 2
     Me.optAccountTypeDNX.Text = "DishNet"
     Me.ttConfig.SetTooltip(Me.optAccountTypeDNX, "Exede package through Dish.")
     Me.optAccountTypeDNX.UseVisualStyleBackColor = True
@@ -743,7 +743,7 @@ Partial Class frmConfig
     Me.lblAccountProviderDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountProviderDescription.Name = "lblAccountProviderDescription"
     Me.lblAccountProviderDescription.Size = New System.Drawing.Size(289, 13)
-    Me.lblAccountProviderDescription.TabIndex = 4
+    Me.lblAccountProviderDescription.TabIndex = 0
     Me.lblAccountProviderDescription.Text = "The Domain is your meter page URL or E-Mail address host."
     '
     'pnlAccountKey
@@ -791,7 +791,7 @@ Partial Class frmConfig
     Me.pnlKey.RowCount = 1
     Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlKey.Size = New System.Drawing.Size(230, 24)
-    Me.pnlKey.TabIndex = 6
+    Me.pnlKey.TabIndex = 1
     '
     'pctKeyState
     '
@@ -899,7 +899,7 @@ Partial Class frmConfig
     Me.lblKey.Location = New System.Drawing.Point(59, 5)
     Me.lblKey.Name = "lblKey"
     Me.lblKey.Size = New System.Drawing.Size(68, 13)
-    Me.lblKey.TabIndex = 1
+    Me.lblKey.TabIndex = 0
     Me.lblKey.Text = "Product &Key:"
     '
     'lblPurchaseKey
@@ -913,7 +913,7 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPurchaseKey.Name = "lblPurchaseKey"
     Me.lblPurchaseKey.Size = New System.Drawing.Size(235, 13)
-    Me.lblPurchaseKey.TabIndex = 7
+    Me.lblPurchaseKey.TabIndex = 2
     Me.lblPurchaseKey.TabStop = True
     Me.lblPurchaseKey.Text = "Purchase a Remote Usage Service Subscription"
     '
@@ -1002,7 +1002,7 @@ Partial Class frmConfig
     Me.lblPrefColorDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPrefColorDescription.Name = "lblPrefColorDescription"
     Me.lblPrefColorDescription.Size = New System.Drawing.Size(193, 39)
-    Me.lblPrefColorDescription.TabIndex = 4
+    Me.lblPrefColorDescription.TabIndex = 0
     Me.lblPrefColorDescription.Text = "Change the colors of the Graphs in the Main History Windows and the Tray Icon."
     '
     'cmdColors
@@ -1013,7 +1013,7 @@ Partial Class frmConfig
     Me.cmdColors.Margin = New System.Windows.Forms.Padding(3, 3, 10, 3)
     Me.cmdColors.Name = "cmdColors"
     Me.cmdColors.Size = New System.Drawing.Size(110, 21)
-    Me.cmdColors.TabIndex = 5
+    Me.cmdColors.TabIndex = 1
     Me.cmdColors.Text = "Customize &Colors"
     Me.ttConfig.SetTooltip(Me.cmdColors, "Change the colors of the Main Window, Tray Icon, and History Graphs.")
     Me.cmdColors.UseVisualStyleBackColor = True
@@ -1073,7 +1073,7 @@ Partial Class frmConfig
     Me.lblPrefAlertDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPrefAlertDescription.Name = "lblPrefAlertDescription"
     Me.lblPrefAlertDescription.Size = New System.Drawing.Size(317, 13)
-    Me.lblPrefAlertDescription.TabIndex = 4
+    Me.lblPrefAlertDescription.TabIndex = 0
     Me.lblPrefAlertDescription.Text = "Satellite Restriction Tracker can notify you of excessive usage."
     '
     'chkOverAlert
@@ -1085,7 +1085,7 @@ Partial Class frmConfig
     Me.chkOverAlert.Location = New System.Drawing.Point(58, 23)
     Me.chkOverAlert.Name = "chkOverAlert"
     Me.chkOverAlert.Size = New System.Drawing.Size(129, 18)
-    Me.chkOverAlert.TabIndex = 5
+    Me.chkOverAlert.TabIndex = 1
     Me.chkOverAlert.Text = "Display Al&ert window"
     Me.ttConfig.SetTooltip(Me.chkOverAlert, "Check this box to display a balloon alert when you use too much of your allocated" & _
         " usage.")
@@ -1098,7 +1098,7 @@ Partial Class frmConfig
     Me.lblOverTime1.Location = New System.Drawing.Point(135, 77)
     Me.lblOverTime1.Name = "lblOverTime1"
     Me.lblOverTime1.Size = New System.Drawing.Size(34, 13)
-    Me.lblOverTime1.TabIndex = 7
+    Me.lblOverTime1.TabIndex = 6
     Me.lblOverTime1.Text = "w&ithin"
     '
     'txtOverTime
@@ -1110,7 +1110,7 @@ Partial Class frmConfig
     Me.txtOverTime.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
     Me.txtOverTime.Name = "txtOverTime"
     Me.txtOverTime.Size = New System.Drawing.Size(50, 20)
-    Me.txtOverTime.TabIndex = 0
+    Me.txtOverTime.TabIndex = 7
     Me.txtOverTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetTooltip(Me.txtOverTime, "Enter the duration of time to check for the defined usage (in minutes).")
     Me.txtOverTime.Value = New Decimal(New Integer() {15, 0, 0, 0})
@@ -1122,7 +1122,7 @@ Partial Class frmConfig
     Me.lblOverSize2.Location = New System.Drawing.Point(231, 51)
     Me.lblOverSize2.Name = "lblOverSize2"
     Me.lblOverSize2.Size = New System.Drawing.Size(23, 13)
-    Me.lblOverSize2.TabIndex = 1
+    Me.lblOverSize2.TabIndex = 5
     Me.lblOverSize2.Text = "MB"
     '
     'txtOverSize
@@ -1134,7 +1134,7 @@ Partial Class frmConfig
     Me.txtOverSize.Minimum = New Decimal(New Integer() {25, 0, 0, 0})
     Me.txtOverSize.Name = "txtOverSize"
     Me.txtOverSize.Size = New System.Drawing.Size(50, 20)
-    Me.txtOverSize.TabIndex = 0
+    Me.txtOverSize.TabIndex = 4
     Me.txtOverSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetTooltip(Me.txtOverSize, "Enter the amount of usage to display an alert about (in Megabytes).")
     Me.txtOverSize.Value = New Decimal(New Integer() {100, 0, 0, 0})
@@ -1157,7 +1157,7 @@ Partial Class frmConfig
     Me.lblOverSize1.Margin = New System.Windows.Forms.Padding(20, 0, 3, 0)
     Me.lblOverSize1.Name = "lblOverSize1"
     Me.lblOverSize1.Size = New System.Drawing.Size(94, 13)
-    Me.lblOverSize1.TabIndex = 10
+    Me.lblOverSize1.TabIndex = 3
     Me.lblOverSize1.Text = "if usage goes &over"
     '
     'cmdAlertStyle
@@ -1169,7 +1169,7 @@ Partial Class frmConfig
     Me.cmdAlertStyle.Margin = New System.Windows.Forms.Padding(3, 3, 10, 3)
     Me.cmdAlertStyle.Name = "cmdAlertStyle"
     Me.cmdAlertStyle.Size = New System.Drawing.Size(110, 20)
-    Me.cmdAlertStyle.TabIndex = 9
+    Me.cmdAlertStyle.TabIndex = 2
     Me.cmdAlertStyle.Text = "Set Alert &Style"
     Me.ttConfig.SetTooltip(Me.cmdAlertStyle, "Choose a style for the Alert Windows used for Usage Alerts and Parse Failures.")
     Me.cmdAlertStyle.UseVisualStyleBackColor = True
@@ -1619,7 +1619,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.Controls.Add(Me.optUpdateRelease, 1, 0)
     Me.pnlNetworkUpdate.Controls.Add(Me.optUpdateBETA, 2, 0)
     Me.pnlNetworkUpdate.Controls.Add(Me.optUpdateNone, 1, 1)
-    Me.pnlNetworkUpdate.Controls.Add(Me.TableLayoutPanel30, 1, 2)
+    Me.pnlNetworkUpdate.Controls.Add(Me.pnlNetworkUpdateTime, 1, 2)
     Me.pnlNetworkUpdate.Location = New System.Drawing.Point(3, 296)
     Me.pnlNetworkUpdate.Name = "pnlNetworkUpdate"
     Me.pnlNetworkUpdate.RowCount = 3
@@ -1650,7 +1650,7 @@ Partial Class frmConfig
     Me.optUpdateRelease.Location = New System.Drawing.Point(59, 3)
     Me.optUpdateRelease.Name = "optUpdateRelease"
     Me.optUpdateRelease.Size = New System.Drawing.Size(160, 18)
-    Me.optUpdateRelease.TabIndex = 3
+    Me.optUpdateRelease.TabIndex = 0
     Me.optUpdateRelease.TabStop = True
     Me.optUpdateRelease.Text = "Check for &Release updates"
     Me.ttConfig.SetTooltip(Me.optUpdateRelease, "Check for updates to Release versions only.")
@@ -1664,7 +1664,7 @@ Partial Class frmConfig
     Me.optUpdateBETA.Location = New System.Drawing.Point(225, 3)
     Me.optUpdateBETA.Name = "optUpdateBETA"
     Me.optUpdateBETA.Size = New System.Drawing.Size(149, 18)
-    Me.optUpdateBETA.TabIndex = 4
+    Me.optUpdateBETA.TabIndex = 1
     Me.optUpdateBETA.TabStop = True
     Me.optUpdateBETA.Text = "Check for &BETA updates"
     Me.ttConfig.SetTooltip(Me.optUpdateBETA, "Check for updates to BETA and Release versions.")
@@ -1679,30 +1679,30 @@ Partial Class frmConfig
     Me.optUpdateNone.Location = New System.Drawing.Point(59, 27)
     Me.optUpdateNone.Name = "optUpdateNone"
     Me.optUpdateNone.Size = New System.Drawing.Size(246, 18)
-    Me.optUpdateNone.TabIndex = 5
+    Me.optUpdateNone.TabIndex = 2
     Me.optUpdateNone.TabStop = True
     Me.optUpdateNone.Text = "&Don't check for updates (Not Recommended)"
     Me.ttConfig.SetTooltip(Me.optUpdateNone, "Don't check for updates automatically. Release Updates can still be downloaded th" & _
         "rough the About window manually.")
     Me.optUpdateNone.UseVisualStyleBackColor = True
     '
-    'TableLayoutPanel30
+    'pnlNetworkUpdateTime
     '
-    Me.TableLayoutPanel30.AutoSize = True
-    Me.TableLayoutPanel30.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.TableLayoutPanel30.ColumnCount = 2
-    Me.pnlNetworkUpdate.SetColumnSpan(Me.TableLayoutPanel30, 2)
-    Me.TableLayoutPanel30.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.TableLayoutPanel30.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.TableLayoutPanel30.Controls.Add(Me.lblUpdateInterval, 0, 0)
-    Me.TableLayoutPanel30.Controls.Add(Me.cmbUpdateInterval, 1, 0)
-    Me.TableLayoutPanel30.Location = New System.Drawing.Point(56, 48)
-    Me.TableLayoutPanel30.Margin = New System.Windows.Forms.Padding(0)
-    Me.TableLayoutPanel30.Name = "TableLayoutPanel30"
-    Me.TableLayoutPanel30.RowCount = 1
-    Me.TableLayoutPanel30.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.TableLayoutPanel30.Size = New System.Drawing.Size(254, 27)
-    Me.TableLayoutPanel30.TabIndex = 7
+    Me.pnlNetworkUpdateTime.AutoSize = True
+    Me.pnlNetworkUpdateTime.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlNetworkUpdateTime.ColumnCount = 2
+    Me.pnlNetworkUpdate.SetColumnSpan(Me.pnlNetworkUpdateTime, 2)
+    Me.pnlNetworkUpdateTime.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlNetworkUpdateTime.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlNetworkUpdateTime.Controls.Add(Me.lblUpdateInterval, 0, 0)
+    Me.pnlNetworkUpdateTime.Controls.Add(Me.cmbUpdateInterval, 1, 0)
+    Me.pnlNetworkUpdateTime.Location = New System.Drawing.Point(56, 48)
+    Me.pnlNetworkUpdateTime.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlNetworkUpdateTime.Name = "pnlNetworkUpdateTime"
+    Me.pnlNetworkUpdateTime.RowCount = 1
+    Me.pnlNetworkUpdateTime.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlNetworkUpdateTime.Size = New System.Drawing.Size(254, 27)
+    Me.pnlNetworkUpdateTime.TabIndex = 3
     '
     'lblUpdateInterval
     '
@@ -1711,7 +1711,7 @@ Partial Class frmConfig
     Me.lblUpdateInterval.Location = New System.Drawing.Point(3, 7)
     Me.lblUpdateInterval.Name = "lblUpdateInterval"
     Me.lblUpdateInterval.Size = New System.Drawing.Size(117, 13)
-    Me.lblUpdateInterval.TabIndex = 6
+    Me.lblUpdateInterval.TabIndex = 0
     Me.lblUpdateInterval.Text = "Perform a &check every:"
     '
     'cmbUpdateInterval
@@ -1723,7 +1723,7 @@ Partial Class frmConfig
     Me.cmbUpdateInterval.Location = New System.Drawing.Point(130, 3)
     Me.cmbUpdateInterval.Name = "cmbUpdateInterval"
     Me.cmbUpdateInterval.Size = New System.Drawing.Size(121, 21)
-    Me.cmbUpdateInterval.TabIndex = 7
+    Me.cmbUpdateInterval.TabIndex = 1
     Me.ttConfig.SetTooltip(Me.cmbUpdateInterval, "Select an interval between automatic update checks.")
     '
     'pnlNetworkProxy
@@ -1777,7 +1777,7 @@ Partial Class frmConfig
     Me.pnlProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlProxy.Size = New System.Drawing.Size(270, 144)
-    Me.pnlProxy.TabIndex = 5
+    Me.pnlProxy.TabIndex = 1
     '
     'lblProxyType
     '
@@ -1845,7 +1845,7 @@ Partial Class frmConfig
     Me.txtProxyAddress.Name = "txtProxyAddress"
     Me.txtProxyAddress.Size = New System.Drawing.Size(129, 20)
     Me.txtProxyAddress.TabIndex = 3
-    Me.txtProxyAddress.Text = "Address of HTTP Proxy to connect through."
+    Me.ttConfig.SetTooltip(Me.txtProxyAddress, "Address of HTTP Proxy to connect through.")
     '
     'lblProxyPort
     '
@@ -1899,7 +1899,7 @@ Partial Class frmConfig
     Me.txtProxyPort.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
     Me.txtProxyPort.Name = "txtProxyPort"
     Me.txtProxyPort.Size = New System.Drawing.Size(50, 20)
-    Me.txtProxyPort.TabIndex = 12
+    Me.txtProxyPort.TabIndex = 5
     Me.txtProxyPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetTooltip(Me.txtProxyPort, "Port to connect to HTTP proxy over.")
     Me.txtProxyPort.Value = New Decimal(New Integer() {8080, 0, 0, 0})
@@ -1926,7 +1926,7 @@ Partial Class frmConfig
     Me.lblNetworkProxyDescrption.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkProxyDescrption.Name = "lblNetworkProxyDescrption"
     Me.lblNetworkProxyDescrption.Size = New System.Drawing.Size(276, 13)
-    Me.lblNetworkProxyDescrption.TabIndex = 4
+    Me.lblNetworkProxyDescrption.TabIndex = 0
     Me.lblNetworkProxyDescrption.Text = "If you connect through a proxy, enter the IP or URL here."
     '
     'pnlNetworkProxyTitle
@@ -2056,7 +2056,7 @@ Partial Class frmConfig
     Me.txtTimeout.Location = New System.Drawing.Point(113, 35)
     Me.txtTimeout.Name = "txtTimeout"
     Me.txtTimeout.Size = New System.Drawing.Size(70, 20)
-    Me.txtTimeout.TabIndex = 0
+    Me.txtTimeout.TabIndex = 2
     Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetTooltip(Me.txtTimeout, "Number of seconds to wait between network communications.")
     '
@@ -2067,7 +2067,7 @@ Partial Class frmConfig
     Me.lblTimeout2.Location = New System.Drawing.Point(189, 38)
     Me.lblTimeout2.Name = "lblTimeout2"
     Me.lblTimeout2.Size = New System.Drawing.Size(47, 13)
-    Me.lblTimeout2.TabIndex = 1
+    Me.lblTimeout2.TabIndex = 3
     Me.lblTimeout2.Text = "seconds"
     '
     'lblTimeout1
@@ -2077,7 +2077,7 @@ Partial Class frmConfig
     Me.lblTimeout1.Location = New System.Drawing.Point(59, 38)
     Me.lblTimeout1.Name = "lblTimeout1"
     Me.lblTimeout1.Size = New System.Drawing.Size(48, 13)
-    Me.lblTimeout1.TabIndex = 3
+    Me.lblTimeout1.TabIndex = 1
     Me.lblTimeout1.Text = "&Timeout:"
     '
     'lblNetworkTimeoutDescription
@@ -2090,7 +2090,7 @@ Partial Class frmConfig
     Me.lblNetworkTimeoutDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkTimeoutDescription.Name = "lblNetworkTimeoutDescription"
     Me.lblNetworkTimeoutDescription.Size = New System.Drawing.Size(316, 26)
-    Me.lblNetworkTimeoutDescription.TabIndex = 4
+    Me.lblNetworkTimeoutDescription.TabIndex = 0
     Me.lblNetworkTimeoutDescription.Text = "The connection to the server is closed if no response is received in a set amount" & _
     " of time."
     '
@@ -2215,7 +2215,7 @@ Partial Class frmConfig
     Me.lblAdvancedPortableDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAdvancedPortableDescription.Name = "lblAdvancedPortableDescription"
     Me.lblAdvancedPortableDescription.Size = New System.Drawing.Size(316, 26)
-    Me.lblAdvancedPortableDescription.TabIndex = 4
+    Me.lblAdvancedPortableDescription.TabIndex = 0
     Me.lblAdvancedPortableDescription.Text = "Create a portable copy of Satellite Restriction Tracker which can run off a flash" & _
     " drive or other writable media without being installed."
     '
@@ -2228,7 +2228,7 @@ Partial Class frmConfig
     Me.cmdMakePortable.Location = New System.Drawing.Point(200, 62)
     Me.cmdMakePortable.Name = "cmdMakePortable"
     Me.cmdMakePortable.Size = New System.Drawing.Size(175, 23)
-    Me.cmdMakePortable.TabIndex = 7
+    Me.cmdMakePortable.TabIndex = 4
     Me.cmdMakePortable.Text = "&Copy to Removable Drive (X:\)"
     Me.ttConfig.SetTooltip(Me.cmdMakePortable, "Copy Satellite Restriction Tracker to the Removable Drive.")
     Me.cmdMakePortable.UseVisualStyleBackColor = True
@@ -2240,7 +2240,7 @@ Partial Class frmConfig
     Me.lblPortableDrive.Location = New System.Drawing.Point(59, 39)
     Me.lblPortableDrive.Name = "lblPortableDrive"
     Me.lblPortableDrive.Size = New System.Drawing.Size(68, 13)
-    Me.lblPortableDrive.TabIndex = 8
+    Me.lblPortableDrive.TabIndex = 1
     Me.lblPortableDrive.Text = "Select &Drive:"
     '
     'cmbPortableDrive
@@ -2252,7 +2252,7 @@ Partial Class frmConfig
     Me.cmbPortableDrive.Location = New System.Drawing.Point(133, 35)
     Me.cmbPortableDrive.Name = "cmbPortableDrive"
     Me.cmbPortableDrive.Size = New System.Drawing.Size(75, 21)
-    Me.cmbPortableDrive.TabIndex = 9
+    Me.cmbPortableDrive.TabIndex = 2
     Me.ttConfig.SetTooltip(Me.cmbPortableDrive, "Choose a removable drive from the list to add Satellite Restriction Tracker to.")
     '
     'chkPortableAutoRun
@@ -2264,7 +2264,7 @@ Partial Class frmConfig
     Me.chkPortableAutoRun.Location = New System.Drawing.Point(254, 36)
     Me.chkPortableAutoRun.Name = "chkPortableAutoRun"
     Me.chkPortableAutoRun.Size = New System.Drawing.Size(121, 18)
-    Me.chkPortableAutoRun.TabIndex = 10
+    Me.chkPortableAutoRun.TabIndex = 3
     Me.chkPortableAutoRun.Text = "Auto-&Run on Insert"
     Me.ttConfig.SetTooltip(Me.chkPortableAutoRun, "Add an Auto-Run script to display Satellite Restriction Tracker's icon on the dri" & _
         "ve and run Satellite Restriction Tracker when it's plugged in or clicked on.")
@@ -2383,7 +2383,7 @@ Partial Class frmConfig
     Me.pnlHistoryDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlHistoryDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
     Me.pnlHistoryDir.Size = New System.Drawing.Size(244, 28)
-    Me.pnlHistoryDir.TabIndex = 17
+    Me.pnlHistoryDir.TabIndex = 4
     '
     'txtHistoryDir
     '
@@ -2421,7 +2421,7 @@ Partial Class frmConfig
     Me.lblAdvancedDataDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAdvancedDataDescription.Name = "lblAdvancedDataDescription"
     Me.lblAdvancedDataDescription.Size = New System.Drawing.Size(313, 39)
-    Me.lblAdvancedDataDescription.TabIndex = 4
+    Me.lblAdvancedDataDescription.TabIndex = 0
     Me.lblAdvancedDataDescription.Text = "Your usage data will be stored in this directory." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you use the Logger Service," & _
     " data must be stored in the" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "ProgramData folder. Otherwise, AppData is recommend" & _
     "ed."
@@ -2434,7 +2434,7 @@ Partial Class frmConfig
     Me.optHistoryCustom.Location = New System.Drawing.Point(3, 98)
     Me.optHistoryCustom.Name = "optHistoryCustom"
     Me.optHistoryCustom.Size = New System.Drawing.Size(69, 18)
-    Me.optHistoryCustom.TabIndex = 18
+    Me.optHistoryCustom.TabIndex = 3
     Me.optHistoryCustom.TabStop = True
     Me.optHistoryCustom.Text = "&Custom:"
     Me.ttConfig.SetTooltip(Me.optHistoryCustom, "Save History Data to a custom directory.")
@@ -2449,7 +2449,7 @@ Partial Class frmConfig
     Me.optHistoryProgramData.Location = New System.Drawing.Point(3, 48)
     Me.optHistoryProgramData.Name = "optHistoryProgramData"
     Me.optHistoryProgramData.Size = New System.Drawing.Size(96, 18)
-    Me.optHistoryProgramData.TabIndex = 19
+    Me.optHistoryProgramData.TabIndex = 1
     Me.optHistoryProgramData.TabStop = True
     Me.optHistoryProgramData.Text = "&Program Data"
     Me.ttConfig.SetTooltip(Me.optHistoryProgramData, "Save History Data to the shared Program Data directory.")
@@ -2464,7 +2464,7 @@ Partial Class frmConfig
     Me.optHistoryAppData.Location = New System.Drawing.Point(3, 72)
     Me.optHistoryAppData.Name = "optHistoryAppData"
     Me.optHistoryAppData.Size = New System.Drawing.Size(109, 18)
-    Me.optHistoryAppData.TabIndex = 20
+    Me.optHistoryAppData.TabIndex = 2
     Me.optHistoryAppData.TabStop = True
     Me.optHistoryAppData.Text = "&Application Data"
     Me.ttConfig.SetTooltip(Me.optHistoryAppData, "Save History Data to your local account's Application Data directory.")
@@ -2478,7 +2478,7 @@ Partial Class frmConfig
     Me.cmdHistoryDirOpen.Location = New System.Drawing.Point(94, 124)
     Me.cmdHistoryDirOpen.Name = "cmdHistoryDirOpen"
     Me.cmdHistoryDirOpen.Size = New System.Drawing.Size(130, 23)
-    Me.cmdHistoryDirOpen.TabIndex = 21
+    Me.cmdHistoryDirOpen.TabIndex = 5
     Me.cmdHistoryDirOpen.Text = "&Open Data Directory"
     Me.ttConfig.SetTooltip(Me.cmdHistoryDirOpen, "Open the directory where your History Data is stored.")
     Me.cmdHistoryDirOpen.UseVisualStyleBackColor = True
@@ -2675,8 +2675,8 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.ResumeLayout(False)
     Me.pnlNetworkUpdate.PerformLayout()
     CType(Me.pctNetworkUpdateIcon, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.TableLayoutPanel30.ResumeLayout(False)
-    Me.TableLayoutPanel30.PerformLayout()
+    Me.pnlNetworkUpdateTime.ResumeLayout(False)
+    Me.pnlNetworkUpdateTime.PerformLayout()
     Me.pnlNetworkProxy.ResumeLayout(False)
     Me.pnlNetworkProxy.PerformLayout()
     Me.pnlProxy.ResumeLayout(False)
@@ -2850,7 +2850,7 @@ Partial Class frmConfig
   Friend WithEvents pctAccountKeyIcon As System.Windows.Forms.PictureBox
   Friend WithEvents lblKey As System.Windows.Forms.Label
   Friend WithEvents lblPurchaseKey As LinkLabel
-  Friend WithEvents TableLayoutPanel30 As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlNetworkUpdateTime As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblUpdateInterval As System.Windows.Forms.Label
   Friend WithEvents cmbUpdateInterval As System.Windows.Forms.ComboBox
   Friend WithEvents tabAdvanced As System.Windows.Forms.TabPage
