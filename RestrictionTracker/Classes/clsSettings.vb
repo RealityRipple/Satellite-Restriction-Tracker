@@ -174,6 +174,7 @@ Class AppSettings
   Private m_Overtime As Integer
   Private m_AlertStyle As String
   Private m_ProxySetting As String
+  Private m_LastNag As Date
   Public Loaded As Boolean
   Public Colors As AppColors
   Private ReadOnly Property ConfigFile As String
@@ -462,6 +463,16 @@ Class AppSettings
           m_ProxySetting = xProxy.Element("value").Value
         Catch ex As Exception
           m_ProxySetting = "None"
+        End Try
+      End If
+      Dim xLastNag As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastNag")
+      If xLastNag Is Nothing Then
+        m_LastNag = New Date(2000, 1, 1)
+      Else
+        Try
+          m_LastNag = Date.FromBinary(xLastNag.Element("value").Value)
+        Catch ex As Exception
+          m_LastNag = New Date(2000, 1, 1)
         End Try
       End If
       Colors = New AppColors
@@ -821,6 +832,7 @@ Class AppSettings
     m_Overtime = 60
     m_AlertStyle = "Default"
     m_ProxySetting = "None"
+    m_LastNag = New Date(2000, 1, 1)
     Colors = New AppColors
     ResetColors()
   End Sub
@@ -892,7 +904,8 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Overuse"), New XElement("value", m_Overuse)),
                                                           New XElement("setting", New XAttribute("name", "Overtime"), New XElement("value", m_Overtime)),
                                                           New XElement("setting", New XAttribute("name", "AlertStyle"), New XElement("value", m_AlertStyle)),
-                                                          New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))),
+                                                          New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
+                                                          New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),
                                                           New XElement("section", New XAttribute("name", "Download"),
@@ -1281,6 +1294,14 @@ Class AppSettings
           End If
         End If
       End If
+    End Set
+  End Property
+  Public Property LastNag As Date
+    Get
+      Return m_LastNag
+    End Get
+    Set(value As Date)
+      m_LastNag = value
     End Set
   End Property
   Class AppColors

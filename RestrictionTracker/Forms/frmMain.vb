@@ -989,7 +989,10 @@ Public Class frmMain
             DoChange(lblRuralAllowedVal, lLim)
           End If
           ResizePanels()
-          If lUsed = 0 And lLim = 0 And lRemain = 0 Then Exit Sub
+          If lUsed = 0 And lLim = 0 And lRemain = 0 Then
+            AskForDonations()
+            Exit Sub
+          End If
         Case "WB"
           Dim lDown As Long = wb_down
           Dim lDLim As Long = wb_dlim
@@ -1006,7 +1009,10 @@ Public Class frmMain
             DoChange(lblUldTotal, lULim)
           End If
           ResizePanels()
-          If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then Exit Sub
+          If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then
+            AskForDonations()
+            Exit Sub
+          End If
       End Select
       If tmrChanges IsNot Nothing Then
         tmrChanges.Dispose()
@@ -1014,6 +1020,18 @@ Public Class frmMain
       End If
       tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), state, 25, System.Threading.Timeout.Infinite)
     End If
+  End Sub
+  Private Sub AskForDonations()
+    Try
+      If Now.Month = 6 Or Now.Month = 12 Then
+        If Math.Abs(DateDiff(DateInterval.Month, mySettings.LastNag, Now)) > 4 And String.IsNullOrEmpty(mySettings.RemoteKey) Then
+          frmDonate.Show()
+          mySettings.LastNag = Today
+          mySettings.Save()
+        End If
+      End If
+    Catch
+    End Try
   End Sub
   Private Sub DoChange(ByRef lblTemp As Label, ByRef toVal As Long)
     Dim tmpVal As Long = 0
