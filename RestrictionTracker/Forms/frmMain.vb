@@ -1023,11 +1023,17 @@ Public Class frmMain
   End Sub
   Private Sub AskForDonations()
     Try
-      If Now.Month = 6 Or Now.Month = 12 Then
-        If Math.Abs(DateDiff(DateInterval.Month, mySettings.LastNag, Now)) > 4 And String.IsNullOrEmpty(mySettings.RemoteKey) Then
-          frmDonate.Show()
-          mySettings.LastNag = Today
-          mySettings.Save()
+      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
+        If Math.Abs(DateDiff(DateInterval.Minute, Process.GetCurrentProcess.StartTime, Now)) > 30 Then
+          If Now.Month = 5 Or Now.Month = 9 Or Now.Month = 12 Then
+            If Now.DayOfWeek = DayOfWeek.Saturday Or Now.DayOfWeek = DayOfWeek.Sunday Then
+              If Math.Abs(DateDiff(DateInterval.Month, mySettings.LastNag, Now)) > 3 Then
+                frmDonate.Show()
+                mySettings.LastNag = Today
+                mySettings.Save()
+              End If
+            End If
+          End If
         End If
       End If
     Catch

@@ -42,9 +42,10 @@ Partial Class frmDonate
     'pnlDonate
     '
     Me.pnlDonate.AutoSize = True
+    Me.pnlDonate.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlDonate.ColumnCount = 2
     Me.pnlDonate.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDonate.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlDonate.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlDonate.Controls.Add(Me.pctStar, 0, 0)
     Me.pnlDonate.Controls.Add(Me.pnlButtons, 1, 3)
     Me.pnlDonate.Controls.Add(Me.lblTitle, 1, 0)
@@ -58,7 +59,7 @@ Partial Class frmDonate
     Me.pnlDonate.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlDonate.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlDonate.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlDonate.Size = New System.Drawing.Size(638, 347)
+    Me.pnlDonate.Size = New System.Drawing.Size(638, 346)
     Me.pnlDonate.TabIndex = 0
     '
     'pctStar
@@ -85,22 +86,22 @@ Partial Class frmDonate
     Me.pnlButtons.Controls.Add(Me.cmdDonate, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdClose, 2, 0)
     Me.pnlButtons.Controls.Add(Me.cmdSignUp, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(220, 312)
+    Me.pnlButtons.Location = New System.Drawing.Point(195, 311)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
     Me.pnlButtons.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlButtons.Size = New System.Drawing.Size(418, 35)
+    Me.pnlButtons.Size = New System.Drawing.Size(443, 35)
     Me.pnlButtons.TabIndex = 0
     '
     'cmdDonate
     '
     Me.cmdDonate.AutoSize = True
     Me.cmdDonate.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdDonate.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdDonate.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdDonate.Location = New System.Drawing.Point(3, 3)
     Me.cmdDonate.Name = "cmdDonate"
-    Me.cmdDonate.Size = New System.Drawing.Size(150, 29)
+    Me.cmdDonate.Size = New System.Drawing.Size(164, 29)
     Me.cmdDonate.TabIndex = 0
     Me.cmdDonate.Text = "Make a Donation!"
     Me.ttButtons.SetToolTip(Me.cmdDonate, "Contribute $5 or $10 to RealityRipple Software to keep Satellite Restriction Trac" & _
@@ -111,10 +112,10 @@ Partial Class frmDonate
     '
     Me.cmdClose.AutoSize = True
     Me.cmdClose.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdClose.Location = New System.Drawing.Point(290, 3)
+    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdClose.Location = New System.Drawing.Point(304, 3)
     Me.cmdClose.Name = "cmdClose"
-    Me.cmdClose.Size = New System.Drawing.Size(125, 29)
+    Me.cmdClose.Size = New System.Drawing.Size(136, 29)
     Me.cmdClose.TabIndex = 2
     Me.cmdClose.Text = "No Thank You"
     Me.ttButtons.SetToolTip(Me.cmdClose, "Close this nag screen and never see it again.")
@@ -124,8 +125,8 @@ Partial Class frmDonate
     '
     Me.cmdSignUp.AutoSize = True
     Me.cmdSignUp.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdSignUp.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdSignUp.Location = New System.Drawing.Point(159, 3)
+    Me.cmdSignUp.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdSignUp.Location = New System.Drawing.Point(173, 3)
     Me.cmdSignUp.Name = "cmdSignUp"
     Me.cmdSignUp.Size = New System.Drawing.Size(125, 29)
     Me.cmdSignUp.TabIndex = 1
@@ -150,9 +151,9 @@ Partial Class frmDonate
     Me.lblPlea.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblPlea.AutoSize = True
     Me.lblPlea.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblPlea.Location = New System.Drawing.Point(153, 66)
+    Me.lblPlea.Location = New System.Drawing.Point(153, 65)
     Me.lblPlea.Name = "lblPlea"
-    Me.lblPlea.Size = New System.Drawing.Size(482, 240)
+    Me.lblPlea.Size = New System.Drawing.Size(475, 240)
     Me.lblPlea.TabIndex = 2
     Me.lblPlea.Text = resources.GetString("lblPlea.Text")
     Me.lblPlea.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
