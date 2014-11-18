@@ -372,14 +372,19 @@ Module modFunctions
       End Try
     End If
   End Sub
+  Public ReadOnly Property AppDataPath As String
+    Get
+      Return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName & "\"
+    End Get
+  End Property
   Public ReadOnly Property AppData As String
     Get
       Static sTmp As String
       If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
         If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
-        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName)
+        If Not My.Computer.FileSystem.DirectoryExists(AppDataPath) Then My.Computer.FileSystem.CreateDirectory(AppDataPath)
         If String.IsNullOrEmpty(sTmp) Then
-          sTmp = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName
+          sTmp = AppDataPath
         End If
       Else
         If String.IsNullOrEmpty(sTmp) Then
@@ -387,6 +392,11 @@ Module modFunctions
         End If
       End If
       Return sTmp
+    End Get
+  End Property
+  Public ReadOnly Property AppDataAllPath As String
+    Get
+      Return IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData) & "\"
     End Get
   End Property
   Public ReadOnly Property AppDataAll As String
