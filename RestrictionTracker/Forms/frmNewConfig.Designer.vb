@@ -316,7 +316,7 @@ Partial Class frmNewConfig
     Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccountKeyTitle.Controls.Add(Me.lblAccountKeyTitle, 0, 0)
     Me.pnlAccountKeyTitle.Controls.Add(Me.lnAccountKeyTitle, 1, 0)
-    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 305)
+    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 306)
     Me.pnlAccountKeyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAccountKeyTitle.Name = "pnlAccountKeyTitle"
     Me.pnlAccountKeyTitle.RowCount = 1
@@ -571,16 +571,17 @@ Partial Class frmNewConfig
     Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAccountProvider.Size = New System.Drawing.Size(351, 146)
+    Me.pnlAccountProvider.Size = New System.Drawing.Size(351, 147)
     Me.pnlAccountProvider.TabIndex = 3
     '
     'chkAccountTypeAuto
     '
     Me.chkAccountTypeAuto.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.chkAccountTypeAuto.AutoSize = True
-    Me.chkAccountTypeAuto.Location = New System.Drawing.Point(163, 49)
+    Me.chkAccountTypeAuto.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkAccountTypeAuto.Location = New System.Drawing.Point(160, 49)
     Me.chkAccountTypeAuto.Name = "chkAccountTypeAuto"
-    Me.chkAccountTypeAuto.Size = New System.Drawing.Size(164, 17)
+    Me.chkAccountTypeAuto.Size = New System.Drawing.Size(170, 18)
     Me.chkAccountTypeAuto.TabIndex = 0
     Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
     Me.chkAccountTypeAuto.UseVisualStyleBackColor = True
@@ -641,7 +642,7 @@ Partial Class frmNewConfig
     Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeRPX, 1, 2)
     Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeRPL, 1, 1)
     Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeDNX, 0, 3)
-    Me.pnlAccountTypes.Location = New System.Drawing.Point(129, 69)
+    Me.pnlAccountTypes.Location = New System.Drawing.Point(129, 70)
     Me.pnlAccountTypes.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlAccountTypes.Name = "pnlAccountTypes"
     Me.pnlAccountTypes.RowCount = 4
@@ -742,7 +743,7 @@ Partial Class frmNewConfig
     Me.pnlAccountKey.Controls.Add(Me.pctAccountKeyIcon, 0, 0)
     Me.pnlAccountKey.Controls.Add(Me.lblKey, 1, 0)
     Me.pnlAccountKey.Controls.Add(Me.lblPurchaseKey, 2, 1)
-    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 326)
+    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 327)
     Me.pnlAccountKey.Name = "pnlAccountKey"
     Me.pnlAccountKey.RowCount = 2
     Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -952,7 +953,7 @@ Partial Class frmNewConfig
     Me.pnlPrefColor.Controls.Add(Me.pctPrefColorIcon, 0, 0)
     Me.pnlPrefColor.Controls.Add(Me.lblPrefColorDescription, 1, 0)
     Me.pnlPrefColor.Controls.Add(Me.cmdColors, 2, 0)
-    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 327)
+    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 326)
     Me.pnlPrefColor.Name = "pnlPrefColor"
     Me.pnlPrefColor.RowCount = 1
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1059,9 +1060,10 @@ Partial Class frmNewConfig
     Me.chkOverAlert.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.chkOverAlert.AutoSize = True
     Me.pnlPrefAlert.SetColumnSpan(Me.chkOverAlert, 2)
+    Me.chkOverAlert.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkOverAlert.Location = New System.Drawing.Point(58, 23)
     Me.chkOverAlert.Name = "chkOverAlert"
-    Me.chkOverAlert.Size = New System.Drawing.Size(123, 17)
+    Me.chkOverAlert.Size = New System.Drawing.Size(129, 18)
     Me.chkOverAlert.TabIndex = 5
     Me.chkOverAlert.Text = "Display Alert window"
     Me.chkOverAlert.UseVisualStyleBackColor = True
@@ -1155,7 +1157,7 @@ Partial Class frmNewConfig
     Me.pnlPrefAccuracy.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracy.Controls.Add(Me.pctPrefAccuracyIcon, 0, 0)
     Me.pnlPrefAccuracy.Controls.Add(Me.pnlPrefAccuracyInput, 1, 0)
-    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 128)
+    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 129)
     Me.pnlPrefAccuracy.Name = "pnlPrefAccuracy"
     Me.pnlPrefAccuracy.RowCount = 1
     Me.pnlPrefAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1312,7 +1314,7 @@ Partial Class frmNewConfig
     Me.pnlPrefAccuracyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lblPrefAccuracyTitle, 0, 0)
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lnPrefAccuracyTitle, 1, 0)
-    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 107)
+    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 108)
     Me.pnlPrefAccuracyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefAccuracyTitle.Name = "pnlPrefAccuracyTitle"
     Me.pnlPrefAccuracyTitle.RowCount = 1
@@ -1396,7 +1398,7 @@ Partial Class frmNewConfig
     Me.pnlPrefColorTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefColorTitle.Controls.Add(Me.lblPrefColorTitle, 0, 0)
     Me.pnlPrefColorTitle.Controls.Add(Me.lnPrefColorTitle, 1, 0)
-    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 306)
+    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 305)
     Me.pnlPrefColorTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefColorTitle.Name = "pnlPrefColorTitle"
     Me.pnlPrefColorTitle.RowCount = 1
@@ -1441,7 +1443,7 @@ Partial Class frmNewConfig
     Me.pnlPrefStart.Name = "pnlPrefStart"
     Me.pnlPrefStart.RowCount = 1
     Me.pnlPrefStart.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlPrefStart.Size = New System.Drawing.Size(378, 72)
+    Me.pnlPrefStart.Size = New System.Drawing.Size(378, 74)
     Me.pnlPrefStart.TabIndex = 5
     '
     'pctPrefStartIcon
@@ -1477,16 +1479,17 @@ Partial Class frmNewConfig
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlPrefStartInput.Size = New System.Drawing.Size(322, 72)
+    Me.pnlPrefStartInput.Size = New System.Drawing.Size(322, 74)
     Me.pnlPrefStartInput.TabIndex = 0
     '
     'chkStartUp
     '
     Me.chkStartUp.AutoSize = True
     Me.pnlPrefStartInput.SetColumnSpan(Me.chkStartUp, 3)
+    Me.chkStartUp.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkStartUp.Location = New System.Drawing.Point(3, 3)
     Me.chkStartUp.Name = "chkStartUp"
-    Me.chkStartUp.Size = New System.Drawing.Size(264, 17)
+    Me.chkStartUp.Size = New System.Drawing.Size(270, 18)
     Me.chkStartUp.TabIndex = 0
     Me.chkStartUp.Text = "Run Satellite Restriction Tracker on system startup"
     Me.chkStartUp.UseVisualStyleBackColor = True
@@ -1495,7 +1498,7 @@ Partial Class frmNewConfig
     '
     Me.lblStartWait1.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblStartWait1.AutoSize = True
-    Me.lblStartWait1.Location = New System.Drawing.Point(3, 29)
+    Me.lblStartWait1.Location = New System.Drawing.Point(3, 30)
     Me.lblStartWait1.Margin = New System.Windows.Forms.Padding(3)
     Me.lblStartWait1.Name = "lblStartWait1"
     Me.lblStartWait1.Size = New System.Drawing.Size(29, 13)
@@ -1505,7 +1508,7 @@ Partial Class frmNewConfig
     'txtStartWait
     '
     Me.txtStartWait.LargeIncrement = CType(1UI, UInteger)
-    Me.txtStartWait.Location = New System.Drawing.Point(38, 26)
+    Me.txtStartWait.Location = New System.Drawing.Point(38, 27)
     Me.txtStartWait.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
     Me.txtStartWait.Name = "txtStartWait"
     Me.txtStartWait.Size = New System.Drawing.Size(50, 20)
@@ -1517,7 +1520,7 @@ Partial Class frmNewConfig
     '
     Me.lblStartWait2.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblStartWait2.AutoSize = True
-    Me.lblStartWait2.Location = New System.Drawing.Point(94, 29)
+    Me.lblStartWait2.Location = New System.Drawing.Point(94, 30)
     Me.lblStartWait2.Margin = New System.Windows.Forms.Padding(3)
     Me.lblStartWait2.Name = "lblStartWait2"
     Me.lblStartWait2.Size = New System.Drawing.Size(210, 13)
@@ -1528,9 +1531,10 @@ Partial Class frmNewConfig
     '
     Me.chkService.AutoSize = True
     Me.pnlPrefStartInput.SetColumnSpan(Me.chkService, 3)
-    Me.chkService.Location = New System.Drawing.Point(3, 52)
+    Me.chkService.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkService.Location = New System.Drawing.Point(3, 53)
     Me.chkService.Name = "chkService"
-    Me.chkService.Size = New System.Drawing.Size(316, 17)
+    Me.chkService.Size = New System.Drawing.Size(316, 18)
     Me.chkService.TabIndex = 7
     Me.chkService.Text = "Run Logger Service when Satellite Restriction Tracker closes"
     Me.chkService.UseVisualStyleBackColor = True
@@ -2208,9 +2212,10 @@ Partial Class frmNewConfig
     Me.chkPortableAutoRun.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.chkPortableAutoRun.AutoSize = True
     Me.chkPortableAutoRun.Enabled = False
-    Me.chkPortableAutoRun.Location = New System.Drawing.Point(260, 37)
+    Me.chkPortableAutoRun.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkPortableAutoRun.Location = New System.Drawing.Point(254, 36)
     Me.chkPortableAutoRun.Name = "chkPortableAutoRun"
-    Me.chkPortableAutoRun.Size = New System.Drawing.Size(115, 17)
+    Me.chkPortableAutoRun.Size = New System.Drawing.Size(121, 18)
     Me.chkPortableAutoRun.TabIndex = 10
     Me.chkPortableAutoRun.Text = "Auto-Run on Insert"
     Me.chkPortableAutoRun.UseVisualStyleBackColor = True
