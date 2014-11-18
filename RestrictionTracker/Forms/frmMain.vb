@@ -12,6 +12,7 @@ Public Class frmMain
   Private WithEvents taskNotifier As TaskbarNotifier
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
+  Private WithEvents wsHostList As CookieAwareWebClient
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
@@ -771,6 +772,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
   Private Sub localData_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
@@ -789,6 +791,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
   Private Sub localData_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
@@ -807,6 +810,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
   Private Sub localData_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
@@ -825,6 +829,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
   Private Sub localData_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
@@ -843,8 +848,31 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
+#Region "Host List"
+  Private didHostListSave As Boolean = False
+  Private Sub SaveToHostList()
+    If Me.InvokeRequired Then
+      Me.BeginInvoke(New MethodInvoker(AddressOf SaveToHostList))
+    Else
+      If didHostListSave Then Exit Sub
+      Try
+        If wsHostList IsNot Nothing Then
+          wsHostList.Dispose()
+          wsHostList = Nothing
+        End If
+        Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
+        wsHostList = New CookieAwareWebClient
+        wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
+        didHostListSave = True
+      Catch ex As Exception
+        didHostListSave = False
+      End Try
+    End If
+  End Sub
+#End Region
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
@@ -941,6 +969,7 @@ Public Class frmMain
         remoteData.Dispose()
         remoteData = Nothing
       End If
+      SaveToHostList()
     End If
   End Sub
 #End Region
@@ -1415,11 +1444,13 @@ Public Class frmMain
     End If
     Select Case dRet
       Case Windows.Forms.DialogResult.Yes
+        didHostListSave = False
         ReLoadSettings()
         SetNextLoginTime()
         Dim ReInitInvoker As New MethodInvoker(AddressOf ReInit)
         ReInitInvoker.BeginInvoke(Nothing, Nothing)
       Case Windows.Forms.DialogResult.OK
+        didHostListSave = False
         ReLoadSettings()
         If bReRun Then
           SetNextLoginTime()
