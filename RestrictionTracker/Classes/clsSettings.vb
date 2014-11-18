@@ -358,7 +358,7 @@ Class AppSettings
         m_UpdateTime = 15
       Else
         Try
-          m_UpdateTime = xAgo.Element("value").Value
+          m_UpdateTime = xUpdateTime.Element("value").Value
         Catch ex As Exception
           m_UpdateTime = 15
         End Try
