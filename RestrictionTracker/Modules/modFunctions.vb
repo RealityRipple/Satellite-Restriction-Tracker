@@ -434,6 +434,15 @@ Module modFunctions
       Return sTmp
     End Get
   End Property
+  Public ReadOnly Property UpdateParam As String
+    Get
+      If AppData = Application.StartupPath & "\Config\" Then
+        Return "/silent /dir=""" & Application.StartupPath & """ /type=portable"
+      Else
+        Return "/silent"
+      End If
+    End Get
+  End Property
   Public ReadOnly Property MySaveDir As String
     Get
       Dim mySettings As New AppSettings

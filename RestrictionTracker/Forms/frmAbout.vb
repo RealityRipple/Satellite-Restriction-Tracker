@@ -34,7 +34,7 @@
     End If
     If e.CloseReason = CloseReason.ApplicationExitCall Then
       Try
-        If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, "/silent")
+        If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, UpdateParam)
       Catch ex As Exception
         MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try

@@ -1862,7 +1862,7 @@ Public Class frmMain
         Application.DoEvents()
         If My.Computer.FileSystem.FileExists(sEXEPath) Then
           Try
-            ShellEx(sEXEPath, "/silent")
+            ShellEx(sEXEPath, UpdateParam)
             Application.Exit()
           Catch ex As Exception
             MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
