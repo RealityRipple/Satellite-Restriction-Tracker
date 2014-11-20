@@ -154,7 +154,7 @@ Public Class frmMain
         ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede Then
           mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         End If
-        If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
+        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
         SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
         If localData IsNot Nothing Then
@@ -178,7 +178,7 @@ Public Class frmMain
         SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
       Else
         mySettings.AccountType = e.HostType
-        If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
+        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
         SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
         If localData IsNot Nothing Then
@@ -774,7 +774,7 @@ Public Class frmMain
       myPanel = SatHostTypes.DishNet_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -793,7 +793,7 @@ Public Class frmMain
       myPanel = SatHostTypes.RuralPortal_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -812,7 +812,7 @@ Public Class frmMain
       myPanel = SatHostTypes.RuralPortal_LEGACY
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
       mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -831,7 +831,7 @@ Public Class frmMain
       myPanel = SatHostTypes.WildBlue_LEGACY
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
       mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -850,7 +850,7 @@ Public Class frmMain
       myPanel = SatHostTypes.WildBlue_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
+      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -941,7 +941,7 @@ Public Class frmMain
       End If
       If e IsNot Nothing Then
         If Not mySettings.AccountTypeForced Then mySettings.AccountType = e.Provider
-        If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
+        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
         Dim iPercent As Integer = 0
         Dim iInterval As Integer = 1
