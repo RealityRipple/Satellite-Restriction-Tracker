@@ -520,8 +520,12 @@ Public Class frmMain
     LOG_Initialize(sAccount, False)
     If ClosingTime Then Exit Sub
     If mySettings.AccountType = SatHostTypes.Other Then
-      SetStatusText("Analyzing Account", "Determining your account type...", False)
-      TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+      If mySettings.AccountTypeForced Then
+        SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+      Else
+        SetStatusText("Analyzing Account", "Determining your account type...", False)
+        TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+      End If
     Else
       tmrIcon.Enabled = False
       SetStatusText("No History", String.Empty, False)
@@ -733,7 +737,7 @@ Public Class frmMain
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, True)
         Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
-          mySettings.AccountType = SatHostTypes.Other
+          If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.Other
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, False)
@@ -747,8 +751,12 @@ Public Class frmMain
           cmdConfig.Focus()
           MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
-          SetStatusText("Analyzing Account", "Determining your account type...", False)
-          TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+          If mySettings.AccountTypeForced Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+          Else
+            SetStatusText("Analyzing Account", "Determining your account type...", False)
+            TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+          End If
       End Select
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -764,7 +772,7 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
       myPanel = SatHostTypes.DishNet_EXEDE
-      mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+      If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
       mySettings.Save()
       If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -783,7 +791,7 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
       myPanel = SatHostTypes.RuralPortal_EXEDE
-      mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
+      If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
       mySettings.Save()
       If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -802,7 +810,7 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
       myPanel = SatHostTypes.RuralPortal_LEGACY
-      mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
+      If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
       mySettings.Save()
       If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -821,7 +829,7 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
       myPanel = SatHostTypes.WildBlue_LEGACY
-      mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
+      If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
       mySettings.Save()
       If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -840,7 +848,7 @@ Public Class frmMain
       NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
       myPanel = SatHostTypes.WildBlue_EXEDE
-      mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+      If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       mySettings.Save()
       If mySettings.Colors.MainUpA = Color.Transparent Then SetDefaultColors()
       DisplayUsage(True, True)
@@ -932,7 +940,7 @@ Public Class frmMain
         SetStatusText(LastTime, "Saving History...", False)
       End If
       If e IsNot Nothing Then
-        mySettings.AccountType = e.Provider
+        If Not mySettings.AccountTypeForced Then mySettings.AccountType = e.Provider
         If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
         Dim iPercent As Integer = 0
