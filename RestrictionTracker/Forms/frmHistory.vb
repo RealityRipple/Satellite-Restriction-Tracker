@@ -421,7 +421,7 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+            If (usageDB(I).DOWNLOAD < 500 And usageDB(I).UPLOAD < 500) And (usageDB(I - 1).DOWNLOAD > 500 Or usageDB(I - 1).UPLOAD > 500) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
                 If usageDB(I).DATETIME > dtpFrom.MaxDate Then
                   From30DaysAgo = dtpFrom.MaxDate
@@ -497,7 +497,7 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If (usageDB(I).DOWNLOAD = 0 And usageDB(I).UPLOAD = 0) And (usageDB(I - 1).DOWNLOAD > 0 Or usageDB(I - 1).UPLOAD > 0) Then
+            If (usageDB(I).DOWNLOAD < 500 And usageDB(I).UPLOAD < 500) And (usageDB(I - 1).DOWNLOAD > 500 Or usageDB(I - 1).UPLOAD > 500) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 6 Then
                 Finds += 1
                 If Finds = 2 Then
