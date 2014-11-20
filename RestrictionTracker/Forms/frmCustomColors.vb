@@ -191,15 +191,6 @@ Public Class frmCustomColors
         lUp -= iU
         If lUp <= 0 Then dUp = True
       End If
-    ElseIf e.Button = Windows.Forms.MouseButtons.Middle Then
-      If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        DisplayAs = SatHostTypes.RuralPortal_EXEDE
-      ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
-        DisplayAs = SatHostTypes.DishNet_EXEDE
-      ElseIf DisplayAs = SatHostTypes.DishNet_EXEDE Then
-        DisplayAs = SatHostTypes.WildBlue_LEGACY
-      End If
-      MakeFakeData()
     End If
     RedrawImages()
   End Sub
@@ -220,30 +211,8 @@ Public Class frmCustomColors
         lUp -= iU
         If lUp <= 0 Then dUp = True
       End If
-    ElseIf e.Button = Windows.Forms.MouseButtons.Middle Then
-      If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        DisplayAs = SatHostTypes.RuralPortal_EXEDE
-      ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
-        DisplayAs = SatHostTypes.DishNet_EXEDE
-      ElseIf DisplayAs = SatHostTypes.DishNet_EXEDE Then
-        DisplayAs = SatHostTypes.WildBlue_LEGACY
-      End If
-      MakeFakeData()
     End If
     RedrawImages()
-  End Sub
-  Private Sub pctHistory_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctHistory.MouseDown
-    If e.Button = Windows.Forms.MouseButtons.Middle Then
-      If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
-        DisplayAs = SatHostTypes.RuralPortal_EXEDE
-      ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
-        DisplayAs = SatHostTypes.DishNet_EXEDE
-      ElseIf DisplayAs = SatHostTypes.DishNet_EXEDE Then
-        DisplayAs = SatHostTypes.WildBlue_LEGACY
-      End If
-      MakeFakeData()
-      RedrawImages()
-    End If
   End Sub
   Private Sub chkB_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkMainDownB.CheckedChanged, chkMainUpB.CheckedChanged, chkTrayDownB.CheckedChanged, chkTrayUpB.CheckedChanged, chkHistoryDownB.CheckedChanged, chkHistoryUpB.CheckedChanged
     Dim chkThis As CheckBox = sender
@@ -398,97 +367,37 @@ Public Class frmCustomColors
     pctColor.Tag = Nothing
   End Sub
   Private Function DefaultColorForElement(Element As String, Provider As SatHostTypes) As Color
-    Select Case Provider
-      Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
-        Select Case Element
-          Case pctMainDownA.Name : Return Color.DarkBlue
-          Case pctMainDownB.Name : Return Color.Transparent
-          Case pctMainDownC.Name : Return Color.Red
-          Case pctMainUpA.Name : Return Color.DarkBlue
-          Case pctMainUpB.Name : Return Color.Transparent
-          Case pctMainUpC.Name : Return Color.Red
-          Case pctMainText.Name : Return Color.White
-          Case pctMainBG.Name : Return Color.Black
+    Dim myColors As AppSettings.AppColors = GetDefaultColors(Provider)
+    Select Case Element
+      Case pctMainDownA.Name : Return myColors.MainDownA
+      Case pctMainDownB.Name : Return myColors.MainDownB
+      Case pctMainDownC.Name : Return myColors.MainDownC
+      Case pctMainUpA.Name : Return myColors.MainUpA
+      Case pctMainUpB.Name : Return myColors.MainUpB
+      Case pctMainUpC.Name : Return myColors.MainUpC
+      Case pctMainText.Name : Return myColors.MainText
+      Case pctMainBG.Name : Return myColors.MainBackground
 
-          Case pctTrayDownA.Name : Return Color.Blue
-          Case pctTrayDownB.Name : Return Color.Yellow
-          Case pctTrayDownC.Name : Return Color.Red
-          Case pctTrayUpA.Name : Return Color.Blue
-          Case pctTrayUpB.Name : Return Color.Yellow
-          Case pctTrayUpC.Name : Return Color.Red
+      Case pctTrayDownA.Name : Return myColors.TrayDownA
+      Case pctTrayDownB.Name : Return myColors.TrayDownB
+      Case pctTrayDownC.Name : Return myColors.TrayDownC
+      Case pctTrayUpA.Name : Return myColors.TrayUpA
+      Case pctTrayUpB.Name : Return myColors.TrayUpB
+      Case pctTrayUpC.Name : Return myColors.TrayUpC
 
-          Case pctHistoryDownA.Name : Return Color.DarkBlue
-          Case pctHistoryDownB.Name : Return Color.Transparent
-          Case pctHistoryDownC.Name : Return Color.Red
-          Case pctHistoryDownMax.Name : Return Color.Yellow
-          Case pctHistoryUpA.Name : Return Color.DarkBlue
-          Case pctHistoryUpB.Name : Return Color.Transparent
-          Case pctHistoryUpC.Name : Return Color.Red
-          Case pctHistoryUpMax.Name : Return Color.Yellow
-          Case pctHistoryText.Name : Return Color.Black
-          Case pctHistoryBG.Name : Return Color.White
-        End Select
-      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
-        Select Case Element
-          Case pctMainDownA.Name : Return Color.Orange
-          Case pctMainDownB.Name : Return Color.Transparent
-          Case pctMainDownC.Name : Return Color.Red
-          Case pctMainUpA.Name : Return Color.Transparent
-          Case pctMainUpB.Name : Return Color.Transparent
-          Case pctMainUpC.Name : Return Color.Transparent
-          Case pctMainText.Name : Return Color.White
-          Case pctMainBG.Name : Return Color.Black
-
-          Case pctTrayDownA.Name : Return Color.Orange
-          Case pctTrayDownB.Name : Return Color.Transparent
-          Case pctTrayDownC.Name : Return Color.Red
-          Case pctTrayUpA.Name : Return Color.Transparent
-          Case pctTrayUpB.Name : Return Color.Transparent
-          Case pctTrayUpC.Name : Return Color.Transparent
-
-          Case pctHistoryDownA.Name : Return Color.Orange
-          Case pctHistoryDownB.Name : Return Color.Transparent
-          Case pctHistoryDownC.Name : Return Color.Red
-          Case pctHistoryDownMax.Name : Return Color.Yellow
-          Case pctHistoryUpA.Name : Return Color.Transparent
-          Case pctHistoryUpB.Name : Return Color.Transparent
-          Case pctHistoryUpC.Name : Return Color.Transparent
-          Case pctHistoryUpMax.Name : Return Color.Transparent
-          Case pctHistoryText.Name : Return Color.Black
-          Case pctHistoryBG.Name : Return Color.White
-        End Select
-      Case SatHostTypes.DishNet_EXEDE
-        Select Case Element
-          Case pctMainDownA.Name : Return Color.DarkBlue
-          Case pctMainDownB.Name : Return Color.Transparent
-          Case pctMainDownC.Name : Return Color.Red
-          Case pctMainUpA.Name : Return Color.DarkBlue
-          Case pctMainUpB.Name : Return Color.Transparent
-          Case pctMainUpC.Name : Return Color.Red
-          Case pctMainText.Name : Return Color.White
-          Case pctMainBG.Name : Return Color.Black
-
-          Case pctTrayDownA.Name : Return Color.Blue
-          Case pctTrayDownB.Name : Return Color.Yellow
-          Case pctTrayDownC.Name : Return Color.Red
-          Case pctTrayUpA.Name : Return Color.Blue
-          Case pctTrayUpB.Name : Return Color.Yellow
-          Case pctTrayUpC.Name : Return Color.Red
-
-          Case pctHistoryDownA.Name : Return Color.DarkBlue
-          Case pctHistoryDownB.Name : Return Color.Transparent
-          Case pctHistoryDownC.Name : Return Color.Red
-          Case pctHistoryDownMax.Name : Return Color.Yellow
-          Case pctHistoryUpA.Name : Return Color.DarkBlue
-          Case pctHistoryUpB.Name : Return Color.Transparent
-          Case pctHistoryUpC.Name : Return Color.Red
-          Case pctHistoryUpMax.Name : Return Color.Yellow
-          Case pctHistoryText.Name : Return Color.Black
-          Case pctHistoryBG.Name : Return Color.White
-        End Select
-      Case Else
-        Return Color.Transparent
+      Case pctHistoryDownA.Name : Return myColors.HistoryDownA
+      Case pctHistoryDownB.Name : Return myColors.HistoryDownB
+      Case pctHistoryDownC.Name : Return myColors.HistoryDownC
+      Case pctHistoryDownMax.Name : Return myColors.HistoryDownMax
+      Case pctHistoryUpA.Name : Return myColors.HistoryUpA
+      Case pctHistoryUpB.Name : Return myColors.HistoryUpB
+      Case pctHistoryUpC.Name : Return myColors.HistoryUpC
+      Case pctHistoryUpMax.Name : Return myColors.HistoryUpMax
+      Case pctHistoryText.Name : Return myColors.HistoryText
+      Case pctHistoryBG.Name : Return myColors.HistoryBackground
+      Case Else : Return Color.Transparent
     End Select
+
   End Function
   Private Function getTitleFromName(name As String) As String
     Select Case name

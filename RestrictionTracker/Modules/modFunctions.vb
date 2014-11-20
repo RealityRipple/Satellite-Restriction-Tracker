@@ -1596,6 +1596,123 @@ Module modFunctions
     End If
   End Sub
 #End Region
+  Public Function GetDefaultColors(useStyle As localRestrictionTracker.SatHostTypes) As AppSettings.AppColors
+    Dim outColors As New AppSettings.AppColors
+    Select Case useStyle
+      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY, localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+        outColors.MainDownA = Color.DarkBlue
+        outColors.MainDownB = Color.Blue
+        outColors.MainDownC = Color.Aqua
+        outColors.MainUpA = Color.DarkBlue
+        outColors.MainUpB = Color.Blue
+        outColors.MainUpC = Color.Aqua
+        outColors.MainText = Color.White
+        outColors.MainBackground = Color.Black
+
+        outColors.TrayDownA = Color.DarkBlue
+        outColors.TrayDownB = Color.Blue
+        outColors.TrayDownC = Color.Aqua
+        outColors.TrayUpA = Color.DarkBlue
+        outColors.TrayUpB = Color.Blue
+        outColors.TrayUpC = Color.Aqua
+
+        outColors.HistoryDownA = Color.DarkBlue
+        outColors.HistoryDownB = Color.Blue
+        outColors.HistoryDownC = Color.Aqua
+        outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpA = Color.DarkBlue
+        outColors.HistoryUpB = Color.Blue
+        outColors.HistoryUpC = Color.Aqua
+        outColors.HistoryUpMax = Color.Yellow
+        outColors.HistoryText = Color.Black
+        outColors.HistoryBackground = Color.White
+
+      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+        outColors.MainDownA = Color.DarkBlue
+        outColors.MainDownB = Color.Blue
+        outColors.MainDownC = Color.Aqua
+        outColors.MainUpA = Color.Transparent
+        outColors.MainUpB = Color.Transparent
+        outColors.MainUpC = Color.Transparent
+        outColors.MainText = Color.White
+        outColors.MainBackground = Color.Black
+
+        outColors.TrayDownA = Color.DarkBlue
+        outColors.TrayDownB = Color.Blue
+        outColors.TrayDownC = Color.Aqua
+        outColors.TrayUpA = Color.Transparent
+        outColors.TrayUpB = Color.Transparent
+        outColors.TrayUpC = Color.Transparent
+
+        outColors.HistoryDownA = Color.DarkBlue
+        outColors.HistoryDownB = Color.Blue
+        outColors.HistoryDownC = Color.Aqua
+        outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpA = Color.Transparent
+        outColors.HistoryUpB = Color.Transparent
+        outColors.HistoryUpC = Color.Transparent
+        outColors.HistoryUpMax = Color.Transparent
+        outColors.HistoryText = Color.Black
+        outColors.HistoryBackground = Color.White
+
+      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+        outColors.MainDownA = Color.DarkBlue
+        outColors.MainDownB = Color.Blue
+        outColors.MainDownC = Color.Aqua
+        outColors.MainUpA = Color.DarkBlue
+        outColors.MainUpB = Color.Blue
+        outColors.MainUpC = Color.Aqua
+        outColors.MainText = Color.White
+        outColors.MainBackground = Color.Black
+
+        outColors.TrayDownA = Color.DarkBlue
+        outColors.TrayDownB = Color.Blue
+        outColors.TrayDownC = Color.Aqua
+        outColors.TrayUpA = Color.DarkBlue
+        outColors.TrayUpB = Color.Blue
+        outColors.TrayUpC = Color.Aqua
+
+        outColors.HistoryDownA = Color.DarkBlue
+        outColors.HistoryDownB = Color.Blue
+        outColors.HistoryDownC = Color.Aqua
+        outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpA = Color.DarkBlue
+        outColors.HistoryUpB = Color.Blue
+        outColors.HistoryUpC = Color.Aqua
+        outColors.HistoryUpMax = Color.Yellow
+        outColors.HistoryText = Color.Black
+        outColors.HistoryBackground = Color.White
+      Case Else
+        outColors.MainDownA = Color.DarkBlue
+        outColors.MainDownB = Color.Blue
+        outColors.MainDownC = Color.Aqua
+        outColors.MainUpA = Color.DarkBlue
+        outColors.MainUpB = Color.Blue
+        outColors.MainUpC = Color.Aqua
+        outColors.MainText = Color.White
+        outColors.MainBackground = Color.Black
+
+        outColors.TrayDownA = Color.DarkBlue
+        outColors.TrayDownB = Color.Blue
+        outColors.TrayDownC = Color.Aqua
+        outColors.TrayUpA = Color.DarkBlue
+        outColors.TrayUpB = Color.Blue
+        outColors.TrayUpC = Color.Aqua
+
+        outColors.HistoryDownA = Color.DarkBlue
+        outColors.HistoryDownB = Color.Blue
+        outColors.HistoryDownC = Color.Aqua
+        outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpA = Color.DarkBlue
+        outColors.HistoryUpB = Color.Blue
+        outColors.HistoryUpC = Color.Aqua
+        outColors.HistoryUpMax = Color.Yellow
+        outColors.HistoryText = Color.Black
+        outColors.HistoryBackground = Color.White
+
+    End Select
+    Return outColors
+  End Function
 #End Region
   ''' <summary>
   ''' Attempts to see if a file is in use, waiting up to five seconds for it to be freed.
