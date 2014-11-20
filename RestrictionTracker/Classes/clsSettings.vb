@@ -152,6 +152,7 @@ End Class
 Class AppSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
+  Private m_AccountTypeF As Boolean
   Private m_StartWait As Integer
   Private m_Interval As Integer
   Private m_Gr As String
@@ -161,8 +162,7 @@ Class AppSettings
   Private m_Ago As UInteger
   Private m_Service As Boolean
   Private m_HistoryDir As String
-  'Private m_HistoryInvert As Boolean
-  Private m_UpdateType As Byte '0 = Off, 1 = On, 2 = Beta
+  Private m_UpdateType As Byte
   Private m_UpdateTime As Byte
   Private m_ScaleScreen As Boolean
   Private m_MainSize As Size
@@ -234,6 +234,16 @@ Class AppSettings
           End If
         Catch ex As Exception
           m_AccountType = SatHostTypes.Other
+        End Try
+        Try
+          Dim xAccountTypeF As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "forceType")
+          If xAccountTypeF Is Nothing Then
+            m_AccountTypeF = False
+          Else
+            m_AccountTypeF = xAccountTypeF.Value = "True"
+          End If
+        Catch ex As Exception
+          m_AccountTypeF = False
         End Try
       End If
       Dim xStartWait As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "StartWait")
@@ -811,6 +821,7 @@ Class AppSettings
   Private Sub Reset()
     m_Account = Nothing
     m_AccountType = SatHostTypes.Other
+    m_AccountTypeF = False
     m_StartWait = 5
     m_Interval = 15
     m_Gr = "aph"
@@ -883,7 +894,7 @@ Class AppSettings
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
-                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
+                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XAttribute("forceType", IIf(m_AccountTypeF, "True", "False")), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "StartWait"), New XElement("value", m_StartWait)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
@@ -1048,6 +1059,14 @@ Class AppSettings
     End Get
     Set(value As SatHostTypes)
       m_AccountType = value
+    End Set
+  End Property
+  Public Property AccountTypeForced As Boolean
+    Get
+      Return m_AccountTypeF
+    End Get
+    Set(value As Boolean)
+      m_AccountTypeF = value
     End Set
   End Property
   Public Property PassCrypt As String

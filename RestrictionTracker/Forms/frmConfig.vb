@@ -31,7 +31,6 @@
       txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
     txtPassword.UseSystemPasswordChar = True
-
     Select Case mySettings.AccountType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
@@ -39,8 +38,7 @@
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
     End Select
-    chkAccountTypeAuto.Checked = True
-
+    chkAccountTypeAuto.Checked = Not mySettings.AccountTypeForced
     Dim sKey As String = mySettings.RemoteKey
     If sKey.Contains("-") Then
       Dim sKeys() As String = Split(sKey, "-")
@@ -288,6 +286,7 @@
     End If
   End Sub
   Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged,
+                                                                             optAccountTypeWBL.CheckedChanged, optAccountTypeWBX.CheckedChanged, optAccountTypeDNX.CheckedChanged, optAccountTypeRPL.CheckedChanged, optAccountTypeRPX.CheckedChanged,
                                                                              txtStartWait.KeyPress, txtStartWait.Scroll, txtStartWait.ValueChanged,
                                                                              txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged,
                                                                              txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged,
@@ -336,6 +335,7 @@
     optAccountTypeWBX.Enabled = Not chkAccountTypeAuto.Checked
     optAccountTypeRPL.Enabled = Not chkAccountTypeAuto.Checked
     optAccountTypeRPX.Enabled = Not chkAccountTypeAuto.Checked
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
     If e.KeyValue = 86 And e.Control Then
@@ -866,6 +866,9 @@
       ElseIf optAccountTypeRPX.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       End If
+      mySettings.AccountTypeForced = True
+    Else
+      mySettings.AccountTypeForced = False
     End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If String.Compare(mySettings.RemoteKey, sKey, True) <> 0 Then
@@ -1061,6 +1064,16 @@
     If bHardChange Then Return True
     If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) = 0 Then Return True
     If Not mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text) Then Return True
+    If mySettings.AccountTypeForced = chkAccountTypeAuto.Checked Then Return True
+    If Not chkAccountTypeAuto.Checked Then
+      Select Case mySettings.AccountType
+        Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True
+      End Select
+    End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""
     If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
