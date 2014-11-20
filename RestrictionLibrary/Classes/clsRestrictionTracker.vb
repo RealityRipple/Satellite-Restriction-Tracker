@@ -995,7 +995,7 @@
           ElseIf sGOTO.Contains("""") Then
             sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
           Else
-            sGOTO = Nothing
+            'sGOTO = Nothing
           End If
         End If
         If String.IsNullOrEmpty(sGOTO) Then
@@ -1013,7 +1013,7 @@
           ElseIf sSQPS.Contains("""") Then
             sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
           Else
-            sSQPS = Nothing
+            'sSQPS = Nothing
           End If
         End If
         If String.IsNullOrEmpty(sSQPS) Then
@@ -1247,7 +1247,7 @@
       If lTotal > 0 Then
         RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
       Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed", Table))
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now))
       End If
     End If
   End Sub
