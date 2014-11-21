@@ -911,6 +911,7 @@ Module modFunctions
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
     Dim tFont As New Font(FontFamily.GenericSansSerif, 7)
+    g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
     Dim lYWidth As Integer = g.MeasureString(yMax.ToString.Trim & " MB", tFont).Width + 10
     Dim lXHeight As Integer = g.MeasureString(Now.ToString("g"), tFont).Height + 10
     g.Clear(ColorBG)
@@ -1110,6 +1111,7 @@ Module modFunctions
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
     Dim tFont As New Font(FontFamily.GenericSansSerif, 7)
+    g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
     Dim lYWidth As Integer = g.MeasureString(yMax.ToString.Trim & " MB", tFont).Width + 10
     Dim lXHeight As Integer = g.MeasureString(Now.ToString("g"), tFont).Height + 10
     g.Clear(ColorBG)
@@ -1313,6 +1315,7 @@ Module modFunctions
     Dim linGrBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(0, ImgSize.Height), ColorA, ColorB, ColorC)
     If Total = 0 Then
       Using g As Graphics = Graphics.FromImage(bmpTmp)
+        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(ColorBG)
         g.FillRectangle(linGrBrush, 0, 0, ImgSize.Width, ImgSize.Height)
         Dim Msg As String = "Loading..."
@@ -1327,6 +1330,7 @@ Module modFunctions
       Dim Msg As String
       If Current < Total Then
         Using g As Graphics = Graphics.FromImage(bmpTmp)
+          g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
           g.Clear(ColorBG)
           If Total > 0 And Current > 0 Then
             Val = (Total - Current) / Total * ImgSize.Height
@@ -1345,6 +1349,7 @@ Module modFunctions
         End Using
       Else
         Using g As Graphics = Graphics.FromImage(bmpTmp)
+          g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
           g.Clear(ColorBG)
           If Total > 0 And Current > 0 Then
             g.FillRectangle(linGrBrush, 0, 0, ImgSize.Width, ImgSize.Height)
@@ -1387,6 +1392,7 @@ Module modFunctions
     Dim upBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorUC, ColorUB, ColorUA)
     If Down + Up + Over < Total Then
       Using g As Graphics = Graphics.FromImage(bmpTmp)
+        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(ColorBG)
         If Total > 0 And (Down > 0 Or Up > 0) Then
           Dim upWidth As Long = ImgSize.Width - ((Total - Up) / Total * ImgSize.Width)
@@ -1416,6 +1422,7 @@ Module modFunctions
       End Using
     Else
       Using g As Graphics = Graphics.FromImage(bmpTmp)
+        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(ColorBG)
         If Total > 0 And (Down > 0 Or Up > 0) Then
           Dim fillT As Long = Down + Up
@@ -1470,6 +1477,7 @@ Module modFunctions
     Dim downBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorC, ColorB, ColorA)
     If Down < Total Then
       Using g As Graphics = Graphics.FromImage(bmpTmp)
+        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(ColorBG)
         If Total > 0 And Down > 0 Then
           Dim downWidth As Long = ImgSize.Width - (((Total - Down) / Total) * ImgSize.Width)
@@ -1488,6 +1496,7 @@ Module modFunctions
       End Using
     Else
       Using g As Graphics = Graphics.FromImage(bmpTmp)
+        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(ColorBG)
         If Total > 0 And Down > 0 Then
           g.FillRectangle(downBrush, 0, 0, ImgSize.Width, ImgSize.Height)
