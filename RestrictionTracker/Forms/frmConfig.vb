@@ -1132,7 +1132,12 @@
   End Function
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
-      If My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
+      If AppData = Application.StartupPath & "\Config\" Then
+        ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & Application.ProductName & ".")
+        txtInterval.Minimum = 15
+        chkService.Enabled = False
+        chkService.Checked = False
+      ElseIf My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
         txtInterval.Minimum = 15
         chkService.Enabled = True
         chkService.Checked = mySettings.Service
@@ -1141,7 +1146,7 @@
         txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
-        ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & Application.ProductName & ".")
+        ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & Application.ProductName & " if you wish to use this feature.")
       End If
     Else
       txtInterval.Minimum = 30
