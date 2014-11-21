@@ -1175,7 +1175,9 @@
         End If
       ElseIf ctl.GetType = GetType(ComboBox) Then
         ctl.Margin = New Padding(3)
-      ElseIf ctl.GetType = GetType(NumericUpDown) Then
+      ElseIf ctl.GetType = GetType(CheckBox) Then
+        ctl.Margin = New Padding(3)
+      ElseIf ctl.GetType = GetType(NumericUpDownIncrementable) Then
         ctl.Margin = New Padding(3)
       ElseIf ctl.GetType = GetType(Button) Then
         If ctl.Name = cmdColors.Name Or ctl.Name = cmdAlertStyle.Name Then
