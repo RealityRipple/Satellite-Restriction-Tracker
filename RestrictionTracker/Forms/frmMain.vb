@@ -340,7 +340,7 @@ Public Class frmMain
         If mySettings.ScaleScreen Then
           Dim fontSize As Single = fMin
           If (Me.Width / 2) < Me.Height Then
-            If (Me.Width / 2) / fRatio > fMin Then
+            If (Me.Width / 2) * fRatio > fMin Then
               fontSize = (Me.Width / 2) * fRatio
             Else
               fontSize = fMin
