@@ -802,6 +802,9 @@
         sMessage = sMessage.Substring(0, sMessage.IndexOf("<"))
         sErrMsg = "Login Failed: " & sMessage
         bReset = False
+      ElseIf sMessage.Contains("my.exede.net") Then
+        sErrMsg = "Login Failed: You must create an account at the new Exede Portal."
+        bReset = True
       Else
         sErrMsg = "Login Failed: Could not understand error."
         sFailText = "WB DIV Error = " & sErrMsg & vbNewLine & sRet
