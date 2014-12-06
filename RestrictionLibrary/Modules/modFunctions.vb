@@ -177,6 +177,8 @@ Module modFunctions
             End If
           ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
             Return "The server closed the connection. Please try again."
+          ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
+            Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
@@ -196,6 +198,8 @@ Module modFunctions
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
             End If
+          ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
+            Return "The server closed the connection. Please change your Network Security Protocol settings and try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Receive failure - " & ex.InnerException.Message
