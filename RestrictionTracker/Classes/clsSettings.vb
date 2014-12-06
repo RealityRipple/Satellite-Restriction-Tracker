@@ -488,12 +488,12 @@ Class AppSettings
       End If
       Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
       If xProtocol Is Nothing Then
-        m_Protocol = Net.SecurityProtocolType.Ssl3
+        m_Protocol = Net.SecurityProtocolType.Tls
       Else
         Try
-          m_Protocol = IIf(xLastNag.Element("value").Value = "TLS", Net.SecurityProtocolType.Tls, Net.SecurityProtocolType.Ssl3)
+          m_Protocol = IIf(xProtocol.Element("value").Value = "TLS", Net.SecurityProtocolType.Tls, Net.SecurityProtocolType.Ssl3)
         Catch ex As Exception
-          m_Protocol = Net.SecurityProtocolType.Ssl3
+          m_Protocol = Net.SecurityProtocolType.Tls
         End Try
       End If
       Colors = New AppColors
@@ -855,7 +855,7 @@ Class AppSettings
     m_AlertStyle = "Default"
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
-    m_Protocol = Net.SecurityProtocolType.Ssl3
+    m_Protocol = Net.SecurityProtocolType.Tls
     Colors = New AppColors
     ResetColors()
   End Sub

@@ -185,11 +185,7 @@
       Case 30 : cmbUpdateInterval.SelectedIndex = 4
       Case Else : cmbUpdateInterval.SelectedIndex = 3
     End Select
-    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls Then
-      optAdvancedProtocolTLS.Checked = True
-    Else
-      optAdvancedProtocolSSL.Checked = True
-    End If
+    chkNetworkProtocolSSL.Checked = mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     cmdSave.Enabled = False
     bSaved = False
     bAccount = False
@@ -298,14 +294,14 @@
                                                                              txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress,
                                                                              chkStartUp.CheckedChanged,
                                                                              txtOverSize.ValueChanged, txtOverTime.ValueChanged,
+                                                                             chkNetworkProtocolSSL.CheckedChanged,
                                                                              txtProxyAddress.TextChanged,
                                                                              txtProxyPort.ValueChanged, txtProxyPort.Scroll, txtProxyPort.KeyPress,
                                                                              txtProxyUser.TextChanged,
                                                                              txtProxyPassword.TextChanged,
                                                                              txtProxyDomain.TextChanged,
                                                                              cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged,
-                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged,
-                                                                             optAdvancedProtocolSSL.CheckedChanged, optAdvancedProtocolTLS.CheckedChanged
+                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged
 
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -1047,10 +1043,11 @@
           End If
         End If
     End Select
-    If optAdvancedProtocolTLS.Checked Then
-      mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
-    Else
+
+    If chkNetworkProtocolSSL.Checked Then
       mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
+    Else
+      mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
     End If
     mySettings.Save()
     If mySettings.Service Then
@@ -1139,8 +1136,8 @@
         End If
       End If
     End If
-    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3 And Not optAdvancedProtocolSSL.Checked Then Return True
-    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls And Not optAdvancedProtocolTLS.Checked Then Return True
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3 And Not chkNetworkProtocolSSL.Checked Then Return True
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls And chkNetworkProtocolSSL.Checked Then Return True
     Return False
   End Function
   Private Sub DoCheck()

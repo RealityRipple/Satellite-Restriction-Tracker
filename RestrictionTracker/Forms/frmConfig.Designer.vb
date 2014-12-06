@@ -117,6 +117,14 @@ Partial Class frmConfig
     Me.chkService = New System.Windows.Forms.CheckBox()
     Me.tabNetwork = New System.Windows.Forms.TabPage()
     Me.pnlNetwork = New System.Windows.Forms.TableLayoutPanel()
+    Me.pnlNetworkProtocol = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctNetworkProtocolIcon = New System.Windows.Forms.PictureBox()
+    Me.pnlNetworkProtocolInput = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblNetworkProtocolDescription = New System.Windows.Forms.Label()
+    Me.chkNetworkProtocolSSL = New System.Windows.Forms.CheckBox()
+    Me.pnlNetworkProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblNetworkProtocolTitle = New System.Windows.Forms.Label()
+    Me.lnNetworkProtocolTitle = New RestrictionTracker.LineBreak()
     Me.pnlNetworkUpdate = New System.Windows.Forms.TableLayoutPanel()
     Me.pctNetworkUpdateIcon = New System.Windows.Forms.PictureBox()
     Me.optUpdateRelease = New System.Windows.Forms.RadioButton()
@@ -158,15 +166,6 @@ Partial Class frmConfig
     Me.lnNetworkUpdateTitle = New RestrictionTracker.LineBreak()
     Me.tabAdvanced = New System.Windows.Forms.TabPage()
     Me.pnlAdvanced = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlAdvancedProtocol = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctAdvancedProtocol = New System.Windows.Forms.PictureBox()
-    Me.pnlAdvancedProtocolInput = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblAdvancedProtocolDescription = New System.Windows.Forms.Label()
-    Me.optAdvancedProtocolSSL = New System.Windows.Forms.RadioButton()
-    Me.optAdvancedProtocolTLS = New System.Windows.Forms.RadioButton()
-    Me.pnlAdvancedProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblAdvancedProtocolTitle = New System.Windows.Forms.Label()
-    Me.lnAdvancedProtocolTitle = New RestrictionTracker.LineBreak()
     Me.pnlAdvancedPortable = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlPortableDir = New System.Windows.Forms.TableLayoutPanel()
     Me.txtPortableDir = New System.Windows.Forms.TextBox()
@@ -238,6 +237,10 @@ Partial Class frmConfig
     CType(Me.txtStartWait, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.tabNetwork.SuspendLayout()
     Me.pnlNetwork.SuspendLayout()
+    Me.pnlNetworkProtocol.SuspendLayout()
+    CType(Me.pctNetworkProtocolIcon, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.pnlNetworkProtocolInput.SuspendLayout()
+    Me.pnlNetworkProtocolTitle.SuspendLayout()
     Me.pnlNetworkUpdate.SuspendLayout()
     CType(Me.pctNetworkUpdateIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNetworkUpdateTime.SuspendLayout()
@@ -253,10 +256,6 @@ Partial Class frmConfig
     Me.pnlNetworkUpdateTitle.SuspendLayout()
     Me.tabAdvanced.SuspendLayout()
     Me.pnlAdvanced.SuspendLayout()
-    Me.pnlAdvancedProtocol.SuspendLayout()
-    CType(Me.pctAdvancedProtocol, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.pnlAdvancedProtocolInput.SuspendLayout()
-    Me.pnlAdvancedProtocolTitle.SuspendLayout()
     Me.pnlAdvancedPortable.SuspendLayout()
     Me.pnlPortableDir.SuspendLayout()
     CType(Me.pctAdvancedPortableIcon, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -282,7 +281,7 @@ Partial Class frmConfig
     Me.tbsConfig.Margin = New System.Windows.Forms.Padding(6, 6, 6, 3)
     Me.tbsConfig.Name = "tbsConfig"
     Me.tbsConfig.SelectedIndex = 0
-    Me.tbsConfig.Size = New System.Drawing.Size(392, 434)
+    Me.tbsConfig.Size = New System.Drawing.Size(392, 484)
     Me.tbsConfig.TabIndex = 0
     '
     'tabAccount
@@ -290,7 +289,7 @@ Partial Class frmConfig
     Me.tabAccount.Controls.Add(Me.pnlAccount)
     Me.tabAccount.Location = New System.Drawing.Point(4, 22)
     Me.tabAccount.Name = "tabAccount"
-    Me.tabAccount.Size = New System.Drawing.Size(384, 408)
+    Me.tabAccount.Size = New System.Drawing.Size(384, 472)
     Me.tabAccount.TabIndex = 0
     Me.tabAccount.Text = "Account"
     Me.tabAccount.UseVisualStyleBackColor = True
@@ -317,7 +316,7 @@ Partial Class frmConfig
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.Size = New System.Drawing.Size(384, 408)
+    Me.pnlAccount.Size = New System.Drawing.Size(384, 472)
     Me.pnlAccount.TabIndex = 0
     '
     'pnlAccountKeyTitle
@@ -331,7 +330,7 @@ Partial Class frmConfig
     Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccountKeyTitle.Controls.Add(Me.lblAccountKeyTitle, 0, 0)
     Me.pnlAccountKeyTitle.Controls.Add(Me.lnAccountKeyTitle, 1, 0)
-    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 340)
+    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 404)
     Me.pnlAccountKeyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAccountKeyTitle.Name = "pnlAccountKeyTitle"
     Me.pnlAccountKeyTitle.RowCount = 1
@@ -535,7 +534,7 @@ Partial Class frmConfig
     Me.pnlAccountProviderTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAccountProviderTitle.Controls.Add(Me.lblAccountProviderTitle, 0, 0)
     Me.pnlAccountProviderTitle.Controls.Add(Me.lnAccountProviderTitle, 1, 0)
-    Me.pnlAccountProviderTitle.Location = New System.Drawing.Point(3, 137)
+    Me.pnlAccountProviderTitle.Location = New System.Drawing.Point(3, 169)
     Me.pnlAccountProviderTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAccountProviderTitle.Name = "pnlAccountProviderTitle"
     Me.pnlAccountProviderTitle.RowCount = 1
@@ -582,7 +581,7 @@ Partial Class frmConfig
     Me.pnlAccountProvider.Controls.Add(Me.lblAccountType, 1, 2)
     Me.pnlAccountProvider.Controls.Add(Me.pnlAccountTypes, 1, 3)
     Me.pnlAccountProvider.Controls.Add(Me.lblAccountProviderDescription, 1, 0)
-    Me.pnlAccountProvider.Location = New System.Drawing.Point(3, 158)
+    Me.pnlAccountProvider.Location = New System.Drawing.Point(3, 190)
     Me.pnlAccountProvider.Name = "pnlAccountProvider"
     Me.pnlAccountProvider.RowCount = 4
     Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -768,7 +767,7 @@ Partial Class frmConfig
     Me.pnlAccountKey.Controls.Add(Me.pctAccountKeyIcon, 0, 0)
     Me.pnlAccountKey.Controls.Add(Me.lblKey, 1, 0)
     Me.pnlAccountKey.Controls.Add(Me.lblPurchaseKey, 2, 1)
-    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 361)
+    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 425)
     Me.pnlAccountKey.Name = "pnlAccountKey"
     Me.pnlAccountKey.RowCount = 2
     Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -932,7 +931,7 @@ Partial Class frmConfig
     Me.tabPrefs.Controls.Add(Me.pnlPrefs)
     Me.tabPrefs.Location = New System.Drawing.Point(4, 22)
     Me.tabPrefs.Name = "tabPrefs"
-    Me.tabPrefs.Size = New System.Drawing.Size(384, 408)
+    Me.tabPrefs.Size = New System.Drawing.Size(384, 472)
     Me.tabPrefs.TabIndex = 1
     Me.tabPrefs.Text = "Preferences"
     Me.tabPrefs.UseVisualStyleBackColor = True
@@ -967,7 +966,7 @@ Partial Class frmConfig
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlPrefs.Size = New System.Drawing.Size(384, 408)
+    Me.pnlPrefs.Size = New System.Drawing.Size(384, 472)
     Me.pnlPrefs.TabIndex = 0
     '
     'pnlPrefColor
@@ -983,7 +982,7 @@ Partial Class frmConfig
     Me.pnlPrefColor.Controls.Add(Me.pctPrefColorIcon, 0, 0)
     Me.pnlPrefColor.Controls.Add(Me.lblPrefColorDescription, 1, 0)
     Me.pnlPrefColor.Controls.Add(Me.cmdColors, 2, 0)
-    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 359)
+    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 422)
     Me.pnlPrefColor.Name = "pnlPrefColor"
     Me.pnlPrefColor.RowCount = 1
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1050,7 +1049,7 @@ Partial Class frmConfig
     Me.pnlPrefAlert.Controls.Add(Me.lblOverTime2, 3, 3)
     Me.pnlPrefAlert.Controls.Add(Me.lblOverSize1, 1, 2)
     Me.pnlPrefAlert.Controls.Add(Me.cmdAlertStyle, 3, 1)
-    Me.pnlPrefAlert.Location = New System.Drawing.Point(3, 227)
+    Me.pnlPrefAlert.Location = New System.Drawing.Point(3, 269)
     Me.pnlPrefAlert.Name = "pnlPrefAlert"
     Me.pnlPrefAlert.RowCount = 4
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1193,7 +1192,7 @@ Partial Class frmConfig
     Me.pnlPrefAccuracy.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracy.Controls.Add(Me.pctPrefAccuracyIcon, 0, 0)
     Me.pnlPrefAccuracy.Controls.Add(Me.pnlPrefAccuracyInput, 1, 0)
-    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 140)
+    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 161)
     Me.pnlPrefAccuracy.Name = "pnlPrefAccuracy"
     Me.pnlPrefAccuracy.RowCount = 1
     Me.pnlPrefAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1352,7 +1351,7 @@ Partial Class frmConfig
     Me.pnlPrefAccuracyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lblPrefAccuracyTitle, 0, 0)
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lnPrefAccuracyTitle, 1, 0)
-    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 119)
+    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 140)
     Me.pnlPrefAccuracyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefAccuracyTitle.Name = "pnlPrefAccuracyTitle"
     Me.pnlPrefAccuracyTitle.RowCount = 1
@@ -1394,7 +1393,7 @@ Partial Class frmConfig
     Me.pnlPrefAlertTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAlertTitle.Controls.Add(Me.lblPrefAlertTitle, 0, 0)
     Me.pnlPrefAlertTitle.Controls.Add(Me.lnPrefAlertTitle, 1, 0)
-    Me.pnlPrefAlertTitle.Location = New System.Drawing.Point(3, 206)
+    Me.pnlPrefAlertTitle.Location = New System.Drawing.Point(3, 248)
     Me.pnlPrefAlertTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefAlertTitle.Name = "pnlPrefAlertTitle"
     Me.pnlPrefAlertTitle.RowCount = 1
@@ -1436,7 +1435,7 @@ Partial Class frmConfig
     Me.pnlPrefColorTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefColorTitle.Controls.Add(Me.lblPrefColorTitle, 0, 0)
     Me.pnlPrefColorTitle.Controls.Add(Me.lnPrefColorTitle, 1, 0)
-    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 338)
+    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 401)
     Me.pnlPrefColorTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefColorTitle.Name = "pnlPrefColorTitle"
     Me.pnlPrefColorTitle.RowCount = 1
@@ -1587,7 +1586,7 @@ Partial Class frmConfig
     Me.tabNetwork.Controls.Add(Me.pnlNetwork)
     Me.tabNetwork.Location = New System.Drawing.Point(4, 22)
     Me.tabNetwork.Name = "tabNetwork"
-    Me.tabNetwork.Size = New System.Drawing.Size(384, 408)
+    Me.tabNetwork.Size = New System.Drawing.Size(384, 458)
     Me.tabNetwork.TabIndex = 2
     Me.tabNetwork.Text = "Network"
     Me.tabNetwork.UseVisualStyleBackColor = True
@@ -1596,26 +1595,143 @@ Partial Class frmConfig
     '
     Me.pnlNetwork.ColumnCount = 1
     Me.pnlNetwork.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlNetwork.Controls.Add(Me.pnlNetworkUpdate, 0, 7)
-    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProxy, 0, 4)
-    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProxyTitle, 0, 3)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProtocol, 0, 4)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProtocolTitle, 0, 3)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkUpdate, 0, 10)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProxy, 0, 7)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkProxyTitle, 0, 6)
     Me.pnlNetwork.Controls.Add(Me.pnlNetworkTimeoutTitle, 0, 0)
     Me.pnlNetwork.Controls.Add(Me.pnlNetworkTimeout, 0, 1)
-    Me.pnlNetwork.Controls.Add(Me.pnlNetworkUpdateTitle, 0, 6)
+    Me.pnlNetwork.Controls.Add(Me.pnlNetworkUpdateTitle, 0, 9)
     Me.pnlNetwork.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlNetwork.Location = New System.Drawing.Point(0, 0)
     Me.pnlNetwork.Name = "pnlNetwork"
-    Me.pnlNetwork.RowCount = 8
+    Me.pnlNetwork.RowCount = 11
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetwork.Size = New System.Drawing.Size(384, 408)
+    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlNetwork.Size = New System.Drawing.Size(384, 458)
     Me.pnlNetwork.TabIndex = 0
+    '
+    'pnlNetworkProtocol
+    '
+    Me.pnlNetworkProtocol.AutoSize = True
+    Me.pnlNetworkProtocol.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlNetworkProtocol.ColumnCount = 2
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkProtocol.Controls.Add(Me.pctNetworkProtocolIcon, 0, 0)
+    Me.pnlNetworkProtocol.Controls.Add(Me.pnlNetworkProtocolInput, 1, 0)
+    Me.pnlNetworkProtocol.Location = New System.Drawing.Point(3, 114)
+    Me.pnlNetworkProtocol.Name = "pnlNetworkProtocol"
+    Me.pnlNetworkProtocol.RowCount = 1
+    Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkProtocol.Size = New System.Drawing.Size(350, 55)
+    Me.pnlNetworkProtocol.TabIndex = 16
+    '
+    'pctNetworkProtocolIcon
+    '
+    Me.pctNetworkProtocolIcon.Anchor = System.Windows.Forms.AnchorStyles.Top
+    Me.pctNetworkProtocolIcon.Image = Global.RestrictionTracker.My.Resources.Resources.advanced_security
+    Me.pctNetworkProtocolIcon.Location = New System.Drawing.Point(21, 3)
+    Me.pctNetworkProtocolIcon.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
+    Me.pctNetworkProtocolIcon.Name = "pctNetworkProtocolIcon"
+    Me.pctNetworkProtocolIcon.Size = New System.Drawing.Size(32, 32)
+    Me.pctNetworkProtocolIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+    Me.pctNetworkProtocolIcon.TabIndex = 0
+    Me.pctNetworkProtocolIcon.TabStop = False
+    '
+    'pnlNetworkProtocolInput
+    '
+    Me.pnlNetworkProtocolInput.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pnlNetworkProtocolInput.AutoSize = True
+    Me.pnlNetworkProtocolInput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlNetworkProtocolInput.ColumnCount = 2
+    Me.pnlNetworkProtocolInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkProtocolInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkProtocolInput.Controls.Add(Me.lblNetworkProtocolDescription, 0, 0)
+    Me.pnlNetworkProtocolInput.Controls.Add(Me.chkNetworkProtocolSSL, 0, 1)
+    Me.pnlNetworkProtocolInput.Location = New System.Drawing.Point(56, 0)
+    Me.pnlNetworkProtocolInput.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlNetworkProtocolInput.Name = "pnlNetworkProtocolInput"
+    Me.pnlNetworkProtocolInput.RowCount = 2
+    Me.pnlNetworkProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlNetworkProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlNetworkProtocolInput.Size = New System.Drawing.Size(294, 55)
+    Me.pnlNetworkProtocolInput.TabIndex = 1
+    '
+    'lblNetworkProtocolDescription
+    '
+    Me.lblNetworkProtocolDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblNetworkProtocolDescription.AutoSize = True
+    Me.pnlNetworkProtocolInput.SetColumnSpan(Me.lblNetworkProtocolDescription, 2)
+    Me.lblNetworkProtocolDescription.Location = New System.Drawing.Point(3, 3)
+    Me.lblNetworkProtocolDescription.Margin = New System.Windows.Forms.Padding(3)
+    Me.lblNetworkProtocolDescription.Name = "lblNetworkProtocolDescription"
+    Me.lblNetworkProtocolDescription.Size = New System.Drawing.Size(288, 26)
+    Me.lblNetworkProtocolDescription.TabIndex = 0
+    Me.lblNetworkProtocolDescription.Text = "Some servers may prefer the older SSL protocol, others may" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "require modern TLS."
+    '
+    'chkNetworkProtocolSSL
+    '
+    Me.chkNetworkProtocolSSL.AutoSize = True
+    Me.chkNetworkProtocolSSL.Location = New System.Drawing.Point(3, 35)
+    Me.chkNetworkProtocolSSL.Name = "chkNetworkProtocolSSL"
+    Me.chkNetworkProtocolSSL.Size = New System.Drawing.Size(124, 17)
+    Me.chkNetworkProtocolSSL.TabIndex = 1
+    Me.chkNetworkProtocolSSL.Text = "Use &Legacy SSL 3.0"
+    Me.chkNetworkProtocolSSL.UseVisualStyleBackColor = True
+    '
+    'pnlNetworkProtocolTitle
+    '
+    Me.pnlNetworkProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pnlNetworkProtocolTitle.AutoSize = True
+    Me.pnlNetworkProtocolTitle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlNetworkProtocolTitle.ColumnCount = 2
+    Me.pnlNetworkProtocolTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkProtocolTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkProtocolTitle.Controls.Add(Me.lblNetworkProtocolTitle, 0, 0)
+    Me.pnlNetworkProtocolTitle.Controls.Add(Me.lnNetworkProtocolTitle, 1, 0)
+    Me.pnlNetworkProtocolTitle.Location = New System.Drawing.Point(3, 93)
+    Me.pnlNetworkProtocolTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
+    Me.pnlNetworkProtocolTitle.Name = "pnlNetworkProtocolTitle"
+    Me.pnlNetworkProtocolTitle.RowCount = 1
+    Me.pnlNetworkProtocolTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkProtocolTitle.Size = New System.Drawing.Size(378, 13)
+    Me.pnlNetworkProtocolTitle.TabIndex = 15
+    '
+    'lblNetworkProtocolTitle
+    '
+    Me.lblNetworkProtocolTitle.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblNetworkProtocolTitle.AutoSize = True
+    Me.lblNetworkProtocolTitle.Location = New System.Drawing.Point(3, 0)
+    Me.lblNetworkProtocolTitle.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblNetworkProtocolTitle.Name = "lblNetworkProtocolTitle"
+    Me.lblNetworkProtocolTitle.Size = New System.Drawing.Size(130, 13)
+    Me.lblNetworkProtocolTitle.TabIndex = 0
+    Me.lblNetworkProtocolTitle.Text = "Network Security Protocol"
+    '
+    'lnNetworkProtocolTitle
+    '
+    Me.lnNetworkProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnNetworkProtocolTitle.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnNetworkProtocolTitle.CausesValidation = False
+    Me.lnNetworkProtocolTitle.Location = New System.Drawing.Point(135, 4)
+    Me.lnNetworkProtocolTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
+    Me.lnNetworkProtocolTitle.Name = "lnNetworkProtocolTitle"
+    Me.lnNetworkProtocolTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
+    Me.lnNetworkProtocolTitle.Size = New System.Drawing.Size(238, 4)
+    Me.lnNetworkProtocolTitle.TabIndex = 1
+    Me.lnNetworkProtocolTitle.TabStop = False
     '
     'pnlNetworkUpdate
     '
@@ -1630,7 +1746,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.Controls.Add(Me.optUpdateBETA, 2, 0)
     Me.pnlNetworkUpdate.Controls.Add(Me.optUpdateNone, 1, 1)
     Me.pnlNetworkUpdate.Controls.Add(Me.pnlNetworkUpdateTime, 1, 2)
-    Me.pnlNetworkUpdate.Location = New System.Drawing.Point(3, 330)
+    Me.pnlNetworkUpdate.Location = New System.Drawing.Point(3, 382)
     Me.pnlNetworkUpdate.Name = "pnlNetworkUpdate"
     Me.pnlNetworkUpdate.RowCount = 3
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1748,7 +1864,7 @@ Partial Class frmConfig
     Me.pnlNetworkProxy.Controls.Add(Me.pnlProxy, 0, 1)
     Me.pnlNetworkProxy.Controls.Add(Me.pctNetworkProxyIcon, 0, 0)
     Me.pnlNetworkProxy.Controls.Add(Me.lblNetworkProxyDescrption, 1, 0)
-    Me.pnlNetworkProxy.Location = New System.Drawing.Point(3, 128)
+    Me.pnlNetworkProxy.Location = New System.Drawing.Point(3, 194)
     Me.pnlNetworkProxy.Name = "pnlNetworkProxy"
     Me.pnlNetworkProxy.RowCount = 2
     Me.pnlNetworkProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1949,7 +2065,7 @@ Partial Class frmConfig
     Me.pnlNetworkProxyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProxyTitle.Controls.Add(Me.lblNetworkProxyTitle, 0, 0)
     Me.pnlNetworkProxyTitle.Controls.Add(Me.lnNetworkProxyTitle, 1, 0)
-    Me.pnlNetworkProxyTitle.Location = New System.Drawing.Point(3, 107)
+    Me.pnlNetworkProxyTitle.Location = New System.Drawing.Point(3, 173)
     Me.pnlNetworkProxyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlNetworkProxyTitle.Name = "pnlNetworkProxyTitle"
     Me.pnlNetworkProxyTitle.RowCount = 1
@@ -2114,7 +2230,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdateTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkUpdateTitle.Controls.Add(Me.lblNetworkUpdateTitle, 0, 0)
     Me.pnlNetworkUpdateTitle.Controls.Add(Me.lnNetworkUpdateTitle, 1, 0)
-    Me.pnlNetworkUpdateTitle.Location = New System.Drawing.Point(3, 309)
+    Me.pnlNetworkUpdateTitle.Location = New System.Drawing.Point(3, 361)
     Me.pnlNetworkUpdateTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlNetworkUpdateTitle.Name = "pnlNetworkUpdateTitle"
     Me.pnlNetworkUpdateTitle.RowCount = 1
@@ -2151,7 +2267,7 @@ Partial Class frmConfig
     Me.tabAdvanced.Controls.Add(Me.pnlAdvanced)
     Me.tabAdvanced.Location = New System.Drawing.Point(4, 22)
     Me.tabAdvanced.Name = "tabAdvanced"
-    Me.tabAdvanced.Size = New System.Drawing.Size(384, 408)
+    Me.tabAdvanced.Size = New System.Drawing.Size(384, 472)
     Me.tabAdvanced.TabIndex = 3
     Me.tabAdvanced.Text = "Advanced"
     Me.tabAdvanced.UseVisualStyleBackColor = True
@@ -2160,163 +2276,25 @@ Partial Class frmConfig
     '
     Me.pnlAdvanced.ColumnCount = 1
     Me.pnlAdvanced.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedProtocol, 0, 4)
-    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedProtocolTitle, 0, 3)
-    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedPortable, 0, 7)
-    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedPortableTitle, 0, 6)
+    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedPortable, 0, 4)
+    Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedPortableTitle, 0, 3)
     Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedData, 0, 1)
     Me.pnlAdvanced.Controls.Add(Me.pnlAdvancedDataTitle, 0, 0)
     Me.pnlAdvanced.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlAdvanced.Location = New System.Drawing.Point(0, 0)
     Me.pnlAdvanced.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlAdvanced.Name = "pnlAdvanced"
-    Me.pnlAdvanced.RowCount = 8
+    Me.pnlAdvanced.RowCount = 5
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvanced.Size = New System.Drawing.Size(384, 408)
+    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlAdvanced.Size = New System.Drawing.Size(384, 472)
     Me.pnlAdvanced.TabIndex = 1
-    '
-    'pnlAdvancedProtocol
-    '
-    Me.pnlAdvancedProtocol.AutoSize = True
-    Me.pnlAdvancedProtocol.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAdvancedProtocol.ColumnCount = 2
-    Me.pnlAdvancedProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAdvancedProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedProtocol.Controls.Add(Me.pctAdvancedProtocol, 0, 0)
-    Me.pnlAdvancedProtocol.Controls.Add(Me.pnlAdvancedProtocolInput, 1, 0)
-    Me.pnlAdvancedProtocol.Location = New System.Drawing.Point(3, 209)
-    Me.pnlAdvancedProtocol.Name = "pnlAdvancedProtocol"
-    Me.pnlAdvancedProtocol.RowCount = 1
-    Me.pnlAdvancedProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedProtocol.Size = New System.Drawing.Size(350, 80)
-    Me.pnlAdvancedProtocol.TabIndex = 15
-    '
-    'pctAdvancedProtocol
-    '
-    Me.pctAdvancedProtocol.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.pctAdvancedProtocol.Image = Global.RestrictionTracker.My.Resources.Resources.advanced_security
-    Me.pctAdvancedProtocol.Location = New System.Drawing.Point(21, 3)
-    Me.pctAdvancedProtocol.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
-    Me.pctAdvancedProtocol.Name = "pctAdvancedProtocol"
-    Me.pctAdvancedProtocol.Size = New System.Drawing.Size(32, 32)
-    Me.pctAdvancedProtocol.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-    Me.pctAdvancedProtocol.TabIndex = 0
-    Me.pctAdvancedProtocol.TabStop = False
-    '
-    'pnlAdvancedProtocolInput
-    '
-    Me.pnlAdvancedProtocolInput.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pnlAdvancedProtocolInput.AutoSize = True
-    Me.pnlAdvancedProtocolInput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAdvancedProtocolInput.ColumnCount = 2
-    Me.pnlAdvancedProtocolInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAdvancedProtocolInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAdvancedProtocolInput.Controls.Add(Me.lblAdvancedProtocolDescription, 0, 0)
-    Me.pnlAdvancedProtocolInput.Controls.Add(Me.optAdvancedProtocolSSL, 0, 1)
-    Me.pnlAdvancedProtocolInput.Controls.Add(Me.optAdvancedProtocolTLS, 0, 2)
-    Me.pnlAdvancedProtocolInput.Location = New System.Drawing.Point(56, 0)
-    Me.pnlAdvancedProtocolInput.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlAdvancedProtocolInput.Name = "pnlAdvancedProtocolInput"
-    Me.pnlAdvancedProtocolInput.RowCount = 3
-    Me.pnlAdvancedProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvancedProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvancedProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvancedProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAdvancedProtocolInput.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAdvancedProtocolInput.Size = New System.Drawing.Size(294, 80)
-    Me.pnlAdvancedProtocolInput.TabIndex = 1
-    '
-    'lblAdvancedProtocolDescription
-    '
-    Me.lblAdvancedProtocolDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblAdvancedProtocolDescription.AutoSize = True
-    Me.pnlAdvancedProtocolInput.SetColumnSpan(Me.lblAdvancedProtocolDescription, 2)
-    Me.lblAdvancedProtocolDescription.Location = New System.Drawing.Point(3, 3)
-    Me.lblAdvancedProtocolDescription.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblAdvancedProtocolDescription.Name = "lblAdvancedProtocolDescription"
-    Me.lblAdvancedProtocolDescription.Size = New System.Drawing.Size(288, 26)
-    Me.lblAdvancedProtocolDescription.TabIndex = 0
-    Me.lblAdvancedProtocolDescription.Text = "Some servers may prefer the older SSL protocol, others may" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "require modern TLS."
-    '
-    'optAdvancedProtocolSSL
-    '
-    Me.optAdvancedProtocolSSL.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAdvancedProtocolSSL.AutoSize = True
-    Me.pnlAdvancedProtocolInput.SetColumnSpan(Me.optAdvancedProtocolSSL, 2)
-    Me.optAdvancedProtocolSSL.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAdvancedProtocolSSL.Location = New System.Drawing.Point(3, 35)
-    Me.optAdvancedProtocolSSL.Name = "optAdvancedProtocolSSL"
-    Me.optAdvancedProtocolSSL.Size = New System.Drawing.Size(69, 18)
-    Me.optAdvancedProtocolSSL.TabIndex = 1
-    Me.optAdvancedProtocolSSL.TabStop = True
-    Me.optAdvancedProtocolSSL.Text = "&SSL 3.0"
-    Me.ttConfig.SetTooltip(Me.optAdvancedProtocolSSL, "Save History Data to the shared Program Data directory.")
-    Me.optAdvancedProtocolSSL.UseVisualStyleBackColor = True
-    '
-    'optAdvancedProtocolTLS
-    '
-    Me.optAdvancedProtocolTLS.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAdvancedProtocolTLS.AutoSize = True
-    Me.pnlAdvancedProtocolInput.SetColumnSpan(Me.optAdvancedProtocolTLS, 2)
-    Me.optAdvancedProtocolTLS.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAdvancedProtocolTLS.Location = New System.Drawing.Point(3, 59)
-    Me.optAdvancedProtocolTLS.Name = "optAdvancedProtocolTLS"
-    Me.optAdvancedProtocolTLS.Size = New System.Drawing.Size(69, 18)
-    Me.optAdvancedProtocolTLS.TabIndex = 2
-    Me.optAdvancedProtocolTLS.TabStop = True
-    Me.optAdvancedProtocolTLS.Text = "&TLS 1.0"
-    Me.ttConfig.SetTooltip(Me.optAdvancedProtocolTLS, "Save History Data to your local account's Application Data directory.")
-    Me.optAdvancedProtocolTLS.UseVisualStyleBackColor = True
-    '
-    'pnlAdvancedProtocolTitle
-    '
-    Me.pnlAdvancedProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pnlAdvancedProtocolTitle.AutoSize = True
-    Me.pnlAdvancedProtocolTitle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAdvancedProtocolTitle.ColumnCount = 2
-    Me.pnlAdvancedProtocolTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAdvancedProtocolTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedProtocolTitle.Controls.Add(Me.lblAdvancedProtocolTitle, 0, 0)
-    Me.pnlAdvancedProtocolTitle.Controls.Add(Me.lnAdvancedProtocolTitle, 1, 0)
-    Me.pnlAdvancedProtocolTitle.Location = New System.Drawing.Point(3, 188)
-    Me.pnlAdvancedProtocolTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
-    Me.pnlAdvancedProtocolTitle.Name = "pnlAdvancedProtocolTitle"
-    Me.pnlAdvancedProtocolTitle.RowCount = 1
-    Me.pnlAdvancedProtocolTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedProtocolTitle.Size = New System.Drawing.Size(378, 13)
-    Me.pnlAdvancedProtocolTitle.TabIndex = 14
-    '
-    'lblAdvancedProtocolTitle
-    '
-    Me.lblAdvancedProtocolTitle.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblAdvancedProtocolTitle.AutoSize = True
-    Me.lblAdvancedProtocolTitle.Location = New System.Drawing.Point(3, 0)
-    Me.lblAdvancedProtocolTitle.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblAdvancedProtocolTitle.Name = "lblAdvancedProtocolTitle"
-    Me.lblAdvancedProtocolTitle.Size = New System.Drawing.Size(130, 13)
-    Me.lblAdvancedProtocolTitle.TabIndex = 0
-    Me.lblAdvancedProtocolTitle.Text = "Network Security Protocol"
-    '
-    'lnAdvancedProtocolTitle
-    '
-    Me.lnAdvancedProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAdvancedProtocolTitle.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAdvancedProtocolTitle.CausesValidation = False
-    Me.lnAdvancedProtocolTitle.Location = New System.Drawing.Point(135, 4)
-    Me.lnAdvancedProtocolTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
-    Me.lnAdvancedProtocolTitle.Name = "lnAdvancedProtocolTitle"
-    Me.lnAdvancedProtocolTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAdvancedProtocolTitle.Size = New System.Drawing.Size(238, 4)
-    Me.lnAdvancedProtocolTitle.TabIndex = 1
-    Me.lnAdvancedProtocolTitle.TabStop = False
     '
     'pnlAdvancedPortable
     '
@@ -2331,7 +2309,7 @@ Partial Class frmConfig
     Me.pnlAdvancedPortable.Controls.Add(Me.lblAdvancedPortableDescription, 1, 0)
     Me.pnlAdvancedPortable.Controls.Add(Me.cmdMakePortable, 1, 2)
     Me.pnlAdvancedPortable.Controls.Add(Me.lblPortableDir, 1, 1)
-    Me.pnlAdvancedPortable.Location = New System.Drawing.Point(3, 317)
+    Me.pnlAdvancedPortable.Location = New System.Drawing.Point(3, 380)
     Me.pnlAdvancedPortable.Name = "pnlAdvancedPortable"
     Me.pnlAdvancedPortable.RowCount = 3
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -2446,7 +2424,7 @@ Partial Class frmConfig
     Me.pnlAdvancedPortableTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedPortableTitle.Controls.Add(Me.lblAdvancedPortableTitle, 0, 0)
     Me.pnlAdvancedPortableTitle.Controls.Add(Me.lnAdvancedPortableTitle, 1, 0)
-    Me.pnlAdvancedPortableTitle.Location = New System.Drawing.Point(3, 296)
+    Me.pnlAdvancedPortableTitle.Location = New System.Drawing.Point(3, 359)
     Me.pnlAdvancedPortableTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAdvancedPortableTitle.Name = "pnlAdvancedPortableTitle"
     Me.pnlAdvancedPortableTitle.RowCount = 1
@@ -2726,7 +2704,7 @@ Partial Class frmConfig
     Me.pnlConfig.RowCount = 2
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlConfig.Size = New System.Drawing.Size(404, 472)
+    Me.pnlConfig.Size = New System.Drawing.Size(404, 522)
     Me.pnlConfig.TabIndex = 4
     '
     'pnlButtons
@@ -2739,7 +2717,7 @@ Partial Class frmConfig
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(244, 443)
+    Me.pnlButtons.Location = New System.Drawing.Point(244, 493)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -2766,12 +2744,12 @@ Partial Class frmConfig
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.AutoSize = True
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(404, 472)
+    Me.ClientSize = New System.Drawing.Size(404, 522)
     Me.Controls.Add(Me.pnlConfig)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.MaximizeBox = False
     Me.MinimizeBox = False
-    Me.MinimumSize = New System.Drawing.Size(410, 465)
+    Me.MinimumSize = New System.Drawing.Size(410, 550)
     Me.Name = "frmConfig"
     Me.ShowIcon = False
     Me.ShowInTaskbar = False
@@ -2838,6 +2816,13 @@ Partial Class frmConfig
     Me.tabNetwork.ResumeLayout(False)
     Me.pnlNetwork.ResumeLayout(False)
     Me.pnlNetwork.PerformLayout()
+    Me.pnlNetworkProtocol.ResumeLayout(False)
+    Me.pnlNetworkProtocol.PerformLayout()
+    CType(Me.pctNetworkProtocolIcon, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.pnlNetworkProtocolInput.ResumeLayout(False)
+    Me.pnlNetworkProtocolInput.PerformLayout()
+    Me.pnlNetworkProtocolTitle.ResumeLayout(False)
+    Me.pnlNetworkProtocolTitle.PerformLayout()
     Me.pnlNetworkUpdate.ResumeLayout(False)
     Me.pnlNetworkUpdate.PerformLayout()
     CType(Me.pctNetworkUpdateIcon, System.ComponentModel.ISupportInitialize).EndInit()
@@ -2862,13 +2847,6 @@ Partial Class frmConfig
     Me.tabAdvanced.ResumeLayout(False)
     Me.pnlAdvanced.ResumeLayout(False)
     Me.pnlAdvanced.PerformLayout()
-    Me.pnlAdvancedProtocol.ResumeLayout(False)
-    Me.pnlAdvancedProtocol.PerformLayout()
-    CType(Me.pctAdvancedProtocol, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.pnlAdvancedProtocolInput.ResumeLayout(False)
-    Me.pnlAdvancedProtocolInput.PerformLayout()
-    Me.pnlAdvancedProtocolTitle.ResumeLayout(False)
-    Me.pnlAdvancedProtocolTitle.PerformLayout()
     Me.pnlAdvancedPortable.ResumeLayout(False)
     Me.pnlAdvancedPortable.PerformLayout()
     Me.pnlPortableDir.ResumeLayout(False)
@@ -3057,14 +3035,13 @@ Partial Class frmConfig
   Friend WithEvents pnlPortableDir As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents txtPortableDir As System.Windows.Forms.TextBox
   Friend WithEvents cmdPortableDir As System.Windows.Forms.Button
-  Friend WithEvents pnlAdvancedProtocolTitle As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblAdvancedProtocolTitle As System.Windows.Forms.Label
-  Friend WithEvents lnAdvancedProtocolTitle As RestrictionTracker.LineBreak
-  Friend WithEvents pnlAdvancedProtocol As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctAdvancedProtocol As System.Windows.Forms.PictureBox
-  Friend WithEvents pnlAdvancedProtocolInput As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblAdvancedProtocolDescription As System.Windows.Forms.Label
-  Friend WithEvents optAdvancedProtocolSSL As System.Windows.Forms.RadioButton
-  Friend WithEvents optAdvancedProtocolTLS As System.Windows.Forms.RadioButton
+  Friend WithEvents pnlNetworkProtocol As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pctNetworkProtocolIcon As System.Windows.Forms.PictureBox
+  Friend WithEvents pnlNetworkProtocolInput As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblNetworkProtocolDescription As System.Windows.Forms.Label
+  Friend WithEvents chkNetworkProtocolSSL As System.Windows.Forms.CheckBox
+  Friend WithEvents pnlNetworkProtocolTitle As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblNetworkProtocolTitle As System.Windows.Forms.Label
+  Friend WithEvents lnNetworkProtocolTitle As RestrictionTracker.LineBreak
 
 End Class
