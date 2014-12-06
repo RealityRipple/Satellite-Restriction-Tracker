@@ -95,6 +95,7 @@ Class AppSettings
     m_PassCrypt = Nothing
     m_Timeout = 60
     m_ProxySetting = "None"
+    m_Protocol = Net.SecurityProtocolType.Ssl3
   End Sub
   Public Property Account As String
     Get
