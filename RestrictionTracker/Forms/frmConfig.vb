@@ -185,6 +185,11 @@
       Case 30 : cmbUpdateInterval.SelectedIndex = 4
       Case Else : cmbUpdateInterval.SelectedIndex = 3
     End Select
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls Then
+      optAdvancedProtocolTLS.Checked = True
+    Else
+      optAdvancedProtocolSSL.Checked = True
+    End If
     cmdSave.Enabled = False
     bSaved = False
     bAccount = False
@@ -299,7 +304,8 @@
                                                                              txtProxyPassword.TextChanged,
                                                                              txtProxyDomain.TextChanged,
                                                                              cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged,
-                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged
+                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged,
+                                                                             optAdvancedProtocolSSL.CheckedChanged, optAdvancedProtocolTLS.CheckedChanged
 
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -1041,6 +1047,11 @@
           End If
         End If
     End Select
+    If optAdvancedProtocolTLS.Checked Then
+      mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
+    Else
+      mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
+    End If
     mySettings.Save()
     If mySettings.Service Then
       Dim cSave As New SvcSettings
@@ -1128,6 +1139,8 @@
         End If
       End If
     End If
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3 And Not optAdvancedProtocolSSL.Checked Then Return True
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls And Not optAdvancedProtocolTLS.Checked Then Return True
     Return False
   End Function
   Private Sub DoCheck()
