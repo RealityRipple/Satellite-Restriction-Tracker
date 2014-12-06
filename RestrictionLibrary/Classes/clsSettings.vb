@@ -9,6 +9,7 @@ Class AppSettings
   Private m_PassCrypt As String
   Private m_Timeout As Integer
   Private m_ProxySetting As String
+  Private m_Protocol As Net.SecurityProtocolType
   Public Loaded As Boolean
   Private Property ConfigFile As String
     Get
@@ -56,6 +57,8 @@ Class AppSettings
                     If Not Integer.TryParse(xValue, m_Timeout) Then m_Timeout = 60
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
+                  ElseIf xName.CompareTo("Protocol") = 0 Then
+                    m_Protocol = IIf(xValue = "TLS", Net.SecurityProtocolType.Tls, Net.SecurityProtocolType.Ssl3)
                   End If
                 Next
                 Loaded = True
@@ -228,6 +231,14 @@ Class AppSettings
           End If
         End If
       End If
+    End Set
+  End Property
+  Public Property SecurityProtocol As Net.SecurityProtocolType
+    Get
+      Return m_Protocol
+    End Get
+    Set(value As Net.SecurityProtocolType)
+      m_Protocol = value
     End Set
   End Property
 End Class

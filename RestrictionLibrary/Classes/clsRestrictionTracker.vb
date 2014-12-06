@@ -224,9 +224,9 @@
   Private sDataPath As String
 #Region "Initialization Functions"
   Public Sub New(ConfigPath As String)
-    Net.ServicePointManager.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
+    Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
     InitAccount()
   End Sub
   Public Sub Connect()

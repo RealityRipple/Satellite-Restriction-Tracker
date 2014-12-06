@@ -194,11 +194,8 @@ Public Class frmMain
 #End Region
 #Region "Form Events"
   Private Sub frmMain_Load(sender As Object, e As System.EventArgs) Handles Me.Load
-    Net.ServicePointManager.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     AddHandler Microsoft.Win32.SystemEvents.PowerModeChanged, AddressOf PowerModeChanged
-    If mySettings Is Nothing Then
-      ReLoadSettings()
-    End If
+    If mySettings Is Nothing Then ReLoadSettings()
     NextGrabTick = Long.MinValue
     Me.Opacity = 0
     Me.ShowInTaskbar = False
@@ -452,6 +449,7 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
+    Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
     If AppData = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
