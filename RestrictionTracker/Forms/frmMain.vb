@@ -1038,24 +1038,6 @@ Public Class frmMain
       tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), state, 25, System.Threading.Timeout.Infinite)
     End If
   End Sub
-  Private Sub AskForDonations()
-    Try
-      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
-        If Math.Abs(DateDiff(DateInterval.Minute, Process.GetCurrentProcess.StartTime, Now)) > 30 Then
-          If Now.Month = 5 Or Now.Month = 9 Or Now.Month = 12 Then
-            If Now.DayOfWeek = DayOfWeek.Saturday Or Now.DayOfWeek = DayOfWeek.Sunday Then
-              If Math.Abs(DateDiff(DateInterval.Month, mySettings.LastNag, Now)) > 3 Then
-                frmDonate.Show()
-                mySettings.LastNag = Today
-                mySettings.Save()
-              End If
-            End If
-          End If
-        End If
-      End If
-    Catch
-    End Try
-  End Sub
   Private Sub DoChange(ByRef lblTemp As Label, ByRef toVal As Long)
     Dim tmpVal As Long = 0
     If lblTemp.Text.Length > 3 And lblTemp.Text.Contains(" ") Then
@@ -1913,6 +1895,32 @@ Public Class frmMain
   End Sub
 #End Region
 #Region "Useful Functions"
+  Private Sub AskForDonations()
+    Try
+      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
+        If Math.Abs(DateDiff(DateInterval.Minute, Process.GetCurrentProcess.StartTime, Now)) > 30 Then
+          If Now.Month = 5 Or Now.Month = 9 Or Now.Month = 12 Then
+            If Now.DayOfWeek = DayOfWeek.Saturday Or Now.DayOfWeek = DayOfWeek.Sunday Then
+              Dim lastAsk As Long = DateDiff(DateInterval.Month, mySettings.LastNag, Now)
+              If lastAsk > 3 Or lastAsk < -12 Then
+                mySettings.LastNag = Today
+                mySettings.Save()
+                frmDonate.Show()
+              End If
+            End If
+          End If
+        End If
+      End If
+    Catch
+    End Try
+  End Sub
+  Public Sub ClickedDonate()
+    Try
+      mySettings.LastNag = DateAdd(DateInterval.Month, 12, Today)
+      mySettings.Save()
+    Catch ex As Exception
+    End Try
+  End Sub
   Private Sub PowerModeChanged(sender As Object, e As Microsoft.Win32.PowerModeChangedEventArgs)
     If e.Mode = Microsoft.Win32.PowerModes.Suspend Then
       If localData IsNot Nothing Then

@@ -3,6 +3,7 @@
   Private Sub cmdDonate_Click(sender As System.Object, e As System.EventArgs) Handles cmdDonate.Click
     Try
       Process.Start("http://realityripple.com/donate.php?itm=Satellite+Restriction+Tracker")
+      frmMain.ClickedDonate()
       Me.Close()
     Catch ex As Exception
       MakeNotifier(taskNotifier, False)
