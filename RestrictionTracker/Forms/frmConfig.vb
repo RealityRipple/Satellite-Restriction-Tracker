@@ -939,48 +939,72 @@
           If sOverWrites.Count > 0 Then
             If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
               Dim sFails As New Collections.Generic.List(Of String)
+              Dim sNoMove As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
                 If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
                 If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
                 Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
-                My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
+                Try
+                  My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
+                Catch ex As Exception
+                  sNoMove.Add(sFile & ": " & ex.Message)
+                End Try
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
               If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             Else
               Dim sFails As New Collections.Generic.List(Of String)
+              Dim sNoMove As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
                 If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
                 If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
                 Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
                 If My.Computer.FileSystem.FileExists(sNewFile) Then Continue For
-                My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
+                Try
+                  My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
+                Catch ex As Exception
+                  sNoMove.Add(sFile & ": " & ex.Message)
+                End Try
                 If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
               If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             End If
           Else
             Dim sFails As New Collections.Generic.List(Of String)
+            Dim sNoMove As New Collections.Generic.List(Of String)
             For Each sFile In sOldFiles
               If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
               If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
               Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
-              My.Computer.FileSystem.MoveFile(sFile, sNewFile)
+              Try
+                My.Computer.FileSystem.MoveFile(sFile, sNewFile)
+              Catch ex As Exception
+                sNoMove.Add(sFile & ": " & ex.Message)
+              End Try
               If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
             If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           End If
         Else
           'Move old files
           Dim sFails As New Collections.Generic.List(Of String)
+          Dim sNoMove As New Collections.Generic.List(Of String)
           For Each sFile In sOldFiles
             If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
             If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
             Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
-            My.Computer.FileSystem.MoveFile(sFile, sNewFile)
+            Try
+              My.Computer.FileSystem.MoveFile(sFile, sNewFile)
+            Catch ex As Exception
+              sNoMove.Add(sFile & ": " & ex.Message)
+            End Try
             If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
           If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         End If
       Else
         'Ignore
