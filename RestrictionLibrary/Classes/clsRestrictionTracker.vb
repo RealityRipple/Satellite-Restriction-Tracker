@@ -1198,6 +1198,9 @@
         End Select
         Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, subState, subVal, sURI)
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
+      ElseIf sRet.Contains("https://myexede.force.com/atlasPlanInvalid") Then
+        sErrMsg = "You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists."
+        bReset = False
       Else
         sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
         sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
