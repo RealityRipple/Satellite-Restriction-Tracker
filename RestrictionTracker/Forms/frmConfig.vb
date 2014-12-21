@@ -1,5 +1,4 @@
 ﻿Public Class frmConfig
-
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents wsHostList As CookieAwareWebClient
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
@@ -846,8 +845,6 @@
        cmbProvider.Text.ToLower.Contains("mysso") Or
        cmbProvider.Text.ToLower.Contains("myexede") Or
        cmbProvider.Text.ToLower.Contains("my.exede") Then cmbProvider.Text = "exede.net"
-
-    'Account Tab
     If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
@@ -882,8 +879,6 @@
         bAccount = True
       End If
     End If
-
-    'Preferences Tab
     If chkStartUp.Checked Then
       If Not My.Computer.FileSystem.FileExists(StartupPath) Then
         Using link As New ShellLink
@@ -897,13 +892,10 @@
     Else
       If My.Computer.FileSystem.FileExists(StartupPath) Then My.Computer.FileSystem.DeleteFile(StartupPath)
     End If
-
     mySettings.StartWait = txtStartWait.Value
-
     mySettings.Interval = txtInterval.Value
     mySettings.Accuracy = txtAccuracy.Value
     mySettings.Timeout = txtTimeout.Value
-
     If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir
     mySettings.Service = chkService.Checked
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
@@ -925,7 +917,6 @@
       LOG_Terminate(True)
       If sOldFiles IsNot Nothing AndAlso sOldFiles.Count > 0 Then
         If sNewFiles IsNot Nothing AndAlso sNewFiles.Count > 0 Then
-          'Ask
           Dim sOverWrites As New Collections.Generic.List(Of String)
           For Each sOld In sOldFiles
             For Each sNew In sNewFiles
@@ -989,7 +980,6 @@
             If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           End If
         Else
-          'Move old files
           Dim sFails As New Collections.Generic.List(Of String)
           Dim sNoMove As New Collections.Generic.List(Of String)
           For Each sFile In sOldFiles
@@ -1006,8 +996,6 @@
           If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         End If
-      Else
-        'Ignore
       End If
       mySettings.HistoryDir = txtHistoryDir.Text
       bAccount = True
@@ -1067,7 +1055,6 @@
           End If
         End If
     End Select
-
     If chkNetworkProtocolSSL.Checked Then
       mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     Else

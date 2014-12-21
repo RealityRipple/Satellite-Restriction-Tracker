@@ -171,7 +171,7 @@ Public Class svcRL
     If iChecks = MySettings.Interval * 60 Or iChecks = 1 Then
       iChecks = 1
       InitAccount()
-      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker.Connect() ' GetUsage()
+      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker.Connect()
     End If
   End Sub
   Private Sub InitAccount()
@@ -221,12 +221,8 @@ Public Class svcRL
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-  'Private Sub tracker_ConnectionWBVResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBVResult
-  '  MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EVOLUTION
-  '  LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
-  'End Sub
   Private Sub tracker_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit) ' e.Download, e.Limit + e.BuyMore, e.Upload, e.Over)
+    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
 End Class

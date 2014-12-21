@@ -715,7 +715,6 @@
             bReset = True
         End Select
       Case SatHostTypes.DishNet_EXEDE
-        'Debug.Print(LoginState & " - Received " & sURI)
         Select Case LoginState
           Case ConnectionStates.Login
             Select Case LoginSubState
@@ -956,8 +955,6 @@
             sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
           ElseIf sGOTO.Contains("""") Then
             sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
-          Else
-            'sGOTO = Nothing
           End If
         End If
         If String.IsNullOrEmpty(sGOTO) Then
@@ -974,8 +971,6 @@
             sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
           ElseIf sSQPS.Contains("""") Then
             sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
-          Else
-            'sSQPS = Nothing
           End If
         End If
         If String.IsNullOrEmpty(sSQPS) Then

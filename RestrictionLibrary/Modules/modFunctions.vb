@@ -351,7 +351,6 @@ Module modFunctions
       Try
         Select Case access
           Case FileAccess.Read
-            'only check for ability to read
             Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite Or FileShare.Delete)
               If fs.CanRead Then
                 Return True
@@ -359,7 +358,6 @@ Module modFunctions
               End If
             End Using
           Case FileAccess.Write, FileAccess.ReadWrite
-            'check for ability to write
             Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite Or FileShare.Delete)
               If fs.CanWrite Then
                 Return True

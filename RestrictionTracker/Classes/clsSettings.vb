@@ -902,7 +902,6 @@ Class AppSettings
     ElseIf m_UpdateType = 2 Then
       sUpdateType = "BETA"
     End If
-    'New XElement("setting", New XAttribute("name", "HistoryInversion"), New XElement("value", IIf(m_HistoryInvert, "True", "False"))),
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",

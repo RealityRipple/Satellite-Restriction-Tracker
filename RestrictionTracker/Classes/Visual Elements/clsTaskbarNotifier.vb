@@ -1,7 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-''' <summary>
-''' TaskbarNotifier allows to display MSN style/Skinned instant messaging popups
-''' </summary>
 Public Class TaskbarNotifier
   Inherits System.Windows.Forms.Form
 #Region "TaskbarNotifier Protected Members"
@@ -49,9 +46,6 @@ Public Class TaskbarNotifier
   Public Event ContentClick As EventHandler
 #End Region
 #Region "TaskbarNotifier Enums"
-  ''' <summary>
-  ''' List of the different popup animation status
-  ''' </summary>
   Public Enum TaskbarStates
     hidden = 0
     appearing = 1
@@ -60,11 +54,7 @@ Public Class TaskbarNotifier
   End Enum
 #End Region
 #Region "TaskbarNotifier Constructor"
-  ''' <summary>
-  ''' The Constructor for TaskbarNotifier
-  ''' </summary>
   Public Sub New()
-    ' Window Style
     FormBorderStyle = FormBorderStyle.None
     WindowState = FormWindowState.Minimized
     MyBase.Show()
@@ -75,24 +65,16 @@ Public Class TaskbarNotifier
     MaximizeBox = False
     MinimizeBox = False
     ControlBox = False
-
     timer.Enabled = True
     AddHandler timer.Tick, New EventHandler(AddressOf OnTimer)
   End Sub
 #End Region
 #Region "TaskbarNotifier Properties"
-  ''' <summary>
-  ''' Get the current TaskbarState (hidden, showing, visible, hiding)
-  ''' </summary>
   Public ReadOnly Property TaskbarState() As TaskbarStates
     Get
       Return m_taskbarState
     End Get
   End Property
-
-  ''' <summary>
-  ''' Get/Set the popup Title Text
-  ''' </summary>
   Public Property TitleText() As String
     Get
       Return m_titleText
@@ -102,10 +84,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the popup Content Text
-  ''' </summary>
   Public Property ContentText() As String
     Get
       Return m_contentText
@@ -115,10 +93,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Normal Title Color
-  ''' </summary>
   Public Property NormalTitleColor() As Color
     Get
       Return m_normalTitleColor
@@ -128,10 +102,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Hover Title Color
-  ''' </summary>
   Public Property HoverTitleColor() As Color
     Get
       Return m_hoverTitleColor
@@ -141,10 +111,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Normal Content Color
-  ''' </summary>
   Public Property NormalContentColor() As Color
     Get
       Return m_normalContentColor
@@ -154,10 +120,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Hover Content Color
-  ''' </summary>
   Public Property HoverContentColor() As Color
     Get
       Return m_hoverContentColor
@@ -167,10 +129,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Normal Title Font
-  ''' </summary>
   Public Property NormalTitleFont() As Font
     Get
       Return m_normalTitleFont
@@ -180,10 +138,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Hover Title Font
-  ''' </summary>
   Public Property HoverTitleFont() As Font
     Get
       Return m_hoverTitleFont
@@ -193,10 +147,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Normal Content Font
-  ''' </summary>
   Public Property NormalContentFont() As Font
     Get
       Return m_normalContentFont
@@ -206,10 +156,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Get/Set the Hover Content Font
-  ''' </summary>
   Public Property HoverContentFont() As Font
     Get
       Return m_hoverContentFont
@@ -219,11 +165,6 @@ Public Class TaskbarNotifier
       Refresh()
     End Set
   End Property
-
-  ''' <summary>
-  ''' Indicates if the popup should remain visible when the mouse pointer is over it.
-  ''' Added Rev 002
-  ''' </summary>
   Public Property KeepVisibleOnMousOver() As Boolean
     Get
       Return bKeepVisibleOnMouseOver
@@ -232,11 +173,6 @@ Public Class TaskbarNotifier
       bKeepVisibleOnMouseOver = value
     End Set
   End Property
-
-  ''' <summary>
-  ''' Indicates if the popup should appear again when mouse moves over it while it's disappearing.
-  ''' Added Rev 002
-  ''' </summary>
   Public Property ReShowOnMouseOver() As Boolean
     Get
       Return bReShowOnMouseOver
@@ -245,20 +181,10 @@ Public Class TaskbarNotifier
       bReShowOnMouseOver = value
     End Set
   End Property
-
 #End Region
 #Region "TaskbarNotifier Public Methods"
-  <DllImport("user32.dll")> _
-  Private Shared Function ShowWindow(hWnd As IntPtr, nCmdShow As Int32) As [Boolean]
+  <DllImport("user32.dll")> Private Shared Function ShowWindow(hWnd As IntPtr, nCmdShow As Int32) As [Boolean]
   End Function
-  ''' <summary>
-  ''' Displays the popup for a certain amount of time
-  ''' </summary>
-  ''' <param name="strTitle">The string which will be shown as the title of the popup</param>
-  ''' <param name="strContent">The string which will be shown as the content of the popup</param>
-  ''' <param name="nTimeToShow">Duration of the showing animation (in milliseconds)</param>
-  ''' <param name="nTimeToStay">Duration of the visible state before collapsing (in milliseconds)</param>
-  ''' <param name="nTimeToHide">Duration of the hiding animation (in milliseconds)</param>
   Public Overloads Sub Show(strTitle As String, strContent As String, nTimeToShow As Integer, nTimeToStay As Integer, nTimeToHide As Integer)
     Dim r As Rectangle = Nothing
     Dim XLoc As Integer = 0
@@ -274,7 +200,6 @@ Public Class TaskbarNotifier
     m_contentText = strContent
     nVisibleEvents = nTimeToStay
     CalculateMouseRectangles()
-
     Dim nEvents As Integer
     If nTimeToShow > 10 Then
       nEvents = Math.Min((nTimeToShow \ 10), 100)
@@ -284,7 +209,6 @@ Public Class TaskbarNotifier
       nShowEvents = 10
       nIncrementShow = 100
     End If
-
     If nTimeToHide > 10 Then
       nEvents = Math.Min((nTimeToHide \ 10), 100)
       nHideEvents = nTimeToHide \ nEvents
@@ -293,10 +217,8 @@ Public Class TaskbarNotifier
       nHideEvents = 10
       nIncrementHide = 100
     End If
-
     XLoc = WorkAreaRectangle.Right - BackgroundBitmap.Width
     YLoc = WorkAreaRectangle.Bottom - BackgroundBitmap.Height - 1
-
     If Math.Abs(r.Height) = WorkAreaRectangle.Height Then
       If WorkAreaRectangle.Left >= r.Left Then XLoc = WorkAreaRectangle.Left
     ElseIf Math.Abs(r.Width) = WorkAreaRectangle.Width Then
@@ -332,10 +254,6 @@ Public Class TaskbarNotifier
         Refresh()
     End Select
   End Sub
-
-  ''' <summary>
-  ''' Hides the popup
-  ''' </summary>
   Public Shadows Sub Hide()
     If m_taskbarState <> TaskbarStates.hidden Then
       timer.[Stop]()
@@ -343,19 +261,12 @@ Public Class TaskbarNotifier
       MyBase.Hide()
     End If
   End Sub
-
   Public Sub SlowHide()
     timer.[Stop]()
     timer.Interval = nHideEvents
     m_taskbarState = TaskbarStates.disappearing
     timer.Start()
   End Sub
-
-  ''' <summary>
-  ''' Sets the background bitmap and its transparency color
-  ''' </summary>
-  ''' <param name="strFilename">Path of the Background Bitmap on the disk</param>
-  ''' <param name="transparencyColor">Color of the Bitmap which won't be visible</param>
   Public Sub SetBackgroundBitmap(strFilename As String, transparencyColor As Color)
     BackgroundBitmap = New Bitmap(strFilename)
     Width = BackgroundBitmap.Width
@@ -363,12 +274,6 @@ Public Class TaskbarNotifier
     Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
     If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
   End Sub
-
-  ''' <summary>
-  ''' Sets the background bitmap and its transparency color
-  ''' </summary>
-  ''' <param name="image">Image/Bitmap object which represents the Background Bitmap</param>
-  ''' <param name="transparencyColor">Color of the Bitmap which won't be visible</param>
   Public Sub SetBackgroundBitmap(image As Image, transparencyColor As Color)
     BackgroundBitmap = New Bitmap(image)
     Width = BackgroundBitmap.Width
@@ -376,13 +281,6 @@ Public Class TaskbarNotifier
     Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
     If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
   End Sub
-
-  ''' <summary>
-  ''' Sets the 3-State Close Button bitmap, its transparency color and its coordinates
-  ''' </summary>
-  ''' <param name="strFilename">Path of the 3-state Close button Bitmap on the disk (width must a multiple of 3)</param>
-  ''' <param name="transparencyColor">Color of the Bitmap which won't be visible</param>
-  ''' <param name="position">Location of the close button on the popup</param>
   Public Sub SetCloseBitmap(strFilename As String, transparencyColor As Color, position As Point)
     CloseBitmap = New Bitmap(strFilename)
     CloseBitmap.MakeTransparent(transparencyColor)
@@ -390,13 +288,6 @@ Public Class TaskbarNotifier
     CloseBitmapLocation = position
     If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultBitmaps()
   End Sub
-
-  ''' <summary>
-  ''' Sets the 3-State Close Button bitmap, its transparency color and its coordinates
-  ''' </summary>
-  ''' <param name="image">Image/Bitmap object which represents the 3-state Close button Bitmap (width must be a multiple of 3)</param>
-  ''' <param name="transparencyColor">Color of the Bitmap which won't be visible</param>
-  ''' /// <param name="position">Location of the close button on the popup</param>
   Public Sub SetCloseBitmap(image As Image, transparencyColor As Color, position As Point)
     CloseBitmap = New Bitmap(image)
     CloseBitmap.MakeTransparent(transparencyColor)
@@ -404,12 +295,10 @@ Public Class TaskbarNotifier
     CloseBitmapLocation = position
     If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultBitmaps()
   End Sub
-
   Private Sub SetDefaultBitmaps()
     SetDefaultBackgroundBitmap()
     SetDefaultCloseBitmap()
   End Sub
-
   Private Sub SetDefaultBackgroundBitmap()
     BackgroundBitmap = My.Resources.default_alert
     Width = BackgroundBitmap.Width
@@ -418,7 +307,6 @@ Public Class TaskbarNotifier
     TitleRectangle = New Rectangle(7, 3, 188, 24)
     ContentRectangle = New Rectangle(9, 31, 227, 66)
   End Sub
-
   Private Sub SetDefaultCloseBitmap()
     CloseBitmap = My.Resources.default_close
     CloseBitmap.MakeTransparent(Color.Fuchsia)
@@ -443,7 +331,6 @@ Public Class TaskbarNotifier
       grfx.DrawImage(CloseBitmap, rectDest, rectSrc, GraphicsUnit.Pixel)
     End If
   End Sub
-
   Protected Sub DrawText(grfx As Graphics)
     If m_titleText IsNot Nothing AndAlso m_titleText.Length <> 0 Then
       Dim sf As New StringFormat()
@@ -473,7 +360,6 @@ Public Class TaskbarNotifier
       End If
     End If
   End Sub
-
   Protected Sub CalculateMouseRectangles()
     Dim grfx As Graphics = CreateGraphics()
     Dim sf As New StringFormat()
@@ -496,7 +382,6 @@ Public Class TaskbarNotifier
     End If
     RealContentRectangle.Inflate(0, 2)
   End Sub
-
   Protected Function BitmapToRegion(bitmap As Bitmap, transparencyColor As Color) As Region
     If bitmap Is Nothing Then
       Throw New ArgumentNullException("Bitmap", "Bitmap cannot be null!")
@@ -555,13 +440,11 @@ Public Class TaskbarNotifier
         End If
     End Select
   End Sub
-
   Protected Overrides Sub OnMouseEnter(ea As EventArgs)
     MyBase.OnMouseEnter(ea)
     bIsMouseOverPopup = True
     Refresh()
   End Sub
-
   Protected Overrides Sub OnMouseLeave(ea As EventArgs)
     MyBase.OnMouseLeave(ea)
     bIsMouseOverPopup = False
@@ -570,7 +453,6 @@ Public Class TaskbarNotifier
     bIsMouseOverContent = False
     Refresh()
   End Sub
-
   Protected Overrides Sub OnMouseMove(mea As MouseEventArgs)
     MyBase.OnMouseMove(mea)
     Dim bContentModified As Boolean = False
@@ -611,7 +493,6 @@ Public Class TaskbarNotifier
       Refresh()
     End If
   End Sub
-
   Protected Overrides Sub WndProc(ByRef msg As System.Windows.Forms.Message)
     If msg.Msg = 32 Then
       If MyBase.Cursor = Cursors.Hand Then
@@ -622,7 +503,6 @@ Public Class TaskbarNotifier
     End If
     MyBase.WndProc(msg)
   End Sub
-
   Protected Overrides Sub OnMouseDown(mea As MouseEventArgs)
     MyBase.OnMouseDown(mea)
     bIsMouseDown = True
@@ -630,7 +510,6 @@ Public Class TaskbarNotifier
       Refresh()
     End If
   End Sub
-
   Protected Overrides Sub OnMouseUp(mea As MouseEventArgs)
     MyBase.OnMouseUp(mea)
     bIsMouseDown = False
@@ -644,7 +523,6 @@ Public Class TaskbarNotifier
       RaiseEvent ContentClick(Me, New EventArgs())
     End If
   End Sub
-
   Protected Overrides Sub OnPaintBackground(pea As PaintEventArgs)
     Dim grfx As Graphics = pea.Graphics
     grfx.PageUnit = GraphicsUnit.Pixel

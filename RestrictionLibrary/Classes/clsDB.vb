@@ -147,9 +147,7 @@ Public Class DataBase
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Using nIn As New IO.StreamReader(nRead)
               Dim firstLine As String = nIn.ReadLine
-              If String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", True) = 0 Then
-                'ignore
-              Else
+              If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", True) = 0 Then
                 Dim firstData() As String = Split(firstLine, ",")
                 Dim DT As Date = Date.Parse(firstData(0))
                 Dim Down As Long = firstData(1)
@@ -212,7 +210,6 @@ Public Class DataBase
       If Not noGood Then
         Dim dLen As Integer = data.Length
         ReDim Preserve data(dLen)
-        'Array.Resize(data, data.Length + 1)
         data(data.Length - 1) = item
       End If
     Else

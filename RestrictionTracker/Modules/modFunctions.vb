@@ -414,17 +414,17 @@ Module modFunctions
         Dim ADDOK As Boolean = GrantFullControlToEveryone(AppDataDir)
         Dim ADOK As Boolean = GrantFullControlToEveryone(sTmp)
         If ADOK And ADDOK Then
-          'Both OK
+
         ElseIf ADOK Then
-          'Bad Parent, OK child
+
         ElseIf ADDOK Then
-          'Bad Child, OK Parent
+
           If Not OneAlert Then
             MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             OneAlert = True
           End If
         Else
-          'Bad Both
+
           If Not OneAlert Then
             MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             OneAlert = True
@@ -715,16 +715,16 @@ Module modFunctions
     End If
     Dim bUpdate As Boolean = False
     If Val(LocalVer(0)) > Val(RemoteVer(0)) Then
-      'Local's OK
+
     ElseIf Val(LocalVer(0)) = Val(RemoteVer(0)) Then
       If Val(LocalVer(1)) > Val(RemoteVer(1)) Then
-        'Local's OK
+
       ElseIf Val(LocalVer(1)) = Val(RemoteVer(1)) Then
         If Val(LocalVer(2)) > Val(RemoteVer(2)) Then
-          'Local's OK
+
         ElseIf Val(LocalVer(2)) = Val(RemoteVer(2)) Then
           If Val(LocalVer(3)) >= Val(RemoteVer(3)) Then
-            'Local's OK
+
           Else
             bUpdate = True
           End If
@@ -804,7 +804,6 @@ Module modFunctions
               If isUnique Then spareFiles.Add(wbFiles(I))
             Next
           Else
-            'no files in SRT folder to get in the way
             spareFiles = New Collections.ObjectModel.Collection(Of String)(srtFiles.ToArray)
           End If
           If spareFiles.Count > 0 Then
@@ -817,7 +816,7 @@ Module modFunctions
             Next
           End If
         Else
-          'no files in WB folder to copy
+
         End If
       Else
         Dim wbFiles As Collections.ObjectModel.ReadOnlyCollection(Of String) = My.Computer.FileSystem.GetFiles(FromDir)
@@ -940,37 +939,30 @@ Module modFunctions
     Dim lLabelInterval As UInteger = 5
     Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
       Case Is <= 61
-        'Under an Hour
         lInterval = 1
         lLabelInterval = 5
         dInterval = DateInterval.Minute
       Case Is < 60 * 13
-        'Under 12 hours
         lInterval = 15
         lLabelInterval = 60
         dInterval = DateInterval.Minute
       Case Is <= 60 * 25
-        'Under a Day
         lInterval = 60
         lLabelInterval = 60 * 6
         dInterval = DateInterval.Minute
       Case Is <= 60 * 24 * 8
-        'Under a Week
         lInterval = 12
         lLabelInterval = 24
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 31
-        'Under 30 Days
         lInterval = 24
         lLabelInterval = 24 * 7
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 366
-        'Under a Year
         lInterval = 7
         lLabelInterval = 30
         dInterval = DateInterval.Day
       Case Else
-        'Over a year
         lInterval = 30
         lLabelInterval = 365
         dInterval = DateInterval.Day
@@ -1135,37 +1127,30 @@ Module modFunctions
     Dim lLabelInterval As UInteger = 5
     Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
       Case Is <= 61
-        'Under an Hour
         lInterval = 1
         lLabelInterval = 5
         dInterval = DateInterval.Minute
       Case Is < 60 * 13
-        'Under 12 hours
         lInterval = 15
         lLabelInterval = 60
         dInterval = DateInterval.Minute
       Case Is <= 60 * 25
-        'Under a Day
         lInterval = 60
         lLabelInterval = 60 * 6
         dInterval = DateInterval.Minute
       Case Is <= 60 * 24 * 8
-        'Under a Week
         lInterval = 12
         lLabelInterval = 24
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 31
-        'Under 30 Days
         lInterval = 24
         lLabelInterval = 24 * 7
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 366
-        'Under a Year
         lInterval = 7
         lLabelInterval = 30
         dInterval = DateInterval.Day
       Case Else
-        'Over a year
         lInterval = 30
         lLabelInterval = 365
         dInterval = DateInterval.Day
@@ -1591,7 +1576,6 @@ Module modFunctions
       downBrush.InterpolationColors = cBlend
     End If
     If lDown + lUp > lLim Then
-      'Maxed
       Dim fillLim As Long = lDown + lUp
       Dim yUp As Integer = icoY - (lUp / fillLim * icoY)
       Dim yDown As Integer = yUp - (lDown / fillLim * icoY)
@@ -1737,7 +1721,6 @@ Module modFunctions
       Try
         Select Case access
           Case FileAccess.Read
-            'only check for ability to read
             Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite Or FileShare.Delete)
               If fs.CanRead Then
                 Return True
@@ -1745,7 +1728,6 @@ Module modFunctions
               End If
             End Using
           Case FileAccess.Write, FileAccess.ReadWrite
-            'check for ability to write
             Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite Or FileShare.Delete)
               If fs.CanWrite Then
                 Return True

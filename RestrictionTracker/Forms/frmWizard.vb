@@ -1,10 +1,8 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
 Imports System.Runtime.InteropServices
-
 Public Class frmWizard
   Private Declare Sub ReleaseCapture Lib "user32" ()
   Private Declare Sub SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As IntPtr, ByVal wMsg As Integer, ByVal wParam As Integer, ByVal lParam As Integer)
-
   <StructLayout(LayoutKind.Explicit)>
   Private Structure DWord
     <FieldOffset(0)> Public LongValue As Integer
@@ -15,11 +13,9 @@ Public Class frmWizard
       HiWord = CShort(hi)
     End Sub
   End Structure
-
   Private Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
-
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
   Private Const WM_GETSYSMENU As Integer = &H313
   Private Const HTCAPTION As Integer = 2
@@ -29,14 +25,12 @@ Public Class frmWizard
   Private pChecker As Threading.Timer
   Private AccountType As SatHostTypes = SatHostTypes.Other
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
-
   Public Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
       ReleaseCapture()
       SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0&)
     End If
   End Sub
-
   Private Sub cmdFAQ_Click(sender As System.Object, e As System.EventArgs) Handles cmdFAQ.Click
     Try
       Process.Start("http://srt.realityripple.com/faq.php")
@@ -46,7 +40,6 @@ Public Class frmWizard
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
-
   Private Sub cmdNext_Click(sender As System.Object, e As System.EventArgs) Handles cmdNext.Click
     Select Case tbsWizardPages.SelectedIndex
       Case 1
@@ -103,13 +96,11 @@ Public Class frmWizard
       tbsWizardPages.SelectedIndex += 1
     End If
   End Sub
-
   Private Sub cmdPrevious_Click(sender As System.Object, e As System.EventArgs) Handles cmdPrevious.Click
     If tbsWizardPages.SelectedIndex > 0 Then
       tbsWizardPages.SelectedIndex -= 1
     End If
   End Sub
-
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click
     If tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1 Then
       If String.IsNullOrEmpty(txtAccountUsername.Text) Then
@@ -173,7 +164,6 @@ Public Class frmWizard
         newSettings.Accuracy = 0
       End If
       newSettings.ScaleScreen = chkDisplayScale.Checked
-      'newSettings.HistoryInversion = chkDisplayInvert.Checked
       If chkOverAlert.Checked Then
         newSettings.Overuse = txtOverSize.Value
         newSettings.Overtime = txtOverTime.Value
@@ -194,7 +184,6 @@ Public Class frmWizard
       newSettings = Nothing
     End If
   End Sub
-
   Private Sub tbsWizardPages_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles tbsWizardPages.SelectedIndexChanged
     cmdPrevious.Enabled = Not tbsWizardPages.SelectedIndex = 0
     cmdNext.Enabled = Not tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1
@@ -239,15 +228,12 @@ Public Class frmWizard
         pctLeftBox.Image = My.Resources.wizFinished
     End Select
   End Sub
-
   Private Sub tmrDraw_Tick(sender As System.Object, e As System.EventArgs) Handles tmrDraw.Tick
     DrawTitle()
   End Sub
-
   Private Sub pctHeader_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctHeader.MouseDown
     If e.Button = Windows.Forms.MouseButtons.Left Then ClickDrag(Me.Handle)
   End Sub
-
   Private Sub pctIcon_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctIcon.MouseDown
     If e.X >= 6 And e.X <= 6 + 16 And e.Y >= 8 And e.Y <= 8 + 16 Then
       If e.Button = Windows.Forms.MouseButtons.Left Or e.Button = Windows.Forms.MouseButtons.Right Then SendMessage(Me.Handle, WM_GETSYSMENU, 0, (New DWord(Cursor.Position.X, Cursor.Position.Y)).LongValue)
@@ -255,7 +241,6 @@ Public Class frmWizard
       ClickDrag(Me.Handle)
     End If
   End Sub
-
   Private Sub frmWizard_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If localTest IsNot Nothing Then
       localTest.Dispose()
@@ -266,27 +251,22 @@ Public Class frmWizard
       remoteTest = Nothing
     End If
   End Sub
-
   Private Sub frmWizard_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Me.Icon = My.Resources.t16_norm
     DrawTitle()
   End Sub
-
   Private Sub cmbAccountHost_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbAccountHost.SelectedIndexChanged
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
-
   Private Sub txtAccountUsername_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountUsername.TextChanged
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
-
   Private Sub txtAccountPass_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountPass.TextChanged
     AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
-
   Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
     If e.KeyValue = 86 And e.Control Then
       If Not String.IsNullOrEmpty(Clipboard.GetText) Then
@@ -354,11 +334,9 @@ Public Class frmWizard
       End If
     End If
   End Sub
-
   Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
     pnlKey.Tag = 0
   End Sub
-
   Private Sub txtSignUp_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles txtSignUp.LinkClicked
     Try
       Process.Start("http://srt.realityripple.com/c_signup.php")
@@ -368,7 +346,6 @@ Public Class frmWizard
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
-
   Private Sub optServices_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optRemote.CheckedChanged, optLocal.CheckedChanged, optNone.CheckedChanged
     txtKey1.Enabled = optRemote.Checked
     txtKey2.Enabled = optRemote.Checked
@@ -379,14 +356,12 @@ Public Class frmWizard
     lblNone.Enabled = optNone.Checked
     If optRemote.Checked Then txtKey1.Focus()
   End Sub
-
   Private Sub chkOverAlert_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkOverAlert.CheckedChanged
     txtOverSize.Enabled = chkOverAlert.Checked
     lblOverSize.Enabled = chkOverAlert.Checked
     txtOverTime.Enabled = chkOverAlert.Checked
     lblOverTime.Enabled = chkOverAlert.Checked
   End Sub
-
 #Region "Display Functions"
   Private Sub DrawTitle()
     Dim sTitle As String = "Satellite Restriction Tracker Configuration Wizard"
@@ -419,7 +394,6 @@ Public Class frmWizard
       End If
     End If
   End Sub
-
   Private Delegate Sub DrawStatusInvoker(Busy As Boolean, Message As String)
   Private Sub DrawStatus(Busy As Boolean, Optional Message As String = Nothing)
     If Me.InvokeRequired Then
@@ -442,7 +416,6 @@ Public Class frmWizard
       End If
     End If
   End Sub
-
   Private Sub PopulateHostList()
     If Me.InvokeRequired Then
       Me.BeginInvoke(New MethodInvoker(AddressOf PopulateHostList))
@@ -504,7 +477,6 @@ Public Class frmWizard
     cmbAccountHost.Items.Add("dishmail.net")
     cmbAccountHost.Items.Add("dish.net")
   End Sub
-
   Private sAccount As String
   Private Sub KeyCheck()
     Dim sKeyTest As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
@@ -590,7 +562,6 @@ Public Class frmWizard
       tbsWizardPages.SelectedIndex += 1
     End If
   End Sub
-
   Private Sub UsageTest()
     If localTest IsNot Nothing Then
       localTest.Dispose()
@@ -619,7 +590,6 @@ Public Class frmWizard
       DrawStatus(False)
       tbsWizardPages.SelectedIndex += 1
       wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
-      'If acct = SatHostTypes.WildBlue_EXEDE Then chkDisplayInvert.Checked = True
     End If
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
@@ -686,9 +656,6 @@ Public Class frmWizard
   Private Sub localTest_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
     LocalComplete(SatHostTypes.WildBlue_LEGACY)
   End Sub
-  'Private Sub localTest_ConnectionWBVResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBVResult
-  '  LocalComplete(SatHostTypes.WildBlue_EVOLUTION)
-  'End Sub
   Private Sub localTest_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
     LocalComplete(SatHostTypes.WildBlue_EXEDE)
   End Sub
