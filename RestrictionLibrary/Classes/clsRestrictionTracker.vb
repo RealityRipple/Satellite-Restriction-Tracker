@@ -256,6 +256,7 @@
         mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         GetUsage()
       Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
+        ResetTimeout()
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
     End Select
   End Sub
@@ -278,7 +279,6 @@
   Private Sub tmrReadTimeout_Tick()
     ReadTimeoutCount += 1
     Dim TimeOutTime As Integer = mySettings.Timeout
-    If TimeOutTime < 60 * 3 Then TimeOutTime = 60 * 3
     If ReadTimeoutCount >= TimeOutTime Then
       If tmrReadTimeout IsNot Nothing Then
         tmrReadTimeout.Dispose()
@@ -550,7 +550,7 @@
           If Key.ToLower = "location" Then
             Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
             wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-            ResetTimeout()
+            ResetTimeout(True)
             wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
             Exit Sub
           End If
@@ -587,7 +587,7 @@
           sErrMsg = Nothing
           bReset = False
         ElseIf e.Error.InnerException.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-          ResetTimeout()
+          ResetTimeout(True)
           RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
           RestartNoCert()
           Exit Sub
@@ -627,7 +627,7 @@
           If Key.ToLower = "location" Then
             Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
             wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-            ResetTimeout()
+            ResetTimeout(True)
             wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
             Exit Sub
           End If
@@ -929,47 +929,6 @@
       Else
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
-      'ElseIf Table.Contains("allowance") Then
-      '  Dim sPlusT As String = String.Empty
-      '  If Table.Contains("loaded:") Then
-      '    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Old Exede method detected!", Table))
-      '  Else
-      '    For I As Integer = 0 To sRows.Length - 1
-      '      If Not String.IsNullOrEmpty(sRows(I)) Then
-      '        If sRows(I).Contains("<strong>") Then
-      '          If String.IsNullOrEmpty(sDownT) Then
-      '            sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-      '            sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-      '          ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
-      '            If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-      '              sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-      '              sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-      '            End If
-      '          ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-      '            If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
-      '              sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-      '              sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-      '            End If
-      '          End If
-      '        End If
-      '      End If
-      '    Next
-      '    ResetTimeout()
-      '    If String.IsNullOrEmpty(sDownT) Then
-      '      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      '    Else
-      '      RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
-      '    End If
-      '  End If
-      'ElseIf Table.Contains("FREEDOM") Then
-      '  If Table.Contains("Current Usage<strong>:") Then
-      '    Table = Table.Substring(Table.IndexOf("Current Usage<strong>:") + 23)
-      '    sDown = Table.Substring(0, Table.IndexOf("</strong>"))
-      '    CleanupResult(sDown)
-      '    RaiseEvent ConnectionWBVResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), 150000, Now))
-      '  Else
-      '    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      '  End If
     End If
   End Sub
 #End Region
@@ -1283,9 +1242,11 @@
             wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
             Dim sSend As String = "warningTrip=true&userName=" & sAccount & "&passwd=" & PercentEncode(sPassword)
             Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, uriString)
+            ResetTimeout(True)
             Try
               wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, aState)
             Catch ex As Exception
+              ResetTimeout()
               sErrMsg = "Login Failed: Error Bypassing Password Change - " & ex.Message
               sFailText = "RuralPortal Login Error = " & sErrMsg & vbNewLine & sRet
               bReset = False
