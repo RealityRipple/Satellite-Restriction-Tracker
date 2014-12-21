@@ -1060,8 +1060,14 @@ Public Class frmMain
           majorDif = 73
         Case Is < 1000
           majorDif = 271
-        Case Else
+        Case Is < 5000
           majorDif = 977
+        Case Is < 10000
+          majorDif = 3347
+        Case Is < 50000
+          majorDif = 8237
+        Case Else
+          majorDif = 38671
       End Select
       If tmpVal > toVal Then
         tmpVal -= majorDif
