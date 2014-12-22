@@ -1551,42 +1551,7 @@ Module modFunctions
     Dim yUsed As Integer = icoY - (lUsed / lLim * icoY)
     If yUsed < 0 Then yUsed = 0
     If yUsed > icoY Then yUsed = icoY
-    g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Floor(icoX / 2)), icoY - yUsed)
-  End Sub
-  Public Sub CreateTrayIcon_Dual(ByRef g As Graphics, lDown As Long, lUp As Long, lLim As Long, cDA As Color, cDB As Color, cDC As Color, cUA As Color, cUB As Color, cUC As Color, icoX As Integer, icoY As Integer)
-    If lLim = 0 Then Exit Sub
-    Dim upBrush As Drawing2D.LinearGradientBrush
-    If cUB = Color.Transparent Then
-      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUA))
-    Else
-      upBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
-      Dim cBlend As New Drawing2D.ColorBlend
-      cBlend.Positions = {0, 0.5, 1}
-      cBlend.Colors = {Color.FromArgb(Alpha, cUC), Color.FromArgb(Alpha, cUB), Color.FromArgb(Alpha, cUA)}
-      upBrush.InterpolationColors = cBlend
-    End If
-    Dim downBrush As Drawing2D.LinearGradientBrush
-    If cDB = Color.Transparent Then
-      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDA))
-    Else
-      downBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.Black, Color.Black)
-      Dim cBlend As New Drawing2D.ColorBlend
-      cBlend.Positions = {0, 0.5, 1}
-      cBlend.Colors = {Color.FromArgb(Alpha, cDC), Color.FromArgb(Alpha, cDB), Color.FromArgb(Alpha, cDA)}
-      downBrush.InterpolationColors = cBlend
-    End If
-    If lDown + lUp > lLim Then
-      Dim fillLim As Long = lDown + lUp
-      Dim yUp As Integer = icoY - (lUp / fillLim * icoY)
-      Dim yDown As Integer = yUp - (lDown / fillLim * icoY)
-      g.FillRectangle(downBrush, 0, yDown, icoX, icoY - ((icoY - yUp) - 1) - yDown)
-      g.FillRectangle(upBrush, 0, yUp, icoX, icoY - yUp)
-    Else
-      Dim yUp As Integer = icoY - (lUp / lLim * icoY)
-      Dim yDown As Integer = yUp - (lDown / lLim * icoY)
-      g.FillRectangle(downBrush, 0, yDown, icoX, icoY - ((icoY - yUp) - 1) - yDown)
-      g.FillRectangle(upBrush, 0, yUp, icoX, icoY - yUp)
-    End If
+    g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Ceiling(icoX / 2)), icoY - yUsed)
   End Sub
 #End Region
   Public Function GetDefaultColors(useStyle As localRestrictionTracker.SatHostTypes) As AppSettings.AppColors
