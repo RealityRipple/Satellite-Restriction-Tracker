@@ -226,6 +226,7 @@
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
     Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+    Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
     InitAccount()
   End Sub
   Public Sub Connect()
@@ -329,7 +330,6 @@
       wsData.Timeout = mySettings.Timeout
       wsData.Proxy = mySettings.Proxy
     End If
-    Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
   End Sub
   Private Sub Login(sUID As String, sPass As String)
     PrepareLogin()
