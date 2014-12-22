@@ -731,8 +731,6 @@ Public Class frmMain
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, False)
-        Case ConnectionFailureEventArgs.FailureType.SSLFailureBypass
-          SetStatusText(LOG_GetLast.ToString("g"), e.Message, False)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
           If Me.WindowState = FormWindowState.Minimized Then
             Me.WindowState = FormWindowState.Normal

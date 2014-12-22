@@ -37,7 +37,6 @@
       LoginFailure
       FatalLoginFailure
       ConnectionTimeout
-      SSLFailureBypass
     End Enum
     Private m_FailType As FailureType
     Private m_Fail As String
@@ -330,6 +329,7 @@
       wsData.Timeout = mySettings.Timeout
       wsData.Proxy = mySettings.Proxy
     End If
+    Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
   End Sub
   Private Sub Login(sUID As String, sPass As String)
     PrepareLogin()
@@ -445,50 +445,12 @@
     End If
   End Sub
   Private Sub wsData_Failure(sender As Object, e As CookieAwareWebClient.ErrorEventArgs) Handles wsData.Failure
-    If e.Error.InnerException IsNot Nothing Then
-      If e.Error.InnerException.Message = "The remote certificate is invalid according to the validation procedure." Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Invalid Certificate; Please check your system Clock and Certificate Store. Bypassing..."))
-        RestartNoCert()
-      ElseIf e.Error.Message.Contains("Could not create SSL/TLS secure channel") Or e.Error.InnerException.Message.Contains("Could not create SSL/TLS secure channel") Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "SSL/TLS request invalid; Please check your system Clock and Certificate Store. Bypassing..."))
-        RestartNoCert()
-      ElseIf e.Error.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
-        RestartNoCert()
-      ElseIf e.Error.InnerException.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
-        RestartNoCert()
-      Else
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & NetworkErrorToString(e.Error, sDataPath)))
-      End If
-    Else
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & NetworkErrorToString(e.Error, sDataPath)))
-    End If
+    ResetTimeout()
+    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & NetworkErrorToString(e.Error, sDataPath)))
     If wsData IsNot Nothing Then
       wsData.Dispose()
       wsData = Nothing
     End If
-  End Sub
-  Private Sub RestartNoCert()
-    If wsData IsNot Nothing Then
-      If wsData.IsBusy Then wsData.CancelAsync()
-      Dim wStarted As Long = TickCount()
-      Do While wsData.IsBusy
-        Threading.Thread.Sleep(100)
-        Threading.Thread.Sleep(0)
-        If TickCount() > wStarted + 1000 Then Exit Do
-      Loop
-    End If
-    PrepareLogin()
-    Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
-    ResetTimeout()
-    GetUsage()
   End Sub
 #End Region
 #Region "Parsing Functions"
@@ -511,11 +473,6 @@
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
-        ElseIf e.Error.InnerException.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-          ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
-          RestartNoCert()
-          Exit Sub
         Else
           sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
           bReset = True
@@ -588,11 +545,6 @@
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
-        ElseIf e.Error.InnerException.Message.CompareTo("The authentication or decryption has failed.") = 0 Then
-          ResetTimeout(True)
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.SSLFailureBypass, "Authentication Failed; Please check your system Clock and Certificate Store. Bypassing..."))
-          RestartNoCert()
-          Exit Sub
         Else
           sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
           bReset = True

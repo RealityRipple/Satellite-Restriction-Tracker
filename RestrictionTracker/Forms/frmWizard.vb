@@ -608,8 +608,6 @@ Public Class frmWizard
           MessageBox.Show("Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
           MessageBox.Show("Fatal Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case ConnectionFailureEventArgs.FailureType.SSLFailureBypass
-          MessageBox.Show("SSL Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
           MessageBox.Show("Missing account information!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
