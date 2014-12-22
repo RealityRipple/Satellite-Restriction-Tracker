@@ -477,10 +477,12 @@
   End Sub
   Private Sub RestartNoCert()
     If wsData IsNot Nothing Then
+      If wsData.IsBusy Then wsData.CancelAsync()
+      Dim wStarted As Long = TickCount()
       Do While wsData.IsBusy
         Threading.Thread.Sleep(100)
         Threading.Thread.Sleep(0)
-        Threading.Thread.Sleep(100)
+        If TickCount() > wStarted + 1000 Then Exit Do
       Loop
     End If
     PrepareLogin()
