@@ -966,7 +966,11 @@ Class AppSettings
 
     If InUseChecker(ConfigFile, IO.FileAccess.Write) Then
       MakeBackup()
-      xConfig.Save(ConfigFile)
+      Try
+        xConfig.Save(ConfigFile)
+      Catch ex As Exception
+        MessageBox.Show("Failed to save settings!" & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      End Try
     Else
       MessageBox.Show("Failed to save settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
     End If
