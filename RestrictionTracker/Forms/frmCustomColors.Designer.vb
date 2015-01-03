@@ -26,7 +26,6 @@ Partial Class frmCustomColors
     Me.pctTray = New System.Windows.Forms.PictureBox()
     Me.pctMain = New System.Windows.Forms.PictureBox()
     Me.pctHistory = New System.Windows.Forms.PictureBox()
-    Me.cmdClose = New System.Windows.Forms.Button()
     Me.grpTray = New System.Windows.Forms.GroupBox()
     Me.pnlTray = New System.Windows.Forms.TableLayoutPanel()
     Me.grpTrayDown = New System.Windows.Forms.GroupBox()
@@ -72,7 +71,6 @@ Partial Class frmCustomColors
     Me.lblHistoryText = New System.Windows.Forms.Label()
     Me.lblHistoryBG = New System.Windows.Forms.Label()
     Me.pctHistoryText = New System.Windows.Forms.PictureBox()
-    Me.cmdSave = New System.Windows.Forms.Button()
     Me.grpMain = New System.Windows.Forms.GroupBox()
     Me.pnlMain = New System.Windows.Forms.TableLayoutPanel()
     Me.grpMainDown = New System.Windows.Forms.GroupBox()
@@ -96,6 +94,9 @@ Partial Class frmCustomColors
     Me.lblMainText = New System.Windows.Forms.Label()
     Me.lblMainBG = New System.Windows.Forms.Label()
     Me.pctMainText = New System.Windows.Forms.PictureBox()
+    Me.pnlButtons = New System.Windows.Forms.TableLayoutPanel()
+    Me.cmdSave = New System.Windows.Forms.Button()
+    Me.cmdClose = New System.Windows.Forms.Button()
     Me.mnuColorOpts = New System.Windows.Forms.ContextMenu()
     Me.mnuChoose = New System.Windows.Forms.MenuItem()
     Me.mnuSpace = New System.Windows.Forms.MenuItem()
@@ -151,6 +152,7 @@ Partial Class frmCustomColors
     Me.pnlMainStyle.SuspendLayout()
     CType(Me.pctMainBG, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctMainText, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.pnlButtons.SuspendLayout()
     Me.SuspendLayout()
     '
     'pnlCustomColors
@@ -163,11 +165,10 @@ Partial Class frmCustomColors
     Me.pnlCustomColors.Controls.Add(Me.pctTray, 1, 1)
     Me.pnlCustomColors.Controls.Add(Me.pctMain, 1, 0)
     Me.pnlCustomColors.Controls.Add(Me.pctHistory, 1, 2)
-    Me.pnlCustomColors.Controls.Add(Me.cmdClose, 1, 3)
     Me.pnlCustomColors.Controls.Add(Me.grpTray, 0, 1)
     Me.pnlCustomColors.Controls.Add(Me.grpHistory, 0, 2)
-    Me.pnlCustomColors.Controls.Add(Me.cmdSave, 0, 3)
     Me.pnlCustomColors.Controls.Add(Me.grpMain, 0, 0)
+    Me.pnlCustomColors.Controls.Add(Me.pnlButtons, 0, 3)
     Me.pnlCustomColors.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlCustomColors.Location = New System.Drawing.Point(0, 0)
     Me.pnlCustomColors.Name = "pnlCustomColors"
@@ -176,7 +177,8 @@ Partial Class frmCustomColors
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlCustomColors.Size = New System.Drawing.Size(397, 494)
+    Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlCustomColors.Size = New System.Drawing.Size(397, 503)
     Me.pnlCustomColors.TabIndex = 0
     '
     'pctTray
@@ -215,19 +217,6 @@ Partial Class frmCustomColors
     Me.pctHistory.TabIndex = 8
     Me.pctHistory.TabStop = False
     '
-    'cmdClose
-    '
-    Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.cmdClose.AutoSize = True
-    Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.cmdClose.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdClose.Location = New System.Drawing.Point(319, 466)
-    Me.cmdClose.Name = "cmdClose"
-    Me.cmdClose.Size = New System.Drawing.Size(75, 23)
-    Me.cmdClose.TabIndex = 10
-    Me.cmdClose.Text = "Close"
-    Me.cmdClose.UseVisualStyleBackColor = True
-    '
     'grpTray
     '
     Me.grpTray.AutoSize = True
@@ -240,7 +229,7 @@ Partial Class frmCustomColors
     Me.grpTray.Size = New System.Drawing.Size(310, 122)
     Me.grpTray.TabIndex = 12
     Me.grpTray.TabStop = False
-    Me.grpTray.Text = "&Tray Icon Curent Usage Graph Overlay"
+    Me.grpTray.Text = "&Tray Icon Current Usage Graph Overlay"
     '
     'pnlTray
     '
@@ -255,7 +244,8 @@ Partial Class frmCustomColors
     Me.pnlTray.Location = New System.Drawing.Point(3, 16)
     Me.pnlTray.Name = "pnlTray"
     Me.pnlTray.RowCount = 1
-    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 103.0!))
     Me.pnlTray.Size = New System.Drawing.Size(304, 103)
     Me.pnlTray.TabIndex = 4
     '
@@ -294,6 +284,7 @@ Partial Class frmCustomColors
     Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlTrayDown.Size = New System.Drawing.Size(140, 78)
     Me.pnlTrayDown.TabIndex = 0
     '
@@ -397,6 +388,7 @@ Partial Class frmCustomColors
     Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlTrayUp.Size = New System.Drawing.Size(140, 78)
     Me.pnlTrayUp.TabIndex = 0
     '
@@ -496,6 +488,7 @@ Partial Class frmCustomColors
     Me.pnlHistory.RowCount = 2
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlHistory.Size = New System.Drawing.Size(304, 155)
     Me.pnlHistory.TabIndex = 2
     '
@@ -534,10 +527,11 @@ Partial Class frmCustomColors
     Me.pnlHistoryDown.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryDown.Name = "pnlHistoryDown"
     Me.pnlHistoryDown.RowCount = 4
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlHistoryDown.Size = New System.Drawing.Size(140, 104)
     Me.pnlHistoryDown.TabIndex = 0
     '
@@ -662,10 +656,11 @@ Partial Class frmCustomColors
     Me.pnlHistoryUp.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryUp.Name = "pnlHistoryUp"
     Me.pnlHistoryUp.RowCount = 4
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlHistoryUp.Size = New System.Drawing.Size(140, 104)
     Me.pnlHistoryUp.TabIndex = 0
     '
@@ -819,18 +814,6 @@ Partial Class frmCustomColors
     Me.pctHistoryText.TabIndex = 1
     Me.pctHistoryText.TabStop = False
     '
-    'cmdSave
-    '
-    Me.cmdSave.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.cmdSave.AutoSize = True
-    Me.cmdSave.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdSave.Location = New System.Drawing.Point(238, 466)
-    Me.cmdSave.Name = "cmdSave"
-    Me.cmdSave.Size = New System.Drawing.Size(75, 23)
-    Me.cmdSave.TabIndex = 9
-    Me.cmdSave.Text = "Save"
-    Me.cmdSave.UseVisualStyleBackColor = True
-    '
     'grpMain
     '
     Me.grpMain.AutoSize = True
@@ -860,8 +843,9 @@ Partial Class frmCustomColors
     Me.pnlMain.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlMain.Name = "pnlMain"
     Me.pnlMain.RowCount = 2
-    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlMain.Size = New System.Drawing.Size(304, 129)
     Me.pnlMain.TabIndex = 1
     '
@@ -921,7 +905,7 @@ Partial Class frmCustomColors
     Me.pctMainDownA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctMainDownA.Location = New System.Drawing.Point(72, 3)
     Me.pctMainDownA.Name = "pctMainDownA"
-    Me.pctMainDownA.Size = New System.Drawing.Size(50, 20)
+    Me.pctMainDownA.Size = New System.Drawing.Size(50, 19)
     Me.pctMainDownA.TabIndex = 1
     Me.pctMainDownA.TabStop = False
     '
@@ -931,9 +915,9 @@ Partial Class frmCustomColors
     Me.pctMainDownB.BackColor = System.Drawing.Color.Transparent
     Me.pctMainDownB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctMainDownB.Enabled = False
-    Me.pctMainDownB.Location = New System.Drawing.Point(72, 29)
+    Me.pctMainDownB.Location = New System.Drawing.Point(72, 28)
     Me.pctMainDownB.Name = "pctMainDownB"
-    Me.pctMainDownB.Size = New System.Drawing.Size(50, 20)
+    Me.pctMainDownB.Size = New System.Drawing.Size(50, 19)
     Me.pctMainDownB.TabIndex = 3
     Me.pctMainDownB.TabStop = False
     '
@@ -941,7 +925,7 @@ Partial Class frmCustomColors
     '
     Me.lblMainDownC.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblMainDownC.AutoSize = True
-    Me.lblMainDownC.Location = New System.Drawing.Point(17, 58)
+    Me.lblMainDownC.Location = New System.Drawing.Point(17, 57)
     Me.lblMainDownC.Name = "lblMainDownC"
     Me.lblMainDownC.Size = New System.Drawing.Size(39, 13)
     Me.lblMainDownC.TabIndex = 4
@@ -952,7 +936,7 @@ Partial Class frmCustomColors
     Me.pctMainDownC.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctMainDownC.BackColor = System.Drawing.Color.Red
     Me.pctMainDownC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainDownC.Location = New System.Drawing.Point(72, 55)
+    Me.pctMainDownC.Location = New System.Drawing.Point(72, 54)
     Me.pctMainDownC.Name = "pctMainDownC"
     Me.pctMainDownC.Size = New System.Drawing.Size(50, 20)
     Me.pctMainDownC.TabIndex = 5
@@ -962,7 +946,7 @@ Partial Class frmCustomColors
     '
     Me.chkMainDownB.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.chkMainDownB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkMainDownB.Location = New System.Drawing.Point(10, 30)
+    Me.chkMainDownB.Location = New System.Drawing.Point(10, 28)
     Me.chkMainDownB.Name = "chkMainDownB"
     Me.chkMainDownB.Size = New System.Drawing.Size(46, 18)
     Me.chkMainDownB.TabIndex = 6
@@ -1005,6 +989,7 @@ Partial Class frmCustomColors
     Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlMainUp.Size = New System.Drawing.Size(140, 78)
     Me.pnlMainUp.TabIndex = 0
     '
@@ -1138,6 +1123,50 @@ Partial Class frmCustomColors
     Me.pctMainText.TabIndex = 1
     Me.pctMainText.TabStop = False
     '
+    'pnlButtons
+    '
+    Me.pnlButtons.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.pnlButtons.AutoSize = True
+    Me.pnlButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlButtons.ColumnCount = 2
+    Me.pnlCustomColors.SetColumnSpan(Me.pnlButtons, 2)
+    Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
+    Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
+    Me.pnlButtons.Location = New System.Drawing.Point(235, 468)
+    Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlButtons.Name = "pnlButtons"
+    Me.pnlButtons.RowCount = 1
+    Me.pnlButtons.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlButtons.Size = New System.Drawing.Size(162, 28)
+    Me.pnlButtons.TabIndex = 14
+    '
+    'cmdSave
+    '
+    Me.cmdSave.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.cmdSave.AutoSize = True
+    Me.cmdSave.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.cmdSave.Location = New System.Drawing.Point(3, 3)
+    Me.cmdSave.Name = "cmdSave"
+    Me.cmdSave.Size = New System.Drawing.Size(75, 22)
+    Me.cmdSave.TabIndex = 9
+    Me.cmdSave.Text = "Save"
+    Me.cmdSave.UseVisualStyleBackColor = True
+    '
+    'cmdClose
+    '
+    Me.cmdClose.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.cmdClose.AutoSize = True
+    Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
+    Me.cmdClose.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.cmdClose.Location = New System.Drawing.Point(84, 3)
+    Me.cmdClose.Name = "cmdClose"
+    Me.cmdClose.Size = New System.Drawing.Size(75, 22)
+    Me.cmdClose.TabIndex = 10
+    Me.cmdClose.Text = "Close"
+    Me.cmdClose.UseVisualStyleBackColor = True
+    '
     'mnuColorOpts
     '
     Me.mnuColorOpts.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuChoose, Me.mnuSpace, Me.mnuDefault})
@@ -1182,7 +1211,7 @@ Partial Class frmCustomColors
     Me.AutoSize = True
     Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(397, 494)
+    Me.ClientSize = New System.Drawing.Size(397, 503)
     Me.Controls.Add(Me.pnlCustomColors)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -1262,6 +1291,8 @@ Partial Class frmCustomColors
     Me.pnlMainStyle.PerformLayout()
     CType(Me.pctMainBG, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctMainText, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.pnlButtons.ResumeLayout(False)
+    Me.pnlButtons.PerformLayout()
     Me.ResumeLayout(False)
     Me.PerformLayout()
 
@@ -1347,4 +1378,5 @@ Partial Class frmCustomColors
   Friend WithEvents pctHistoryDownMax As System.Windows.Forms.PictureBox
   Friend WithEvents mnuGraphDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
+  Friend WithEvents pnlButtons As System.Windows.Forms.TableLayoutPanel
 End Class
