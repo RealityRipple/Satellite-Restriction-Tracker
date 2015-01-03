@@ -26,6 +26,77 @@ Public Class frmCustomColors
       Me.DialogResult = Windows.Forms.DialogResult.No
     End If
   End Sub
+  Private Sub frmCustomColors_Load(sender As Object, e As System.EventArgs) Handles Me.Load
+    If mySettings IsNot Nothing Then
+      Select Case mySettings.AccountType
+        Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
+          grpMain.Text = "Main Window Current Usage Graphs"
+          grpMainDown.Text = "Download Colors"
+          grpMainUp.Text = "Upload Colors"
+          grpMainUp.Visible = True
+          grpTray.Text = "Tray Icon Current Usage Graph Overlay"
+          grpTrayDown.Text = "Download Colors"
+          grpTrayUp.Text = "Upload Colors"
+          grpTrayUp.Visible = True
+          grpHistory.Text = "History Window Graphs"
+          grpHistoryDown.Text = "Download Colors"
+          grpHistoryUp.Text = "Upload Colors"
+          grpHistoryUp.Visible = True
+          lblHistoryUpMax.Visible = True
+          pctHistoryUpMax.Visible = True
+          DisplayAs = SatHostTypes.WildBlue_LEGACY
+          SetTextBGAlignments(True)
+        Case SatHostTypes.DishNet_EXEDE
+          grpMain.Text = "Main Window Current Usage Graphs"
+          grpMainDown.Text = "Anytime Colors"
+          grpMainUp.Text = "Off-Peak Colors"
+          grpMainUp.Visible = True
+          grpTray.Text = "Tray Icon Current Usage Graph Overlay"
+          grpTrayDown.Text = "Anytime Colors"
+          grpTrayUp.Text = "Off-Peak Colors"
+          grpTrayUp.Visible = True
+          grpHistory.Text = "History Window Graphs"
+          grpHistoryDown.Text = "Anytime Colors"
+          grpHistoryUp.Text = "Off-Peak Colors"
+          grpHistoryUp.Visible = True
+          lblHistoryUpMax.Visible = True
+          pctHistoryUpMax.Visible = True
+          DisplayAs = SatHostTypes.DishNet_EXEDE
+          SetTextBGAlignments(True)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+          grpMain.Text = "Main Window Graph"
+          grpMainDown.Text = "Usage Colors"
+          grpMainUp.Visible = False
+          grpTray.Text = "Tray Icon Graph Overlay"
+          grpTrayDown.Text = "Usage Colors"
+          grpTrayUp.Visible = False
+          grpHistory.Text = "History Window Graph"
+          grpHistoryDown.Text = "Usage Colors"
+          grpHistoryUp.Visible = False
+          lblHistoryUpMax.Visible = False
+          pctHistoryUpMax.Visible = False
+          DisplayAs = SatHostTypes.RuralPortal_EXEDE
+          SetTextBGAlignments(False)
+        Case Else
+          grpMain.Text = "Main Window Current Usage Graphs"
+          grpMainDown.Text = "Download Colors"
+          grpMainUp.Text = "Upload Colors"
+          grpMainUp.Visible = True
+          grpTray.Text = "Tray Icon Current Usage Graph Overlay"
+          grpTrayDown.Text = "Download Colors"
+          grpTrayUp.Text = "Upload Colors"
+          grpTrayUp.Visible = True
+          grpHistory.Text = "History Window Graphs"
+          grpHistoryDown.Text = "Download Colors"
+          grpHistoryUp.Text = "Upload Colors"
+          grpHistoryUp.Visible = True
+          lblHistoryUpMax.Visible = True
+          pctHistoryUpMax.Visible = True
+          DisplayAs = SatHostTypes.Other
+          SetTextBGAlignments(True)
+      End Select
+    End If
+  End Sub
   Private Sub frmCustomColors_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Randomize()
     If lDownLim = 0 And lUpLim = 0 Then
@@ -41,54 +112,70 @@ Public Class frmCustomColors
     useStyle = mySettings.AccountType
     Select Case useStyle
       Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
+        grpMain.Text = "Main Window Current Usage Graphs"
         grpMainDown.Text = "Download Colors"
         grpMainUp.Text = "Upload Colors"
         grpMainUp.Visible = True
+        grpTray.Text = "Tray Icon Current Usage Graph Overlay"
         grpTrayDown.Text = "Download Colors"
         grpTrayUp.Text = "Upload Colors"
         grpTrayUp.Visible = True
+        grpHistory.Text = "History Window Graphs"
         grpHistoryDown.Text = "Download Colors"
         grpHistoryUp.Text = "Upload Colors"
         grpHistoryUp.Visible = True
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.WildBlue_LEGACY
+        SetTextBGAlignments(True)
       Case SatHostTypes.DishNet_EXEDE
+        grpMain.Text = "Main Window Current Usage Graphs"
         grpMainDown.Text = "Anytime Colors"
         grpMainUp.Text = "Off-Peak Colors"
         grpMainUp.Visible = True
+        grpTray.Text = "Tray Icon Current Usage Graph Overlay"
         grpTrayDown.Text = "Anytime Colors"
         grpTrayUp.Text = "Off-Peak Colors"
         grpTrayUp.Visible = True
+        grpHistory.Text = "History Window Graphs"
         grpHistoryDown.Text = "Anytime Colors"
         grpHistoryUp.Text = "Off-Peak Colors"
         grpHistoryUp.Visible = True
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.DishNet_EXEDE
+        SetTextBGAlignments(True)
       Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+        grpMain.Text = "Main Window Graph"
         grpMainDown.Text = "Usage Colors"
         grpMainUp.Visible = False
+        grpTray.Text = "Tray Icon Graph Overlay"
         grpTrayDown.Text = "Usage Colors"
         grpTrayUp.Visible = False
+        grpHistory.Text = "History Window Graph"
         grpHistoryDown.Text = "Usage Colors"
         grpHistoryUp.Visible = False
         lblHistoryUpMax.Visible = False
         pctHistoryUpMax.Visible = False
         DisplayAs = SatHostTypes.RuralPortal_EXEDE
+        SetTextBGAlignments(False)
       Case Else
+        grpMain.Text = "Main Window Current Usage Graphs"
         grpMainDown.Text = "Download Colors"
         grpMainUp.Text = "Upload Colors"
         grpMainUp.Visible = True
+        grpTray.Text = "Tray Icon Current Usage Graph Overlay"
         grpTrayDown.Text = "Download Colors"
         grpTrayUp.Text = "Upload Colors"
         grpTrayUp.Visible = True
+        grpHistory.Text = "History Window Graphs"
         grpHistoryDown.Text = "Download Colors"
         grpHistoryUp.Text = "Upload Colors"
         grpHistoryUp.Visible = True
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.Other
+        SetTextBGAlignments(True)
     End Select
     If mySettings.Colors.MainDownA = Color.Transparent Then
       mnuAllDefault_Click(mnuAllDefault, New EventArgs)
@@ -489,11 +576,13 @@ Public Class frmCustomColors
       pctMain.Image.Dispose()
       pctMain.Image = Nothing
     End If
-    Dim iSize As Integer = pctMain.Width
-    Dim iHalf As Integer = Math.Floor(iSize / 2)
+    Dim iWidth As Integer = pctMain.Width
+    Dim iHalfW As Integer = Math.Floor(iWidth / 2)
+    Dim iHeight As Integer = pctMain.Height
+    Dim iHalfH As Integer = Math.Floor(iHeight / 2)
     Select Case DisplayAs
       Case SatHostTypes.WildBlue_LEGACY
-        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
+        Dim FakeMRect As New Rectangle(0, 0, iWidth, iHeight * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
@@ -502,8 +591,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
-          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
+          Dim dRect As New Rectangle(0, 0, iHalfW, iHeight)
+          Dim uRect As New Rectangle(iHalfW, 0, iHalfW, iHeight)
           g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
@@ -511,7 +600,7 @@ Public Class frmCustomColors
       Case SatHostTypes.RuralPortal_EXEDE
         pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
       Case SatHostTypes.DishNet_EXEDE
-        Dim FakeMRect As New Rectangle(0, 0, iSize, iSize * 2)
+        Dim FakeMRect As New Rectangle(0, 0, iWidth, iHeight * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
@@ -520,8 +609,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, 0, iHalf, iSize)
-          Dim uRect As New Rectangle(iHalf, 0, iHalf, iSize)
+          Dim dRect As New Rectangle(0, 0, iHalfW, iHeight)
+          Dim uRect As New Rectangle(iHalfW, 0, iHalfW, iHeight)
           g.DrawImage(FakeD, dRect, FakeMRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeMRect, GraphicsUnit.Pixel)
         End Using
@@ -584,8 +673,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
-          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
+          Dim dRect As New Rectangle(0, iHalfH * 0.1, iWidth, iHalfH * 0.85)
+          Dim uRect As New Rectangle(0, iHalfH + (iHalfH * 0.05), iWidth, iHalfH * 0.85)
           g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
@@ -598,7 +687,12 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf / 2, iSize, iHalf)
+          Dim dRect As Rectangle
+          If iHeight = 75 Then
+            dRect = New Rectangle(0, iHalfH / 2, iWidth, iHalfH)
+          Else
+            dRect = New Rectangle(0, 0, iWidth, iHeight)
+          End If
           g.DrawImage(FakeR, dRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
         pctHistory.Image = fakeI
@@ -611,8 +705,8 @@ Public Class frmCustomColors
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
           g.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
           g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-          Dim dRect As New Rectangle(0, iHalf * 0.1, iSize, iHalf * 0.85)
-          Dim uRect As New Rectangle(0, iHalf + (iHalf * 0.05), iSize, iHalf * 0.85)
+          Dim dRect As New Rectangle(0, iHalfH * 0.1, iWidth, iHalfH * 0.85)
+          Dim uRect As New Rectangle(0, iHalfH + (iHalfH * 0.05), iWidth, iHalfH * 0.85)
           g.DrawImage(FakeD, dRect, FakeHRect, GraphicsUnit.Pixel)
           g.DrawImage(FakeU, uRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
@@ -626,5 +720,232 @@ Public Class frmCustomColors
     If I = Low Then I = High
     Return I
   End Function
+  Private Sub SetTextBGAlignments(Horizontal As Boolean)
+    If Horizontal Then
+      Dim preSize As New Size(75, 75)
+      pnlCustomColors.ColumnCount = 2
+      pnlCustomColors.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 100)
+      pnlCustomColors.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
+      pnlCustomColors.RowCount = 4
+      pnlCustomColors.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      pnlCustomColors.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+      If pnlCustomColors.RowStyles.Count = 2 Then
+        pnlCustomColors.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        pnlCustomColors.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+      ElseIf pnlCustomColors.RowStyles.Count = 3 Then
+        pnlCustomColors.RowStyles(2) = New RowStyle(SizeType.AutoSize)
+        pnlCustomColors.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+      Else
+        pnlCustomColors.RowStyles(2) = New RowStyle(SizeType.AutoSize)
+        pnlCustomColors.RowStyles(3) = New RowStyle(SizeType.AutoSize)
+      End If
+      pnlCustomColors.SetRow(pnlButtons, 3)
+      pnlCustomColors.SetColumn(pnlButtons, 0)
+      pnlCustomColors.SetColumnSpan(pnlButtons, 2)
+
+      pnlCustomColors.SetRow(grpHistory, 2)
+      pnlCustomColors.SetColumn(grpHistory, 0)
+      If pnlHistory.Controls.Contains(pctHistory) Then
+        pnlHistory.Controls.Remove(pctHistory)
+        pnlHistory.RowCount = 2
+        pnlHistory.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        pnlHistory.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+        pnlHistory.SetRow(grpHistoryDown, 0)
+        pnlHistory.SetRow(pnlHistoryStyle, 1)
+        pnlCustomColors.Controls.Add(pctHistory, 1, 2)
+        pctHistory.Size = preSize
+      End If
+      pnlHistory.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 50)
+      pnlHistory.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      If Not pnlHistory.Controls.Contains(grpHistoryUp) Then pnlHistory.Controls.Add(grpHistoryUp, 1, 0)
+      pnlHistoryStyle.ColumnCount = 4
+      pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      pnlHistoryStyle.ColumnStyles(2) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlHistoryStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 50)
+      pnlHistoryStyle.RowCount = 1
+      pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      pnlHistoryStyle.SetColumn(lblHistoryText, 0)
+      pnlHistoryStyle.SetRow(lblHistoryText, 0)
+      pnlHistoryStyle.SetColumn(pctHistoryText, 1)
+      pnlHistoryStyle.SetRow(pctHistoryText, 0)
+      pnlHistoryStyle.SetColumn(lblHistoryBG, 2)
+      pnlHistoryStyle.SetRow(lblHistoryBG, 0)
+      pnlHistoryStyle.SetColumn(pctHistoryBG, 3)
+      pnlHistoryStyle.SetRow(pctHistoryBG, 0)
+
+      pnlCustomColors.SetRow(grpTray, 1)
+      pnlCustomColors.SetColumn(grpTray, 0)
+      If pnlTray.Controls.Contains(pctTray) Then
+        pnlTray.Controls.Remove(pctTray)
+        pnlTray.RowCount = 1
+        pnlTray.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        pnlTray.SetRow(grpTrayDown, 0)
+        pnlCustomColors.Controls.Add(pctTray, 1, 1)
+        pctTray.Size = preSize
+      End If
+      pnlTray.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 50)
+      pnlTray.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      If Not pnlTray.Controls.Contains(grpTrayUp) Then pnlTray.Controls.Add(grpTrayUp, 1, 0)
+
+      If pnlMain.Controls.Contains(pctMain) Then
+        pnlMain.Controls.Remove(pctMain)
+        pnlMain.RowCount = 2
+        pnlMain.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        pnlMain.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+        pnlMain.SetRow(grpMainDown, 0)
+        pnlMain.SetRow(pnlMainStyle, 1)
+        pnlCustomColors.Controls.Add(pctMain, 1, 0)
+        pctMain.Size = preSize
+      End If
+      pnlMain.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 50)
+      pnlMain.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      If Not pnlMain.Controls.Contains(grpMainUp) Then pnlMain.Controls.Add(grpMainUp, 1, 0)
+      pnlMainStyle.ColumnCount = 4
+      pnlMainStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlMainStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      pnlMainStyle.ColumnStyles(2) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlMainStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 50)
+      pnlMainStyle.RowCount = 1
+      pnlMainStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      pnlMainStyle.SetColumn(lblMainText, 0)
+      pnlMainStyle.SetRow(lblMainText, 0)
+      pnlMainStyle.SetColumn(pctMainText, 1)
+      pnlMainStyle.SetRow(pctMainText, 0)
+      pnlMainStyle.SetColumn(lblMainBG, 2)
+      pnlMainStyle.SetRow(lblMainBG, 0)
+      pnlMainStyle.SetColumn(pctMainBG, 3)
+      pnlMainStyle.SetRow(pctMainBG, 0)
+    Else
+      Dim preSize As New Size(100, 50)
+      pnlCustomColors.ColumnCount = 3
+      pnlCustomColors.ColumnStyles(0) = New ColumnStyle(SizeType.AutoSize)
+      pnlCustomColors.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
+      If pnlCustomColors.ColumnStyles.Count = 2 Then
+        pnlCustomColors.ColumnStyles.Add(New ColumnStyle(SizeType.AutoSize))
+      Else
+        pnlCustomColors.ColumnStyles(2) = New ColumnStyle(SizeType.AutoSize)
+      End If
+
+      If pnlMain.Controls.Contains(grpMainUp) Then pnlMain.Controls.Remove(grpMainUp)
+      pnlMain.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 100)
+      pnlMain.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
+      If pnlCustomColors.Controls.Contains(pctMain) Then
+        pnlCustomColors.Controls.Remove(pctMain)
+        pnlMain.RowCount = 5
+        pnlMain.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        pnlMain.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+        If pnlMain.RowStyles.Count = 2 Then
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.Percent, 50))
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.Percent, 50))
+        ElseIf pnlMain.RowStyles.Count = 3 Then
+          pnlMain.RowStyles(2) = New RowStyle(SizeType.Percent, 50)
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.Percent, 50))
+        ElseIf pnlMain.RowStyles.Count = 4 Then
+          pnlMain.RowStyles(2) = New RowStyle(SizeType.Percent, 50)
+          pnlMain.RowStyles(3) = New RowStyle(SizeType.AutoSize)
+          pnlMain.RowStyles.Add(New RowStyle(SizeType.Percent, 50))
+        Else
+          pnlMain.RowStyles(2) = New RowStyle(SizeType.Percent, 50)
+          pnlMain.RowStyles(3) = New RowStyle(SizeType.AutoSize)
+          pnlMain.RowStyles(4) = New RowStyle(SizeType.Percent, 50)
+        End If
+        pnlMain.SetRow(pnlMainStyle, 3)
+        pnlMain.SetRow(grpMainDown, 1)
+        pnlMain.Controls.Add(pctMain, 0, 0)
+        pctMain.Size = preSize
+      End If
+      pnlMainStyle.ColumnCount = 2
+      pnlMainStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlMainStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
+      pnlMainStyle.RowCount = 2
+      pnlMainStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      If pnlMainStyle.RowStyles.Count = 1 Then
+        pnlMainStyle.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+      Else
+        pnlMainStyle.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+      End If
+      pnlMainStyle.SetColumn(lblMainText, 0)
+      pnlMainStyle.SetRow(lblMainText, 0)
+      pnlMainStyle.SetColumn(pctMainText, 1)
+      pnlMainStyle.SetRow(pctMainText, 0)
+      pnlMainStyle.SetColumn(lblMainBG, 0)
+      pnlMainStyle.SetRow(lblMainBG, 1)
+      pnlMainStyle.SetColumn(pctMainBG, 1)
+      pnlMainStyle.SetRow(pctMainBG, 1)
+
+      If pnlTray.Controls.Contains(grpTrayUp) Then pnlTray.Controls.Remove(grpTrayUp)
+      pnlTray.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 100)
+      pnlTray.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
+      If pnlCustomColors.Controls.Contains(pctTray) Then
+        pnlCustomColors.Controls.Remove(pctTray)
+        pnlTray.RowCount = 3
+        pnlTray.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        If pnlTray.RowStyles.Count = 1 Then
+          pnlTray.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+          pnlTray.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
+        ElseIf pnlTray.RowStyles.Count = 2 Then
+          pnlTray.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+          pnlTray.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
+        Else
+          pnlTray.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+          pnlTray.RowStyles(2) = New RowStyle(SizeType.Percent, 100)
+        End If
+        pnlTray.SetRow(grpTrayDown, 1)
+        pnlTray.Controls.Add(pctTray, 0, 0)
+        pctTray.Size = preSize
+      End If
+
+      If pnlHistory.Controls.Contains(grpHistoryUp) Then pnlHistory.Controls.Remove(grpHistoryUp)
+      pnlHistory.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 100)
+      pnlHistory.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
+      If pnlCustomColors.Controls.Contains(pctHistory) Then
+        pnlCustomColors.Controls.Remove(pctHistory)
+        pnlHistory.RowCount = 3
+        pnlHistory.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+        pnlHistory.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+        If pnlHistory.RowStyles.Count = 2 Then
+          pnlHistory.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+        Else
+          pnlHistory.RowStyles(2) = New RowStyle(SizeType.AutoSize)
+        End If
+        pnlMain.SetRow(pnlHistoryStyle, 2)
+        pnlHistory.SetRow(grpHistoryDown, 1)
+        pnlHistory.Controls.Add(pctHistory, 0, 0)
+        pctHistory.Size = preSize
+      End If
+      pnlHistoryStyle.ColumnCount = 2
+      pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
+      pnlHistoryStyle.RowCount = 2
+      pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      If pnlHistoryStyle.RowStyles.Count = 1 Then
+        pnlHistoryStyle.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+      Else
+        pnlHistoryStyle.RowStyles(1) = New RowStyle(SizeType.AutoSize)
+      End If
+      pnlHistoryStyle.SetColumn(lblHistoryText, 0)
+      pnlHistoryStyle.SetRow(lblHistoryText, 0)
+      pnlHistoryStyle.SetColumn(pctHistoryText, 1)
+      pnlHistoryStyle.SetRow(pctHistoryText, 0)
+      pnlHistoryStyle.SetColumn(lblHistoryBG, 0)
+      pnlHistoryStyle.SetRow(lblHistoryBG, 1)
+      pnlHistoryStyle.SetColumn(pctHistoryBG, 1)
+      pnlHistoryStyle.SetRow(pctHistoryBG, 1)
+
+      pnlCustomColors.SetColumn(grpTray, 1)
+      pnlCustomColors.SetRow(grpTray, 0)
+      pnlCustomColors.SetColumn(grpHistory, 2)
+      pnlCustomColors.SetRow(grpHistory, 0)
+
+      pnlCustomColors.SetColumn(pnlButtons, 0)
+      pnlCustomColors.SetRow(pnlButtons, 1)
+      pnlCustomColors.SetColumnSpan(pnlButtons, 3)
+
+      pnlCustomColors.RowCount = 2
+    End If
+  End Sub
 #End Region
 End Class
