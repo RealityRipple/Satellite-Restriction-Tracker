@@ -316,6 +316,7 @@ Public Class TaskbarNotifier
 #End Region
 #Region "TaskbarNotifier Protected Methods"
   Protected Sub DrawCloseButton(grfx As Graphics)
+    If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultCloseBitmap()
     If CloseBitmap IsNot Nothing Then
       Dim rectDest As New Rectangle(CloseBitmapLocation, CloseBitmapSize)
       Dim rectSrc As Rectangle
