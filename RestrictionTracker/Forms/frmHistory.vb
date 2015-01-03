@@ -667,6 +667,8 @@ Public Class frmHistory
       pctErr.Image = Nothing
       ttHistory.SetTooltip(pctErr, Nothing)
       If DateDiff(DateInterval.Second, dMin, dMax) > 0 Then
+        dtpFrom.MinDate = fDate
+        dtpTo.MinDate = fDate
         dtpFrom.MaxDate = dMax
         dtpTo.MaxDate = dMax
         dtpFrom.MinDate = dMin
