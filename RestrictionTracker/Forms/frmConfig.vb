@@ -93,10 +93,14 @@
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     DoCheck()
     Dim DisableHistory As Boolean = False
+    Dim aD As String = AppData
+    If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
+    Dim hD As String = mySettings.HistoryDir
+    If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
     If chkService.Checked Then
       optHistoryProgramData.Checked = False
       DisableHistory = True
-    ElseIf AppData = Application.StartupPath & "\Config\" Then
+    ElseIf String.Compare(aD, Application.StartupPath & "\Config\", True) = 0 Then
       optHistoryProgramData.Checked = False
       optHistoryAppData.Checked = False
       optHistoryCustom.Checked = False
@@ -107,9 +111,9 @@
       cmdPortableDir.Enabled = False
       cmdMakePortable.Enabled = False
       tbsConfig.TabPages.Remove(tabAdvanced)
-    ElseIf mySettings.HistoryDir = AppDataAllPath Then
+    ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
       optHistoryProgramData.Checked = True
-    ElseIf mySettings.HistoryDir = AppDataPath Then
+    ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
       optHistoryAppData.Checked = True
     Else
       optHistoryCustom.Checked = True
