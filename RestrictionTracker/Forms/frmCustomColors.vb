@@ -858,7 +858,7 @@ Public Class frmCustomColors
         pctMain.Size = preSize
       End If
       pnlMainStyle.ColumnCount = 2
-      pnlMainStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlMainStyle.ColumnStyles(0) = New ColumnStyle(SizeType.AutoSize)
       pnlMainStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
       pnlMainStyle.RowCount = 2
       pnlMainStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
@@ -917,7 +917,7 @@ Public Class frmCustomColors
         pctHistory.Size = preSize
       End If
       pnlHistoryStyle.ColumnCount = 2
-      pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
+      pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.AutoSize)
       pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
       pnlHistoryStyle.RowCount = 2
       pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
