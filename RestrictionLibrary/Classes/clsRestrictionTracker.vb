@@ -1004,6 +1004,9 @@
         If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
           sErrMsg = "Login Failed: Incorrect Password"
           bReset = False
+        ElseIf sRet.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
+          sErrMsg = "Login Failed: Exede Account Locked. Check your password, wait 5 minutes and try again."
+          bReset = False
         Else
           sErrMsg = "Unknown Login Error."
           sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
