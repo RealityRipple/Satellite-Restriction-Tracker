@@ -97,7 +97,7 @@ Module modFunctions
         Return "Connection to the server timed out. Please try again."
       ElseIf ex.Message.StartsWith("The request was aborted:") Then
         If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
-          Return "Unable to create secure connection. Please check your Certificate Store and try again."
+          Return "Unable to create secure connection. Please change your Network Security Protocol settings and try again."
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return "Connection aborted."
         Else
@@ -151,6 +151,10 @@ Module modFunctions
           Return "Received empty response from server. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: The connection was closed") Then
           Return "The server closed the connection. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host") Then
+          Return "The server closed the connection. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An established connection was aborted by the software in your host machine") Then
+          Return "Connection aborted."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
@@ -179,6 +183,8 @@ Module modFunctions
             Return "The server closed the connection. Please try again."
           ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
             Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
+          ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
+            Return "The server closed the connection. Please try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
@@ -194,6 +200,8 @@ Module modFunctions
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
             ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
               Return "The server closed the connection. Please try again."
+            ElseIf ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host.") Then
+              Return "The server closed the connection. Please try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
@@ -206,7 +214,7 @@ Module modFunctions
           End If
         ElseIf ex.Message.Contains("Could not establish trust relationship for the SSL/TLS secure channel.") Then
           If ex.InnerException.Message.StartsWith("The remote certificate is invalid according to the validation procedure") Then
-            Return "Server certificate is invalid. Check your clock and system certificates list."
+            Return "Server certificate is invalid. Please change your Network Security Protocol settings and try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Server security could not be established - " & ex.InnerException.Message
