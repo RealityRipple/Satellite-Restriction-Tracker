@@ -1005,7 +1005,7 @@
           sErrMsg = "Login Failed: Incorrect Password"
           bReset = False
         ElseIf sRet.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
-          sErrMsg = "Login Failed: Exede Account Locked. Check your password, wait 5 minutes and try again."
+          sErrMsg = "Login Failed: Exede Account Locked. Check your username and password."
           bReset = False
         Else
           sErrMsg = "Unknown Login Error."
@@ -1469,6 +1469,9 @@
         sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
         bReset = False
       End If
+    ElseIf sRet.ToLower.Contains("you've submitted your request too soon. please wait and try again.") Then
+      sErrMsg = "Login Failed: Too many requests. Check for usage data less often."
+      bReset = False
     Else
       sErrMsg = "Login Failed: Could not understand response."
       sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
