@@ -23,7 +23,6 @@ Partial Class frmConfig
   <System.Diagnostics.DebuggerStepThrough()> _
   Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
-    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConfig))
     Me.tbsConfig = New System.Windows.Forms.TabControl()
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
@@ -69,6 +68,7 @@ Partial Class frmConfig
     Me.pctAccountKeyIcon = New System.Windows.Forms.PictureBox()
     Me.lblKey = New System.Windows.Forms.Label()
     Me.lblPurchaseKey = New RestrictionTracker.LinkLabel()
+    Me.lblAccountKeyDescription = New System.Windows.Forms.Label()
     Me.tabPrefs = New System.Windows.Forms.TabPage()
     Me.pnlPrefs = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlPrefColor = New System.Windows.Forms.TableLayoutPanel()
@@ -197,7 +197,6 @@ Partial Class frmConfig
     Me.pnlButtons = New System.Windows.Forms.TableLayoutPanel()
     Me.fswController = New System.IO.FileSystemWatcher()
     Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
-    Me.lblAccountKeyDescription = New System.Windows.Forms.Label()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -485,8 +484,8 @@ Partial Class frmConfig
     Me.txtAccount.Name = "txtAccount"
     Me.txtAccount.Size = New System.Drawing.Size(150, 20)
     Me.txtAccount.TabIndex = 2
-    Me.ttConfig.SetTooltip(Me.txtAccount, "Your ViaSat Username. If you were provided with an E-Mail address, this is the fi" & _
-        "rst half of that address.")
+    Me.ttConfig.SetTooltip(Me.txtAccount, "Your ViaSat Username." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were provided with an E-Mail address, this is the f" & _
+        "irst half of that address.")
     '
     'txtPassword
     '
@@ -515,7 +514,7 @@ Partial Class frmConfig
     'pctPassDisplay
     '
     Me.pctPassDisplay.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctPassDisplay.Image = CType(resources.GetObject("pctPassDisplay.Image"), System.Drawing.Image)
+    Me.pctPassDisplay.Image = Global.RestrictionTracker.My.Resources.Resources.pass
     Me.pctPassDisplay.Location = New System.Drawing.Point(221, 50)
     Me.pctPassDisplay.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
     Me.pctPassDisplay.Name = "pctPassDisplay"
@@ -604,8 +603,8 @@ Partial Class frmConfig
     Me.chkAccountTypeAuto.TabIndex = 4
     Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
     Me.ttConfig.SetTooltip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
-        "onnection. If you'd like to choose a type manually, you can uncheck this box and" & _
-        " select an option below.")
+        "onnection." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you'd like to choose a type manually, you can uncheck this box an" & _
+        "d select an option below.")
     Me.chkAccountTypeAuto.UseVisualStyleBackColor = True
     '
     'pctAccountProviderIcon
@@ -629,9 +628,9 @@ Partial Class frmConfig
     Me.cmbProvider.Name = "cmbProvider"
     Me.cmbProvider.Size = New System.Drawing.Size(150, 21)
     Me.cmbProvider.TabIndex = 2
-    Me.ttConfig.SetTooltip(Me.cmbProvider, "Your ViaSat Provider domain. If you were given an E-Mail address, this is everyth" & _
-        "ing after the @ symbol. You can choose a domain from the dropdown or enter your " & _
-        "own to add it to the list.")
+    Me.ttConfig.SetTooltip(Me.cmbProvider, "Your ViaSat Provider domain." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were given an E-Mail address, this is everyt" & _
+        "hing after the @ symbol." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "You can choose a domain from the dropdown or enter you" & _
+        "r own to add it to the list.")
     '
     'lblProvider
     '
@@ -927,6 +926,18 @@ Partial Class frmConfig
     Me.lblPurchaseKey.TabIndex = 2
     Me.lblPurchaseKey.TabStop = True
     Me.lblPurchaseKey.Text = "Purchase a Remote Usage Service Subscription"
+    '
+    'lblAccountKeyDescription
+    '
+    Me.lblAccountKeyDescription.AutoSize = True
+    Me.pnlAccountKey.SetColumnSpan(Me.lblAccountKeyDescription, 2)
+    Me.lblAccountKeyDescription.Location = New System.Drawing.Point(59, 3)
+    Me.lblAccountKeyDescription.Margin = New System.Windows.Forms.Padding(3)
+    Me.lblAccountKeyDescription.Name = "lblAccountKeyDescription"
+    Me.lblAccountKeyDescription.Size = New System.Drawing.Size(316, 26)
+    Me.lblAccountKeyDescription.TabIndex = 3
+    Me.lblAccountKeyDescription.Text = "Let us track your usage for you! 24-hour meter information at your fingertips, pr" & _
+    "ovided by RealityRipple Software."
     '
     'tabPrefs
     '
@@ -1692,6 +1703,8 @@ Partial Class frmConfig
     Me.chkNetworkProtocolSSL.Size = New System.Drawing.Size(124, 17)
     Me.chkNetworkProtocolSSL.TabIndex = 1
     Me.chkNetworkProtocolSSL.Text = "Use &Legacy SSL 3.0"
+    Me.ttConfig.SetTooltip(Me.chkNetworkProtocolSSL, "Check this box to use the older SSL 3.0 instead of TLS 1.0 for secure connections" & _
+        ".")
     Me.chkNetworkProtocolSSL.UseVisualStyleBackColor = True
     '
     'pnlNetworkProtocolTitle
@@ -1811,8 +1824,8 @@ Partial Class frmConfig
     Me.optUpdateNone.TabIndex = 2
     Me.optUpdateNone.TabStop = True
     Me.optUpdateNone.Text = "&Don't check for updates (Not Recommended)"
-    Me.ttConfig.SetTooltip(Me.optUpdateNone, "Don't check for updates automatically. Release Updates can still be downloaded th" & _
-        "rough the About window manually.")
+    Me.ttConfig.SetTooltip(Me.optUpdateNone, "Don't check for updates automatically." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Release Updates can still be downloaded t" & _
+        "hrough the About window manually.")
     Me.optUpdateNone.UseVisualStyleBackColor = True
     '
     'pnlNetworkUpdateTime
@@ -2350,7 +2363,8 @@ Partial Class frmConfig
     Me.txtPortableDir.Name = "txtPortableDir"
     Me.txtPortableDir.Size = New System.Drawing.Size(220, 20)
     Me.txtPortableDir.TabIndex = 0
-    Me.ttConfig.SetTooltip(Me.txtPortableDir, "Directory used to save History Data.")
+    Me.ttConfig.SetTooltip(Me.txtPortableDir, "Select the location you wish to place a portable copy of Satellite Restriction Tr" & _
+        "acker, such as a desktop folder or a flash drive.")
     '
     'cmdPortableDir
     '
@@ -2363,7 +2377,7 @@ Partial Class frmConfig
     Me.cmdPortableDir.Size = New System.Drawing.Size(36, 22)
     Me.cmdPortableDir.TabIndex = 1
     Me.cmdPortableDir.Text = ". . ."
-    Me.ttConfig.SetTooltip(Me.cmdPortableDir, "Browse for a Directory to save History Data to.")
+    Me.ttConfig.SetTooltip(Me.cmdPortableDir, "Browse for a Directory to place the portable application.")
     Me.cmdPortableDir.UseVisualStyleBackColor = True
     '
     'pctAdvancedPortableIcon
@@ -2555,7 +2569,7 @@ Partial Class frmConfig
     Me.cmdHistoryDir.Size = New System.Drawing.Size(36, 22)
     Me.cmdHistoryDir.TabIndex = 1
     Me.cmdHistoryDir.Text = ". . ."
-    Me.ttConfig.SetTooltip(Me.cmdHistoryDir, "Browse for a Directory to save History Data to.")
+    Me.ttConfig.SetTooltip(Me.cmdHistoryDir, "Browse for a Directory in which to save History Data.")
     Me.cmdHistoryDir.UseVisualStyleBackColor = True
     '
     'lblAdvancedDataDescription
@@ -2739,18 +2753,6 @@ Partial Class frmConfig
     Me.ttConfig.InitialDelay = 300
     Me.ttConfig.Persistant = True
     Me.ttConfig.ReshowDelay = 100
-    '
-    'lblAccountKeyDescription
-    '
-    Me.lblAccountKeyDescription.AutoSize = True
-    Me.pnlAccountKey.SetColumnSpan(Me.lblAccountKeyDescription, 2)
-    Me.lblAccountKeyDescription.Location = New System.Drawing.Point(59, 3)
-    Me.lblAccountKeyDescription.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblAccountKeyDescription.Name = "lblAccountKeyDescription"
-    Me.lblAccountKeyDescription.Size = New System.Drawing.Size(316, 26)
-    Me.lblAccountKeyDescription.TabIndex = 3
-    Me.lblAccountKeyDescription.Text = "Let us track your usage for you! 24-hour meter information at your fingertips, pr" & _
-    "ovided by RealityRipple Software."
     '
     'frmConfig
     '
