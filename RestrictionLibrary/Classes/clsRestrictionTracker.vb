@@ -1545,7 +1545,7 @@
           sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
           If sUsageDiv.Contains("</script>") Then
             sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
-            If sUsageDiv.ToLower.Contains("var anytime=") Then
+            If sUsageDiv.ToLower.Contains("var anytime") Then
               ReadUsage(sUsageDiv)
             Else
               sErrMsg = "Login Failed: Could not detect usage data."
@@ -1626,7 +1626,7 @@
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
-    ElseIf Table.ToLower.Contains("var anytime=") Then
+    ElseIf Table.ToLower.Contains("var anytime") Then
       Dim UsageList As New System.Collections.Specialized.StringDictionary
       For Each Row As String In Split(Table, "var ")
         If Row.Contains("='") Then
@@ -1644,8 +1644,38 @@
               UsageList.Add(sK, sV)
             End If
           End If
+        ElseIf Row.Contains(" = '") Then
+          Dim kV() As String = Split(Row, " = '")
+          Dim sK As String = kV(0)
+          CleanupResult(sK)
+          sK = sK.ToLower
+          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf("'"))
+          CleanupResult(sV)
+          sV = sV.ToLower
+          If Not String.IsNullOrEmpty(sV) Then
+            If UsageList.ContainsKey(sK) Then
+              If Not UsageList(sK) = sV Then UsageList(sK) = sV
+            Else
+              UsageList.Add(sK, sV)
+            End If
+          End If
         ElseIf Row.Contains("=""") Then
           Dim kV() As String = Split(Row, "=""")
+          Dim sK As String = kV(0)
+          CleanupResult(sK)
+          sK = sK.ToLower
+          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf(""""))
+          CleanupResult(sV)
+          sV = sV.ToLower
+          If Not String.IsNullOrEmpty(sV) Then
+            If UsageList.ContainsKey(sK) Then
+              If Not UsageList(sK) = sV Then UsageList(sK) = sV
+            Else
+              UsageList.Add(sK, sV)
+            End If
+          End If
+        ElseIf Row.Contains(" = """) Then
+          Dim kV() As String = Split(Row, " ="" ")
           Dim sK As String = kV(0)
           CleanupResult(sK)
           sK = sK.ToLower
