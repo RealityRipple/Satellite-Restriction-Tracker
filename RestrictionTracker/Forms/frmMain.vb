@@ -614,7 +614,7 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
-          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", True)
+          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
           DisplayUsage(False, False)
           NextGrabTick = TickCount() + 5000
         End If
