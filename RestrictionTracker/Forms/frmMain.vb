@@ -156,7 +156,7 @@ Public Class frmMain
         End If
         If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
-        SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
+        SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
         If localData IsNot Nothing Then
           localData.Dispose()
           localData = Nothing
@@ -180,7 +180,7 @@ Public Class frmMain
         mySettings.AccountType = e.HostType
         If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
         mySettings.Save()
-        SetStatusText(LOG_GetLast.ToString("g"), "Preparing First Connection...", False)
+        SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
         If localData IsNot Nothing Then
           localData.Dispose()
           localData = Nothing
@@ -473,7 +473,7 @@ Public Class frmMain
       LOG_Initialize(sAccount, False)
       If ClosingTime Then Exit Sub
       DisplayUsage(False, False)
-      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Reloaded Connection...", False)
+      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
       Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
       UsageInvoker.BeginInvoke(Nothing, Nothing)
     End If
@@ -566,7 +566,7 @@ Public Class frmMain
               If Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then
                 NextGrabTick = Long.MaxValue
                 EnableProgressIcon()
-                SetStatusText(LOG_GetLast.ToString("g"), "Preparing Next Connection...", False)
+                SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
                 Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
                 UsageInvoker.BeginInvoke(Nothing, Nothing)
                 Exit Sub
@@ -614,8 +614,9 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
-          SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
+          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", True)
           DisplayUsage(False, False)
+          NextGrabTick = TickCount() + 5000
         End If
       End If
     End If
@@ -1439,7 +1440,7 @@ Public Class frmMain
         If bReRun Then
           SetNextLoginTime()
           EnableProgressIcon()
-          SetStatusText(LOG_GetLast.ToString("g"), "Re-Preparing New Connection...", False)
+          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
           Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
           UsageInvoker.BeginInvoke(Nothing, Nothing)
         Else
@@ -1458,7 +1459,7 @@ Public Class frmMain
         If bReRun Then
           SetNextLoginTime()
           EnableProgressIcon()
-          SetStatusText(LOG_GetLast.ToString("g"), "Re-Preparing Connection...", False)
+          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
           Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
           UsageInvoker.BeginInvoke(Nothing, Nothing)
         Else
