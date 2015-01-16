@@ -1539,35 +1539,26 @@
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("Data Plan start") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("Data Plan start"))
-        sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf(">") + 1)
-        If sUsageDiv.Contains("Data Usage Graph End") Then
-          sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("Data Usage Graph End"))
-          sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.LastIndexOf("<"))
-        End If
-        ReadUsage(sUsageDiv)
-      ElseIf sRet.Contains("<div id=""usagestatus""") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<div id=""usagestatus"""))
-        If sUsageDiv.Contains("</h2>") Then
-          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("</h2>") + 5)
-          If sUsageDiv.Contains("<h2") Then
-            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("<h2"))
-            If sRet.Contains("Monthly Usage Allowance</h3>") Then
-              Dim sMaxDiv As String = sRet.Substring(sRet.IndexOf("Monthly Usage Allowance</h3>") + 28)
-              If sMaxDiv.Contains("</table>") Then
-                sMaxDiv = sMaxDiv.Substring(0, sMaxDiv.IndexOf("</table>"))
-                sUsageDiv &= vbNewLine & sMaxDiv
-              End If
+      If sRet.Contains("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>") Then
+        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>"))
+        If sUsageDiv.Contains("<script type=""text/javascript"">") Then
+          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
+          If sUsageDiv.Contains("</script>") Then
+            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
+            If sUsageDiv.Contains("var anyTime=") Then
+              ReadUsage(sUsageDiv)
+            Else
+              sErrMsg = "Login Failed: Could not detect usage data."
+              sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
+              bReset = True
             End If
-            ReadUsage(sUsageDiv)
           Else
-            sErrMsg = "Login Failed: Could not parse usage meter."
+            sErrMsg = "Login Failed: Could not parse usage data."
             sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
             bReset = True
           End If
         Else
-          sErrMsg = "Login Failed: Could not parse usage meter."
+          sErrMsg = "Login Failed: Could not find usage data."
           sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
           bReset = True
         End If
@@ -1593,35 +1584,26 @@
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("Data Plan start") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("Data Plan start"))
-        sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf(">") + 1)
-        If sUsageDiv.Contains("Data Usage Graph End") Then
-          sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("Data Usage Graph End"))
-          sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.LastIndexOf("<"))
-        End If
-        ReadUsage(sUsageDiv)
-      ElseIf sRet.Contains("<div id=""usagestatus""") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<div id=""usagestatus"""))
-        If sUsageDiv.Contains("</h2>") Then
-          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("</h2>") + 5)
-          If sUsageDiv.Contains("<h2") Then
-            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("<h2"))
-            If sRet.Contains("Monthly Usage Allowance</h3>") Then
-              Dim sMaxDiv As String = sRet.Substring(sRet.IndexOf("Monthly Usage Allowance</h3>") + 28)
-              If sMaxDiv.Contains("</table>") Then
-                sMaxDiv = sMaxDiv.Substring(0, sMaxDiv.IndexOf("</table>"))
-                sUsageDiv &= vbNewLine & sMaxDiv
-              End If
+      If sRet.Contains("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>") Then
+        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>"))
+        If sUsageDiv.Contains("<script type=""text/javascript"">") Then
+          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
+          If sUsageDiv.Contains("</script>") Then
+            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
+            If sUsageDiv.Contains("var anyTime=") Then
+              ReadUsage(sUsageDiv)
+            Else
+              sErrMsg = "Login Failed: Could not detect usage data."
+              sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
+              bReset = True
             End If
-            ReadUsage(sUsageDiv)
           Else
-            sErrMsg = "Login Failed: Could not parse usage meter."
+            sErrMsg = "Login Failed: Could not parse usage data."
             sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
             bReset = True
           End If
         Else
-          sErrMsg = "Login Failed: Could not parse usage meter."
+          sErrMsg = "Login Failed: Could not find usage data."
           sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
           bReset = True
         End If
@@ -1644,207 +1626,58 @@
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
-    ElseIf Table.Contains("Data Usage Graph Start") Then
-      Dim sMaxAnytime As String = Nothing
-      If Table.Contains("Anytime") Then
-        sMaxAnytime = Table.Substring(Table.IndexOf("Anytime"))
-        sMaxAnytime = sMaxAnytime.Substring(0, sMaxAnytime.IndexOf("<div class=""row"""))
-        sMaxAnytime = sMaxAnytime.Substring(sMaxAnytime.IndexOf("label"">") + 7)
-        sMaxAnytime = sMaxAnytime.Substring(0, sMaxAnytime.IndexOf("</"))
-        CleanupResult(sMaxAnytime)
-      End If
-      Dim sMaxOffPeak As String = Nothing
-      If Table.Contains("Off-Peak") Then
-        sMaxOffPeak = Table.Substring(Table.IndexOf("Off-Peak"))
-        sMaxOffPeak = sMaxOffPeak.Substring(0, sMaxOffPeak.IndexOf("<div class=""row"""))
-        sMaxOffPeak = sMaxOffPeak.Substring(sMaxOffPeak.IndexOf("label"">") + 7)
-        sMaxOffPeak = sMaxOffPeak.Substring(0, sMaxOffPeak.IndexOf("</"))
-        CleanupResult(sMaxOffPeak)
-      End If
-      Table = Table.Substring(Table.IndexOf("Data Usage Graph Start"))
-      Table = Table.Substring(Table.IndexOf(">") + 1)
-      Dim sAnytime As String = Nothing
-      If Table.Contains("Anytime") Then
-        sAnytime = Table.Substring(0, Table.IndexOf("Anytime"))
-        sAnytime = sAnytime.Substring(sAnytime.LastIndexOf(">") + 1)
-        CleanupResult(sAnytime)
-      End If
-      Dim sOffPeak As String = Nothing
-      If Table.Contains("Off-Peak") Then
-        sOffPeak = Table.Substring(0, Table.IndexOf("Off-Peak"))
-        sOffPeak = sOffPeak.Substring(sOffPeak.LastIndexOf(">") + 1)
-        CleanupResult(sOffPeak)
-      End If
-      Dim sAdditional As String = Nothing
-      If Table.Contains("Additional") Then
-        sAdditional = Table.Substring(0, Table.IndexOf("Additional"))
-        sAdditional = sAdditional.Substring(sAdditional.LastIndexOf(">") + 1)
-        CleanupResult(sAdditional)
-        If sAdditional.Contains("&mdash;") Then sAdditional = Nothing
-      End If
-      If String.IsNullOrEmpty(sAnytime) Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      Else
-        Dim lDown, lDownT, lUp, lUpT As Long
-        If Not String.IsNullOrEmpty(sAnytime) Then
-          lDown = StrToVal(sAnytime, MBPerGB)
+    ElseIf Table.Contains("var anyTime='") Then
+      Dim UsageList As New System.Collections.Specialized.StringDictionary
+      For Each Row As String In Split(Table, "var ")
+        If Row.Contains("='") Then
+          Dim kV() As String = Split(Row, "='")
+          Dim sK As String = kV(0)
+          CleanupResult(sK)
+          sK = sK.ToLower
+          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf("'"))
+          CleanupResult(sV)
+          sV = sV.ToLower
+          If Not String.IsNullOrEmpty(sV) Then
+            If UsageList.ContainsKey(sK) Then
+              If Not UsageList(sK) = sV Then UsageList(sK) = sV
+            Else
+              UsageList.Add(sK, sV)
+            End If
+          End If
         End If
-        If Not String.IsNullOrEmpty(sMaxAnytime) Then
-          lDownT = StrToVal(sMaxAnytime, MBPerGB)
-          lDown = lDownT - lDown
-        End If
-        If Not String.IsNullOrEmpty(sOffPeak) Then
-          lUp = StrToVal(sOffPeak, MBPerGB)
-        End If
-        If Not String.IsNullOrEmpty(sMaxOffPeak) Then
-          lUpT = StrToVal(sMaxOffPeak, MBPerGB)
-          lUp = lUpT - lUp
-        End If
-        If Not String.IsNullOrEmpty(sAdditional) Then
-          lDownT += StrToVal(sAdditional, MBPerGB)
-        End If
-        If lDownT > 0 Then
-          RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
-        Else
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-        End If
+      Next
+      Dim lDown, lDownT, lUp, lUpT As Long
+      If UsageList.ContainsKey("anytime") Then
+        lDownT = StrToVal(UsageList("anytime"), MBPerGB)
       End If
-    Else
-      DN_Read_OldTable(Table)
-    End If
-  End Sub
-  Private Sub DN_Read_OldTable(Table As String)
-    If Table.Contains("alertError") Then
-      ResetTimeout()
-      If Table.Contains("This information is currently unavailable.") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage information currently unavailable."))
+      If UsageList.ContainsKey("anytimeresult") Then
+        Dim dMult As Double = StrToFloat(UsageList("anytimeresult"))
+        lDown = (lDownT - ((lDownT * dMult) / 100))
+      End If
+      If UsageList.ContainsKey("offpeak") Then
+        lUpT = StrToVal(UsageList("offpeak"), MBPerGB)
+      End If
+      If UsageList.ContainsKey("offpeakresult") Then
+        Dim dMult As Double = StrToFloat(UsageList("offpeakresult"))
+        lUp = (lUpT - ((lUpT * dMult) / 100))
+      End If
+      If lDownT > 0 Then
+        If UsageList.ContainsKey("tokentotal") Then
+          Dim lExtraT As Long = StrToVal(UsageList("tokentotal"), MBPerGB)
+          Dim lExtra As Long = 0
+          If UsageList.ContainsKey("tokenresult") Then
+            Dim dMult As Double = StrToFloat(UsageList("tokenresult"))
+            lExtra = (lExtraT - ((lExtraT * dMult) / 100))
+          End If
+          lDownT += lExtraT
+          lDown += lExtra
+        End If
+        RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
     Else
-      Dim sAnytime As String = Nothing
-      Dim sOffPeak As String = Nothing
-      Dim sAdditional As String = Nothing
-      If Table.Contains("Anytime</h3>") Then
-        sAnytime = Table.Substring(Table.IndexOf("Anytime</h3>") + 12)
-        If sAnytime.Contains("Remaining") Then
-          sAnytime = sAnytime.Substring(0, sAnytime.IndexOf("Remaining"))
-          If sAnytime.Contains("padding230") Then
-            sAnytime = sAnytime.Substring(sAnytime.IndexOf("padding230"))
-            If sAnytime.Contains(">") Then
-              sAnytime = sAnytime.Substring(sAnytime.IndexOf(">") + 1)
-              CleanupResult(sAnytime)
-            Else
-              sAnytime = Nothing
-            End If
-          Else
-            sAnytime = Nothing
-          End If
-        Else
-          sAnytime = Nothing
-        End If
-      End If
-      If Table.Contains("Off-Peak (2am - 8am)</h3>") Then
-        sOffPeak = Table.Substring(Table.IndexOf("am)</h3>") + 8)
-        If sOffPeak.Contains("Remaining") Then
-          sOffPeak = sOffPeak.Substring(0, sOffPeak.IndexOf("Remaining"))
-          If sOffPeak.Contains("padding230") Then
-            sOffPeak = sOffPeak.Substring(sOffPeak.IndexOf("padding230"))
-            If sOffPeak.Contains(">") Then
-              sOffPeak = sOffPeak.Substring(sOffPeak.IndexOf(">") + 1)
-              CleanupResult(sOffPeak)
-            Else
-              sOffPeak = Nothing
-            End If
-          Else
-            sOffPeak = Nothing
-          End If
-        Else
-          sOffPeak = Nothing
-        End If
-      End If
-      If Table.Contains("Additional Capacity</h3>") Then
-        sAdditional = Table.Substring(Table.IndexOf("Additional Capacity</h3>") + 24)
-        If sAdditional.Contains("Remaining") Then
-          sAdditional = sAdditional.Substring(0, sAdditional.IndexOf("Remaining"))
-          If sAdditional.Contains("padding230") Then
-            sAdditional = sAdditional.Substring(sAdditional.IndexOf("padding230"))
-            If sAdditional.Contains(">") Then
-              sAdditional = sAdditional.Substring(sAdditional.IndexOf(">") + 1)
-              CleanupResult(sAdditional)
-            Else
-              sAdditional = Nothing
-            End If
-          Else
-            sAdditional = Nothing
-          End If
-        Else
-          sAdditional = Nothing
-        End If
-      End If
-      Dim sAnyMax As String = Nothing
-      Dim sOffMax As String = Nothing
-      If Table.Contains("Anytime</label>") Then
-        sAnyMax = Table.Substring(Table.IndexOf("Anytime</label>"))
-        If sAnyMax.Contains("<td style=""text-align: right; width: 60px;"">") Then
-          sAnyMax = sAnyMax.Substring(sAnyMax.IndexOf("<td style=""text-align: right; width: 60px;"">") + 44)
-          If sAnyMax.Contains("</td>") Then
-            sAnyMax = sAnyMax.Substring(0, sAnyMax.IndexOf("</td>"))
-            CleanupResult(sAnyMax)
-          Else
-            sAnytime = Nothing
-            sAnyMax = Nothing
-          End If
-        Else
-          sAnytime = Nothing
-          sAnyMax = Nothing
-        End If
-      End If
-      If Table.Contains("8am)</label>") Then
-        sOffMax = Table.Substring(Table.IndexOf("8am)</label>"))
-        If sOffMax.Contains("<td style=""text-align: right; width: 60px;"">") Then
-          sOffMax = sOffMax.Substring(sOffMax.IndexOf("<td style=""text-align: right; width: 60px;"">") + 44)
-          If sOffMax.Contains("</td>") Then
-            sOffMax = sOffMax.Substring(0, sOffMax.IndexOf("</td>"))
-            CleanupResult(sOffMax)
-          Else
-            sOffPeak = Nothing
-            sOffMax = Nothing
-          End If
-        Else
-          sOffPeak = Nothing
-          sOffMax = Nothing
-        End If
-      End If
-      If String.IsNullOrEmpty(sAnytime) Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      Else
-        Dim lDown, lDownT, lUp, lUpT As Long
-        If Not String.IsNullOrEmpty(sAnytime) Then
-          lDown = StrToVal(sAnytime, MBPerGB)
-        End If
-        If Not String.IsNullOrEmpty(sAnyMax) Then
-          lDownT = StrToVal(sAnyMax, MBPerGB)
-          lDown = lDownT - lDown
-        End If
-        If Not String.IsNullOrEmpty(sOffPeak) Then
-          lUp = StrToVal(sOffPeak, MBPerGB)
-        End If
-        If Not String.IsNullOrEmpty(sOffMax) Then
-          lUpT = StrToVal(sOffMax, MBPerGB)
-          lUp = lUpT - lUp
-        End If
-        If Not String.IsNullOrEmpty(sAdditional) Then
-          lDownT += StrToVal(sAdditional, MBPerGB)
-        End If
-        If lDownT > 0 Then
-          RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
-        Else
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-        End If
-      End If
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
     End If
   End Sub
 #End Region
@@ -1863,15 +1696,24 @@
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
     Return CLng(Val(str.Substring(0, str.IndexOf(" ")).Replace(",", "")) * vMult)
   End Function
+  Private Function StrToFloat(str As String) As Double
+    If String.IsNullOrEmpty(str) Then Return 0.0#
+    If Not str.Contains(" ") Then Return Val(str.Replace(",", ""))
+    Return Val(str.Substring(0, str.IndexOf(" ")).Replace(",", ""))
+  End Function
   Private Sub CleanupResult(ByRef result As String)
-    result = Replace(result, "&nbsp;", " ")
-    result = Replace(result, vbTab, "")
-    result = Replace(result, vbCr, "")
-    result = Replace(result, vbLf, "")
-    Do
-      result = Replace(result, "  ", " ")
-    Loop While result.Contains("  ")
-    result = Trim(result)
+    If Not String.IsNullOrEmpty(result) Then
+      result = Replace(result, "&nbsp;", " ")
+      result = Replace(result, vbTab, "")
+      result = Replace(result, vbCr, "")
+      result = Replace(result, vbLf, "")
+      Do
+        result = Replace(result, "  ", " ")
+      Loop While result.Contains("  ")
+      result = Trim(result)
+    Else
+      result = ""
+    End If
   End Sub
   Public Function IgnoreCert(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Net.Security.SslPolicyErrors) As Boolean
     Return True
