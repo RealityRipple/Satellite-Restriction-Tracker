@@ -30,7 +30,6 @@ Public Class svcRL
             ElseIf wbP > rpP And wbP > exP Then
               Return SatHostTypes.WildBlue
             Else
-              Debug.Print("RP: " & FormatPercent(rpP) & ", Ex: " & FormatPercent(exP) & ", WB: " & FormatPercent(wbP))
               If rpP > wbP And exP > wbP And rpP = exP Then
                 Return SatHostTypes.Exede
               Else
@@ -38,7 +37,6 @@ Public Class svcRL
               End If
             End If
           End If
-
         End If
       Else
         Return OfflineCheck()

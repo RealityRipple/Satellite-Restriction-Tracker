@@ -116,7 +116,6 @@ Public Class frmMain
         ElseIf wbP > rpP And wbP > exP Then
           RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
         Else
-          Debug.Print("RP: " & FormatPercent(rpP) & ", Ex: " & FormatPercent(exP) & ", WB: " & FormatPercent(wbP))
           If rpP > wbP And exP > wbP And rpP = exP Then
             RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
           Else

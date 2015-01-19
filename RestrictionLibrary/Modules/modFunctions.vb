@@ -295,11 +295,7 @@ Module modFunctions
               If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)
               Dim bRet() As Byte = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
               Dim sRet As String = System.Text.Encoding.GetEncoding(LATIN_1).GetString(bRet)
-              If sRet = "e exists" Or sRet = "e added" Then
-                reports.RemoveAt(I)
-              Else
-                Debug.Print(sRet)
-              End If
+              If sRet = "e exists" Or sRet = "e added" Then reports.RemoveAt(I)
             End Using
           Catch
             Exit For
