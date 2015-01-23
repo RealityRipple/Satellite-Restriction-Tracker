@@ -1539,8 +1539,8 @@
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>"))
+      If sRet.Contains("/javascript/broadband.js""></script>") Then
+        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("/javascript/broadband.js""></script>"))
         If sUsageDiv.Contains("<script type=""text/javascript"">") Then
           sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
           If sUsageDiv.Contains("</script>") Then
@@ -1584,8 +1584,8 @@
       sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("<script type=""text/javascript"" src=""/customercaresc/99012/javascript/broadband.js""></script>"))
+      If sRet.Contains("/javascript/broadband.js""></script>") Then
+        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("/javascript/broadband.js""></script>"))
         If sUsageDiv.Contains("<script type=""text/javascript"">") Then
           sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
           If sUsageDiv.Contains("</script>") Then
