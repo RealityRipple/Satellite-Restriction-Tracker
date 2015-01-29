@@ -1034,6 +1034,8 @@
         wsData.DownloadStringAsync(New Uri(sURI), aState)
       ElseIf sRet.Contains("maintenance") Then
         sErrMsg = "Login Failed: Server Down for Maintenance."
+      ElseIf sRet.Contains("https://DOMAIN.my.salesforce.com") Then
+        sErrMsg = "Login Failed: Server Down for Maintenance."
       Else
         sErrMsg = "Login Failed: Could not understand response."
         sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
