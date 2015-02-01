@@ -257,6 +257,8 @@ Module modFunctions
             Return "Could not connect to the server. Check your Internet connection."
           ElseIf ex.InnerException.Message.Contains("Network is unreachable") Then
             Return "The network is unreachable. Check your Internet connection."
+          ElseIf ex.InnerException.Message.Contains("Connection refused") Then
+            Return "The server refused the connection. Please try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
