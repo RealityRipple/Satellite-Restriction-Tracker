@@ -1766,7 +1766,8 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetworkUpdate.Size = New System.Drawing.Size(376, 77)
+    Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlNetworkUpdate.Size = New System.Drawing.Size(310, 77)
     Me.pnlNetworkUpdate.TabIndex = 6
     '
     'pctNetworkUpdateIcon
@@ -1842,10 +1843,10 @@ Partial Class frmConfig
     Me.cmbUpdateAutomation.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cmbUpdateAutomation.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.cmbUpdateAutomation.FormattingEnabled = True
-    Me.cmbUpdateAutomation.Items.AddRange(New Object() {"Install updates automatically (recommended)", "Download updates but let me choose whether to install them", "Never check for updates (not recommended)"})
+    Me.cmbUpdateAutomation.Items.AddRange(New Object() {"Install updates automatically (recommended)", "Let me choose whether to install updates", "Never check for updates (not recommended)"})
     Me.cmbUpdateAutomation.Location = New System.Drawing.Point(59, 3)
     Me.cmbUpdateAutomation.Name = "cmbUpdateAutomation"
-    Me.cmbUpdateAutomation.Size = New System.Drawing.Size(314, 21)
+    Me.cmbUpdateAutomation.Size = New System.Drawing.Size(248, 21)
     Me.cmbUpdateAutomation.TabIndex = 6
     Me.ttConfig.SetTooltip(Me.cmbUpdateAutomation, "Choose how Satellite Restriction Tracker installs updates.")
     '
