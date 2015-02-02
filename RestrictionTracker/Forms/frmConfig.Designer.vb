@@ -2184,7 +2184,7 @@ Partial Class frmConfig
     Me.txtTimeout.TabIndex = 2
     Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetTooltip(Me.txtTimeout, "Number of seconds to wait between network communications.")
-    Me.txtTimeout.Value = New Decimal(New Integer() {5, 0, 0, 0})
+    Me.txtTimeout.Value = New Decimal(New Integer() {60, 0, 0, 0})
     '
     'lblTimeout2
     '
