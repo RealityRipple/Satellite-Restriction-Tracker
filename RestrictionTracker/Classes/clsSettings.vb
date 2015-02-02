@@ -345,7 +345,16 @@ Class AppSettings
       End If
       Dim xUpdateBETA As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateBETA")
       If xUpdateBETA Is Nothing Then
-        m_UpdateBETA = False
+        Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
+        If xBetaCheck Is Nothing Then
+          m_UpdateBETA = False
+        Else
+          Try
+            m_UpdateBETA = xBetaCheck.Element("value").Value = "True"
+          Catch ex As Exception
+            m_UpdateBETA = False
+          End Try
+        End If
       Else
         Try
           m_UpdateBETA = xUpdateBETA.Element("value").Value = "True"
