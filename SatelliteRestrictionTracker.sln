@@ -6,9 +6,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RestrictionLogger", "RestrictionLogger\RestrictionLogger.vbproj", "{AE10B9E9-C528-4B42-B6E0-9D927170F443}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RestrictionController", "RestrictionController\RestrictionController.vbproj", "{00F084B8-A06D-44F1-A92D-E1F46A163539}"
-	ProjectSection(ProjectDependencies) = postProject
-		{AE10B9E9-C528-4B42-B6E0-9D927170F443} = {AE10B9E9-C528-4B42-B6E0-9D927170F443}
-	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RestrictionLibrary", "RestrictionLibrary\RestrictionLibrary.vbproj", "{40B5E309-B3F6-47D1-8CC7-9EE0646E1136}"
 EndProject
