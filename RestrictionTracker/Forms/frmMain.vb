@@ -551,7 +551,7 @@ Public Class frmMain
         If NextGrabTick - TickCount() < mySettings.StartWait * 60 * 1000 Then NextGrabTick = TickCount() + (mySettings.StartWait * 60 * 1000)
       End If
       If TickCount() >= NextGrabTick Then
-        If mySettings.UpdateType > 0 AndAlso Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
+        If Not mySettings.UpdateType = AppSettings.UpdateTypes.None AndAlso Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
           CheckForUpdates()
         Else
           If Not String.IsNullOrEmpty(sAccount) Then
@@ -1711,55 +1711,11 @@ Public Class frmMain
       mySettings.LastUpdate = Now
       mySettings.Save()
       If e.Error Is Nothing And Not e.Cancelled Then
-        Dim fUpdate As New frmUpdate
-        Select Case e.Result
-          Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-            fUpdate.NewUpdate(e.Version, False, Not isAdmin())
-            Select Case fUpdate.ShowDialog()
-              Case Windows.Forms.DialogResult.Yes
-                If remoteData IsNot Nothing Then
-                  remoteData.Dispose()
-                  remoteData = Nothing
-                ElseIf localData IsNot Nothing Then
-                  localData.Dispose()
-                  localData = Nothing
-                End If
-                updateChecker.DownloadUpdate(sEXEPath)
-              Case Windows.Forms.DialogResult.No
-                If updateChecker IsNot Nothing Then
-                  updateChecker.Dispose()
-                  updateChecker = Nothing
-                End If
-                NextGrabTick = Long.MinValue
-              Case Windows.Forms.DialogResult.OK
-                If remoteData IsNot Nothing Then
-                  remoteData.Dispose()
-                  remoteData = Nothing
-                ElseIf localData IsNot Nothing Then
-                  localData.Dispose()
-                  localData = Nothing
-                End If
-                updateChecker.DownloadUpdate(sEXEPath)
-                mySettings.UpdateType = 1
-                mySettings.Save()
-              Case Windows.Forms.DialogResult.Cancel
-                mySettings.UpdateType = 1
-                mySettings.Save()
-                If updateChecker IsNot Nothing Then
-                  updateChecker.Dispose()
-                  updateChecker = Nothing
-                End If
-                NextGrabTick = Long.MinValue
-              Case Else
-                If updateChecker IsNot Nothing Then
-                  updateChecker.Dispose()
-                  updateChecker = Nothing
-                End If
-                NextGrabTick = Long.MinValue
-            End Select
-          Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-            If mySettings.UpdateType = 2 Then
-              fUpdate.NewUpdate(e.Version, True, Not isAdmin())
+        If mySettings.UpdateType = AppSettings.UpdateTypes.Ask Then
+          Dim fUpdate As New frmUpdate
+          Select Case e.Result
+            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+              fUpdate.NewUpdate(e.Version, False, Not isAdmin())
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
                   If remoteData IsNot Nothing Then
@@ -1785,10 +1741,10 @@ Public Class frmMain
                     localData = Nothing
                   End If
                   updateChecker.DownloadUpdate(sEXEPath)
-                  mySettings.UpdateType = 1
+                  mySettings.UpdateBETA = False
                   mySettings.Save()
                 Case Windows.Forms.DialogResult.Cancel
-                  mySettings.UpdateType = 1
+                  mySettings.UpdateBETA = False
                   mySettings.Save()
                   If updateChecker IsNot Nothing Then
                     updateChecker.Dispose()
@@ -1802,15 +1758,91 @@ Public Class frmMain
                   End If
                   NextGrabTick = Long.MinValue
               End Select
-            End If
-          Case Else
-            SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
-            If updateChecker IsNot Nothing Then
-              updateChecker.Dispose()
-              updateChecker = Nothing
-            End If
-            NextGrabTick = Long.MinValue
-        End Select
+            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+              If mySettings.UpdateBETA Then
+                fUpdate.NewUpdate(e.Version, True, Not isAdmin())
+                Select Case fUpdate.ShowDialog()
+                  Case Windows.Forms.DialogResult.Yes
+                    If remoteData IsNot Nothing Then
+                      remoteData.Dispose()
+                      remoteData = Nothing
+                    ElseIf localData IsNot Nothing Then
+                      localData.Dispose()
+                      localData = Nothing
+                    End If
+                    updateChecker.DownloadUpdate(sEXEPath)
+                  Case Windows.Forms.DialogResult.No
+                    If updateChecker IsNot Nothing Then
+                      updateChecker.Dispose()
+                      updateChecker = Nothing
+                    End If
+                    NextGrabTick = Long.MinValue
+                  Case Windows.Forms.DialogResult.OK
+                    If remoteData IsNot Nothing Then
+                      remoteData.Dispose()
+                      remoteData = Nothing
+                    ElseIf localData IsNot Nothing Then
+                      localData.Dispose()
+                      localData = Nothing
+                    End If
+                    updateChecker.DownloadUpdate(sEXEPath)
+                    mySettings.UpdateBETA = False
+                    mySettings.Save()
+                  Case Windows.Forms.DialogResult.Cancel
+                    mySettings.UpdateBETA = False
+                    mySettings.Save()
+                    If updateChecker IsNot Nothing Then
+                      updateChecker.Dispose()
+                      updateChecker = Nothing
+                    End If
+                    NextGrabTick = Long.MinValue
+                  Case Else
+                    If updateChecker IsNot Nothing Then
+                      updateChecker.Dispose()
+                      updateChecker = Nothing
+                    End If
+                    NextGrabTick = Long.MinValue
+                End Select
+              End If
+            Case Else
+              SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
+              If updateChecker IsNot Nothing Then
+                updateChecker.Dispose()
+                updateChecker = Nothing
+              End If
+              NextGrabTick = Long.MinValue
+          End Select
+        Else
+          Select Case e.Result
+            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+              If remoteData IsNot Nothing Then
+                remoteData.Dispose()
+                remoteData = Nothing
+              ElseIf localData IsNot Nothing Then
+                localData.Dispose()
+                localData = Nothing
+              End If
+              updateChecker.DownloadUpdate(sEXEPath)
+            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+              If mySettings.UpdateBETA Then
+                If remoteData IsNot Nothing Then
+                  remoteData.Dispose()
+                  remoteData = Nothing
+                ElseIf localData IsNot Nothing Then
+                  localData.Dispose()
+                  localData = Nothing
+                End If
+                updateChecker.DownloadUpdate(sEXEPath)
+              End If
+            Case Else
+              SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
+              If updateChecker IsNot Nothing Then
+                updateChecker.Dispose()
+                updateChecker = Nothing
+              End If
+              NextGrabTick = Long.MinValue
+          End Select
+        End If
       End If
     End If
   End Sub
@@ -1819,10 +1851,10 @@ Public Class frmMain
       Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
     Else
       tmrSpeed.Enabled = True
-      SetStatusText(LOG_GetLast.ToString("g"), "Downloading Software Update...", True)
+      SetStatusText(LOG_GetLast.ToString("g"), "Downloading Software Update...", False)
     End If
   End Sub
-  Private Sub updateChecker_DownloadResult(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles updateChecker.DownloadResult
+  Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
     Else
@@ -1842,7 +1874,7 @@ Public Class frmMain
           updateChecker.Dispose()
           updateChecker = Nothing
         End If
-        SetStatusText(LOG_GetLast.ToString("g"), "Software Update Download Complete", True)
+        SetStatusText(LOG_GetLast.ToString("g"), "Software Update Download Complete", False)
         Application.DoEvents()
         If My.Computer.FileSystem.FileExists(sEXEPath) Then
           Try

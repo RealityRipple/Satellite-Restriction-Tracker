@@ -175,10 +175,11 @@
         txtProxyDomain.Text = String.Empty
       End If
     End If
+    chkUpdateBETA.Checked = mySettings.UpdateBETA
     Select Case mySettings.UpdateType
-      Case 0 : optUpdateNone.Checked = True
-      Case 1 : optUpdateRelease.Checked = True
-      Case 2 : optUpdateBETA.Checked = True
+      Case AppSettings.UpdateTypes.Auto : cmbUpdateAutomation.SelectedIndex = 0
+      Case AppSettings.UpdateTypes.Ask : cmbUpdateAutomation.SelectedIndex = 1
+      Case AppSettings.UpdateTypes.None : cmbUpdateAutomation.SelectedIndex = 2
     End Select
     Select Case mySettings.UpdateTime
       Case 1 : cmbUpdateInterval.SelectedIndex = 0
@@ -509,22 +510,52 @@
     End Select
     cmdSave.Enabled = SettingsChanged()
   End Sub
-  Private Sub optUpdateRelease_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateRelease.CheckedChanged
-    pctNetworkUpdateIcon.Image = My.Resources.net_update_good
-    lblUpdateInterval.Enabled = True
-    cmbUpdateInterval.Enabled = True
-    cmdSave.Enabled = SettingsChanged()
+  Private Sub cmbUpdateAutomation_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbUpdateAutomation.SelectedIndexChanged
+    Select Case cmbUpdateAutomation.SelectedIndex
+      Case 0
+        If chkUpdateBETA.Checked Then
+          pctNetworkUpdateIcon.Image = My.Resources.net_update_unknown
+        Else
+          pctNetworkUpdateIcon.Image = My.Resources.net_update_good
+        End If
+        lblUpdateInterval.Enabled = True
+        cmbUpdateInterval.Enabled = True
+        chkUpdateBETA.Enabled = True
+        cmdSave.Enabled = SettingsChanged()
+      Case 1
+        If chkUpdateBETA.Checked Then
+          pctNetworkUpdateIcon.Image = My.Resources.net_update_unknown
+        Else
+          pctNetworkUpdateIcon.Image = My.Resources.net_update_warn
+        End If
+        lblUpdateInterval.Enabled = True
+        cmbUpdateInterval.Enabled = True
+        chkUpdateBETA.Enabled = True
+        cmdSave.Enabled = SettingsChanged()
+      Case 2
+        pctNetworkUpdateIcon.Image = My.Resources.net_update_bad
+        lblUpdateInterval.Enabled = False
+        cmbUpdateInterval.Enabled = False
+        chkUpdateBETA.Enabled = False
+        cmdSave.Enabled = SettingsChanged()
+      Case Else
+        pctNetworkUpdateIcon.Image = My.Resources.net_update_unknown
+        lblUpdateInterval.Enabled = False
+        cmbUpdateInterval.Enabled = False
+        chkUpdateBETA.Enabled = False
+        cmdSave.Enabled = SettingsChanged()
+    End Select
   End Sub
-  Private Sub optUpdateBETA_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateBETA.CheckedChanged
-    pctNetworkUpdateIcon.Image = My.Resources.net_update_warn
-    lblUpdateInterval.Enabled = True
-    cmbUpdateInterval.Enabled = True
-    cmdSave.Enabled = SettingsChanged()
-  End Sub
-  Private Sub optUpdateNone_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optUpdateNone.CheckedChanged
-    pctNetworkUpdateIcon.Image = My.Resources.net_update_bad
-    lblUpdateInterval.Enabled = False
-    cmbUpdateInterval.Enabled = False
+  Private Sub chkUpdateBETA_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkUpdateBETA.CheckedChanged
+    If chkUpdateBETA.Checked Then
+      pctNetworkUpdateIcon.Image = My.Resources.net_update_unknown
+    Else
+      If cmbUpdateAutomation.SelectedIndex = 0 Then
+        pctNetworkUpdateIcon.Image = My.Resources.net_update_good
+      ElseIf cmbUpdateAutomation.SelectedIndex = 1 Then
+        pctNetworkUpdateIcon.Image = My.Resources.net_update_warn
+      End If
+    End If
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub optHistoryProgramData_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optHistoryProgramData.CheckedChanged
@@ -1010,13 +1041,12 @@
       mySettings.Overuse = 0
     End If
     mySettings.Overtime = txtOverTime.Value
-    If optUpdateBETA.Checked Then
-      mySettings.UpdateType = 2
-    ElseIf optUpdateRelease.Checked Then
-      mySettings.UpdateType = 1
-    ElseIf optUpdateNone.Checked Then
-      mySettings.UpdateType = 0
-    End If
+    mySettings.UpdateBETA = chkUpdateBETA.Checked
+    Select Case cmbUpdateAutomation.SelectedIndex
+      Case 0 : mySettings.UpdateType = AppSettings.UpdateTypes.Auto
+      Case 1 : mySettings.UpdateType = AppSettings.UpdateTypes.Ask
+      Case 2 : mySettings.UpdateType = AppSettings.UpdateTypes.None
+    End Select
     Select Case cmbUpdateInterval.SelectedIndex
       Case 0 : mySettings.UpdateTime = 1
       Case 1 : mySettings.UpdateTime = 3
@@ -1110,9 +1140,12 @@
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
-    If optUpdateNone.Checked And Not mySettings.UpdateType = 0 Then Return True
-    If optUpdateRelease.Checked And Not mySettings.UpdateType = 1 Then Return True
-    If optUpdateBETA.Checked And Not mySettings.UpdateType = 2 Then Return True
+    If Not mySettings.UpdateBETA = chkUpdateBETA.Checked Then Return True
+    Select Case cmbUpdateAutomation.SelectedIndex
+      Case 0 : If Not mySettings.UpdateType = AppSettings.UpdateTypes.Auto Then Return True
+      Case 1 : If Not mySettings.UpdateType = AppSettings.UpdateTypes.Ask Then Return True
+      Case 2 : If Not mySettings.UpdateType = AppSettings.UpdateTypes.None Then Return True
+    End Select
     Select Case cmbUpdateInterval.SelectedIndex
       Case 0 : If Not mySettings.UpdateTime = 1 Then Return True
       Case 1 : If Not mySettings.UpdateTime = 3 Then Return True

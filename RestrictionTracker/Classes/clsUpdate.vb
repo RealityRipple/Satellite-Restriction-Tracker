@@ -26,15 +26,33 @@
       Version = sVersion
       Result = rtResult
     End Sub
+    Friend Sub New(rtResult As ResultType, sVersion As String, e As System.ComponentModel.AsyncCompletedEventArgs)
+      MyBase.New(e.Error, e.Cancelled, e.UserState)
+      Version = sVersion
+      Result = rtResult
+    End Sub
+  End Class
+  Class DownloadEventArgs
+    Inherits System.ComponentModel.AsyncCompletedEventArgs
+    Public Version As String
+    Friend Sub New(sVersion As String, [error] As Exception, [cancelled] As Boolean, [userState] As Object)
+      MyBase.New([error], [cancelled], [userState])
+      Version = sVersion
+    End Sub
+    Friend Sub New(sVersion As String, e As System.ComponentModel.AsyncCompletedEventArgs)
+      MyBase.New(e.Error, e.Cancelled, e.UserState)
+      Version = sVersion
+    End Sub
   End Class
   Public Event CheckingVersion(sender As Object, e As EventArgs)
   Public Event CheckProgressChanged(sender As Object, e As ProgressEventArgs)
   Public Event CheckResult(sender As Object, e As CheckEventArgs)
   Public Event DownloadingUpdate(sender As Object, e As EventArgs)
   Public Event UpdateProgressChanged(sender As Object, e As ProgressEventArgs)
-  Public Event DownloadResult(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs)
+  Public Event DownloadResult(sender As Object, e As DownloadEventArgs)
   Private WithEvents wsVer As New CookieAwareWebClient()
   Private DownloadURL As String
+  Private VerNumber As String
 #Region "IDisposable Support"
   Private disposedValue As Boolean
   Protected Overridable Sub Dispose(disposing As Boolean)
@@ -100,7 +118,7 @@
         If CompareVersions(sVMU(0)) Then
           mySettings = Nothing
           Return CheckEventArgs.ResultType.NewUpdate
-        ElseIf mySettings.UpdateType = 2 And Not String.IsNullOrEmpty(sVL(1)) Then
+        ElseIf mySettings.UpdateBETA And Not String.IsNullOrEmpty(sVL(1)) Then
           Dim sVBU() As String = sVL(1).Split("|"c)
           If CompareVersions(sVBU(0)) Then
             mySettings = Nothing
@@ -130,8 +148,8 @@
   End Sub
   Private Sub wsVer_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsVer.DownloadStringCompleted
     Dim rRet As CheckEventArgs.ResultType = CheckEventArgs.ResultType.NoUpdate
-    Dim sVer As String = Nothing
     DownloadURL = Nothing
+    VerNumber = Nothing
     If e.Error Is Nothing Then
       Try
         Dim sVerStr As String = e.Result
@@ -148,7 +166,7 @@
           If CompareVersions(sVU(0)) Then
             rRet = CheckEventArgs.ResultType.NewUpdate
             DownloadURL = sVU(1)
-            sVer = sVU(0)
+            VerNumber = sVU(0)
           End If
         Else
           Dim sVL() As String = Split(sVerStr, sSplit, 2)
@@ -158,28 +176,29 @@
             If CompareVersions(sVMU(0)) Then
               rRet = CheckEventArgs.ResultType.NewUpdate
               DownloadURL = sVMU(1)
-              sVer = sVMU(0)
-            ElseIf mySettings.UpdateType = 2 And Not String.IsNullOrEmpty(sVL(1)) Then
+              VerNumber = sVMU(0)
+            ElseIf mySettings.UpdateBETA And Not String.IsNullOrEmpty(sVL(1)) Then
               Dim sVBU() As String = sVL(1).Split("|"c)
               If CompareVersions(sVBU(0)) Then
                 rRet = CheckEventArgs.ResultType.NewBeta
                 DownloadURL = sVBU(1)
-                sVer = sVBU(0)
+                VerNumber = sVBU(0)
               End If
             End If
             mySettings = Nothing
           Else
-            RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, sVer, New Exception("Version Reading Error", New Exception("Empty Version String")), e.Cancelled, e.UserState))
+            RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Reading Error", New Exception("Empty Version String")), e.Cancelled, e.UserState))
             Exit Sub
           End If
         End If
       Catch ex As Exception
-        RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, sVer, New Exception("Version Parsing Error", ex), e.Cancelled, e.UserState))
+        RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Parsing Error", ex), e.Cancelled, e.UserState))
+        Exit Sub
       End Try
     End If
-    RaiseEvent CheckResult(sender, New CheckEventArgs(rRet, sVer, e.Error, e.Cancelled, e.UserState))
+    RaiseEvent CheckResult(sender, New CheckEventArgs(rRet, VerNumber, e))
   End Sub
   Private Sub wsVer_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsVer.DownloadFileCompleted
-    RaiseEvent DownloadResult(sender, e)
+    RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, e))
   End Sub
 End Class

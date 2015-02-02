@@ -244,38 +244,16 @@
         lblUpdate.Link = False
         tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
       Else
-        Dim fUpdate As New frmUpdate
-        fUpdate.TopMost = Me.TopMost
         Dim mySettings As New AppSettings
-        Select Case e.Result
-          Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-            SetUpdateValue("New Update Available", , "Click to begin download.")
-            lblUpdate.Link = True
-            Application.DoEvents()
-            fUpdate.NewUpdate(e.Version, False, False)
-            Select Case fUpdate.ShowDialog()
-              Case Windows.Forms.DialogResult.Yes
-                lblUpdate.Link = False
-                updateChecker.DownloadUpdate(sEXEPath)
-              Case Windows.Forms.DialogResult.No
-
-              Case Windows.Forms.DialogResult.OK
-                lblUpdate.Link = False
-                updateChecker.DownloadUpdate(sEXEPath)
-                mySettings.UpdateType = 1
-                mySettings.Save()
-              Case Windows.Forms.DialogResult.Cancel
-                mySettings.UpdateType = 1
-                mySettings.Save()
-              Case Else
-
-            End Select
-          Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-            If mySettings.UpdateType = 2 Then
-              SetUpdateValue("New BETA Available", , "Click to begin download.")
+        If mySettings.UpdateType = AppSettings.UpdateTypes.Ask Then
+          Dim fUpdate As New frmUpdate
+          fUpdate.TopMost = Me.TopMost
+          Select Case e.Result
+            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+              SetUpdateValue("New Update Available", , "Click to begin download.")
               lblUpdate.Link = True
               Application.DoEvents()
-              fUpdate.NewUpdate(e.Version, True, False)
+              fUpdate.NewUpdate(e.Version, False, False)
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
                   lblUpdate.Link = False
@@ -285,26 +263,73 @@
                 Case Windows.Forms.DialogResult.OK
                   lblUpdate.Link = False
                   updateChecker.DownloadUpdate(sEXEPath)
-                  mySettings.UpdateType = 1
+                  mySettings.UpdateBETA = False
                   mySettings.Save()
                 Case Windows.Forms.DialogResult.Cancel
-                  mySettings.UpdateType = 1
+                  mySettings.UpdateBETA = False
                   mySettings.Save()
-                  SetUpdateValue("No New Updates")
-                  lblUpdate.Link = False
                 Case Else
 
               End Select
-            Else
+            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+              If mySettings.UpdateBETA Then
+                SetUpdateValue("New BETA Available", , "Click to begin download.")
+                lblUpdate.Link = True
+                Application.DoEvents()
+                fUpdate.NewUpdate(e.Version, True, False)
+                Select Case fUpdate.ShowDialog()
+                  Case Windows.Forms.DialogResult.Yes
+                    lblUpdate.Link = False
+                    updateChecker.DownloadUpdate(sEXEPath)
+                  Case Windows.Forms.DialogResult.No
+
+                  Case Windows.Forms.DialogResult.OK
+                    lblUpdate.Link = False
+                    updateChecker.DownloadUpdate(sEXEPath)
+                    mySettings.UpdateBETA = False
+                    mySettings.Save()
+                  Case Windows.Forms.DialogResult.Cancel
+                    mySettings.UpdateBETA = False
+                    mySettings.Save()
+                    SetUpdateValue("No New Updates")
+                    lblUpdate.Link = False
+                  Case Else
+
+                End Select
+              Else
+                SetUpdateValue("No New Updates")
+                lblUpdate.Link = False
+                tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+              End If
+            Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
               SetUpdateValue("No New Updates")
               lblUpdate.Link = False
               tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-            End If
-          Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
-            SetUpdateValue("No New Updates")
-            lblUpdate.Link = False
-            tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-        End Select
+          End Select
+        Else
+          Select Case e.Result
+            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+              SetUpdateValue("New Update Available")
+              lblUpdate.Link = False
+              Application.DoEvents()
+              updateChecker.DownloadUpdate(sEXEPath)
+            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+              If mySettings.UpdateBETA Then
+                SetUpdateValue("New BETA Available")
+                lblUpdate.Link = False
+                Application.DoEvents()
+                updateChecker.DownloadUpdate(sEXEPath)
+              Else
+                SetUpdateValue("No New Updates")
+                lblUpdate.Link = False
+                tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+              End If
+            Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
+              SetUpdateValue("No New Updates")
+              lblUpdate.Link = False
+              tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+          End Select
+        End If
         mySettings = Nothing
       End If
     End If
@@ -318,7 +343,7 @@
       lblUpdate.Link = False
     End If
   End Sub
-  Private Sub updateChecker_DownloadResult(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles updateChecker.DownloadResult
+  Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
     Else

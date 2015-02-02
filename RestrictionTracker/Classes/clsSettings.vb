@@ -162,7 +162,8 @@ Class AppSettings
   Private m_Ago As UInteger
   Private m_Service As Boolean
   Private m_HistoryDir As String
-  Private m_UpdateType As Byte
+  Private m_UpdateBETA As Boolean
+  Private m_UpdateType As UpdateTypes
   Private m_UpdateTime As Byte
   Private m_ScaleScreen As Boolean
   Private m_MainSize As Size
@@ -178,6 +179,11 @@ Class AppSettings
   Private m_Protocol As Net.SecurityProtocolType
   Public Loaded As Boolean
   Public Colors As AppColors
+  Enum UpdateTypes
+    Auto = 1
+    Ask
+    None
+  End Enum
   Private ReadOnly Property ConfigFile As String
     Get
       Return AppData & "\user.config"
@@ -337,32 +343,34 @@ Class AppSettings
           m_HistoryDir = Nothing
         End Try
       End If
+      Dim xUpdateBETA As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateBETA")
+      If xUpdateBETA Is Nothing Then
+        m_UpdateBETA = False
+      Else
+        Try
+          m_UpdateBETA = xUpdateBETA.Element("value").Value = "True"
+        Catch ex As Exception
+          m_UpdateBETA = False
+        End Try
+      End If
       Dim xUpdateType As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateType")
       If xUpdateType Is Nothing Then
-        Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
-        If xBetaCheck Is Nothing Then
-          m_UpdateType = 1
-        Else
-          Try
-            m_UpdateType = IIf(xBetaCheck.Element("value").Value = "True", 2, 1)
-          Catch ex As Exception
-            m_UpdateType = 1
-          End Try
-        End If
+        m_UpdateType = UpdateTypes.Ask
       Else
         Try
           Dim sUpdateType As String = xUpdateType.Element("value").Value
           If sUpdateType = "BETA" Then
-            m_UpdateType = 2
-          ElseIf sUpdateType = "Release" Then
-            m_UpdateType = 1
+            m_UpdateBETA = True
+            m_UpdateType = UpdateTypes.Ask
+          ElseIf sUpdateType = "Auto" Then
+            m_UpdateType = UpdateTypes.Auto
           ElseIf sUpdateType = "None" Then
-            m_UpdateType = 0
+            m_UpdateType = UpdateTypes.None
           Else
-            m_UpdateType = 1
+            m_UpdateType = UpdateTypes.Ask
           End If
         Catch ex As Exception
-          m_UpdateType = 1
+          m_UpdateType = UpdateTypes.Ask
         End Try
       End If
       Dim xUpdateTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateTime")
@@ -842,7 +850,8 @@ Class AppSettings
     m_Ago = 30
     m_Service = False
     m_HistoryDir = Nothing
-    m_UpdateType = 1
+    m_UpdateBETA = False
+    m_UpdateType = UpdateTypes.Ask
     m_UpdateTime = 15
     m_ScaleScreen = False
     m_MainSize = New Size(450, 200)
@@ -896,12 +905,12 @@ Class AppSettings
   End Sub
   Public Sub Save()
     Dim sAccountType As String = HostTypeToString(m_AccountType)
-    Dim sUpdateType As String = "Release"
-    If m_UpdateType = 0 Then
-      sUpdateType = "None"
-    ElseIf m_UpdateType = 2 Then
-      sUpdateType = "BETA"
-    End If
+    Dim sUpdateType As String = "Ask"
+    Select Case m_UpdateType
+      Case UpdateTypes.Auto : sUpdateType = "Auto"
+      Case UpdateTypes.Ask : sUpdateType = "Ask"
+      Case UpdateTypes.None : sUpdateType = "None"
+    End Select
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
@@ -916,6 +925,7 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Ago"), New XElement("value", m_Ago)),
                                                           New XElement("setting", New XAttribute("name", "Service"), New XElement("value", IIf(m_Service, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "HistoryDir"), New XElement("value", m_HistoryDir)),
+                                                          New XElement("setting", New XAttribute("name", "UpdateBETA"), New XElement("value", IIf(m_UpdateBETA, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "UpdateType"), New XElement("value", sUpdateType)),
                                                           New XElement("setting", New XAttribute("name", "UpdateTime"), New XElement("value", m_UpdateTime)),
                                                           New XElement("setting", New XAttribute("name", "ScaleScreen"), New XElement("value", IIf(m_ScaleScreen, "True", "False"))),
@@ -1165,11 +1175,19 @@ Class AppSettings
       m_HistoryDir = value
     End Set
   End Property
-  Public Property UpdateType As Byte
+  Public Property UpdateBETA As Boolean
+    Get
+      Return m_UpdateBETA
+    End Get
+    Set(value As Boolean)
+      m_UpdateBETA = value
+    End Set
+  End Property
+  Public Property UpdateType As UpdateTypes
     Get
       Return m_UpdateType
     End Get
-    Set(value As Byte)
+    Set(value As UpdateTypes)
       m_UpdateType = value
     End Set
   End Property
