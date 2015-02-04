@@ -187,18 +187,18 @@ Module modFunctions
     End Function
   End Class
   Public Function LoadAlertStyle(Path As String) As NotifierStyle
-    If My.Computer.FileSystem.FileExists(AppData & "\" & Path & ".tgz") Then
-      Path = AppData & "\" & Path & ".tgz"
-    ElseIf My.Computer.FileSystem.FileExists(AppData & "\" & Path & ".tar.gz") Then
-      Path = AppData & "\" & Path & ".tar.gz"
-    ElseIf My.Computer.FileSystem.FileExists(AppData & "\" & Path & ".tar") Then
-      Path = AppData & "\" & Path & ".tar"
+    If My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tgz") Then
+      Path = AppDataPath & Path & ".tgz"
+    ElseIf My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tar.gz") Then
+      Path = AppDataPath & Path & ".tar.gz"
+    ElseIf My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tar") Then
+      Path = AppDataPath & Path & ".tar"
     Else
       Return New NotifierStyle
     End If
     Try
-      Dim TempAlertDir As String = AppData & "\notifier\"
-      Dim TempAlertTAR As String = AppData & "\notifier.tar"
+      Dim TempAlertDir As String = AppData & "notifier\"
+      Dim TempAlertTAR As String = AppData & "notifier.tar"
       If Path.EndsWith(".tar") Then
         ExtractTar(Path, TempAlertDir)
       Else
@@ -350,10 +350,8 @@ Module modFunctions
   End Sub
   Public Sub PlaySong()
     If Song Is Nothing Then
-      If Not My.Computer.FileSystem.DirectoryExists(IO.Path.GetDirectoryName(AppData)) Then My.Computer.FileSystem.CreateDirectory(IO.Path.GetDirectoryName(AppData))
-      If Not My.Computer.FileSystem.DirectoryExists(AppData) Then My.Computer.FileSystem.CreateDirectory(AppData)
-      My.Computer.FileSystem.WriteAllBytes(AppData & "\Song.mid", My.Resources.Song, False)
-      Song = New MCIPlayer(AppData & "\Song.mid")
+      My.Computer.FileSystem.WriteAllBytes(AppData & "Song.mid", My.Resources.Song, False)
+      Song = New MCIPlayer(AppData & "Song.mid")
       Song.Play()
     End If
   End Sub
@@ -365,9 +363,9 @@ Module modFunctions
       Song.Dispose()
       Song = Nothing
     End If
-    If My.Computer.FileSystem.FileExists(AppData & "\Song.mid") Then
+    If My.Computer.FileSystem.FileExists(AppDataPath & "Song.mid") Then
       Try
-        My.Computer.FileSystem.DeleteFile(AppData & "\Song.mid")
+        My.Computer.FileSystem.DeleteFile(AppData & "Song.mid")
       Catch ex As Exception
       End Try
     End If
@@ -380,12 +378,10 @@ Module modFunctions
   Public ReadOnly Property AppData As String
     Get
       Static sTmp As String
-      If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
+      If Application.StartupPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
         If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
         If Not My.Computer.FileSystem.DirectoryExists(AppDataPath) Then My.Computer.FileSystem.CreateDirectory(AppDataPath)
-        If String.IsNullOrEmpty(sTmp) Then
-          sTmp = AppDataPath
-        End If
+        If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataPath
       Else
         If String.IsNullOrEmpty(sTmp) Then
           sTmp = Application.StartupPath & "\Config\"
@@ -396,39 +392,33 @@ Module modFunctions
   End Property
   Public ReadOnly Property AppDataAllPath As String
     Get
-      Return IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData) & "\"
+      Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName & "\"
     End Get
   End Property
   Public ReadOnly Property AppDataAll As String
     Get
       Static sTmp As String
       Static OneAlert As Boolean
-      If String.IsNullOrEmpty(sTmp) Then
-        sTmp = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
-        Try
-          My.Computer.FileSystem.DeleteDirectory(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, FileIO.DeleteDirectoryOption.DeleteAllContents)
-        Catch ex As Exception
+      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName)
+      If Not My.Computer.FileSystem.DirectoryExists(AppDataAllPath) Then My.Computer.FileSystem.CreateDirectory(AppDataAllPath)
+      If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataAllPath
 
-        End Try
-        Dim AppDataDir As String = IO.Path.GetDirectoryName(sTmp)
-        Dim ADDOK As Boolean = GrantFullControlToEveryone(AppDataDir)
-        Dim ADOK As Boolean = GrantFullControlToEveryone(sTmp)
-        If ADOK And ADDOK Then
+      Dim AppDataDir As String = IO.Path.GetDirectoryName(sTmp)
+      Dim ADDOK As Boolean = GrantFullControlToEveryone(AppDataDir)
+      Dim ADOK As Boolean = GrantFullControlToEveryone(sTmp)
+      If ADOK And ADDOK Then
 
-        ElseIf ADOK Then
+      ElseIf ADOK Then
 
-        ElseIf ADDOK Then
-
-          If Not OneAlert Then
-            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-            OneAlert = True
-          End If
-        Else
-
-          If Not OneAlert Then
-            MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-            OneAlert = True
-          End If
+      ElseIf ADDOK Then
+        If Not OneAlert Then
+          MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          OneAlert = True
+        End If
+      Else
+        If Not OneAlert Then
+          MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          OneAlert = True
         End If
       End If
       Return sTmp
@@ -436,36 +426,38 @@ Module modFunctions
   End Property
   Public ReadOnly Property UpdateParam As String
     Get
-      If AppData = Application.StartupPath & "\Config\" Then
+      If AppDataPath = Application.StartupPath & "\Config\" Then
         Return "/silent /dir=""" & Application.StartupPath & """ /type=portable"
       Else
         Return "/silent"
       End If
     End Get
   End Property
-  Public ReadOnly Property MySaveDir As String
+  Public ReadOnly Property MySaveDir(Optional Create As Boolean = False) As String
     Get
       Dim mySettings As New AppSettings
       If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
         If String.IsNullOrEmpty(mySettings.HistoryDir) Then
-          If My.Computer.FileSystem.DirectoryExists(AppData) Then
-            If Array.Exists(My.Computer.FileSystem.GetFiles(AppData).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
-              mySettings.HistoryDir = AppData
+          If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
+            If Array.Exists(My.Computer.FileSystem.GetFiles(AppDataPath).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
+              mySettings.HistoryDir = IIf(Create, AppData, AppDataPath)
             Else
-              mySettings.HistoryDir = AppDataAll
+              mySettings.HistoryDir = IIf(Create, AppDataAll, AppDataAllPath)
             End If
           Else
-            mySettings.HistoryDir = AppDataAll
+            mySettings.HistoryDir = IIf(Create, AppDataAll, AppDataAllPath)
           End If
         End If
       Else
         mySettings.HistoryDir = Application.StartupPath & "\Config\"
       End If
-      Try
-        If Not My.Computer.FileSystem.DirectoryExists(mySettings.HistoryDir) Then My.Computer.FileSystem.CreateDirectory(mySettings.HistoryDir)
-      Catch ex As Exception
-        Return AppDataAll
-      End Try
+      If Create Then
+        Try
+          If Not My.Computer.FileSystem.DirectoryExists(mySettings.HistoryDir) Then My.Computer.FileSystem.CreateDirectory(mySettings.HistoryDir)
+        Catch ex As Exception
+          Return AppDataAll
+        End Try
+      End If
       Return mySettings.HistoryDir
     End Get
   End Property

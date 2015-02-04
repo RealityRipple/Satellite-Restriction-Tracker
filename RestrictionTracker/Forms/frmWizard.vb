@@ -585,7 +585,7 @@ Public Class frmWizard
     If Me.InvokeRequired Then
       Me.BeginInvoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
     Else
-      If IO.File.Exists(AppData & "\user.config") Then IO.File.Delete(AppData & "\user.config")
+      If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
       AccountType = acct
       DrawStatus(False)
       tbsWizardPages.SelectedIndex += 1
@@ -599,7 +599,7 @@ Public Class frmWizard
     If Me.InvokeRequired Then
       Me.BeginInvoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
     Else
-      If IO.File.Exists(AppData & "\user.config") Then IO.File.Delete(AppData & "\user.config")
+      If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
       AccountType = SatHostTypes.Other
       Select Case e.Type
         Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout

@@ -32,7 +32,7 @@ Public Class frmMain
   Private sDisp_TT_M = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
-  Private sEXEPath As String = AppData & "\Setup.exe"
+  Private sEXEPath As String = AppDataPath & "Setup.exe"
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
   Private imSlowed As Boolean
@@ -399,7 +399,7 @@ Public Class frmMain
       cSave.Interval = mySettings.Interval
       cSave.Save()
     End If
-    If My.Computer.FileSystem.FileExists(AppData & "\del.bat") Then My.Computer.FileSystem.DeleteFile(AppData & "\del.bat")
+    If My.Computer.FileSystem.FileExists(AppDataPath & "del.bat") Then My.Computer.FileSystem.DeleteFile(AppDataPath & "del.bat")
     Select Case e.CloseReason
       Case CloseReason.WindowsShutDown
       Case CloseReason.ApplicationExitCall
@@ -441,7 +441,7 @@ Public Class frmMain
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
     Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
-    If AppData = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
@@ -1449,7 +1449,7 @@ Public Class frmMain
         sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
-          If AppData = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+          If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
           frmHistory.DoResize(True)
         End If
       Case Windows.Forms.DialogResult.Abort
@@ -1522,7 +1522,7 @@ Public Class frmMain
       sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
-        If AppData = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+        If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
         frmHistory.DoResize(True)
       End If
     End If
@@ -1919,7 +1919,7 @@ Public Class frmMain
       sStatus = "Downloading Update (Waiting for Response)..."
       sProgress = "(Waiting for Response)"
     End If
-    SetStatusText("Downloading Update " & sProgress, sStatus, True)
+    SetStatusText("Downloading Update " & sProgress, sStatus, False)
   End Sub
 #End Region
 #Region "Useful Functions"

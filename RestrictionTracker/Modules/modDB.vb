@@ -59,20 +59,20 @@
   End Function
   Public Sub LOG_Initialize(sAccount As String, withDisplay As Boolean)
     isLoaded = False
-    sFile = MySaveDir & "\History-" & sAccount & ".wb"
-    If Not My.Computer.FileSystem.FileExists(sFile) Then sFile = MySaveDir & "\History-" & sAccount & ".xml"
+    sFile = MySaveDir(True) & "\History-" & sAccount & ".wb"
+    If Not My.Computer.FileSystem.FileExists(sFile) Then sFile = MySaveDir(True) & "\History-" & sAccount & ".xml"
     If My.Computer.FileSystem.FileExists(sFile) Then
       usageDB = New DataBase(sFile, withDisplay)
       usageDB.StartNew()
-      If sFile = MySaveDir & "\History-" & sAccount & ".xml" Then
-        sFile = MySaveDir & "\History-" & sAccount & ".wb"
+      If sFile = MySaveDir(True) & "\History-" & sAccount & ".xml" Then
+        sFile = MySaveDir(True) & "\History-" & sAccount & ".wb"
         usageDB.Save(sFile, withDisplay)
-        If InUseChecker(MySaveDir & "\History-" & sAccount & ".xml", IO.FileAccess.Write) Then
-          My.Computer.FileSystem.DeleteFile(MySaveDir & "\History-" & sAccount & ".xml")
+        If InUseChecker(MySaveDir(True) & "\History-" & sAccount & ".xml", IO.FileAccess.Write) Then
+          My.Computer.FileSystem.DeleteFile(MySaveDir(True) & "\History-" & sAccount & ".xml")
         End If
       End If
     Else
-      If sFile = MySaveDir & "\History-" & sAccount & ".xml" Then sFile = MySaveDir & "\History-" & sAccount & ".wb"
+      If sFile = MySaveDir(True) & "\History-" & sAccount & ".xml" Then sFile = MySaveDir(True) & "\History-" & sAccount & ".wb"
     End If
     isLoaded = True
   End Sub

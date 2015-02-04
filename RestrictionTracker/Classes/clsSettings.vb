@@ -179,19 +179,19 @@ Class AppSettings
   Private m_Protocol As Net.SecurityProtocolType
   Public Loaded As Boolean
   Public Colors As AppColors
-  Enum UpdateTypes
+  Public Enum UpdateTypes
     Auto = 1
     Ask
     None
   End Enum
   Private ReadOnly Property ConfigFile As String
     Get
-      Return AppData & "\user.config"
+      Return AppData & "user.config"
     End Get
   End Property
   Private ReadOnly Property ConfigFileBackup As String
     Get
-      Return AppData & "\backup.config"
+      Return AppData & "backup.config"
     End Get
   End Property
   Public Sub New()

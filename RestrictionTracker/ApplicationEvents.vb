@@ -54,7 +54,7 @@
           cSave.Interval = cSettings.Interval
           cSave.Save()
         Else
-          If My.Computer.FileSystem.FileExists(AppDataAll & "\user.config") Then My.Computer.FileSystem.DeleteFile(AppDataAll & "\user.config")
+          If My.Computer.FileSystem.FileExists(AppDataAllPath & "\user.config") Then My.Computer.FileSystem.DeleteFile(AppDataAllPath & "\user.config")
         End If
       End If
       Dim sOldStartup As String = Nothing

@@ -12,7 +12,7 @@
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
-    If AppData = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     RepadAllItems(Me)
     Dim sAccount As String = mySettings.Account
     Dim sUsername, sProvider As String
@@ -93,7 +93,7 @@
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     DoCheck()
     Dim DisableHistory As Boolean = False
-    Dim aD As String = AppData
+    Dim aD As String = AppDataPath
     If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
     Dim hD As String = mySettings.HistoryDir
     If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
@@ -119,7 +119,7 @@
       optHistoryCustom.Checked = True
     End If
     txtHistoryDir.Text = mySettings.HistoryDir
-    If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir
+    If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
     optHistoryAppData.Enabled = Not DisableHistory
     optHistoryProgramData.Enabled = Not DisableHistory
     optHistoryCustom.Enabled = Not DisableHistory
@@ -437,7 +437,7 @@
   Private Sub chkService_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkService.CheckedChanged
     If chkService.Checked Then
       txtHistoryDir.Tag = txtHistoryDir.Text
-      txtHistoryDir.Text = AppDataAll
+      txtHistoryDir.Text = AppDataAllPath
     ElseIf Not String.IsNullOrEmpty(txtHistoryDir.Tag) Then
       txtHistoryDir.Text = txtHistoryDir.Tag
       txtHistoryDir.Tag = Nothing
@@ -774,11 +774,23 @@
   End Sub
   Private Sub cmdHistoryDirOpen_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistoryDirOpen.Click
     If optHistoryProgramData.Checked Then
-      Process.Start(AppDataAllPath)
+      If My.Computer.FileSystem.DirectoryExists(AppDataAllPath) Then
+        Process.Start(AppDataAllPath)
+      Else
+        MessageBox.Show("The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      End If
     ElseIf optHistoryAppData.Checked Then
-      Process.Start(AppDataPath)
+      If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
+        Process.Start(AppDataPath)
+      Else
+        MessageBox.Show("The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      End If
     Else
-      Process.Start(txtHistoryDir.Text)
+      If My.Computer.FileSystem.DirectoryExists(txtHistoryDir.Text) Then
+        Process.Start(txtHistoryDir.Text)
+      Else
+        MessageBox.Show("The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      End If
     End If
   End Sub
   Private Sub cmdMakePortable_Click(sender As System.Object, e As System.EventArgs) Handles cmdMakePortable.Click
@@ -816,14 +828,14 @@
         End If
       Next
       If Not AppDataPath = MySaveDir Then
-        For Each file In New IO.DirectoryInfo(MySaveDir).EnumerateFiles
+        For Each file In New IO.DirectoryInfo(MySaveDir(True)).EnumerateFiles
           file.CopyTo(sPath & "Config\" & file.Name, True)
         Next
       End If
-      MsgBox(Application.ProductName & " has been ported to """ & sPath & """!", MsgBoxStyle.Information, "Files Copied!")
+      MessageBox.Show(Application.ProductName & " has been ported to """ & sPath & """!", "Files Copied!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
     Catch ex As Exception
       txtPortableDir.Focus()
-      MsgBox("There was an error trying to create a portable install in """ & sPath & """!" & vbNewLine & ex.Message, MsgBoxStyle.Critical, "Drive Error")
+      MessageBox.Show("There was an error trying to create a portable install in """ & sPath & """!" & vbNewLine & ex.Message, "Drive Error", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       Exit Sub
     End Try
   End Sub
@@ -865,9 +877,7 @@
       cmbProvider.Focus()
       Exit Sub
     End If
-    If String.IsNullOrEmpty(txtHistoryDir.Text) Then
-      txtHistoryDir.Text = MySaveDir
-    End If
+    If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
     For Each c As Char In IO.Path.GetInvalidPathChars
       If txtHistoryDir.Text.Contains(c) Then
         MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
@@ -931,7 +941,7 @@
     mySettings.Interval = txtInterval.Value
     mySettings.Accuracy = txtAccuracy.Value
     mySettings.Timeout = txtTimeout.Value
-    If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir
+    If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir(True)
     mySettings.Service = chkService.Checked
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
       Dim sOldFiles() As String = My.Computer.FileSystem.GetFiles(mySettings.HistoryDir).ToArray
@@ -975,7 +985,7 @@
                 Catch ex As Exception
                   sNoMove.Add(sFile & ": " & ex.Message)
                 End Try
-                If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
+                If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
               If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
               If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
@@ -992,7 +1002,7 @@
                 Catch ex As Exception
                   sNoMove.Add(sFile & ": " & ex.Message)
                 End Try
-                If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
+                If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
               If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
               If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
@@ -1009,7 +1019,7 @@
               Catch ex As Exception
                 sNoMove.Add(sFile & ": " & ex.Message)
               End Try
-              If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
+              If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
             If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
@@ -1026,7 +1036,7 @@
             Catch ex As Exception
               sNoMove.Add(sFile & ": " & ex.Message)
             End Try
-            If txtHistoryDir.Text = AppDataAll Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
+            If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
           If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
@@ -1190,7 +1200,7 @@
   End Function
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
-      If AppData = Application.StartupPath & "\Config\" Then
+      If AppDataPath = Application.StartupPath & "\Config\" Then
         ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & Application.ProductName & ".")
         txtInterval.Minimum = 15
         chkService.Enabled = False

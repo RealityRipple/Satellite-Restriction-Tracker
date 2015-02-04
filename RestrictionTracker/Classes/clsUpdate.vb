@@ -136,7 +136,7 @@
       wsVer.DownloadFileAsync(New Uri(DownloadURL), toLocation, "FILE")
       RaiseEvent DownloadingUpdate(Me, New EventArgs)
     Else
-      RaiseEvent DownloadResult(Me, New System.ComponentModel.AsyncCompletedEventArgs(New Exception("Version Check was not run."), True, Nothing))
+      RaiseEvent DownloadResult(Me, New DownloadEventArgs(Nothing, New Exception("Version Check was not run."), True, Nothing))
     End If
   End Sub
   Private Sub wsVer_DownloadProgressChanged(sender As Object, e As System.Net.DownloadProgressChangedEventArgs) Handles wsVer.DownloadProgressChanged

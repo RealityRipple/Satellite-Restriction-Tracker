@@ -1,5 +1,5 @@
 ﻿Public NotInheritable Class frmAbout
-  Private sEXEPath As String = AppData & "\Setup.exe"
+  Private sEXEPath As String = AppData & "Setup.exe"
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
   Private tReset As Threading.Timer
