@@ -371,7 +371,7 @@
   End Sub
   Private Sub ContinueLoginExede(sUID As String, sPass As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://myexede.force.com/login?startURL=%2Fdashboard"
+    Dim uriString As String = "https://my.exede.net/login"
     Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     myUID = sUID
     myPass = sPass
@@ -1044,11 +1044,11 @@
     End If
   End Sub
   Private Sub EX_Download_Homepage(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "myexede.force.com" Then
+    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
       sErrMsg = "Authentication Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath = "/secur/frontdoor.jsp" Then
-      Dim sURI As String = "https://myexede.force.com/dashboard"
+      Dim sURI As String = "https://" & sHost & "/dashboard"
       Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, (1 / 5), sURI)
       wsData.DownloadStringAsync(New Uri(sURI), aState)
     ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Then
@@ -1061,7 +1061,7 @@
     End If
   End Sub
   Private Sub EX_Download_Ajax(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean, AjaxID As String)
-    If Not sHost = "myexede.force.com" Then
+    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
       sErrMsg = "Dashboard Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath = "/dashboard" Then
@@ -1089,7 +1089,7 @@
                "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
                "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
                "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
-        Dim sURI As String = "https://myexede.force.com/dashboard?refURL=https%3A%2F%2Fmyexede.force.com%2Fdashboard"
+        Dim sURI As String = "https://" & sHost & "/dashboard?refURL=https%3A%2F%2F" & sHost & "%2Fdashboard"
         Dim subState As ConnectionSubStates = ConnectionSubStates.None
         Dim subVal As Decimal = 0
         Select Case AjaxID
@@ -1126,7 +1126,7 @@
     End If
   End Sub
   Private Sub EX_Download_Table(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "myexede.force.com" Then
+    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
       sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
       bReset = False
     ElseIf sPath = "/dashboard" Then
