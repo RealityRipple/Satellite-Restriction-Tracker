@@ -96,6 +96,7 @@
     Dim aD As String = AppDataPath
     If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
     Dim hD As String = mySettings.HistoryDir
+    If String.IsNullOrEmpty(hD) Then hD = AppDataPath
     If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
     If chkService.Checked Then
       optHistoryProgramData.Checked = False
