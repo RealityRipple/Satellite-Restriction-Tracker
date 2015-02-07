@@ -123,16 +123,6 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
-        Friend ReadOnly Property advanced_security() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("advanced_security", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
         Friend ReadOnly Property default_alert() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("default_alert", resourceCulture)
@@ -233,6 +223,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property network_security() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("network_security", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property pass() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("pass", resourceCulture)
@@ -256,6 +256,16 @@ Namespace My.Resources
         Friend ReadOnly Property prefs_colors() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("prefs_colors", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property prefs_interface() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("prefs_interface", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

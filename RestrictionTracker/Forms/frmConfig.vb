@@ -268,7 +268,7 @@
     pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
     pnlAdvanced.MouseMove,
     pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
-    pnlButtons.MouseMove
+    pnlButtons.MouseMove, TableLayoutPanel2.MouseMove, TableLayoutPanel1.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -306,7 +306,7 @@
                                                                              txtProxyPassword.TextChanged,
                                                                              txtProxyDomain.TextChanged,
                                                                              cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged,
-                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged
+                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkScaleScreen.CheckedChanged, chkTrayMin.CheckedChanged
 
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -1265,5 +1265,13 @@
         End If
       End If
     Next
+  End Sub
+
+  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs)
+
+  End Sub
+
+  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.ScrollEventArgs)
+
   End Sub
 End Class
