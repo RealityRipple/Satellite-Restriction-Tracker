@@ -23,6 +23,7 @@ Partial Class frmConfig
   <System.Diagnostics.DebuggerStepThrough()> _
   Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
+    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConfig))
     Me.tbsConfig = New System.Windows.Forms.TabControl()
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
@@ -1663,6 +1664,7 @@ Partial Class frmConfig
     Me.chkAutoHide.Size = New System.Drawing.Size(255, 18)
     Me.chkAutoHide.TabIndex = 8
     Me.chkAutoHide.Text = "&Minimize Satellite Restriction Tracker on startup"
+    Me.ttConfig.SetTooltip(Me.chkAutoHide, "Automatically minimize the program when it starts.")
     Me.chkAutoHide.UseVisualStyleBackColor = True
     '
     'TableLayoutPanel1
@@ -1678,7 +1680,7 @@ Partial Class frmConfig
     Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
     Me.TableLayoutPanel1.RowCount = 1
     Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel1.Size = New System.Drawing.Size(384, 72)
+    Me.TableLayoutPanel1.Size = New System.Drawing.Size(224, 72)
     Me.TableLayoutPanel1.TabIndex = 5
     '
     'pctPrefInterfaceIcon
@@ -1712,7 +1714,7 @@ Partial Class frmConfig
     Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel2.Size = New System.Drawing.Size(328, 72)
+    Me.TableLayoutPanel2.Size = New System.Drawing.Size(168, 72)
     Me.TableLayoutPanel2.TabIndex = 0
     '
     'chkScaleScreen
@@ -1722,9 +1724,11 @@ Partial Class frmConfig
     Me.chkScaleScreen.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkScaleScreen.Location = New System.Drawing.Point(3, 3)
     Me.chkScaleScreen.Name = "chkScaleScreen"
-    Me.chkScaleScreen.Size = New System.Drawing.Size(270, 18)
+    Me.chkScaleScreen.Size = New System.Drawing.Size(151, 18)
     Me.chkScaleScreen.TabIndex = 0
-    Me.chkScaleScreen.Text = "&Run Satellite Restriction Tracker on system startup"
+    Me.chkScaleScreen.Text = "Scale text to window si&ze"
+    Me.ttConfig.SetTooltip(Me.chkScaleScreen, "Text in the main window of Satellite Restriction Tracker will scale to fit its si" & _
+        "ze.")
     Me.chkScaleScreen.UseVisualStyleBackColor = True
     '
     'chkTrayIcon
@@ -1734,9 +1738,10 @@ Partial Class frmConfig
     Me.chkTrayIcon.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkTrayIcon.Location = New System.Drawing.Point(3, 27)
     Me.chkTrayIcon.Name = "chkTrayIcon"
-    Me.chkTrayIcon.Size = New System.Drawing.Size(322, 18)
+    Me.chkTrayIcon.Size = New System.Drawing.Size(137, 18)
     Me.chkTrayIcon.TabIndex = 7
-    Me.chkTrayIcon.Text = "Run &Logger Service when Satellite Restriction Tracker closes"
+    Me.chkTrayIcon.Text = "Show system &tray icon"
+    Me.ttConfig.SetTooltip(Me.chkTrayIcon, "Display an icon in the system Notification Area.")
     Me.chkTrayIcon.UseVisualStyleBackColor = True
     '
     'chkTrayMin
@@ -1745,9 +1750,10 @@ Partial Class frmConfig
     Me.chkTrayMin.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkTrayMin.Location = New System.Drawing.Point(35, 51)
     Me.chkTrayMin.Name = "chkTrayMin"
-    Me.chkTrayMin.Size = New System.Drawing.Size(255, 18)
+    Me.chkTrayMin.Size = New System.Drawing.Size(130, 18)
     Me.chkTrayMin.TabIndex = 8
-    Me.chkTrayMin.Text = "&Minimize Satellite Restriction Tracker on startup"
+    Me.chkTrayMin.Text = "O&nly when minimized"
+    Me.ttConfig.SetTooltip(Me.chkTrayMin, "Display the tray icon only when Satellite Restriction Tracker is minimized.")
     Me.chkTrayMin.UseVisualStyleBackColor = True
     '
     'tabNetwork
@@ -1809,7 +1815,7 @@ Partial Class frmConfig
     'pctNetworkProtocolIcon
     '
     Me.pctNetworkProtocolIcon.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.pctNetworkProtocolIcon.Image = Global.RestrictionTracker.My.Resources.Resources.network_security
+    Me.pctNetworkProtocolIcon.Image = CType(resources.GetObject("pctNetworkProtocolIcon.Image"), System.Drawing.Image)
     Me.pctNetworkProtocolIcon.Location = New System.Drawing.Point(21, 3)
     Me.pctNetworkProtocolIcon.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
     Me.pctNetworkProtocolIcon.Name = "pctNetworkProtocolIcon"
