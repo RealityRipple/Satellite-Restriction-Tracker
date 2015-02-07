@@ -476,6 +476,7 @@
   End Sub
   Private Sub chkTrayIcon_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTrayIcon.CheckedChanged
     chkTrayMin.Enabled = chkTrayIcon.Checked
+    If Not chkTrayMin.Enabled Then chkTrayMin.Checked = False
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
