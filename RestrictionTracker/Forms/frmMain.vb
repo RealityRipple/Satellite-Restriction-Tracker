@@ -225,7 +225,16 @@ Public Class frmMain
           trayIcon.ContextMenu = mnuTray
           trayIcon.Icon = MakeIcon(IconName.norm)
           trayIcon.Text = Me.Text
-          trayIcon.Visible = True
+          If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
+            trayIcon.Visible = True
+          ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
+            If myState = LoadStates.Loaded Then
+              If Me.WindowState = FormWindowState.Minimized Then trayIcon.Visible = True
+            Else
+              If mySettings.AutoHide Then trayIcon.Visible = True
+              trayIcon.Visible = mySettings.AutoHide
+            End If
+          End If
         End If
       End If
     End If
@@ -235,9 +244,12 @@ Public Class frmMain
       InitAccount()
       If Not String.IsNullOrEmpty(sAccount) Then
         Me.ShowInTaskbar = True
-        Me.Hide()
-        mnuRestore.Text = "&Restore"
-        Me.WindowState = FormWindowState.Minimized
+        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        If mySettings.AutoHide Then
+          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then Me.Hide()
+          mnuRestore.Text = "&Restore"
+          Me.WindowState = FormWindowState.Minimized
+        End If
         If Me.Opacity = 0 Then Me.Opacity = 1
         SetStatusText("Initializing", "Beginning application initialization process...", False)
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
@@ -312,7 +324,12 @@ Public Class frmMain
       Me.BeginInvoke(New EventHandler(AddressOf frmMain_SizeChanged), sender, e)
     Else
       If Me.WindowState = FormWindowState.Minimized Then
-        Me.Hide()
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
+          Me.Hide()
+        ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
+          trayIcon.Visible = True
+          Me.Hide()
+        End If
         mnuRestore.Text = "&Restore"
       Else
         If mySettings Is Nothing Then
@@ -454,6 +471,13 @@ Public Class frmMain
       NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
     Else
       NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
+    End If
+    If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
+      trayIcon.Visible = True
+    ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
+      trayIcon.Visible = Me.WindowState = FormWindowState.Minimized
+    Else
+      trayIcon.Visible = False
     End If
   End Sub
   Private Sub ReInit()
@@ -1478,6 +1502,7 @@ Public Class frmMain
       Me.Show()
       mnuRestore.Text = "&Focus"
       Me.WindowState = FormWindowState.Normal
+      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
       Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
     End If
     Dim myProc As Integer = 0
