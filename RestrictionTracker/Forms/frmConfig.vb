@@ -74,10 +74,12 @@
       lblPurchaseKey.Text = LINK_PANEL
       ttConfig.SetTooltip(lblPurchaseKey, LINK_PANEL_TT)
     End If
+    chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
     If mySettings.StartWait < txtStartWait.Minimum Then mySettings.StartWait = txtStartWait.Minimum
     txtStartWait.Value = mySettings.StartWait
     txtStartWait.LargeIncrement = 1
+    chkAutoHide.Checked = mySettings.AutoHide
     If mySettings.Interval > txtInterval.Maximum Then mySettings.Interval = txtInterval.Maximum
     If mySettings.Interval < txtInterval.Minimum Then mySettings.Interval = txtInterval.Minimum
     txtInterval.Value = mySettings.Interval
@@ -90,42 +92,6 @@
     If mySettings.Timeout < txtTimeout.Minimum Then mySettings.Timeout = txtTimeout.Minimum
     txtTimeout.Value = mySettings.Timeout
     txtTimeout.LargeIncrement = 15
-    chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
-    DoCheck()
-    Dim DisableHistory As Boolean = False
-    Dim aD As String = AppDataPath
-    If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
-    Dim hD As String = mySettings.HistoryDir
-    If String.IsNullOrEmpty(hD) Then hD = AppDataPath
-    If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
-    If chkService.Checked Then
-      optHistoryProgramData.Checked = False
-      DisableHistory = True
-    ElseIf String.Compare(aD, Application.StartupPath & "\Config\", True) = 0 Then
-      optHistoryProgramData.Checked = False
-      optHistoryAppData.Checked = False
-      optHistoryCustom.Checked = False
-      mySettings.HistoryDir = Application.StartupPath & "\Config\"
-      DisableHistory = True
-      lblPortableDir.Enabled = False
-      txtPortableDir.Enabled = False
-      cmdPortableDir.Enabled = False
-      cmdMakePortable.Enabled = False
-      tbsConfig.TabPages.Remove(tabAdvanced)
-    ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
-      optHistoryProgramData.Checked = True
-    ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
-      optHistoryAppData.Checked = True
-    Else
-      optHistoryCustom.Checked = True
-    End If
-    txtHistoryDir.Text = mySettings.HistoryDir
-    If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
-    optHistoryAppData.Enabled = Not DisableHistory
-    optHistoryProgramData.Enabled = Not DisableHistory
-    optHistoryCustom.Enabled = Not DisableHistory
-    txtHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
-    cmdHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
     If mySettings.Overuse = 0 Then
       chkOverAlert.Checked = False
       txtOverSize.Value = 100
@@ -135,7 +101,19 @@
     End If
     chkOverAlert_CheckedChanged(New Object, New EventArgs)
     txtOverTime.Value = mySettings.Overtime
-
+    chkScaleScreen.Checked = mySettings.ScaleScreen
+    Select Case mySettings.TrayIconStyle
+      Case AppSettings.TrayStyles.Always
+        chkTrayIcon.Checked = True
+        chkTrayMin.Checked = False
+      Case AppSettings.TrayStyles.Minimized
+        chkTrayIcon.Checked = True
+        chkTrayMin.Checked = True
+      Case AppSettings.TrayStyles.Never
+        chkTrayIcon.Checked = False
+        chkTrayMin.Checked = False
+    End Select
+    chkTrayIcon_CheckedChanged(New Object, New EventArgs)
     If mySettings.Proxy Is Nothing Then
       cmbProxyType.SelectedIndex = 0
       txtProxyAddress.Text = String.Empty
@@ -176,12 +154,13 @@
         txtProxyDomain.Text = String.Empty
       End If
     End If
-    chkUpdateBETA.Checked = mySettings.UpdateBETA
+    chkNetworkProtocolSSL.Checked = mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
     Select Case mySettings.UpdateType
       Case AppSettings.UpdateTypes.Auto : cmbUpdateAutomation.SelectedIndex = 0
       Case AppSettings.UpdateTypes.Ask : cmbUpdateAutomation.SelectedIndex = 1
       Case AppSettings.UpdateTypes.None : cmbUpdateAutomation.SelectedIndex = 2
     End Select
+    chkUpdateBETA.Checked = mySettings.UpdateBETA
     Select Case mySettings.UpdateTime
       Case 1 : cmbUpdateInterval.SelectedIndex = 0
       Case 3 : cmbUpdateInterval.SelectedIndex = 1
@@ -190,7 +169,41 @@
       Case 30 : cmbUpdateInterval.SelectedIndex = 4
       Case Else : cmbUpdateInterval.SelectedIndex = 3
     End Select
-    chkNetworkProtocolSSL.Checked = mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
+    DoCheck()
+    Dim DisableHistory As Boolean = False
+    Dim aD As String = AppDataPath
+    If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
+    Dim hD As String = mySettings.HistoryDir
+    If String.IsNullOrEmpty(hD) Then hD = AppDataPath
+    If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
+    If chkService.Checked Then
+      optHistoryProgramData.Checked = False
+      DisableHistory = True
+    ElseIf String.Compare(aD, Application.StartupPath & "\Config\", True) = 0 Then
+      optHistoryProgramData.Checked = False
+      optHistoryAppData.Checked = False
+      optHistoryCustom.Checked = False
+      mySettings.HistoryDir = Application.StartupPath & "\Config\"
+      DisableHistory = True
+      lblPortableDir.Enabled = False
+      txtPortableDir.Enabled = False
+      cmdPortableDir.Enabled = False
+      cmdMakePortable.Enabled = False
+      tbsConfig.TabPages.Remove(tabAdvanced)
+    ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
+      optHistoryProgramData.Checked = True
+    ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
+      optHistoryAppData.Checked = True
+    Else
+      optHistoryCustom.Checked = True
+    End If
+    txtHistoryDir.Text = mySettings.HistoryDir
+    If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
+    optHistoryAppData.Enabled = Not DisableHistory
+    optHistoryProgramData.Enabled = Not DisableHistory
+    optHistoryCustom.Enabled = Not DisableHistory
+    txtHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
+    cmdHistoryDir.Enabled = Not DisableHistory And optHistoryCustom.Checked
     cmdSave.Enabled = False
     bSaved = False
     bAccount = False
@@ -268,7 +281,7 @@
     pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
     pnlAdvanced.MouseMove,
     pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
-    pnlButtons.MouseMove, TableLayoutPanel2.MouseMove, TableLayoutPanel1.MouseMove
+    pnlButtons.MouseMove, pnlPrefInterfaceInput.MouseMove, TableLayoutPanel1.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -297,7 +310,7 @@
                                                                              txtInterval.KeyPress, txtInterval.Scroll, txtInterval.ValueChanged,
                                                                              txtAccuracy.KeyPress, txtAccuracy.Scroll, txtAccuracy.ValueChanged,
                                                                              txtTimeout.ValueChanged, txtTimeout.Scroll, txtTimeout.KeyPress,
-                                                                             chkStartUp.CheckedChanged,
+                                                                             chkStartUp.CheckedChanged, chkAutoHide.CheckedChanged,
                                                                              txtOverSize.ValueChanged, txtOverTime.ValueChanged,
                                                                              chkNetworkProtocolSSL.CheckedChanged,
                                                                              txtProxyAddress.TextChanged,
@@ -459,6 +472,10 @@
     txtOverTime.Enabled = chkOverAlert.Checked
     lblOverTime2.Enabled = chkOverAlert.Checked
     cmdAlertStyle.Enabled = chkOverAlert.Checked
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+  Private Sub chkTrayIcon_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTrayIcon.CheckedChanged
+    chkTrayMin.Enabled = chkTrayIcon.Checked
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
@@ -939,11 +956,81 @@
       If My.Computer.FileSystem.FileExists(StartupPath) Then My.Computer.FileSystem.DeleteFile(StartupPath)
     End If
     mySettings.StartWait = txtStartWait.Value
+    mySettings.Service = chkService.Checked
+    mySettings.AutoHide = chkAutoHide.Checked
     mySettings.Interval = txtInterval.Value
     mySettings.Accuracy = txtAccuracy.Value
+    If chkOverAlert.Checked Then
+      mySettings.Overuse = txtOverSize.Value
+    Else
+      mySettings.Overuse = 0
+    End If
+    mySettings.Overtime = txtOverTime.Value
+    mySettings.ScaleScreen = chkScaleScreen.Checked
+    If chkTrayIcon.Checked Then
+      If chkTrayMin.Checked Then
+        mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized
+      Else
+        mySettings.TrayIconStyle = AppSettings.TrayStyles.Always
+      End If
+    Else
+      mySettings.TrayIconStyle = AppSettings.TrayStyles.Never
+    End If
     mySettings.Timeout = txtTimeout.Value
+    Select Case cmbProxyType.SelectedIndex
+      Case 0 : mySettings.Proxy = Nothing
+      Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
+      Case 2
+        If String.IsNullOrEmpty(txtProxyAddress.Text) Then
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+          txtProxyAddress.Focus()
+          Exit Sub
+        End If
+        If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
+          mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value))
+        Else
+          If String.IsNullOrEmpty(txtProxyDomain.Text) Then
+            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value)) With {.Credentials = New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text)}
+          Else
+            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value)) With {.Credentials = New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text, txtProxyDomain.Text)}
+          End If
+        End If
+      Case 3
+        If String.IsNullOrEmpty(txtProxyAddress.Text) Then
+          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+          txtProxyAddress.Focus()
+          Exit Sub
+        End If
+        If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
+          mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text)
+        Else
+          If String.IsNullOrEmpty(txtProxyDomain.Text) Then
+            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, False, Nothing, New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text))
+          Else
+            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, False, Nothing, New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text, txtProxyDomain.Text))
+          End If
+        End If
+    End Select
+    If chkNetworkProtocolSSL.Checked Then
+      mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
+    Else
+      mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
+    End If
+    Select Case cmbUpdateAutomation.SelectedIndex
+      Case 0 : mySettings.UpdateType = AppSettings.UpdateTypes.Auto
+      Case 1 : mySettings.UpdateType = AppSettings.UpdateTypes.Ask
+      Case 2 : mySettings.UpdateType = AppSettings.UpdateTypes.None
+    End Select
+    mySettings.UpdateBETA = chkUpdateBETA.Checked
+    Select Case cmbUpdateInterval.SelectedIndex
+      Case 0 : mySettings.UpdateTime = 1
+      Case 1 : mySettings.UpdateTime = 3
+      Case 2 : mySettings.UpdateTime = 7
+      Case 3 : mySettings.UpdateTime = 15
+      Case 4 : mySettings.UpdateTime = 30
+      Case Else : mySettings.UpdateTime = 15
+    End Select
     If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir(True)
-    mySettings.Service = chkService.Checked
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
       Dim sOldFiles() As String = My.Computer.FileSystem.GetFiles(mySettings.HistoryDir).ToArray
       Dim sNewFiles() As String = Nothing
@@ -1046,65 +1133,6 @@
       mySettings.HistoryDir = txtHistoryDir.Text
       bAccount = True
     End If
-    If chkOverAlert.Checked Then
-      mySettings.Overuse = txtOverSize.Value
-    Else
-      mySettings.Overuse = 0
-    End If
-    mySettings.Overtime = txtOverTime.Value
-    mySettings.UpdateBETA = chkUpdateBETA.Checked
-    Select Case cmbUpdateAutomation.SelectedIndex
-      Case 0 : mySettings.UpdateType = AppSettings.UpdateTypes.Auto
-      Case 1 : mySettings.UpdateType = AppSettings.UpdateTypes.Ask
-      Case 2 : mySettings.UpdateType = AppSettings.UpdateTypes.None
-    End Select
-    Select Case cmbUpdateInterval.SelectedIndex
-      Case 0 : mySettings.UpdateTime = 1
-      Case 1 : mySettings.UpdateTime = 3
-      Case 2 : mySettings.UpdateTime = 7
-      Case 3 : mySettings.UpdateTime = 15
-      Case 4 : mySettings.UpdateTime = 30
-      Case Else : mySettings.UpdateTime = 15
-    End Select
-    Select Case cmbProxyType.SelectedIndex
-      Case 0 : mySettings.Proxy = Nothing
-      Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
-      Case 2
-        If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
-          txtProxyAddress.Focus()
-          Exit Sub
-        End If
-        If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
-          mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value))
-        Else
-          If String.IsNullOrEmpty(txtProxyDomain.Text) Then
-            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value)) With {.Credentials = New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text)}
-          Else
-            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value)) With {.Credentials = New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text, txtProxyDomain.Text)}
-          End If
-        End If
-      Case 3
-        If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
-          txtProxyAddress.Focus()
-          Exit Sub
-        End If
-        If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
-          mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text)
-        Else
-          If String.IsNullOrEmpty(txtProxyDomain.Text) Then
-            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, False, Nothing, New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text))
-          Else
-            mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, False, Nothing, New Net.NetworkCredential(txtProxyUser.Text, txtProxyPassword.Text, txtProxyDomain.Text))
-          End If
-        End If
-    End Select
-    If chkNetworkProtocolSSL.Checked Then
-      mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
-    Else
-      mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
-    End If
     mySettings.Save()
     If mySettings.Service Then
       Dim cSave As New SvcSettings
@@ -1141,6 +1169,7 @@
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""
     If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
+    If Not mySettings.AutoHide = chkAutoHide.Checked Then Return True
     If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
@@ -1151,6 +1180,12 @@
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True
+    If Not mySettings.ScaleScreen = chkScaleScreen.Checked Then Return True
+    Select Case mySettings.TrayIconStyle
+      Case AppSettings.TrayStyles.Always : If Not chkTrayIcon.Checked Or chkTrayMin.Checked Then Return True
+      Case AppSettings.TrayStyles.Minimized : If Not chkTrayIcon.Checked Or Not chkTrayMin.Checked Then Return True
+      Case AppSettings.TrayStyles.Never : If chkTrayIcon.Checked Or chkTrayMin.Checked Then Return True
+    End Select
     If Not mySettings.UpdateBETA = chkUpdateBETA.Checked Then Return True
     Select Case cmbUpdateAutomation.SelectedIndex
       Case 0 : If Not mySettings.UpdateType = AppSettings.UpdateTypes.Auto Then Return True
@@ -1265,13 +1300,5 @@
         End If
       End If
     Next
-  End Sub
-
-  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs)
-
-  End Sub
-
-  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.ScrollEventArgs)
-
   End Sub
 End Class

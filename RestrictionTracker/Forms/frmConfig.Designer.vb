@@ -122,7 +122,7 @@ Partial Class frmConfig
     Me.chkAutoHide = New System.Windows.Forms.CheckBox()
     Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
     Me.pctPrefInterfaceIcon = New System.Windows.Forms.PictureBox()
-    Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
+    Me.pnlPrefInterfaceInput = New System.Windows.Forms.TableLayoutPanel()
     Me.chkScaleScreen = New System.Windows.Forms.CheckBox()
     Me.chkTrayIcon = New System.Windows.Forms.CheckBox()
     Me.chkTrayMin = New System.Windows.Forms.CheckBox()
@@ -248,7 +248,7 @@ Partial Class frmConfig
     CType(Me.txtStartWait, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.TableLayoutPanel1.SuspendLayout()
     CType(Me.pctPrefInterfaceIcon, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.TableLayoutPanel2.SuspendLayout()
+    Me.pnlPrefInterfaceInput.SuspendLayout()
     Me.tabNetwork.SuspendLayout()
     Me.pnlNetwork.SuspendLayout()
     Me.pnlNetworkProtocol.SuspendLayout()
@@ -295,7 +295,7 @@ Partial Class frmConfig
     Me.tbsConfig.Margin = New System.Windows.Forms.Padding(6, 6, 6, 3)
     Me.tbsConfig.Name = "tbsConfig"
     Me.tbsConfig.SelectedIndex = 0
-    Me.tbsConfig.Size = New System.Drawing.Size(673, 752)
+    Me.tbsConfig.Size = New System.Drawing.Size(389, 539)
     Me.tbsConfig.TabIndex = 0
     '
     'tabAccount
@@ -303,7 +303,7 @@ Partial Class frmConfig
     Me.tabAccount.Controls.Add(Me.pnlAccount)
     Me.tabAccount.Location = New System.Drawing.Point(4, 22)
     Me.tabAccount.Name = "tabAccount"
-    Me.tabAccount.Size = New System.Drawing.Size(665, 726)
+    Me.tabAccount.Size = New System.Drawing.Size(381, 513)
     Me.tabAccount.TabIndex = 0
     Me.tabAccount.Text = "Account"
     Me.tabAccount.UseVisualStyleBackColor = True
@@ -330,7 +330,7 @@ Partial Class frmConfig
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.Size = New System.Drawing.Size(665, 726)
+    Me.pnlAccount.Size = New System.Drawing.Size(381, 513)
     Me.pnlAccount.TabIndex = 0
     '
     'pnlAccountKeyTitle
@@ -344,12 +344,12 @@ Partial Class frmConfig
     Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccountKeyTitle.Controls.Add(Me.lblAccountKeyTitle, 0, 0)
     Me.pnlAccountKeyTitle.Controls.Add(Me.lnAccountKeyTitle, 1, 0)
-    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 640)
+    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 414)
     Me.pnlAccountKeyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAccountKeyTitle.Name = "pnlAccountKeyTitle"
     Me.pnlAccountKeyTitle.RowCount = 1
     Me.pnlAccountKeyTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountKeyTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlAccountKeyTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlAccountKeyTitle.TabIndex = 4
     '
     'lblAccountKeyTitle
@@ -372,7 +372,7 @@ Partial Class frmConfig
     Me.lnAccountKeyTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnAccountKeyTitle.Name = "lnAccountKeyTitle"
     Me.lnAccountKeyTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAccountKeyTitle.Size = New System.Drawing.Size(484, 4)
+    Me.lnAccountKeyTitle.Size = New System.Drawing.Size(200, 4)
     Me.lnAccountKeyTitle.TabIndex = 1
     Me.lnAccountKeyTitle.TabStop = False
     '
@@ -391,7 +391,7 @@ Partial Class frmConfig
     Me.pnlAccountViaSatTitle.Name = "pnlAccountViaSatTitle"
     Me.pnlAccountViaSatTitle.RowCount = 1
     Me.pnlAccountViaSatTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountViaSatTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlAccountViaSatTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlAccountViaSatTitle.TabIndex = 0
     '
     'lblAccountViaSatTitle
@@ -414,7 +414,7 @@ Partial Class frmConfig
     Me.lnAccountViaSatTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnAccountViaSatTitle.Name = "lnAccountViaSatTitle"
     Me.lnAccountViaSatTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAccountViaSatTitle.Size = New System.Drawing.Size(568, 4)
+    Me.lnAccountViaSatTitle.Size = New System.Drawing.Size(284, 4)
     Me.lnAccountViaSatTitle.TabIndex = 1
     Me.lnAccountViaSatTitle.TabStop = False
     '
@@ -548,12 +548,12 @@ Partial Class frmConfig
     Me.pnlAccountProviderTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAccountProviderTitle.Controls.Add(Me.lblAccountProviderTitle, 0, 0)
     Me.pnlAccountProviderTitle.Controls.Add(Me.lnAccountProviderTitle, 1, 0)
-    Me.pnlAccountProviderTitle.Location = New System.Drawing.Point(3, 287)
+    Me.pnlAccountProviderTitle.Location = New System.Drawing.Point(3, 174)
     Me.pnlAccountProviderTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAccountProviderTitle.Name = "pnlAccountProviderTitle"
     Me.pnlAccountProviderTitle.RowCount = 1
     Me.pnlAccountProviderTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountProviderTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlAccountProviderTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlAccountProviderTitle.TabIndex = 2
     '
     'lblAccountProviderTitle
@@ -576,7 +576,7 @@ Partial Class frmConfig
     Me.lnAccountProviderTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnAccountProviderTitle.Name = "lnAccountProviderTitle"
     Me.lnAccountProviderTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAccountProviderTitle.Size = New System.Drawing.Size(554, 4)
+    Me.lnAccountProviderTitle.Size = New System.Drawing.Size(270, 4)
     Me.lnAccountProviderTitle.TabIndex = 1
     Me.lnAccountProviderTitle.TabStop = False
     '
@@ -595,7 +595,7 @@ Partial Class frmConfig
     Me.pnlAccountProvider.Controls.Add(Me.lblAccountType, 1, 2)
     Me.pnlAccountProvider.Controls.Add(Me.pnlAccountTypes, 1, 3)
     Me.pnlAccountProvider.Controls.Add(Me.lblAccountProviderDescription, 1, 0)
-    Me.pnlAccountProvider.Location = New System.Drawing.Point(3, 308)
+    Me.pnlAccountProvider.Location = New System.Drawing.Point(3, 195)
     Me.pnlAccountProvider.Name = "pnlAccountProvider"
     Me.pnlAccountProvider.RowCount = 4
     Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -782,13 +782,13 @@ Partial Class frmConfig
     Me.pnlAccountKey.Controls.Add(Me.lblKey, 1, 1)
     Me.pnlAccountKey.Controls.Add(Me.lblPurchaseKey, 2, 2)
     Me.pnlAccountKey.Controls.Add(Me.lblAccountKeyDescription, 1, 0)
-    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 661)
+    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 435)
     Me.pnlAccountKey.Name = "pnlAccountKey"
     Me.pnlAccountKey.RowCount = 3
     Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountKey.Size = New System.Drawing.Size(594, 62)
+    Me.pnlAccountKey.Size = New System.Drawing.Size(375, 75)
     Me.pnlAccountKey.TabIndex = 5
     '
     'pnlKey
@@ -809,7 +809,7 @@ Partial Class frmConfig
     Me.pnlKey.Controls.Add(Me.txtKey3, 2, 0)
     Me.pnlKey.Controls.Add(Me.txtKey4, 3, 0)
     Me.pnlKey.Controls.Add(Me.txtKey5, 4, 0)
-    Me.pnlKey.Location = New System.Drawing.Point(130, 19)
+    Me.pnlKey.Location = New System.Drawing.Point(130, 32)
     Me.pnlKey.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlKey.Name = "pnlKey"
     Me.pnlKey.RowCount = 1
@@ -920,7 +920,7 @@ Partial Class frmConfig
     '
     Me.lblKey.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblKey.AutoSize = True
-    Me.lblKey.Location = New System.Drawing.Point(59, 24)
+    Me.lblKey.Location = New System.Drawing.Point(59, 37)
     Me.lblKey.Name = "lblKey"
     Me.lblKey.Size = New System.Drawing.Size(68, 13)
     Me.lblKey.TabIndex = 0
@@ -933,7 +933,7 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
     Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 46)
+    Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 59)
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPurchaseKey.Name = "lblPurchaseKey"
     Me.lblPurchaseKey.Size = New System.Drawing.Size(235, 13)
@@ -948,7 +948,7 @@ Partial Class frmConfig
     Me.lblAccountKeyDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblAccountKeyDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountKeyDescription.Name = "lblAccountKeyDescription"
-    Me.lblAccountKeyDescription.Size = New System.Drawing.Size(532, 13)
+    Me.lblAccountKeyDescription.Size = New System.Drawing.Size(313, 26)
     Me.lblAccountKeyDescription.TabIndex = 3
     Me.lblAccountKeyDescription.Text = "Let us track your usage for you! 24-hour meter information at your fingertips, pr" & _
     "ovided by RealityRipple Software."
@@ -958,7 +958,7 @@ Partial Class frmConfig
     Me.tabPrefs.Controls.Add(Me.pnlPrefs)
     Me.tabPrefs.Location = New System.Drawing.Point(4, 22)
     Me.tabPrefs.Name = "tabPrefs"
-    Me.tabPrefs.Size = New System.Drawing.Size(665, 726)
+    Me.tabPrefs.Size = New System.Drawing.Size(381, 513)
     Me.tabPrefs.TabIndex = 1
     Me.tabPrefs.Text = "Preferences"
     Me.tabPrefs.UseVisualStyleBackColor = True
@@ -995,7 +995,7 @@ Partial Class frmConfig
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.99813!))
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefs.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlPrefs.Size = New System.Drawing.Size(665, 726)
+    Me.pnlPrefs.Size = New System.Drawing.Size(381, 513)
     Me.pnlPrefs.TabIndex = 0
     '
     'pnlPrefInterfaceTitle
@@ -1008,12 +1008,12 @@ Partial Class frmConfig
     Me.pnlPrefInterfaceTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefInterfaceTitle.Controls.Add(Me.lblPrefInterfaceTitle, 0, 0)
     Me.pnlPrefInterfaceTitle.Controls.Add(Me.lnPrefInterfaceTitle, 1, 0)
-    Me.pnlPrefInterfaceTitle.Location = New System.Drawing.Point(3, 506)
+    Me.pnlPrefInterfaceTitle.Location = New System.Drawing.Point(3, 344)
     Me.pnlPrefInterfaceTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefInterfaceTitle.Name = "pnlPrefInterfaceTitle"
     Me.pnlPrefInterfaceTitle.RowCount = 1
     Me.pnlPrefInterfaceTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlPrefInterfaceTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlPrefInterfaceTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlPrefInterfaceTitle.TabIndex = 9
     '
     'lblPrefInterfaceTitle
@@ -1036,7 +1036,7 @@ Partial Class frmConfig
     Me.lnPrefInterfaceTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnPrefInterfaceTitle.Name = "lnPrefInterfaceTitle"
     Me.lnPrefInterfaceTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnPrefInterfaceTitle.Size = New System.Drawing.Size(493, 4)
+    Me.lnPrefInterfaceTitle.Size = New System.Drawing.Size(209, 4)
     Me.lnPrefInterfaceTitle.TabIndex = 1
     Me.lnPrefInterfaceTitle.TabStop = False
     '
@@ -1053,12 +1053,12 @@ Partial Class frmConfig
     Me.pnlPrefColor.Controls.Add(Me.pctPrefColorIcon, 0, 0)
     Me.pnlPrefColor.Controls.Add(Me.lblPrefColorDescription, 1, 0)
     Me.pnlPrefColor.Controls.Add(Me.cmdColors, 2, 0)
-    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 682)
+    Me.pnlPrefColor.Location = New System.Drawing.Point(3, 466)
     Me.pnlPrefColor.Name = "pnlPrefColor"
     Me.pnlPrefColor.RowCount = 1
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38.0!))
-    Me.pnlPrefColor.Size = New System.Drawing.Size(659, 38)
+    Me.pnlPrefColor.Size = New System.Drawing.Size(375, 45)
     Me.pnlPrefColor.TabIndex = 8
     '
     'pctPrefColorIcon
@@ -1081,7 +1081,7 @@ Partial Class frmConfig
     Me.lblPrefColorDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblPrefColorDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPrefColorDescription.Name = "lblPrefColorDescription"
-    Me.lblPrefColorDescription.Size = New System.Drawing.Size(474, 13)
+    Me.lblPrefColorDescription.Size = New System.Drawing.Size(190, 39)
     Me.lblPrefColorDescription.TabIndex = 0
     Me.lblPrefColorDescription.Text = "Change the colors of the Graphs in the Main Window, the History Window and the Tr" & _
     "ay Icon."
@@ -1090,7 +1090,7 @@ Partial Class frmConfig
     '
     Me.cmdColors.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.cmdColors.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdColors.Location = New System.Drawing.Point(539, 8)
+    Me.cmdColors.Location = New System.Drawing.Point(255, 12)
     Me.cmdColors.Margin = New System.Windows.Forms.Padding(3, 3, 10, 3)
     Me.cmdColors.Name = "cmdColors"
     Me.cmdColors.Size = New System.Drawing.Size(110, 21)
@@ -1121,14 +1121,14 @@ Partial Class frmConfig
     Me.pnlPrefAlert.Controls.Add(Me.lblOverTime2, 3, 3)
     Me.pnlPrefAlert.Controls.Add(Me.lblOverSize1, 1, 2)
     Me.pnlPrefAlert.Controls.Add(Me.cmdAlertStyle, 3, 1)
-    Me.pnlPrefAlert.Location = New System.Drawing.Point(3, 347)
+    Me.pnlPrefAlert.Location = New System.Drawing.Point(3, 239)
     Me.pnlPrefAlert.Name = "pnlPrefAlert"
     Me.pnlPrefAlert.RowCount = 4
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlPrefAlert.Size = New System.Drawing.Size(659, 97)
+    Me.pnlPrefAlert.Size = New System.Drawing.Size(375, 97)
     Me.pnlPrefAlert.TabIndex = 7
     '
     'pctPrefAlertIcon
@@ -1153,7 +1153,7 @@ Partial Class frmConfig
     Me.lblPrefAlertDescription.Location = New System.Drawing.Point(58, 3)
     Me.lblPrefAlertDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPrefAlertDescription.Name = "lblPrefAlertDescription"
-    Me.lblPrefAlertDescription.Size = New System.Drawing.Size(598, 13)
+    Me.lblPrefAlertDescription.Size = New System.Drawing.Size(314, 13)
     Me.lblPrefAlertDescription.TabIndex = 0
     Me.lblPrefAlertDescription.Text = "Satellite Restriction Tracker can notify you of excessive usage."
     '
@@ -1246,7 +1246,7 @@ Partial Class frmConfig
     Me.cmdAlertStyle.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.pnlPrefAlert.SetColumnSpan(Me.cmdAlertStyle, 2)
     Me.cmdAlertStyle.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdAlertStyle.Location = New System.Drawing.Point(539, 22)
+    Me.cmdAlertStyle.Location = New System.Drawing.Point(255, 22)
     Me.cmdAlertStyle.Margin = New System.Windows.Forms.Padding(3, 3, 10, 3)
     Me.cmdAlertStyle.Name = "cmdAlertStyle"
     Me.cmdAlertStyle.Size = New System.Drawing.Size(110, 20)
@@ -1264,7 +1264,7 @@ Partial Class frmConfig
     Me.pnlPrefAccuracy.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracy.Controls.Add(Me.pctPrefAccuracyIcon, 0, 0)
     Me.pnlPrefAccuracy.Controls.Add(Me.pnlPrefAccuracyInput, 1, 0)
-    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 212)
+    Me.pnlPrefAccuracy.Location = New System.Drawing.Point(3, 158)
     Me.pnlPrefAccuracy.Name = "pnlPrefAccuracy"
     Me.pnlPrefAccuracy.RowCount = 1
     Me.pnlPrefAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -1386,7 +1386,7 @@ Partial Class frmConfig
     Me.pnlPrefStartTitle.RowCount = 1
     Me.pnlPrefStartTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefStartTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 13.0!))
-    Me.pnlPrefStartTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlPrefStartTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlPrefStartTitle.TabIndex = 1
     '
     'lblPrefStartTitle
@@ -1409,7 +1409,7 @@ Partial Class frmConfig
     Me.lnPrefStartTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnPrefStartTitle.Name = "lnPrefStartTitle"
     Me.lnPrefStartTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnPrefStartTitle.Size = New System.Drawing.Size(540, 4)
+    Me.lnPrefStartTitle.Size = New System.Drawing.Size(256, 4)
     Me.lnPrefStartTitle.TabIndex = 1
     Me.lnPrefStartTitle.TabStop = False
     '
@@ -1423,12 +1423,12 @@ Partial Class frmConfig
     Me.pnlPrefAccuracyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lblPrefAccuracyTitle, 0, 0)
     Me.pnlPrefAccuracyTitle.Controls.Add(Me.lnPrefAccuracyTitle, 1, 0)
-    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 191)
+    Me.pnlPrefAccuracyTitle.Location = New System.Drawing.Point(3, 137)
     Me.pnlPrefAccuracyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefAccuracyTitle.Name = "pnlPrefAccuracyTitle"
     Me.pnlPrefAccuracyTitle.RowCount = 1
     Me.pnlPrefAccuracyTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlPrefAccuracyTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlPrefAccuracyTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlPrefAccuracyTitle.TabIndex = 2
     '
     'lblPrefAccuracyTitle
@@ -1451,7 +1451,7 @@ Partial Class frmConfig
     Me.lnPrefAccuracyTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnPrefAccuracyTitle.Name = "lnPrefAccuracyTitle"
     Me.lnPrefAccuracyTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnPrefAccuracyTitle.Size = New System.Drawing.Size(563, 4)
+    Me.lnPrefAccuracyTitle.Size = New System.Drawing.Size(279, 4)
     Me.lnPrefAccuracyTitle.TabIndex = 1
     Me.lnPrefAccuracyTitle.TabStop = False
     '
@@ -1465,12 +1465,12 @@ Partial Class frmConfig
     Me.pnlPrefAlertTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAlertTitle.Controls.Add(Me.lblPrefAlertTitle, 0, 0)
     Me.pnlPrefAlertTitle.Controls.Add(Me.lnPrefAlertTitle, 1, 0)
-    Me.pnlPrefAlertTitle.Location = New System.Drawing.Point(3, 326)
+    Me.pnlPrefAlertTitle.Location = New System.Drawing.Point(3, 218)
     Me.pnlPrefAlertTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefAlertTitle.Name = "pnlPrefAlertTitle"
     Me.pnlPrefAlertTitle.RowCount = 1
     Me.pnlPrefAlertTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlPrefAlertTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlPrefAlertTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlPrefAlertTitle.TabIndex = 3
     '
     'lblPrefAlertTitle
@@ -1493,7 +1493,7 @@ Partial Class frmConfig
     Me.lnPrefAlertTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnPrefAlertTitle.Name = "lnPrefAlertTitle"
     Me.lnPrefAlertTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnPrefAlertTitle.Size = New System.Drawing.Size(587, 4)
+    Me.lnPrefAlertTitle.Size = New System.Drawing.Size(303, 4)
     Me.lnPrefAlertTitle.TabIndex = 1
     Me.lnPrefAlertTitle.TabStop = False
     '
@@ -1507,12 +1507,12 @@ Partial Class frmConfig
     Me.pnlPrefColorTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefColorTitle.Controls.Add(Me.lblPrefColorTitle, 0, 0)
     Me.pnlPrefColorTitle.Controls.Add(Me.lnPrefColorTitle, 1, 0)
-    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 661)
+    Me.pnlPrefColorTitle.Location = New System.Drawing.Point(3, 445)
     Me.pnlPrefColorTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlPrefColorTitle.Name = "pnlPrefColorTitle"
     Me.pnlPrefColorTitle.RowCount = 1
     Me.pnlPrefColorTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlPrefColorTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlPrefColorTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlPrefColorTitle.TabIndex = 4
     '
     'lblPrefColorTitle
@@ -1535,7 +1535,7 @@ Partial Class frmConfig
     Me.lnPrefColorTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnPrefColorTitle.Name = "lnPrefColorTitle"
     Me.lnPrefColorTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnPrefColorTitle.Size = New System.Drawing.Size(581, 4)
+    Me.lnPrefColorTitle.Size = New System.Drawing.Size(297, 4)
     Me.lnPrefColorTitle.TabIndex = 1
     Me.lnPrefColorTitle.TabStop = False
     '
@@ -1552,7 +1552,7 @@ Partial Class frmConfig
     Me.pnlPrefStart.Name = "pnlPrefStart"
     Me.pnlPrefStart.RowCount = 1
     Me.pnlPrefStart.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlPrefStart.Size = New System.Drawing.Size(384, 98)
+    Me.pnlPrefStart.Size = New System.Drawing.Size(375, 98)
     Me.pnlPrefStart.TabIndex = 5
     '
     'pctPrefStartIcon
@@ -1589,7 +1589,7 @@ Partial Class frmConfig
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefStartInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlPrefStartInput.Size = New System.Drawing.Size(328, 98)
+    Me.pnlPrefStartInput.Size = New System.Drawing.Size(319, 98)
     Me.pnlPrefStartInput.TabIndex = 0
     '
     'chkStartUp
@@ -1647,7 +1647,7 @@ Partial Class frmConfig
     Me.chkService.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkService.Location = New System.Drawing.Point(3, 53)
     Me.chkService.Name = "chkService"
-    Me.chkService.Size = New System.Drawing.Size(322, 18)
+    Me.chkService.Size = New System.Drawing.Size(313, 18)
     Me.chkService.TabIndex = 7
     Me.chkService.Text = "Run &Logger Service when Satellite Restriction Tracker closes"
     Me.ttConfig.SetTooltip(Me.chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracke" & _
@@ -1675,12 +1675,12 @@ Partial Class frmConfig
     Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.TableLayoutPanel1.Controls.Add(Me.pctPrefInterfaceIcon, 0, 0)
-    Me.TableLayoutPanel1.Controls.Add(Me.TableLayoutPanel2, 1, 0)
-    Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 527)
+    Me.TableLayoutPanel1.Controls.Add(Me.pnlPrefInterfaceInput, 1, 0)
+    Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 365)
     Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
     Me.TableLayoutPanel1.RowCount = 1
     Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel1.Size = New System.Drawing.Size(224, 72)
+    Me.TableLayoutPanel1.Size = New System.Drawing.Size(213, 72)
     Me.TableLayoutPanel1.TabIndex = 5
     '
     'pctPrefInterfaceIcon
@@ -1695,32 +1695,31 @@ Partial Class frmConfig
     Me.pctPrefInterfaceIcon.TabIndex = 1
     Me.pctPrefInterfaceIcon.TabStop = False
     '
-    'TableLayoutPanel2
+    'pnlPrefInterfaceInput
     '
-    Me.TableLayoutPanel2.AutoSize = True
-    Me.TableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.TableLayoutPanel2.ColumnCount = 2
-    Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32.0!))
-    Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.TableLayoutPanel2.Controls.Add(Me.chkScaleScreen, 0, 0)
-    Me.TableLayoutPanel2.Controls.Add(Me.chkTrayIcon, 0, 2)
-    Me.TableLayoutPanel2.Controls.Add(Me.chkTrayMin, 1, 3)
-    Me.TableLayoutPanel2.Location = New System.Drawing.Point(56, 0)
-    Me.TableLayoutPanel2.Margin = New System.Windows.Forms.Padding(0)
-    Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
-    Me.TableLayoutPanel2.RowCount = 4
-    Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.TableLayoutPanel2.Size = New System.Drawing.Size(168, 72)
-    Me.TableLayoutPanel2.TabIndex = 0
+    Me.pnlPrefInterfaceInput.AutoSize = True
+    Me.pnlPrefInterfaceInput.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlPrefInterfaceInput.ColumnCount = 2
+    Me.pnlPrefInterfaceInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18.0!))
+    Me.pnlPrefInterfaceInput.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlPrefInterfaceInput.Controls.Add(Me.chkScaleScreen, 0, 0)
+    Me.pnlPrefInterfaceInput.Controls.Add(Me.chkTrayIcon, 0, 2)
+    Me.pnlPrefInterfaceInput.Controls.Add(Me.chkTrayMin, 1, 3)
+    Me.pnlPrefInterfaceInput.Location = New System.Drawing.Point(56, 0)
+    Me.pnlPrefInterfaceInput.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlPrefInterfaceInput.Name = "pnlPrefInterfaceInput"
+    Me.pnlPrefInterfaceInput.RowCount = 4
+    Me.pnlPrefInterfaceInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlPrefInterfaceInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlPrefInterfaceInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlPrefInterfaceInput.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlPrefInterfaceInput.Size = New System.Drawing.Size(157, 72)
+    Me.pnlPrefInterfaceInput.TabIndex = 0
     '
     'chkScaleScreen
     '
     Me.chkScaleScreen.AutoSize = True
-    Me.TableLayoutPanel2.SetColumnSpan(Me.chkScaleScreen, 2)
+    Me.pnlPrefInterfaceInput.SetColumnSpan(Me.chkScaleScreen, 2)
     Me.chkScaleScreen.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkScaleScreen.Location = New System.Drawing.Point(3, 3)
     Me.chkScaleScreen.Name = "chkScaleScreen"
@@ -1734,7 +1733,7 @@ Partial Class frmConfig
     'chkTrayIcon
     '
     Me.chkTrayIcon.AutoSize = True
-    Me.TableLayoutPanel2.SetColumnSpan(Me.chkTrayIcon, 2)
+    Me.pnlPrefInterfaceInput.SetColumnSpan(Me.chkTrayIcon, 2)
     Me.chkTrayIcon.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkTrayIcon.Location = New System.Drawing.Point(3, 27)
     Me.chkTrayIcon.Name = "chkTrayIcon"
@@ -1748,7 +1747,7 @@ Partial Class frmConfig
     '
     Me.chkTrayMin.AutoSize = True
     Me.chkTrayMin.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkTrayMin.Location = New System.Drawing.Point(35, 51)
+    Me.chkTrayMin.Location = New System.Drawing.Point(21, 51)
     Me.chkTrayMin.Name = "chkTrayMin"
     Me.chkTrayMin.Size = New System.Drawing.Size(130, 18)
     Me.chkTrayMin.TabIndex = 8
@@ -1761,7 +1760,7 @@ Partial Class frmConfig
     Me.tabNetwork.Controls.Add(Me.pnlNetwork)
     Me.tabNetwork.Location = New System.Drawing.Point(4, 22)
     Me.tabNetwork.Name = "tabNetwork"
-    Me.tabNetwork.Size = New System.Drawing.Size(665, 726)
+    Me.tabNetwork.Size = New System.Drawing.Size(381, 513)
     Me.tabNetwork.TabIndex = 2
     Me.tabNetwork.Text = "Network"
     Me.tabNetwork.UseVisualStyleBackColor = True
@@ -1793,7 +1792,7 @@ Partial Class frmConfig
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetwork.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetwork.Size = New System.Drawing.Size(665, 726)
+    Me.pnlNetwork.Size = New System.Drawing.Size(381, 513)
     Me.pnlNetwork.TabIndex = 0
     '
     'pnlNetworkProtocol
@@ -1805,7 +1804,7 @@ Partial Class frmConfig
     Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProtocol.Controls.Add(Me.pctNetworkProtocolIcon, 0, 0)
     Me.pnlNetworkProtocol.Controls.Add(Me.pnlNetworkProtocolInput, 1, 0)
-    Me.pnlNetworkProtocol.Location = New System.Drawing.Point(3, 473)
+    Me.pnlNetworkProtocol.Location = New System.Drawing.Point(3, 336)
     Me.pnlNetworkProtocol.Name = "pnlNetworkProtocol"
     Me.pnlNetworkProtocol.RowCount = 1
     Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
@@ -1878,12 +1877,12 @@ Partial Class frmConfig
     Me.pnlNetworkProtocolTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProtocolTitle.Controls.Add(Me.lblNetworkProtocolTitle, 0, 0)
     Me.pnlNetworkProtocolTitle.Controls.Add(Me.lnNetworkProtocolTitle, 1, 0)
-    Me.pnlNetworkProtocolTitle.Location = New System.Drawing.Point(3, 452)
+    Me.pnlNetworkProtocolTitle.Location = New System.Drawing.Point(3, 315)
     Me.pnlNetworkProtocolTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlNetworkProtocolTitle.Name = "pnlNetworkProtocolTitle"
     Me.pnlNetworkProtocolTitle.RowCount = 1
     Me.pnlNetworkProtocolTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlNetworkProtocolTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlNetworkProtocolTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlNetworkProtocolTitle.TabIndex = 15
     '
     'lblNetworkProtocolTitle
@@ -1906,7 +1905,7 @@ Partial Class frmConfig
     Me.lnNetworkProtocolTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnNetworkProtocolTitle.Name = "lnNetworkProtocolTitle"
     Me.lnNetworkProtocolTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnNetworkProtocolTitle.Size = New System.Drawing.Size(562, 4)
+    Me.lnNetworkProtocolTitle.Size = New System.Drawing.Size(278, 4)
     Me.lnNetworkProtocolTitle.TabIndex = 1
     Me.lnNetworkProtocolTitle.TabStop = False
     '
@@ -1922,7 +1921,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.Controls.Add(Me.pnlNetworkUpdateTime, 1, 2)
     Me.pnlNetworkUpdate.Controls.Add(Me.chkUpdateBETA, 1, 1)
     Me.pnlNetworkUpdate.Controls.Add(Me.cmbUpdateAutomation, 1, 0)
-    Me.pnlNetworkUpdate.Location = New System.Drawing.Point(3, 645)
+    Me.pnlNetworkUpdate.Location = New System.Drawing.Point(3, 433)
     Me.pnlNetworkUpdate.Name = "pnlNetworkUpdate"
     Me.pnlNetworkUpdate.RowCount = 3
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -2024,7 +2023,7 @@ Partial Class frmConfig
     Me.pnlNetworkProxy.Controls.Add(Me.pnlProxy, 0, 1)
     Me.pnlNetworkProxy.Controls.Add(Me.pctNetworkProxyIcon, 0, 0)
     Me.pnlNetworkProxy.Controls.Add(Me.lblNetworkProxyDescrption, 1, 0)
-    Me.pnlNetworkProxy.Location = New System.Drawing.Point(3, 193)
+    Me.pnlNetworkProxy.Location = New System.Drawing.Point(3, 131)
     Me.pnlNetworkProxy.Name = "pnlNetworkProxy"
     Me.pnlNetworkProxy.RowCount = 2
     Me.pnlNetworkProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
@@ -2225,12 +2224,12 @@ Partial Class frmConfig
     Me.pnlNetworkProxyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProxyTitle.Controls.Add(Me.lblNetworkProxyTitle, 0, 0)
     Me.pnlNetworkProxyTitle.Controls.Add(Me.lnNetworkProxyTitle, 1, 0)
-    Me.pnlNetworkProxyTitle.Location = New System.Drawing.Point(3, 172)
+    Me.pnlNetworkProxyTitle.Location = New System.Drawing.Point(3, 110)
     Me.pnlNetworkProxyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlNetworkProxyTitle.Name = "pnlNetworkProxyTitle"
     Me.pnlNetworkProxyTitle.RowCount = 1
     Me.pnlNetworkProxyTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlNetworkProxyTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlNetworkProxyTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlNetworkProxyTitle.TabIndex = 3
     '
     'lblNetworkProxyTitle
@@ -2253,7 +2252,7 @@ Partial Class frmConfig
     Me.lnNetworkProxyTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnNetworkProxyTitle.Name = "lnNetworkProxyTitle"
     Me.lnNetworkProxyTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnNetworkProxyTitle.Size = New System.Drawing.Size(584, 4)
+    Me.lnNetworkProxyTitle.Size = New System.Drawing.Size(300, 4)
     Me.lnNetworkProxyTitle.TabIndex = 1
     Me.lnNetworkProxyTitle.TabStop = False
     '
@@ -2272,7 +2271,7 @@ Partial Class frmConfig
     Me.pnlNetworkTimeoutTitle.Name = "pnlNetworkTimeoutTitle"
     Me.pnlNetworkTimeoutTitle.RowCount = 1
     Me.pnlNetworkTimeoutTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlNetworkTimeoutTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlNetworkTimeoutTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlNetworkTimeoutTitle.TabIndex = 1
     '
     'lblNetworkTimeoutTitle
@@ -2295,7 +2294,7 @@ Partial Class frmConfig
     Me.lnNetworkTimeoutTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnNetworkTimeoutTitle.Name = "lnNetworkTimeoutTitle"
     Me.lnNetworkTimeoutTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnNetworkTimeoutTitle.Size = New System.Drawing.Size(561, 4)
+    Me.lnNetworkTimeoutTitle.Size = New System.Drawing.Size(277, 4)
     Me.lnNetworkTimeoutTitle.TabIndex = 1
     Me.lnNetworkTimeoutTitle.TabStop = False
     '
@@ -2319,7 +2318,7 @@ Partial Class frmConfig
     Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlNetworkTimeout.Size = New System.Drawing.Size(485, 45)
+    Me.pnlNetworkTimeout.Size = New System.Drawing.Size(375, 58)
     Me.pnlNetworkTimeout.TabIndex = 2
     '
     'pctNetworkTimeoutIcon
@@ -2339,7 +2338,7 @@ Partial Class frmConfig
     '
     Me.txtTimeout.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.txtTimeout.LargeIncrement = CType(15UI, UInteger)
-    Me.txtTimeout.Location = New System.Drawing.Point(113, 22)
+    Me.txtTimeout.Location = New System.Drawing.Point(113, 35)
     Me.txtTimeout.Maximum = New Decimal(New Integer() {600, 0, 0, 0})
     Me.txtTimeout.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
     Me.txtTimeout.Name = "txtTimeout"
@@ -2353,7 +2352,7 @@ Partial Class frmConfig
     '
     Me.lblTimeout2.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblTimeout2.AutoSize = True
-    Me.lblTimeout2.Location = New System.Drawing.Point(189, 25)
+    Me.lblTimeout2.Location = New System.Drawing.Point(189, 38)
     Me.lblTimeout2.Name = "lblTimeout2"
     Me.lblTimeout2.Size = New System.Drawing.Size(47, 13)
     Me.lblTimeout2.TabIndex = 3
@@ -2363,7 +2362,7 @@ Partial Class frmConfig
     '
     Me.lblTimeout1.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblTimeout1.AutoSize = True
-    Me.lblTimeout1.Location = New System.Drawing.Point(59, 25)
+    Me.lblTimeout1.Location = New System.Drawing.Point(59, 38)
     Me.lblTimeout1.Name = "lblTimeout1"
     Me.lblTimeout1.Size = New System.Drawing.Size(48, 13)
     Me.lblTimeout1.TabIndex = 1
@@ -2378,7 +2377,7 @@ Partial Class frmConfig
     Me.lblNetworkTimeoutDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblNetworkTimeoutDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkTimeoutDescription.Name = "lblNetworkTimeoutDescription"
-    Me.lblNetworkTimeoutDescription.Size = New System.Drawing.Size(423, 13)
+    Me.lblNetworkTimeoutDescription.Size = New System.Drawing.Size(313, 26)
     Me.lblNetworkTimeoutDescription.TabIndex = 0
     Me.lblNetworkTimeoutDescription.Text = "The connection to the server is closed if no response is received in a set amount" & _
     " of time."
@@ -2393,12 +2392,12 @@ Partial Class frmConfig
     Me.pnlNetworkUpdateTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkUpdateTitle.Controls.Add(Me.lblNetworkUpdateTitle, 0, 0)
     Me.pnlNetworkUpdateTitle.Controls.Add(Me.lnNetworkUpdateTitle, 1, 0)
-    Me.pnlNetworkUpdateTitle.Location = New System.Drawing.Point(3, 624)
+    Me.pnlNetworkUpdateTitle.Location = New System.Drawing.Point(3, 412)
     Me.pnlNetworkUpdateTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlNetworkUpdateTitle.Name = "pnlNetworkUpdateTitle"
     Me.pnlNetworkUpdateTitle.RowCount = 1
     Me.pnlNetworkUpdateTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlNetworkUpdateTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlNetworkUpdateTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlNetworkUpdateTitle.TabIndex = 5
     '
     'lblNetworkUpdateTitle
@@ -2421,7 +2420,7 @@ Partial Class frmConfig
     Me.lnNetworkUpdateTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnNetworkUpdateTitle.Name = "lnNetworkUpdateTitle"
     Me.lnNetworkUpdateTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnNetworkUpdateTitle.Size = New System.Drawing.Size(602, 4)
+    Me.lnNetworkUpdateTitle.Size = New System.Drawing.Size(318, 4)
     Me.lnNetworkUpdateTitle.TabIndex = 1
     Me.lnNetworkUpdateTitle.TabStop = False
     '
@@ -2430,7 +2429,7 @@ Partial Class frmConfig
     Me.tabAdvanced.Controls.Add(Me.pnlAdvanced)
     Me.tabAdvanced.Location = New System.Drawing.Point(4, 22)
     Me.tabAdvanced.Name = "tabAdvanced"
-    Me.tabAdvanced.Size = New System.Drawing.Size(665, 726)
+    Me.tabAdvanced.Size = New System.Drawing.Size(381, 513)
     Me.tabAdvanced.TabIndex = 3
     Me.tabAdvanced.Text = "Advanced"
     Me.tabAdvanced.UseVisualStyleBackColor = True
@@ -2456,7 +2455,7 @@ Partial Class frmConfig
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAdvanced.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAdvanced.Size = New System.Drawing.Size(665, 726)
+    Me.pnlAdvanced.Size = New System.Drawing.Size(381, 513)
     Me.pnlAdvanced.TabIndex = 1
     '
     'pnlAdvancedPortable
@@ -2472,13 +2471,13 @@ Partial Class frmConfig
     Me.pnlAdvancedPortable.Controls.Add(Me.lblAdvancedPortableDescription, 1, 0)
     Me.pnlAdvancedPortable.Controls.Add(Me.cmdMakePortable, 1, 2)
     Me.pnlAdvancedPortable.Controls.Add(Me.lblPortableDir, 1, 1)
-    Me.pnlAdvancedPortable.Location = New System.Drawing.Point(3, 634)
+    Me.pnlAdvancedPortable.Location = New System.Drawing.Point(3, 421)
     Me.pnlAdvancedPortable.Name = "pnlAdvancedPortable"
     Me.pnlAdvancedPortable.RowCount = 3
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAdvancedPortable.Size = New System.Drawing.Size(378, 89)
+    Me.pnlAdvancedPortable.Size = New System.Drawing.Size(375, 89)
     Me.pnlAdvancedPortable.TabIndex = 13
     '
     'pnlPortableDir
@@ -2497,7 +2496,7 @@ Partial Class frmConfig
     Me.pnlPortableDir.RowCount = 1
     Me.pnlPortableDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPortableDir.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlPortableDir.Size = New System.Drawing.Size(264, 28)
+    Me.pnlPortableDir.Size = New System.Drawing.Size(261, 28)
     Me.pnlPortableDir.TabIndex = 2
     '
     'txtPortableDir
@@ -2508,7 +2507,7 @@ Partial Class frmConfig
     Me.txtPortableDir.Location = New System.Drawing.Point(3, 4)
     Me.txtPortableDir.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtPortableDir.Name = "txtPortableDir"
-    Me.txtPortableDir.Size = New System.Drawing.Size(220, 20)
+    Me.txtPortableDir.Size = New System.Drawing.Size(217, 20)
     Me.txtPortableDir.TabIndex = 0
     Me.ttConfig.SetTooltip(Me.txtPortableDir, "Select the location you wish to place a portable copy of Satellite Restriction Tr" & _
         "acker, such as a desktop folder or a flash drive.")
@@ -2518,7 +2517,7 @@ Partial Class frmConfig
     Me.cmdPortableDir.AutoSize = True
     Me.cmdPortableDir.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.cmdPortableDir.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdPortableDir.Location = New System.Drawing.Point(225, 3)
+    Me.cmdPortableDir.Location = New System.Drawing.Point(222, 3)
     Me.cmdPortableDir.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
     Me.cmdPortableDir.Name = "cmdPortableDir"
     Me.cmdPortableDir.Size = New System.Drawing.Size(36, 22)
@@ -2549,7 +2548,7 @@ Partial Class frmConfig
     Me.lblAdvancedPortableDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblAdvancedPortableDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAdvancedPortableDescription.Name = "lblAdvancedPortableDescription"
-    Me.lblAdvancedPortableDescription.Size = New System.Drawing.Size(316, 26)
+    Me.lblAdvancedPortableDescription.Size = New System.Drawing.Size(313, 26)
     Me.lblAdvancedPortableDescription.TabIndex = 0
     Me.lblAdvancedPortableDescription.Text = "Create a portable copy of Satellite Restriction Tracker which can" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "run off a flas" & _
     "h drive or other location without being installed."
@@ -2560,7 +2559,7 @@ Partial Class frmConfig
     Me.pnlAdvancedPortable.SetColumnSpan(Me.cmdMakePortable, 2)
     Me.cmdMakePortable.Enabled = False
     Me.cmdMakePortable.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdMakePortable.Location = New System.Drawing.Point(200, 63)
+    Me.cmdMakePortable.Location = New System.Drawing.Point(197, 63)
     Me.cmdMakePortable.Name = "cmdMakePortable"
     Me.cmdMakePortable.Size = New System.Drawing.Size(175, 23)
     Me.cmdMakePortable.TabIndex = 3
@@ -2588,12 +2587,12 @@ Partial Class frmConfig
     Me.pnlAdvancedPortableTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedPortableTitle.Controls.Add(Me.lblAdvancedPortableTitle, 0, 0)
     Me.pnlAdvancedPortableTitle.Controls.Add(Me.lnAdvancedPortableTitle, 1, 0)
-    Me.pnlAdvancedPortableTitle.Location = New System.Drawing.Point(3, 613)
+    Me.pnlAdvancedPortableTitle.Location = New System.Drawing.Point(3, 400)
     Me.pnlAdvancedPortableTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
     Me.pnlAdvancedPortableTitle.Name = "pnlAdvancedPortableTitle"
     Me.pnlAdvancedPortableTitle.RowCount = 1
     Me.pnlAdvancedPortableTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedPortableTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlAdvancedPortableTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlAdvancedPortableTitle.TabIndex = 12
     '
     'lblAdvancedPortableTitle
@@ -2616,7 +2615,7 @@ Partial Class frmConfig
     Me.lnAdvancedPortableTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnAdvancedPortableTitle.Name = "lnAdvancedPortableTitle"
     Me.lnAdvancedPortableTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAdvancedPortableTitle.Size = New System.Drawing.Size(548, 4)
+    Me.lnAdvancedPortableTitle.Size = New System.Drawing.Size(264, 4)
     Me.lnAdvancedPortableTitle.TabIndex = 1
     Me.lnAdvancedPortableTitle.TabStop = False
     '
@@ -2806,7 +2805,7 @@ Partial Class frmConfig
     Me.pnlAdvancedDataTitle.Name = "pnlAdvancedDataTitle"
     Me.pnlAdvancedDataTitle.RowCount = 1
     Me.pnlAdvancedDataTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAdvancedDataTitle.Size = New System.Drawing.Size(659, 13)
+    Me.pnlAdvancedDataTitle.Size = New System.Drawing.Size(375, 13)
     Me.pnlAdvancedDataTitle.TabIndex = 10
     '
     'lblAdvancedDataTitle
@@ -2829,7 +2828,7 @@ Partial Class frmConfig
     Me.lnAdvancedDataTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
     Me.lnAdvancedDataTitle.Name = "lnAdvancedDataTitle"
     Me.lnAdvancedDataTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAdvancedDataTitle.Size = New System.Drawing.Size(574, 4)
+    Me.lnAdvancedDataTitle.Size = New System.Drawing.Size(290, 4)
     Me.lnAdvancedDataTitle.TabIndex = 1
     Me.lnAdvancedDataTitle.TabStop = False
     '
@@ -2868,7 +2867,7 @@ Partial Class frmConfig
     Me.pnlConfig.RowCount = 2
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlConfig.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlConfig.Size = New System.Drawing.Size(685, 790)
+    Me.pnlConfig.Size = New System.Drawing.Size(401, 577)
     Me.pnlConfig.TabIndex = 4
     '
     'pnlButtons
@@ -2881,7 +2880,7 @@ Partial Class frmConfig
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(525, 761)
+    Me.pnlButtons.Location = New System.Drawing.Point(241, 548)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -2908,7 +2907,7 @@ Partial Class frmConfig
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.AutoSize = True
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(685, 790)
+    Me.ClientSize = New System.Drawing.Size(401, 577)
     Me.Controls.Add(Me.pnlConfig)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.MaximizeBox = False
@@ -2981,8 +2980,8 @@ Partial Class frmConfig
     Me.TableLayoutPanel1.ResumeLayout(False)
     Me.TableLayoutPanel1.PerformLayout()
     CType(Me.pctPrefInterfaceIcon, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.TableLayoutPanel2.ResumeLayout(False)
-    Me.TableLayoutPanel2.PerformLayout()
+    Me.pnlPrefInterfaceInput.ResumeLayout(False)
+    Me.pnlPrefInterfaceInput.PerformLayout()
     Me.tabNetwork.ResumeLayout(False)
     Me.pnlNetwork.ResumeLayout(False)
     Me.pnlNetwork.PerformLayout()
@@ -3219,7 +3218,7 @@ Partial Class frmConfig
   Friend WithEvents lnPrefColorTitle As RestrictionTracker.LineBreak
   Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pctPrefInterfaceIcon As System.Windows.Forms.PictureBox
-  Friend WithEvents TableLayoutPanel2 As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlPrefInterfaceInput As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents chkScaleScreen As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayIcon As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayMin As System.Windows.Forms.CheckBox

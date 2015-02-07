@@ -174,6 +174,8 @@ Class AppSettings
   Private m_Overuse As Integer
   Private m_Overtime As Integer
   Private m_AlertStyle As String
+  Private m_TrayIcon As TrayStyles
+  Private m_AutoHide As Boolean
   Private m_ProxySetting As String
   Private m_LastNag As Date
   Private m_Protocol As Net.SecurityProtocolType
@@ -183,6 +185,11 @@ Class AppSettings
     Auto = 1
     Ask
     None
+  End Enum
+  Public Enum TrayStyles
+    Always
+    Minimized
+    Never
   End Enum
   Private ReadOnly Property ConfigFile As String
     Get
@@ -481,6 +488,30 @@ Class AppSettings
           m_AlertStyle = xAlertStyle.Element("value").Value
         Catch ex As Exception
           m_AlertStyle = "Default"
+        End Try
+      End If
+      Dim xTrayIcon As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TrayIcon")
+      If xTrayIcon Is Nothing Then
+        m_TrayIcon = TrayStyles.Always
+      Else
+        Try
+          Select Case xTrayIcon.Element("value").Value
+            Case "Never" : m_TrayIcon = TrayStyles.Never
+            Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+            Case Else : m_TrayIcon = TrayStyles.Always
+          End Select
+        Catch ex As Exception
+          m_TrayIcon = TrayStyles.Always
+        End Try
+      End If
+      Dim xAutoHide As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AutoHide")
+      If xAutoHide Is Nothing Then
+        m_AutoHide = True
+      Else
+        Try
+          m_AutoHide = xAutoHide.Element("value").Value = "True"
+        Catch ex As Exception
+          m_AutoHide = True
         End Try
       End If
       Dim xProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
@@ -871,6 +902,8 @@ Class AppSettings
     m_Overuse = 0
     m_Overtime = 60
     m_AlertStyle = "Default"
+    m_TrayIcon = TrayStyles.Always
+    m_AutoHide = True
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
     m_Protocol = Net.SecurityProtocolType.Tls
@@ -917,8 +950,12 @@ Class AppSettings
     Dim sUpdateType As String = "Ask"
     Select Case m_UpdateType
       Case UpdateTypes.Auto : sUpdateType = "Auto"
-      Case UpdateTypes.Ask : sUpdateType = "Ask"
       Case UpdateTypes.None : sUpdateType = "None"
+    End Select
+    Dim sTrayIcon As String = "Always"
+    Select Case m_TrayIcon
+      Case TrayStyles.Never : sTrayIcon = "Never"
+      Case TrayStyles.Minimized : sTrayIcon = "Minimized"
     End Select
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
@@ -945,6 +982,8 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Overuse"), New XElement("value", m_Overuse)),
                                                           New XElement("setting", New XAttribute("name", "Overtime"), New XElement("value", m_Overtime)),
                                                           New XElement("setting", New XAttribute("name", "AlertStyle"), New XElement("value", m_AlertStyle)),
+                                                          New XElement("setting", New XAttribute("name", "TrayIcon"), New XElement("value", sTrayIcon)),
+                                                          New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", IIf(m_Protocol = Net.SecurityProtocolType.Tls, "TLS", "SSL"))))),
@@ -982,7 +1021,6 @@ Class AppSettings
                                                                        New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryUpMax)))),
                                                           New XElement("setting", New XAttribute("name", "Text"), New XElement("value", ColorToStr(Colors.HistoryText))),
                                                           New XElement("setting", New XAttribute("name", "Background"), New XElement("value", ColorToStr(Colors.HistoryBackground))))))
-
     If InUseChecker(ConfigFile, IO.FileAccess.Write) Then
       MakeBackup()
       Try
@@ -1270,6 +1308,22 @@ Class AppSettings
     End Get
     Set(value As String)
       m_AlertStyle = value
+    End Set
+  End Property
+  Public Property TrayIconStyle As TrayStyles
+    Get
+      Return m_TrayIcon
+    End Get
+    Set(value As TrayStyles)
+      m_TrayIcon = value
+    End Set
+  End Property
+  Public Property AutoHide
+    Get
+      Return m_AutoHide
+    End Get
+    Set(value)
+      m_AutoHide = value
     End Set
   End Property
   Public Property Proxy As Net.IWebProxy
