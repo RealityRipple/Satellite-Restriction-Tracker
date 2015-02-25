@@ -83,6 +83,23 @@
     Try
       Dim response As Net.WebResponse = MyBase.GetWebResponse(request)
       ResponseURI = response.ResponseUri
+      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
+        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+        End Try
+      ElseIf response.ContentType.ToLower.Contains("charset=") Then
+        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
+        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
+        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+        End Try
+      End If
       Return response
     Catch ex As Net.WebException
       If c_ErrorBypass Then
@@ -100,6 +117,23 @@
     Try
       Dim response As Net.WebResponse = MyBase.GetWebResponse(request, result)
       ResponseURI = response.ResponseUri
+      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
+        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+        End Try
+      ElseIf response.ContentType.ToLower.Contains("charset=") Then
+        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
+        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
+        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+        End Try
+      End If
       Return response
     Catch ex As Net.WebException
       If c_ErrorBypass Then
