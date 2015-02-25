@@ -69,6 +69,8 @@ Module modFunctions
         ElseIf ex.Message.Contains("401") Then
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "The server did not like the login. Please check your provider."
+        ElseIf ex.Message.Contains("403") Then
+          Return "The server did not like the login. Please check your provider."
         ElseIf ex.Message.Contains("404") Then
           Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
         ElseIf ex.Message.Contains("405") Then
@@ -104,6 +106,10 @@ Module modFunctions
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection aborted - " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
         End If
+      ElseIf ex.Message.Contains("Exception of type 'System.OutOfMemoryException' was thrown") Then
+        Return "Out of Memory exception. Check your local network."
+      ElseIf ex.Message.Contains("The server committed a protocol violation") Then
+        Return "The server response was unexpected. Check your Internet connection."
       ElseIf ex.Message.StartsWith("Error:") Then
         If ex.Message.Contains("NameResolutionFailure") Then
           Return "Could not connect to your DNS. Check your Internet connection."
@@ -259,6 +265,8 @@ Module modFunctions
             Return "The network is unreachable. Check your Internet connection."
           ElseIf ex.InnerException.Message.Contains("Connection refused") Then
             Return "The server refused the connection. Please try again."
+          ElseIf ex.InnerException.Message.Contains("Connection timed out") Then
+            Return "Connection to the server timed out. Please try again."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
