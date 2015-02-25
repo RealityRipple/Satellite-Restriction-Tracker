@@ -923,6 +923,8 @@ Public Class frmMain
           UsageInvoker.BeginInvoke(Nothing, Nothing)
         Case remoteRestrictionTracker.FailureEventArgs.FailType.Network
           sErr = "Network Connection Error" & IIf(String.IsNullOrEmpty(e.Details), ".", " (" & e.Details & ")")
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
+          sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
       End Select
       If remoteData IsNot Nothing Then
         remoteData.Dispose()

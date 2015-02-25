@@ -706,13 +706,12 @@
       Dim sErr As String = "There was an error verifying your key!"
       Select Case e.Type
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadPassword : sErr = "Your password is incorrect!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "There is no data on your account yet!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoPassword : sErr = "Your account has no password registered to it!"
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection."
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
       End Select
       If pChecker IsNot Nothing Then
         pChecker.Dispose()

@@ -519,13 +519,12 @@ Public Class frmWizard
       Dim sErr As String = "There was an error verifying your key!"
       Select Case e.Type
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadPassword : sErr = "Your password is incorrect!"
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "There is no data on your account yet!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoPassword : sErr = "Your account has no password registered to it!"
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
         Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection."
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
       End Select
       If pChecker IsNot Nothing Then
         pChecker.Dispose()
@@ -535,12 +534,13 @@ Public Class frmWizard
         remoteTest.Dispose()
         remoteTest = Nothing
       End If
-      If e.Type = remoteRestrictionTracker.FailureEventArgs.FailType.Network Then
-        optNone.Checked = True
-        MessageBox.Show("You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
-      Else
-        MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-      End If
+      Select Case e.Type
+        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
+          MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+        Case Else
+          optNone.Checked = True
+          MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      End Select
       DrawStatus(False)
       pnlKey.Tag = 0
     End If
