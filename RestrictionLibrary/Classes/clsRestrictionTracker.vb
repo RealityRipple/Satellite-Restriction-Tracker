@@ -1015,6 +1015,9 @@
       ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
         sErrMsg = "Login Failed: Please check your account information and try again."
         bReset = False
+      ElseIf sRet.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
+        sErrMsg = "Login Failed: Server encountered an unexpected error."
+        bReset = False
       Else
         sErrMsg = "Could not log in."
         sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
@@ -1136,6 +1139,9 @@
         ReadUsage(sTable)
       ElseIf sRet.Contains("<span id=""ajax-view-state""") Then
         EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "3")
+      ElseIf sRet.ToLower.Contains("we are down for maintenance.") Then
+        sErrMsg = "Usage Failed: Server down for maintenance."
+        bReset = False
       Else
         sErrMsg = "ViewState Load Failed: Could not find usage data."
         sFailText = "Exede AJAX Page Error = " & sErrMsg & vbNewLine & sRet
