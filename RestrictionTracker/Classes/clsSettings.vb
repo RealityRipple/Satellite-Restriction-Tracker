@@ -17,7 +17,11 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
     If InUseChecker(AppDataAll & "\user.config", IO.FileAccess.Write) Then
-      xConfig.Save(AppDataAll & "\user.config")
+      Try
+        xConfig.Save(AppDataAll & "\user.config")
+      Catch ex As Exception
+        MessageBox.Show("Failed to save Service settings!" & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      End Try
     Else
       MessageBox.Show("Failed to save Service settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
     End If
