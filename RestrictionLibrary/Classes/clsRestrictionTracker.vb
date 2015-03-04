@@ -1169,10 +1169,14 @@
       Dim lUsed As Long = StrToVal(Used, MBPerGB)
       Dim lTotal As Long = StrToVal(Total, MBPerGB)
       ResetTimeout()
-      If lTotal > 0 Then
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
+      If lUsed = 0 And lTotal = 0 Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
       Else
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now))
+        If lTotal > 0 Then
+          RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
+        Else
+          RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now))
+        End If
       End If
     End If
   End Sub
