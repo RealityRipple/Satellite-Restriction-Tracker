@@ -321,6 +321,16 @@ Public Class DataBase
       My.Computer.FileSystem.RenameFile(Path, IO.Path.GetFileName(Path) & ".bak")
       bDelBack = True
     End If
+    Dim bFreedom As Boolean = True
+    Dim sample As UInt64 = CULng(data.LongLength) - 1
+    If sample > 15 Then sample = 15
+    For I As UInt64 = 0 To sample
+      Dim dRow As DataRow = data(I)
+      If Not (dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then
+        bFreedom = False
+        Exit For
+      End If
+    Next
     Try
       If LCase(IO.Path.GetExtension(Path)).CompareTo(".xml") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
@@ -331,6 +341,8 @@ Public Class DataBase
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
               nOut.WriteLine("  <History>")
               nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o") & "</DATETIME>")
               nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString & "</DOWNLOAD>")
@@ -350,6 +362,8 @@ Public Class DataBase
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
               SAVE_Write(nOut, dRow.DATETIME)
               SAVE_Write(nOut, dRow.DOWNLOAD)
               SAVE_Write(nOut, dRow.DOWNLIM)
@@ -367,6 +381,8 @@ Public Class DataBase
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = data(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
               nOut.WriteLine(dRow.DATETIME.ToString("o") & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
             Next
             nOut.Close()
