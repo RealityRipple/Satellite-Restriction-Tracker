@@ -267,6 +267,8 @@ Module modFunctions
             Return "The server refused the connection. Please try again."
           ElseIf ex.InnerException.Message.Contains("Connection timed out") Then
             Return "Connection to the server timed out. Please try again."
+          ElseIf ex.InnerException.Message.Contains("Network subsystem is down") Then
+            Return "Your computer's network is down. Check your networking settings."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
