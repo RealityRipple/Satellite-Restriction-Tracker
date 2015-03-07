@@ -1484,6 +1484,9 @@
     ElseIf sRet.ToLower.Contains("you've submitted your request too soon. please wait and try again.") Then
       sErrMsg = "Login Failed: Too many requests. Check for usage data less often."
       bReset = False
+    ElseIf sRet.ToLower.Contains("captcha") Then
+      sErrMsg = "Login Failed: Server requires a captcha to be entered to validate your account. Please log in through your web browser, then try again."
+      bReset = False
     Else
       sErrMsg = "Login Failed: Could not understand response."
       sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
