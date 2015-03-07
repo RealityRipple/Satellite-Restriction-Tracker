@@ -1115,8 +1115,10 @@
         Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, subState, subVal, sURI)
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
       ElseIf sRet.Contains("https://myexede.force.com/atlasPlanInvalid") Or sRet.Contains("https://my.exede.net/atlasPlanInvalid") Then
-        sErrMsg = "You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists."
+        sErrMsg = "Dashboard Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists."
         bReset = False
+      ElseIf sRet.Contains("Concurrent requests limit exceeded.") Then
+        sErrMsg = "Dashboard Load Failed: Too many requests. Check for usage data less often."
       Else
         sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
         sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
