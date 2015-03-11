@@ -1054,7 +1054,7 @@
       Dim sURI As String = "https://" & sHost & "/dashboard"
       Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, (1 / 5), sURI)
       wsData.DownloadStringAsync(New Uri(sURI), aState)
-    ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Then
+    ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Or sPath.ToLower.Contains("/ssoerror") Then
       sErrMsg = "Authentication Failed: The server may be down."
       bReset = True
     Else
