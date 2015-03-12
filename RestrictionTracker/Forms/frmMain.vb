@@ -1156,23 +1156,7 @@ Public Class frmMain
     tmrIcon.Enabled = False
     trayIcon.Icon = CreateRTrayIcon(lDown, lDownLim)
     SetNotifyIconText(trayIcon, sTTT)
-    If mySettings.Overuse > 0 Then
-      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
-      Dim TimeCheck As Integer = -mySettings.Overtime
-      If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
-        For I As Integer = lItems.Count - 2 To 0 Step -1
-          If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          End If
-        Next
-      End If
-    End If
+    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
   Private Sub DisplayDResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
@@ -1249,30 +1233,7 @@ Public Class frmMain
     tmrIcon.Enabled = False
     trayIcon.Icon = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
     SetNotifyIconText(trayIcon, sTTT)
-    If mySettings.Overuse > 0 Then
-      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
-      Dim TimeCheck As Integer = -mySettings.Overtime
-      If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
-        For I As Integer = lItems.Count - 2 To 0 Step -1
-          If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", Application.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          End If
-        Next
-      End If
-    End If
+    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
   Private Sub DisplayWResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
@@ -1349,30 +1310,7 @@ Public Class frmMain
     tmrIcon.Enabled = False
     trayIcon.Icon = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
     SetNotifyIconText(trayIcon, sTTT)
-    If mySettings.Overuse > 0 Then
-      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
-      Dim TimeCheck As Integer = -mySettings.Overtime
-      If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
-        For I As Integer = lItems.Count - 2 To 0 Step -1
-          If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", Application.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
-            Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
-            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", Application.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-            lastBalloon = TickCount()
-            Exit For
-          End If
-        Next
-      End If
-    End If
+    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
   Private Sub DisplayResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
     If lDownLim > 0 Or lUpLim > 0 Then
@@ -1394,6 +1332,60 @@ Public Class frmMain
       trayIcon.Text = Me.Text
       tmrIcon.Enabled = False
       trayIcon.Icon = MakeIcon(IconName.norm)
+    End If
+  End Sub
+  Private Sub DisplayResultAlert(Type As localRestrictionTracker.SatHostTypes, lDown As Long, lUp As Long)
+    If mySettings.Overuse > 0 Then
+      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
+      Dim TimeCheck As Integer = -mySettings.Overtime
+      If TimeCheck <= -15 Then
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        For I As Integer = lItems.Count - 2 To 0 Step -1
+          Select Case Type
+            Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
+              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
+                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
+                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+                MakeNotifier(taskNotifier, False)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", Application.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                lastBalloon = TickCount()
+                Exit For
+              ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
+                Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
+                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+                MakeNotifier(taskNotifier, False)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", Application.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                lastBalloon = TickCount()
+                Exit For
+              End If
+            Case SatHostTypes.WildBlue_EXEDE, SatHostTypes.RuralPortal_EXEDE
+              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
+                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
+                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+                MakeNotifier(taskNotifier, False)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                lastBalloon = TickCount()
+                Exit For
+              End If
+            Case SatHostTypes.DishNet_EXEDE
+              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
+                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
+                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+                MakeNotifier(taskNotifier, False)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                lastBalloon = TickCount()
+                Exit For
+              ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
+                Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
+                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+                MakeNotifier(taskNotifier, False)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", Application.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                lastBalloon = TickCount()
+                Exit For
+              End If
+          End Select
+        Next
+      End If
     End If
   End Sub
 #End Region
