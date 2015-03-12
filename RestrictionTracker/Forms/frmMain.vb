@@ -1118,7 +1118,12 @@ Public Class frmMain
     End If
     Dim sTTT As String = Me.Text
     If lDown >= lDownLim Then imSlowed = True
-    If lDown < lDownLim * 0.7 Then imSlowed = False
+    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
+      If lDown < lDownLim Then imSlowed = False
+      If lDownLim = 150000 Then imSlowed = False
+    Else
+      If lDown < lDownLim * 0.7 Then imSlowed = False
+    End If
     pnlWildBlue.Visible = False
     pnlExede.Visible = False
     pnlRural.Visible = True
@@ -1172,7 +1177,11 @@ Public Class frmMain
   Private Sub DisplayDResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
     If lDown >= lDownLim Then imSlowed = True
-    If lDown < lDownLim * 0.7 Then imSlowed = False
+    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
+      If lDown < lDownLim Then imSlowed = False
+    Else
+      If lDown < lDownLim * 0.7 Then imSlowed = False
+    End If
     pnlWildBlue.Visible = True
     pnlExede.Visible = False
     pnlRural.Visible = False
@@ -1268,7 +1277,11 @@ Public Class frmMain
   Private Sub DisplayWResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
     If lDown >= lDownLim Or lUp >= lUpLim Then imSlowed = True
-    If lDown < lDownLim * 0.7 And lUp < lUpLim * 0.7 Then imSlowed = False
+    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
+      If lDown < lDownLim And lUp < lUpLim Then imSlowed = False
+    Else
+      If lDown < lDownLim * 0.7 And lUp < lUpLim * 0.7 Then imSlowed = False
+    End If
     pnlWildBlue.Visible = True
     pnlExede.Visible = False
     pnlRural.Visible = False
