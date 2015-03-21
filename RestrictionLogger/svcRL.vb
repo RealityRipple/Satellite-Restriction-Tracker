@@ -216,7 +216,7 @@ Public Class svcRL
         End If
       End If
     Catch ex As Exception
-      myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 8)
+      myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 2)
     End Try
   End Sub
   Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
@@ -224,7 +224,7 @@ Public Class svcRL
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
   Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure
-    myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 9)
+    myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 3)
   End Sub
   Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
@@ -235,7 +235,7 @@ Public Class svcRL
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
   Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
-    myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
+    'myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
   End Sub
   Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
