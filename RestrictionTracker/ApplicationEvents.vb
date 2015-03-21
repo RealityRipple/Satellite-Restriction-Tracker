@@ -49,10 +49,13 @@
         If cSettings.Service Then
           Dim cSave As New SvcSettings
           cSave.Account = cSettings.Account
+          cSave.AccountType = cSettings.AccountType
+          cSave.Interval = cSettings.Interval
           If Not String.IsNullOrEmpty(cSettings.PassCrypt) Then
             cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(cSettings.PassCrypt))
           End If
-          cSave.Interval = cSettings.Interval
+          cSave.Proxy = cSettings.Proxy
+          cSave.Timeout = cSettings.Timeout
           cSave.Save()
         Else
           If My.Computer.FileSystem.FileExists(AppDataAllPath & "\user.config") Then My.Computer.FileSystem.DeleteFile(AppDataAllPath & "\user.config")

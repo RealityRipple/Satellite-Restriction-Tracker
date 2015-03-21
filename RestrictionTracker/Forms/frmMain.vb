@@ -410,10 +410,12 @@ Public Class frmMain
     If mySettings.Service Then
       Dim cSave As New SvcSettings
       cSave.Account = mySettings.Account
+      cSave.Interval = mySettings.Interval
       If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
         cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(mySettings.PassCrypt))
       End If
-      cSave.Interval = mySettings.Interval
+      cSave.Proxy = mySettings.Proxy
+      cSave.Timeout = mySettings.Timeout
       cSave.Save()
     End If
     If My.Computer.FileSystem.FileExists(AppDataPath & "del.bat") Then My.Computer.FileSystem.DeleteFile(AppDataPath & "del.bat")

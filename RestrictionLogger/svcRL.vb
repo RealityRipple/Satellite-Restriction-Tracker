@@ -7,7 +7,7 @@ Public Class svcRL
   Private myLog As EventLog
   Private DataPath As String
   Private WithEvents tracker As localRestrictionTracker
-  Private WithEvents typeDetermination As DetermineType
+  Private typeDetermination As DetermineType
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.DishNet
@@ -135,15 +135,33 @@ Public Class svcRL
     End Function
   End Class
   Protected Overrides Sub OnStart(ByVal args() As String)
-    myLog = New EventLog("Satellite Restriction Service Log")
-    myLog.Source = "Service"
-    DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
-    tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), tmrCheck, 5000, 1000)
-    MySettings = New Settings(DataPath & "\user.config")
-    If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
-    InitAccount()
-    My.Computer.FileSystem.DeleteDirectory(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, FileIO.DeleteDirectoryOption.DeleteAllContents)
-    MyBase.OnStart(args)
+    If Not EventLog.SourceExists("Restriction Logger") Then
+      EventLog.CreateEventSource("Restriction Logger", "Application")
+    End If
+    myLog = New EventLog("Application")
+    myLog.Source = "Restriction Logger"
+    Try
+      DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
+      tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), tmrCheck, 5000, 1000)
+      MySettings = New Settings(DataPath & "\user.config")
+      If MySettings Is Nothing Then
+        myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
+      Else
+        InitAccount()
+        If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then
+          Try
+            MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
+          Catch ex As Exception
+            myLog.WriteEntry("Failed to determine type: " & ex.Message, EventLogEntryType.Warning)
+            MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
+          End Try
+        End If
+      End If
+      My.Computer.FileSystem.DeleteDirectory(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, FileIO.DeleteDirectoryOption.DeleteAllContents)
+      MyBase.OnStart(args)
+    Catch ex As Exception
+      myLog.WriteEntry("Error on Start: " & ex.Message, EventLogEntryType.Error, 1)
+    End Try
   End Sub
   Protected Overrides Sub OnStop()
     LOG_Terminate(False)
@@ -173,36 +191,40 @@ Public Class svcRL
     End If
   End Sub
   Private Sub InitAccount()
-    tracker = New localRestrictionTracker(DataPath)
-    MySettings = New Settings(DataPath & "\user.config")
-    If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
-      sPassword = StoredPassword.DecryptLogger(MySettings.PassCrypt)
-    End If
-    If Not sAccount = MySettings.Account Then
-      sAccount = MySettings.Account
-      If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-        sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
-        If My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".wb") Then
-          LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
-        ElseIf My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".xml") Then
-          LOG_Initialize(DataPath & "\History-" & sAccount & ".xml")
-        Else
-          LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
-        End If
-        If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
-      Else
-        MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
-        sAccount = String.Empty
-        sProvider = String.Empty
+    Try
+      tracker = New localRestrictionTracker(DataPath)
+      MySettings = New Settings(DataPath & "\user.config")
+      If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
+        sPassword = StoredPassword.DecryptLogger(MySettings.PassCrypt)
       End If
-    End If
+      If Not sAccount = MySettings.Account Then
+        sAccount = MySettings.Account
+        If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
+          sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
+          If My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".wb") Then
+            LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
+          ElseIf My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".xml") Then
+            LOG_Initialize(DataPath & "\History-" & sAccount & ".xml")
+          Else
+            LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
+          End If
+          If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
+        Else
+          MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
+          sAccount = String.Empty
+          sProvider = String.Empty
+        End If
+      End If
+    Catch ex As Exception
+      myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 8)
+    End Try
   End Sub
   Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
   Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure
-    myLog.WriteEntry(e.Type.ToString & ": " & e.Message, EventLogEntryType.Error)
+    myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 9)
   End Sub
   Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
@@ -213,7 +235,7 @@ Public Class svcRL
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
   Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
-    myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information)
+    myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
   End Sub
   Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY

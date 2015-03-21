@@ -8,10 +8,11 @@ Class SvcSettings
   Private m_Timeout As Integer
   Private m_ProxySetting As String
   Public Sub Save()
+    Dim sAccountType As String = HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionLogger.My.MySettings",
-                                                          New XElement("setting", New XAttribute("name", "Account"), New XElement("value", m_Account)),
+                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
@@ -28,6 +29,7 @@ Class SvcSettings
   End Sub
   Public Sub New()
     m_Account = Nothing
+    m_AccountType = SatHostTypes.Other
     m_PassCrypt = Nothing
     m_Interval = 15
     m_Timeout = 60

@@ -175,10 +175,11 @@ Public Class frmWizard
       If newSettings.Service Then
         Dim cSave As New SvcSettings
         cSave.Account = newSettings.Account
+        cSave.AccountType = newSettings.AccountType
+        cSave.Interval = newSettings.Interval
         If Not String.IsNullOrEmpty(newSettings.PassCrypt) Then
           cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(newSettings.PassCrypt))
         End If
-        cSave.Interval = newSettings.Interval
         cSave.Save()
       End If
       newSettings = Nothing
