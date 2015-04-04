@@ -75,6 +75,8 @@ Module modFunctions
           Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
         ElseIf ex.Message.Contains("405") Then
           Return "The server did not like the method. Please try again."
+        ElseIf ex.Message.Contains("408") Then
+          Return "Connection to the server timed out. Please try again."
         ElseIf ex.Message.Contains("500") Then
           Return "The server is too busy. Please try again."
         ElseIf ex.Message.Contains("502") Then
@@ -161,6 +163,10 @@ Module modFunctions
           Return "The server closed the connection. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An established connection was aborted by the software in your host machine") Then
           Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Cannot open log for source 'Restriction Logger'. You may not have write access") Then
+          Return "Error writing to logging service error log."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
@@ -269,9 +275,23 @@ Module modFunctions
             Return "Connection to the server timed out. Please try again."
           ElseIf ex.InnerException.Message.Contains("Network subsystem is down") Then
             Return "Your computer's network is down. Check your networking settings."
+          ElseIf ex.InnerException.Message.Contains("The requested address is not valid in this context") Then
+            Return "Invalid address. Check your Provider in the Configuration."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
+          End If
+        ElseIf ex.Message.Contains("SendFailure") Then
+          If ex.InnerException.Message.Contains("Error writing headers") Then
+            If ex.InnerException.InnerException.Message.Contains("The socket is not connected") Then
+              Return "Connection aborted."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Send Header Error - " & ex.InnerException.Message
+            End If
+          Else
+            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            Return "Send Error - " & ex.InnerException.Message
           End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
