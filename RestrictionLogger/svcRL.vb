@@ -135,24 +135,35 @@ Public Class svcRL
     End Function
   End Class
   Protected Overrides Sub OnStart(ByVal args() As String)
-    If Not EventLog.SourceExists("Restriction Logger") Then
-      EventLog.CreateEventSource("Restriction Logger", "Application")
-    End If
-    myLog = New EventLog("Application")
-    myLog.Source = "Restriction Logger"
+    Try
+      If Not EventLog.SourceExists("Restriction Logger") Then
+        EventLog.CreateEventSource("Restriction Logger", "Application")
+        Dim startWait As Long = TickCount()
+        Do Until EventLog.SourceExists("Restriction Logger")
+          Threading.Thread.Sleep(1)
+          If TickCount() - startWait >= 5000 Then Exit Do
+        Loop
+      End If
+      If EventLog.SourceExists("Restriction Logger") Then
+        myLog = New EventLog("Application")
+        myLog.Source = "Restriction Logger"
+      End If
+    Catch ex As Exception
+      myLog = Nothing
+    End Try
     Try
       DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
       tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), tmrCheck, 5000, 1000)
       MySettings = New Settings(DataPath & "\user.config")
       If MySettings Is Nothing Then
-        myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
+        If myLog IsNot Nothing Then myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
       Else
         InitAccount()
         If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then
           Try
             MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
           Catch ex As Exception
-            myLog.WriteEntry("Failed to determine type: " & ex.Message, EventLogEntryType.Warning)
+            If myLog IsNot Nothing Then myLog.WriteEntry("Failed to determine type: " & ex.Message, EventLogEntryType.Warning)
             MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
           End Try
         End If
@@ -160,7 +171,7 @@ Public Class svcRL
       My.Computer.FileSystem.DeleteDirectory(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData, FileIO.DeleteDirectoryOption.DeleteAllContents)
       MyBase.OnStart(args)
     Catch ex As Exception
-      myLog.WriteEntry("Error on Start: " & ex.Message, EventLogEntryType.Error, 1)
+      If myLog IsNot Nothing Then myLog.WriteEntry("Error on Start: " & ex.Message, EventLogEntryType.Error, 1)
     End Try
   End Sub
   Protected Overrides Sub OnStop()
@@ -216,7 +227,7 @@ Public Class svcRL
         End If
       End If
     Catch ex As Exception
-      myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 2)
+      If myLog IsNot Nothing Then myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 2)
     End Try
   End Sub
   Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
@@ -224,7 +235,7 @@ Public Class svcRL
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
   Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure
-    myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 3)
+    If myLog IsNot Nothing Then myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 3)
   End Sub
   Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
@@ -235,7 +246,7 @@ Public Class svcRL
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
   Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
-    'myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
+    'If myLog IsNot Nothing Then myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
   End Sub
   Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
