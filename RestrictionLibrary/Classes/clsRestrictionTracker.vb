@@ -832,7 +832,7 @@
         sErr = sRet.Substring(sRet.IndexOf("Oops"))
         If sErr.Contains("</h3>") Then
           sErr = sErr.Substring(0, sErr.IndexOf("</h3>"))
-          If sErr = "Oops. We're having a problem displaying your usage information." Then sErr = "Usage data is not available at this time."
+          If sErr = "Oops. We're having a problem displaying your usage information." Then sErr = "Data temporarily unavailable."
         ElseIf sErr.Contains("<hr>") Then
           sErr = sErr.Substring(sErr.IndexOf("<hr>") + 4)
           sErr = sErr.Substring(0, sErr.IndexOf("<hr>"))
@@ -1281,7 +1281,7 @@
       bReset = False
     ElseIf sRet.Contains("Current Usage") Then
       If sRet.Contains("Usage data is not available.") Then
-        sErrMsg = "Usage Failed: Usage data is not available at this time."
+        sErrMsg = "Data temporarily unavailable."
         bReset = False
       ElseIf sRet.Contains("<!-- usage bar -->") Then
         Dim sFind As String = sRet.Substring(sRet.IndexOf("<!-- usage bar -->"))
@@ -1639,7 +1639,7 @@
     If Table.Contains("alertError") Then
       ResetTimeout()
       If Table.Contains("This information is currently unavailable.") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage information currently unavailable."))
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
@@ -1723,7 +1723,9 @@
         Dim dMult As Double = StrToFloat(UsageList("offpeakresult"))
         lUp = (lUpT - ((lUpT * dMult) / 100))
       End If
-      If lDownT > 0 Then
+      If lDownT = 0 And lUpT = 0 Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
+      ElseIf lDownT > 0 Then
         If UsageList.ContainsKey("tokentotal") Then
           Dim lExtraT As Long = StrToVal(UsageList("tokentotal"), MBPerGB)
           Dim lExtra As Long = 0
