@@ -657,7 +657,7 @@ Public Class frmHistory
   Private Sub ResetDates()
     Dim dMin, dMax As Date
     LOG_Get(0, dMin, 0, 0, 0, 0)
-    Dim fDate As Date = DateSerial(2000, 1, 1)
+    Dim fDate As Date = New Date(2000, 1, 1)
     If DateDiff(DateInterval.Year, fDate, dMin) < 0 Then dMin = fDate
     If DateDiff(DateInterval.Second, dMin, Now) < 0 Then
       pctErr.Image = New ErrorProvider().Icon.ToBitmap
@@ -678,8 +678,8 @@ Public Class frmHistory
         ttHistory.SetTooltip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
       End If
     End If
-    If dtpFrom.MinDate.Year < 2000 Then dtpFrom.MinDate = DateSerial(2000, 1, 1)
-    If dtpTo.MinDate.Year < 2000 Then dtpTo.MinDate = DateSerial(2000, 1, 1)
+    If dtpFrom.MinDate.Year < 2000 Then dtpFrom.MinDate = New Date(2000, 1, 1)
+    If dtpTo.MinDate.Year < 2000 Then dtpTo.MinDate = New Date(2000, 1, 1)
   End Sub
 #End Region
 #Region "Notices"

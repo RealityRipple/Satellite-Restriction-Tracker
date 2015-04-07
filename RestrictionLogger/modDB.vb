@@ -43,11 +43,11 @@
     Return wbDB.Count
   End Function
   Public Function LOG_GetLast() As Date
-    If Not isLoaded Then Return DateSerial(1970, 1, 1)
+    If Not isLoaded Then Return New Date(1970, 1, 1)
     If LOG_GetCount() > 0 Then
       Return wbDB(LOG_GetCount() - 1).DATETIME
     Else
-      Return DateSerial(1970, 1, 1)
+      Return New Date(1970, 1, 1)
     End If
   End Function
   Public Sub LOG_Initialize(sPath As String)
