@@ -122,6 +122,9 @@
     <Compile Include="Classes\Visual Elements\clsLineBreak.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Classes\Visual Elements\clsLinkPictureBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\Visual Elements\clsNumericUpDown.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -335,6 +338,9 @@
     <None Include="Resources\config\advanced_portable_missing.png" />
     <None Include="Resources\config\advanced_security.png" />
     <None Include="Resources\config\network_security.png" />
+    <None Include="Resources\config\advanced_nettest_edit.png" />
+    <None Include="Resources\config\advanced_nettest_error.png" />
+    <None Include="Resources\config\advanced_nettest_load.png" />
     <Content Include="Resources\config\prefs_interface.png" />
     <Content Include="Resources\default_alert.png" />
     <Content Include="Resources\default_close.png" />

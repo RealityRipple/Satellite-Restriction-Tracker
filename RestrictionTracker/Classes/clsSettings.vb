@@ -184,6 +184,7 @@ Class AppSettings
   Private m_AutoHide As Boolean
   Private m_ProxySetting As String
   Private m_LastNag As Date
+  Private m_NetTest As String
   Private m_Protocol As Net.SecurityProtocolType
   Public Loaded As Boolean
   Public Colors As AppColors
@@ -550,6 +551,16 @@ Class AppSettings
           m_Protocol = Net.SecurityProtocolType.Tls
         End Try
       End If
+      Dim xNetTest As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "NetTestURL")
+      If xNetTest Is Nothing Then
+        m_NetTest = Nothing
+      Else
+        Try
+          m_NetTest = xNetTest.Element("value").Value
+        Catch ex As Exception
+          m_NetTest = Nothing
+        End Try
+      End If
       Colors = New AppColors
       Dim xcolorSettings As XElement = xConfig.Element("colorSettings")
       If xcolorSettings Is Nothing Then
@@ -913,6 +924,7 @@ Class AppSettings
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
     m_Protocol = Net.SecurityProtocolType.Tls
+    m_NetTest = Nothing
     Colors = New AppColors
     ResetColors()
   End Sub
@@ -992,7 +1004,8 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
-                                                          New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", IIf(m_Protocol = Net.SecurityProtocolType.Tls, "TLS", "SSL"))))),
+                                                          New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", IIf(m_Protocol = Net.SecurityProtocolType.Tls, "TLS", "SSL"))),
+                                                          New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),
                                                           New XElement("section", New XAttribute("name", "Download"),
@@ -1432,6 +1445,14 @@ Class AppSettings
     End Get
     Set(value As Net.SecurityProtocolType)
       m_Protocol = value
+    End Set
+  End Property
+  Public Property NetTestURL As String
+    Get
+      Return m_NetTest
+    End Get
+    Set(value As String)
+      m_NetTest = value
     End Set
   End Property
   Class AppColors

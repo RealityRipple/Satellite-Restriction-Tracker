@@ -13,6 +13,7 @@ Public Class frmMain
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
   Private WithEvents wsHostList As CookieAwareWebClient
+  Private WithEvents wsNetTest As CookieAwareWebClient
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
@@ -433,6 +434,18 @@ Public Class frmMain
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
+  Private Sub pctNetworkTest_Click(sender As System.Object, e As System.EventArgs) Handles pctNetworkTest.Click
+    Try
+      If mySettings.NetTestURL.Contains("://") Then
+        Process.Start(mySettings.NetTestURL)
+      Else
+        Process.Start("http://" & mySettings.NetTestURL)
+      End If
+    Catch ex As Exception
+      MakeNotifier(taskNotifier, False)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+    End Try
+  End Sub
   Protected Overrides Function ProcessKeyPreview(ByRef m As System.Windows.Forms.Message) As Boolean
     Static bDown As Boolean
     Select Case m.Msg
@@ -480,6 +493,32 @@ Public Class frmMain
       trayIcon.Visible = Me.WindowState = FormWindowState.Minimized
     Else
       trayIcon.Visible = False
+    End If
+    If String.IsNullOrEmpty(mySettings.NetTestURL) Then
+      pctNetworkTest.Visible = False
+      pctNetworkTest.Cursor = Cursors.Default
+    Else
+      pctNetworkTest.Visible = True
+      pctNetworkTest.Cursor = Cursors.Hand
+      Dim sNetTestIco As String = IO.Path.Combine(AppDataPath, "netTest.png")
+      If IO.File.Exists(sNetTestIco) Then
+        Using imgNetDrawn As New Bitmap(16, 16)
+          Using g As Graphics = Graphics.FromImage(imgNetDrawn)
+            Using imgNetTest As Image = Image.FromFile(sNetTestIco)
+              g.DrawImage(imgNetTest, 0, 0)
+            End Using
+            pctNetworkTest.Image = imgNetDrawn.Clone
+          End Using
+        End Using
+      Else
+        pctNetworkTest.Image = My.Resources.throbber
+        GetNetTestIcon(mySettings.NetTestURL)
+      End If
+      Dim sNetTestTitle As String = mySettings.NetTestURL
+      If sNetTestTitle.Contains("://") Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf("://") + 3)
+      If sNetTestTitle.StartsWith("www.") Then sNetTestTitle = sNetTestTitle.Substring(4)
+      If sNetTestTitle.Contains("/") Then sNetTestTitle = sNetTestTitle.Substring(0, sNetTestTitle.IndexOf("/"))
+      ttUI.SetTooltip(pctNetworkTest, "Visit " & sNetTestTitle & ".")
     End If
   End Sub
   Private Sub ReInit()
@@ -2124,6 +2163,177 @@ Public Class frmMain
       Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
     Else
       mySettings.Colors = GetDefaultColors(mySettings.AccountType)
+    End If
+  End Sub
+  Private Sub GetNetTestIcon(Optional URL As String = Nothing)
+    If String.IsNullOrEmpty(URL) Then
+      pctNetworkTest.Image = Nothing
+      pctNetworkTest.Visible = False
+    Else
+      Try
+        wsNetTest = New CookieAwareWebClient
+        If Not URL.Contains("://") Then URL = "http://" & URL
+        Dim pathURL As New Uri(URL)
+        wsNetTest.DownloadFileAsync(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
+      Catch ex As Exception
+        Try
+          GenNetTestIconFrom(URL)
+        Catch ex2 As Exception
+          pctNetworkTest.Image = My.Resources.ico_err
+          pctNetworkTest.Visible = True
+        End Try
+      End Try
+    End If
+  End Sub
+  Private Sub GenNetTestIconFrom(URL As String)
+    Try
+      wsNetTest = New CookieAwareWebClient
+      If Not URL.Contains("://") Then URL = "http://" & URL
+      Dim pathURL As New Uri(URL)
+      wsNetTest.DownloadStringAsync(pathURL, URL)
+    Catch ex As Exception
+      pctNetworkTest.Image = My.Resources.ico_err
+      pctNetworkTest.Visible = True
+    End Try
+  End Sub
+  Private Sub wsNetTest_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsNetTest.DownloadFileCompleted
+    If Me.InvokeRequired Then
+      Me.Invoke(New System.ComponentModel.AsyncCompletedEventHandler(AddressOf wsNetTest_DownloadFileCompleted), sender, e)
+      Return
+    End If
+    If e.Cancelled Then
+      If e.UserState Is Nothing Then
+        pctNetworkTest.Image = My.Resources.ico_err
+        pctNetworkTest.Visible = True
+      Else
+        GenNetTestIconFrom(e.UserState)
+        Return
+      End If
+    ElseIf e.Error IsNot Nothing Then
+      If e.UserState Is Nothing Then
+        pctNetworkTest.Image = My.Resources.ico_err
+        pctNetworkTest.Visible = True
+      Else
+        GenNetTestIconFrom(e.UserState)
+        Return
+      End If
+    Else
+      Dim imgFile As String = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico")
+      Dim pctPNG As New Bitmap(16, 16)
+      Dim didOK As Boolean = True
+      Using gPNG As Graphics = Graphics.FromImage(pctPNG)
+        Dim imgHeader(3) As Byte
+        Using iStream As IO.FileStream = IO.File.OpenRead(imgFile)
+          iStream.Read(imgHeader, 0, 4)
+        End Using
+        Try
+          Select Case BitConverter.ToUInt32(imgHeader, 0)
+            Case &H10000
+              Using newI As New Icon(imgFile, 16, 16)
+                gPNG.DrawIcon(newI, New Rectangle(0, 0, 16, 16))
+              End Using
+            Case &H474E5089
+              Using newI As Image = Image.FromFile(imgFile)
+                gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
+              End Using
+            Case Else
+              Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
+              Using newI As Image = Image.FromFile(imgFile)
+                gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
+              End Using
+          End Select
+        Catch ex As Exception
+          didOK = False
+        End Try
+      End Using
+      If didOK Then
+        pctPNG.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
+        pctNetworkTest.Image = pctPNG.Clone
+        pctNetworkTest.Visible = True
+      Else
+        If e.UserState Is Nothing Then
+          pctNetworkTest.Image = My.Resources.ico_err
+          pctNetworkTest.Visible = True
+        Else
+          GenNetTestIconFrom(e.UserState)
+          Return
+        End If
+      End If
+      pctPNG.Dispose()
+      pctPNG = Nothing
+      IO.File.Delete(imgFile)
+    End If
+    If wsNetTest IsNot Nothing Then
+      wsNetTest.Dispose()
+      wsNetTest = Nothing
+    End If
+  End Sub
+  Private Sub wsNetTest_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsNetTest.DownloadStringCompleted
+    If Me.InvokeRequired Then
+      Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsNetTest_DownloadStringCompleted), sender, e)
+      Return
+    End If
+    If e.Cancelled Then
+      pctNetworkTest.Image = My.Resources.ico_err
+      pctNetworkTest.Visible = True
+    ElseIf e.Error IsNot Nothing Then
+      pctNetworkTest.Image = My.Resources.ico_err
+      pctNetworkTest.Visible = True
+    Else
+      Dim sHTML As String = e.Result
+      If sHTML.ToLower.Contains("rel=""icon""") Then
+        If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
+          sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
+          If sHTML.Contains(">") Then
+            sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
+            If sHTML.ToLower.Contains("href") Then
+              sHTML = sHTML.Substring(sHTML.IndexOf("href"))
+              If sHTML.Contains("""") Then
+                sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
+                If sHTML.Contains("""") Then
+                  Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
+                  Try
+                    wsNetTest = New CookieAwareWebClient
+                    If Not URL.Contains("://") Then
+                      Dim oldURL As String = e.UserState
+                      If Not oldURL.EndsWith("/") Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
+                      If URL.StartsWith("/") Then
+                        oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
+                        URL = oldURL & URL
+                      Else
+                        URL = oldURL & URL
+                      End If
+                    End If
+                    Dim pathURL As New Uri(URL)
+                    wsNetTest.DownloadFileAsync(pathURL, IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+                  Catch ex As Exception
+                    pctNetworkTest.Image = My.Resources.ico_err
+                    pctNetworkTest.Visible = True
+                  End Try
+                Else
+                  pctNetworkTest.Image = My.Resources.ico_err
+                  pctNetworkTest.Visible = True
+                End If
+              Else
+                pctNetworkTest.Image = My.Resources.ico_err
+                pctNetworkTest.Visible = True
+              End If
+            Else
+              pctNetworkTest.Image = My.Resources.ico_err
+              pctNetworkTest.Visible = True
+            End If
+          Else
+            pctNetworkTest.Image = My.Resources.ico_err
+            pctNetworkTest.Visible = True
+          End If
+        Else
+          pctNetworkTest.Image = My.Resources.ico_err
+          pctNetworkTest.Visible = True
+        End If
+      Else
+        pctNetworkTest.Image = My.Resources.ico_err
+        pctNetworkTest.Visible = True
+      End If
     End If
   End Sub
 #End Region

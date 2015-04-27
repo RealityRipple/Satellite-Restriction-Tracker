@@ -1,6 +1,7 @@
 ﻿Public Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents wsHostList As CookieAwareWebClient
+  Private WithEvents wsNetTest As CookieAwareWebClient
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
@@ -155,6 +156,18 @@
       End If
     End If
     chkNetworkProtocolSSL.Checked = mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3
+    If String.IsNullOrEmpty(mySettings.NetTestURL) Then
+      optNetTestNone.Checked = True
+    Else
+      Select Case mySettings.NetTestURL
+        Case "http://testmy.net" : optNetTestTestMyNet.Checked = True
+        Case "http://speedtest.net" : optNetTestSpeedTest.Checked = True
+        Case Else
+          optNetTestCustom.Checked = True
+          txtNetTestCustom.Text = mySettings.NetTestURL
+          SetNetTestIcon(txtNetTestCustom.Text)
+      End Select
+    End If
     Select Case mySettings.UpdateType
       Case AppSettings.UpdateTypes.Auto : cmbUpdateAutomation.SelectedIndex = 0
       Case AppSettings.UpdateTypes.Ask : cmbUpdateAutomation.SelectedIndex = 1
@@ -281,7 +294,7 @@
     pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
     pnlAdvanced.MouseMove,
     pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
-    pnlButtons.MouseMove, pnlPrefInterfaceInput.MouseMove, TableLayoutPanel1.MouseMove
+    pnlButtons.MouseMove, pnlPrefInterfaceInput.MouseMove, TableLayoutPanel1.MouseMove, pnlAdvancedNetTestInput.MouseMove, pnlAdvancedNetTest.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -596,6 +609,58 @@
     txtHistoryDir.Text = MySaveDir
     cmdSave.Enabled = SettingsChanged()
   End Sub
+  Private Sub optNetTestNone_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestNone.CheckedChanged
+    If optNetTestNone.Checked Then
+      ResetNetTestIconLoad()
+      txtNetTestCustom.Text = ""
+      txtNetTestCustom.Enabled = False
+      SetNetTestIcon()
+      cmdSave.Enabled = SettingsChanged()
+    End If
+  End Sub
+  Private Sub optNetTestTestMyNet_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestTestMyNet.CheckedChanged
+    If optNetTestTestMyNet.Checked Then
+      ResetNetTestIconLoad()
+      txtNetTestCustom.Text = "http://testmy.net"
+      txtNetTestCustom.Enabled = False
+      SetNetTestIcon("testmy.net")
+      cmdSave.Enabled = SettingsChanged()
+    End If
+  End Sub
+  Private Sub optNetTestSpeedTest_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestSpeedTest.CheckedChanged
+    If optNetTestSpeedTest.Checked Then
+      ResetNetTestIconLoad()
+      txtNetTestCustom.Text = "http://speedtest.net"
+      txtNetTestCustom.Enabled = False
+      SetNetTestIcon("speedtest.net")
+      cmdSave.Enabled = SettingsChanged()
+    End If
+  End Sub
+  Private Sub optNetTestCustom_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestCustom.CheckedChanged
+    If optNetTestCustom.Checked Then
+      ResetNetTestIconLoad()
+      txtNetTestCustom.Text = ""
+      txtNetTestCustom.Enabled = True
+      SetNetTestIcon()
+      cmdSave.Enabled = SettingsChanged()
+    End If
+  End Sub
+  Private Sub txtNetTestCustom_LostFocus(sender As Object, e As System.EventArgs) Handles txtNetTestCustom.LostFocus
+    If optNetTestCustom.Checked Then
+      If pctAdvancedNetTestIcon.Tag Is Nothing Then
+        tmrIcoWait.Stop()
+        SetNetTestIcon(txtNetTestCustom.Text)
+      End If
+    End If
+  End Sub
+  Private Sub txtNetTestCustom_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtNetTestCustom.TextChanged
+    If optNetTestCustom.Checked Then
+      SetNetTestIcon()
+      cmdSave.Enabled = SettingsChanged()
+      tmrIcoWait.Stop()
+      tmrIcoWait.Start()
+    End If
+  End Sub
   Private Sub txtPortableDir_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtPortableDir.TextChanged
     If String.IsNullOrEmpty(txtPortableDir.Text) Then
       cmdMakePortable.Enabled = False
@@ -655,6 +720,195 @@
     cmbProvider.Items.Add("exede.net")
     cmbProvider.Items.Add("dishmail.net")
     cmbProvider.Items.Add("dish.net")
+  End Sub
+#End Region
+#Region "Net Test"
+  Private Sub ResetNetTestIconLoad()
+    If wsNetTest IsNot Nothing Then
+      If wsNetTest.IsBusy Then wsNetTest.CancelAsync()
+      wsNetTest.Dispose()
+      wsNetTest = Nothing
+    End If
+  End Sub
+  Private Sub SetNetTestIcon(Optional URL As String = Nothing)
+    tmrIcoWait.Stop()
+    pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.InitialImage
+    pctAdvancedNetTestIcon.Tag = Nothing
+    If String.IsNullOrEmpty(URL) Then
+      pctAdvancedNetTestIcon.Image = My.Resources.advanced_nettest_edit
+    Else
+      ResetNetTestIconLoad()
+      Try
+        wsNetTest = New CookieAwareWebClient
+        If Not URL.Contains("://") Then URL = "http://" & URL
+        Dim pathURL As New Uri(URL)
+        wsNetTest.DownloadFileAsync(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
+      Catch ex As Exception
+        pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+        pctAdvancedNetTestIcon.Tag = Nothing
+      End Try
+    End If
+  End Sub
+  Private Sub GenNetTestIconFrom(URL As String)
+    Try
+      wsNetTest = New CookieAwareWebClient
+      If Not URL.Contains("://") Then URL = "http://" & URL
+      Dim pathURL As New Uri(URL)
+      wsNetTest.DownloadStringAsync(pathURL, URL)
+    Catch ex As Exception
+      pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+      pctAdvancedNetTestIcon.Tag = Nothing
+    End Try
+  End Sub
+  Private Sub wsNetTest_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsNetTest.DownloadFileCompleted
+    If Me.InvokeRequired Then
+      Me.Invoke(New System.ComponentModel.AsyncCompletedEventHandler(AddressOf wsNetTest_DownloadFileCompleted), sender, e)
+      Return
+    End If
+    If e.Cancelled Then
+      If e.UserState Is Nothing Then
+        pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+        pctAdvancedNetTestIcon.Tag = Nothing
+      Else
+        GenNetTestIconFrom(e.UserState)
+        Return
+      End If
+    ElseIf e.Error IsNot Nothing Then
+      If e.UserState Is Nothing Then
+        pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+        pctAdvancedNetTestIcon.Tag = Nothing
+      Else
+        GenNetTestIconFrom(e.UserState)
+        Return
+      End If
+    Else
+      Dim imgFile As String = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico")
+      Dim pctImage As New Bitmap(32, 32)
+      Dim pctPNG As New Bitmap(16, 16)
+      Using g As Graphics = Graphics.FromImage(pctImage)
+        Using gPNG As Graphics = Graphics.FromImage(pctPNG)
+          Dim imgHeader(3) As Byte
+          Using iStream As IO.FileStream = IO.File.OpenRead(imgFile)
+            iStream.Read(imgHeader, 0, 4)
+          End Using
+          Try
+            Select Case BitConverter.ToUInt32(imgHeader, 0)
+              Case &H10000
+                Using newI As New Icon(imgFile, 32, 32)
+                  g.DrawIcon(newI, New Rectangle(0, 0, 32, 32))
+                End Using
+                Using newI As New Icon(imgFile, 16, 16)
+                  gPNG.DrawIcon(newI, New Rectangle(0, 0, 16, 16))
+                End Using
+              Case &H474E5089
+                Using newI As Image = Image.FromFile(imgFile)
+                  g.DrawImage(newI, New Rectangle(0, 0, 32, 32))
+                  gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
+                End Using
+              Case Else
+                Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
+                Using newI As Image = Image.FromFile(imgFile)
+                  g.DrawImage(newI, New Rectangle(0, 0, 32, 32))
+                  gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
+                End Using
+            End Select
+          Catch ex As Exception
+            If e.UserState Is Nothing Then
+              pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+              pctAdvancedNetTestIcon.Tag = Nothing
+            Else
+              GenNetTestIconFrom(e.UserState)
+              Return
+            End If
+          End Try
+        End Using
+      End Using
+      pctAdvancedNetTestIcon.Image = pctImage.Clone
+      pctImage.Dispose()
+      pctImage = Nothing
+      pctAdvancedNetTestIcon.Tag = pctPNG.Clone
+      pctPNG.Dispose()
+      pctPNG = Nothing
+      IO.File.Delete(imgFile)
+    End If
+    If wsNetTest IsNot Nothing Then
+      wsNetTest.Dispose()
+      wsNetTest = Nothing
+    End If
+  End Sub
+  Private Sub wsNetTest_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsNetTest.DownloadStringCompleted
+    If Me.InvokeRequired Then
+      Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsNetTest_DownloadStringCompleted), sender, e)
+      Return
+    End If
+    If e.Cancelled Then
+      pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+      pctAdvancedNetTestIcon.Tag = Nothing
+    ElseIf e.Error IsNot Nothing Then
+      pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+      pctAdvancedNetTestIcon.Tag = Nothing
+    Else
+      Dim sHTML As String = e.Result
+      If sHTML.ToLower.Contains("rel=""icon""") Then
+        If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
+          sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
+          If sHTML.Contains(">") Then
+            sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
+            If sHTML.ToLower.Contains("href") Then
+              sHTML = sHTML.Substring(sHTML.IndexOf("href"))
+              If sHTML.Contains("""") Then
+                sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
+                If sHTML.Contains("""") Then
+                  Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
+                  Try
+                    wsNetTest = New CookieAwareWebClient
+                    If Not URL.Contains("://") Then
+                      Dim oldURL As String = e.UserState
+                      If Not oldURL.EndsWith("/") Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
+                      If URL.StartsWith("/") Then
+                        oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
+                        URL = oldURL & URL
+                      Else
+                        URL = oldURL & URL
+                      End If
+                    End If
+                    Dim pathURL As New Uri(URL)
+                    wsNetTest.DownloadFileAsync(pathURL, IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+                  Catch ex As Exception
+                    pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+                    pctAdvancedNetTestIcon.Tag = Nothing
+                  End Try
+                Else
+                  pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+                  pctAdvancedNetTestIcon.Tag = Nothing
+                End If
+              Else
+                pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+                pctAdvancedNetTestIcon.Tag = Nothing
+              End If
+            Else
+              pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+              pctAdvancedNetTestIcon.Tag = Nothing
+            End If
+          Else
+            pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+            pctAdvancedNetTestIcon.Tag = Nothing
+          End If
+        Else
+          pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+          pctAdvancedNetTestIcon.Tag = Nothing
+        End If
+      Else
+        pctAdvancedNetTestIcon.Image = pctAdvancedNetTestIcon.ErrorImage
+        pctAdvancedNetTestIcon.Tag = Nothing
+      End If
+    End If
+  End Sub
+  Private Sub tmrIcoWait_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcoWait.Tick
+    tmrIcoWait.Stop()
+    If optNetTestCustom.Checked Then
+      SetNetTestIcon(txtNetTestCustom.Text)
+    End If
   End Sub
 #End Region
 #End Region
@@ -1017,6 +1271,36 @@
     Else
       mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
     End If
+    Dim sNetTestIco As String = IO.Path.Combine(AppDataPath, "netTest.png")
+    Try
+      If IO.File.Exists(sNetTestIco) Then IO.File.Delete(sNetTestIco)
+    Catch ex As Exception
+    End Try
+    If optNetTestTestMyNet.Checked Then
+      mySettings.NetTestURL = "http://testmy.net"
+      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
+        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
+        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
+      End If
+    ElseIf optNetTestSpeedTest.Checked Then
+      mySettings.NetTestURL = "http://speedtest.net"
+      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
+        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
+        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
+      End If
+    ElseIf optNetTestCustom.Checked Then
+      mySettings.NetTestURL = txtNetTestCustom.Text
+      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
+        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
+        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
+      End If
+    Else
+      mySettings.NetTestURL = Nothing
+      Try
+        If IO.File.Exists(sNetTestIco) Then IO.File.Delete(sNetTestIco)
+      Catch ex As Exception
+      End Try
+    End If
     Select Case cmbUpdateAutomation.SelectedIndex
       Case 0 : mySettings.UpdateType = AppSettings.UpdateTypes.Auto
       Case 1 : mySettings.UpdateType = AppSettings.UpdateTypes.Ask
@@ -1236,6 +1520,15 @@
     End If
     If mySettings.SecurityProtocol = Net.SecurityProtocolType.Ssl3 And Not chkNetworkProtocolSSL.Checked Then Return True
     If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls And chkNetworkProtocolSSL.Checked Then Return True
+    If optNetTestNone.Checked Then
+      If Not String.IsNullOrEmpty(mySettings.NetTestURL) Then Return True
+    ElseIf optNetTestTestMyNet.Checked Then
+      If Not mySettings.NetTestURL = "http://testmy.net" Then Return True
+    ElseIf optNetTestSpeedTest.Checked Then
+      If Not mySettings.NetTestURL = "http://speedtest.net" Then Return True
+    ElseIf optNetTestCustom.Checked Then
+      If Not mySettings.NetTestURL = txtNetTestCustom.Text Then Return True
+    End If
     Return False
   End Function
   Private Sub DoCheck()

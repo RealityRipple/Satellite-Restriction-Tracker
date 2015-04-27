@@ -30,6 +30,7 @@ Partial Class frmMain
     Me.cmdRefresh = New System.Windows.Forms.Button()
     Me.cmdConfig = New System.Windows.Forms.Button()
     Me.gbUsage = New System.Windows.Forms.GroupBox()
+    Me.pctNetworkTest = New RestrictionTracker.LinkPictureBox()
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
@@ -109,6 +110,7 @@ Partial Class frmMain
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
     Me.gbUsage.SuspendLayout()
+    CType(Me.pctNetworkTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNothing.SuspendLayout()
     Me.pnlWildBlue.SuspendLayout()
     Me.gbUld.SuspendLayout()
@@ -237,6 +239,7 @@ Partial Class frmMain
     '
     'gbUsage
     '
+    Me.gbUsage.Controls.Add(Me.pctNetworkTest)
     Me.gbUsage.Controls.Add(Me.lblStatus)
     Me.gbUsage.Controls.Add(Me.pnlNothing)
     Me.gbUsage.Controls.Add(Me.pnlWildBlue)
@@ -249,6 +252,16 @@ Partial Class frmMain
     Me.gbUsage.Size = New System.Drawing.Size(428, 128)
     Me.gbUsage.TabIndex = 1
     Me.gbUsage.TabStop = False
+    '
+    'pctNetworkTest
+    '
+    Me.pctNetworkTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pctNetworkTest.Location = New System.Drawing.Point(400, 0)
+    Me.pctNetworkTest.Name = "pctNetworkTest"
+    Me.pctNetworkTest.Size = New System.Drawing.Size(16, 16)
+    Me.pctNetworkTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+    Me.pctNetworkTest.TabIndex = 6
+    Me.pctNetworkTest.TabStop = False
     '
     'lblStatus
     '
@@ -1165,6 +1178,7 @@ Partial Class frmMain
     Me.pnlSettings.PerformLayout()
     Me.gbUsage.ResumeLayout(False)
     Me.gbUsage.PerformLayout()
+    CType(Me.pctNetworkTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
     Me.pnlWildBlue.ResumeLayout(False)
@@ -1300,4 +1314,5 @@ Partial Class frmMain
   Friend WithEvents mnuGraphSpace As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphColors As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphInvert As System.Windows.Forms.MenuItem
+  Friend WithEvents pctNetworkTest As LinkPictureBox
 End Class
