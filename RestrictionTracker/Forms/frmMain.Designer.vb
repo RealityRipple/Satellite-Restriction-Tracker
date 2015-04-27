@@ -30,7 +30,7 @@ Partial Class frmMain
     Me.cmdRefresh = New System.Windows.Forms.Button()
     Me.cmdConfig = New System.Windows.Forms.Button()
     Me.gbUsage = New System.Windows.Forms.GroupBox()
-    Me.pctNetworkTest = New RestrictionTracker.LinkPictureBox()
+    Me.pctNetTest = New RestrictionTracker.LinkPictureBox()
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
@@ -110,7 +110,7 @@ Partial Class frmMain
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
     Me.gbUsage.SuspendLayout()
-    CType(Me.pctNetworkTest, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNothing.SuspendLayout()
     Me.pnlWildBlue.SuspendLayout()
     Me.gbUld.SuspendLayout()
@@ -239,7 +239,7 @@ Partial Class frmMain
     '
     'gbUsage
     '
-    Me.gbUsage.Controls.Add(Me.pctNetworkTest)
+    Me.gbUsage.Controls.Add(Me.pctNetTest)
     Me.gbUsage.Controls.Add(Me.lblStatus)
     Me.gbUsage.Controls.Add(Me.pnlNothing)
     Me.gbUsage.Controls.Add(Me.pnlWildBlue)
@@ -253,15 +253,15 @@ Partial Class frmMain
     Me.gbUsage.TabIndex = 1
     Me.gbUsage.TabStop = False
     '
-    'pctNetworkTest
+    'pctNetTest
     '
-    Me.pctNetworkTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pctNetworkTest.Location = New System.Drawing.Point(400, 0)
-    Me.pctNetworkTest.Name = "pctNetworkTest"
-    Me.pctNetworkTest.Size = New System.Drawing.Size(16, 16)
-    Me.pctNetworkTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
-    Me.pctNetworkTest.TabIndex = 6
-    Me.pctNetworkTest.TabStop = False
+    Me.pctNetTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pctNetTest.Location = New System.Drawing.Point(400, 0)
+    Me.pctNetTest.Name = "pctNetTest"
+    Me.pctNetTest.Size = New System.Drawing.Size(16, 16)
+    Me.pctNetTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+    Me.pctNetTest.TabIndex = 6
+    Me.pctNetTest.TabStop = False
     '
     'lblStatus
     '
@@ -1178,7 +1178,7 @@ Partial Class frmMain
     Me.pnlSettings.PerformLayout()
     Me.gbUsage.ResumeLayout(False)
     Me.gbUsage.PerformLayout()
-    CType(Me.pctNetworkTest, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
     Me.pnlWildBlue.ResumeLayout(False)
@@ -1314,5 +1314,5 @@ Partial Class frmMain
   Friend WithEvents mnuGraphSpace As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphColors As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphInvert As System.Windows.Forms.MenuItem
-  Friend WithEvents pctNetworkTest As LinkPictureBox
+  Friend WithEvents pctNetTest As LinkPictureBox
 End Class
