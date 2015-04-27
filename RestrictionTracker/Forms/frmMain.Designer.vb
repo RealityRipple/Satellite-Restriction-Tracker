@@ -30,11 +30,9 @@ Partial Class frmMain
     Me.cmdRefresh = New System.Windows.Forms.Button()
     Me.cmdConfig = New System.Windows.Forms.Button()
     Me.gbUsage = New System.Windows.Forms.GroupBox()
-    Me.pctNetTest = New RestrictionTracker.LinkPictureBox()
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
-    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.pnlWildBlue = New System.Windows.Forms.TableLayoutPanel()
     Me.gbUld = New System.Windows.Forms.GroupBox()
     Me.pnlUld = New System.Windows.Forms.TableLayoutPanel()
@@ -106,11 +104,13 @@ Partial Class frmMain
     Me.tmrIcoDelay = New System.Windows.Forms.Timer(Me.components)
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.tmrStatus = New System.Windows.Forms.Timer(Me.components)
+    Me.pctNetTest = New RestrictionTracker.LinkPictureBox()
+    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.ttUI = New RestrictionTracker.ToolTip(Me.components)
+    Me.ColorDialog1 = New RestrictionTracker.ColorDialog()
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
     Me.gbUsage.SuspendLayout()
-    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNothing.SuspendLayout()
     Me.pnlWildBlue.SuspendLayout()
     Me.gbUld.SuspendLayout()
@@ -139,6 +139,7 @@ Partial Class frmMain
     Me.pnlRuralFree.SuspendLayout()
     Me.pnlRuralTotal.SuspendLayout()
     CType(Me.pctRural, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'pnlDetails
@@ -192,7 +193,7 @@ Partial Class frmMain
     Me.cmdAbout.Size = New System.Drawing.Size(104, 22)
     Me.cmdAbout.TabIndex = 3
     Me.cmdAbout.Text = "&About"
-    Me.ttUI.SetTooltip(Me.cmdAbout, "View information about Satellite Restriction Tracker and check for updates.")
+    Me.ttUI.SetToolTip(Me.cmdAbout, "View information about Satellite Restriction Tracker and check for updates.")
     Me.cmdAbout.UseVisualStyleBackColor = True
     '
     'cmdHistory
@@ -206,7 +207,7 @@ Partial Class frmMain
     Me.cmdHistory.Size = New System.Drawing.Size(102, 22)
     Me.cmdHistory.TabIndex = 1
     Me.cmdHistory.Text = "&History"
-    Me.ttUI.SetTooltip(Me.cmdHistory, "View your usage history.")
+    Me.ttUI.SetToolTip(Me.cmdHistory, "View your usage history.")
     Me.cmdHistory.UseVisualStyleBackColor = True
     '
     'cmdRefresh
@@ -220,7 +221,7 @@ Partial Class frmMain
     Me.cmdRefresh.Size = New System.Drawing.Size(102, 22)
     Me.cmdRefresh.TabIndex = 0
     Me.cmdRefresh.Text = "&Refresh"
-    Me.ttUI.SetTooltip(Me.cmdRefresh, "Reload usage level information immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Hold CTRL to reload database.)")
+    Me.ttUI.SetToolTip(Me.cmdRefresh, "Reload usage level information immediately." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(Hold CTRL to reload database.)")
     Me.cmdRefresh.UseVisualStyleBackColor = True
     '
     'cmdConfig
@@ -234,7 +235,7 @@ Partial Class frmMain
     Me.cmdConfig.Size = New System.Drawing.Size(102, 22)
     Me.cmdConfig.TabIndex = 2
     Me.cmdConfig.Text = "&Configuration"
-    Me.ttUI.SetTooltip(Me.cmdConfig, "Change program settings.")
+    Me.ttUI.SetToolTip(Me.cmdConfig, "Change program settings.")
     Me.cmdConfig.UseVisualStyleBackColor = True
     '
     'gbUsage
@@ -252,16 +253,6 @@ Partial Class frmMain
     Me.gbUsage.Size = New System.Drawing.Size(428, 128)
     Me.gbUsage.TabIndex = 1
     Me.gbUsage.TabStop = False
-    '
-    'pctNetTest
-    '
-    Me.pctNetTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pctNetTest.Location = New System.Drawing.Point(400, 0)
-    Me.pctNetTest.Name = "pctNetTest"
-    Me.pctNetTest.Size = New System.Drawing.Size(16, 16)
-    Me.pctNetTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
-    Me.pctNetTest.TabIndex = 6
-    Me.pctNetTest.TabStop = False
     '
     'lblStatus
     '
@@ -302,18 +293,6 @@ Partial Class frmMain
     Me.lblNothing.Size = New System.Drawing.Size(406, 37)
     Me.lblNothing.TabIndex = 0
     Me.lblNothing.Text = "Satellite Restriction Tracker"
-    '
-    'lblRRS
-    '
-    Me.lblRRS.AutoSize = True
-    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
-    Me.lblRRS.Name = "lblRRS"
-    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
-    Me.lblRRS.TabIndex = 1
-    Me.lblRRS.Text = "by RealityRipple Software"
     '
     'pnlWildBlue
     '
@@ -371,7 +350,7 @@ Partial Class frmMain
     Me.pctUld.Size = New System.Drawing.Size(121, 81)
     Me.pctUld.TabIndex = 0
     Me.pctUld.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctUld, "Graph representing your upload usage.")
+    Me.ttUI.SetToolTip(Me.pctUld, "Graph representing your upload usage.")
     '
     'mnuGraph
     '
@@ -580,7 +559,7 @@ Partial Class frmMain
     Me.pctDld.Size = New System.Drawing.Size(121, 81)
     Me.pctDld.TabIndex = 0
     Me.pctDld.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctDld, "Graph representing your download usage.")
+    Me.ttUI.SetToolTip(Me.pctDld, "Graph representing your download usage.")
     '
     'pnlDldText
     '
@@ -952,7 +931,7 @@ Partial Class frmMain
     Me.pctExede.Size = New System.Drawing.Size(330, 109)
     Me.pctExede.TabIndex = 1
     Me.pctExede.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctExede, "Graph representing your usage.")
+    Me.ttUI.SetToolTip(Me.pctExede, "Graph representing your usage.")
     '
     'pnlRural
     '
@@ -1102,7 +1081,7 @@ Partial Class frmMain
     Me.pctRural.Size = New System.Drawing.Size(335, 109)
     Me.pctRural.TabIndex = 1
     Me.pctRural.TabStop = False
-    Me.ttUI.SetTooltip(Me.pctRural, "Graph representing your usage.")
+    Me.ttUI.SetToolTip(Me.pctRural, "Graph representing your usage.")
     '
     'trayIcon
     '
@@ -1155,11 +1134,36 @@ Partial Class frmMain
     Me.tmrStatus.Enabled = True
     Me.tmrStatus.Interval = 500
     '
+    'pctNetTest
+    '
+    Me.pctNetTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pctNetTest.Location = New System.Drawing.Point(400, 0)
+    Me.pctNetTest.Name = "pctNetTest"
+    Me.pctNetTest.Size = New System.Drawing.Size(16, 16)
+    Me.pctNetTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+    Me.pctNetTest.TabIndex = 0
+    '
+    'lblRRS
+    '
+    Me.lblRRS.AutoSize = True
+    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
+    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
+    Me.lblRRS.Name = "lblRRS"
+    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
+    Me.lblRRS.TabIndex = 1
+    Me.lblRRS.Text = "by RealityRipple Software"
+    '
     'ttUI
     '
     Me.ttUI.AutoPopDelay = 30000
     Me.ttUI.InitialDelay = 500
     Me.ttUI.ReshowDelay = 100
+    '
+    'ColorDialog1
+    '
+    Me.ColorDialog1.Title = ""
     '
     'frmMain
     '
@@ -1178,7 +1182,6 @@ Partial Class frmMain
     Me.pnlSettings.PerformLayout()
     Me.gbUsage.ResumeLayout(False)
     Me.gbUsage.PerformLayout()
-    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
     Me.pnlWildBlue.ResumeLayout(False)
@@ -1228,6 +1231,7 @@ Partial Class frmMain
     Me.pnlRuralTotal.ResumeLayout(False)
     Me.pnlRuralTotal.PerformLayout()
     CType(Me.pctRural, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -1315,4 +1319,5 @@ Partial Class frmMain
   Friend WithEvents mnuGraphColors As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphInvert As System.Windows.Forms.MenuItem
   Friend WithEvents pctNetTest As LinkPictureBox
+  Friend WithEvents ColorDialog1 As RestrictionTracker.ColorDialog
 End Class

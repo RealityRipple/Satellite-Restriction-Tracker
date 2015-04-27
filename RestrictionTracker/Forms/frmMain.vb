@@ -373,6 +373,11 @@ Public Class frmMain
           lblRRS.Font = pnlDetails.Font
           lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
         End If
+        If (lblStatus.Height / 2) - (pctNetTest.Height / 2) > 0 Then
+          pctNetTest.Top = (lblStatus.Height / 2) - (pctNetTest.Height / 2)
+        Else
+          pctNetTest.Top = 0
+        End If
       End If
     End If
   End Sub
@@ -433,6 +438,20 @@ Public Class frmMain
       MakeNotifier(taskNotifier, False)
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
+  End Sub
+  Private Sub pctNetTest_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles pctNetTest.KeyUp
+    If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then
+      Try
+        If mySettings.NetTestURL.Contains("://") Then
+          Process.Start(mySettings.NetTestURL)
+        Else
+          Process.Start("http://" & mySettings.NetTestURL)
+        End If
+      Catch ex As Exception
+        MakeNotifier(taskNotifier, False)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+      End Try
+    End If
   End Sub
   Private Sub pctNetTest_MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctNetTest.MouseClick
     If e.Button = Windows.Forms.MouseButtons.Left Then
@@ -2340,4 +2359,8 @@ Public Class frmMain
     End If
   End Sub
 #End Region
+
+  Private Sub pctNetTest_Click(sender As System.Object, e As System.EventArgs) Handles pctNetTest.Click
+
+  End Sub
 End Class
