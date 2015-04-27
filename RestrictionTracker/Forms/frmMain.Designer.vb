@@ -30,9 +30,11 @@ Partial Class frmMain
     Me.cmdRefresh = New System.Windows.Forms.Button()
     Me.cmdConfig = New System.Windows.Forms.Button()
     Me.gbUsage = New System.Windows.Forms.GroupBox()
+    Me.pctNetTest = New RestrictionTracker.LinkPictureBox()
     Me.lblStatus = New System.Windows.Forms.Label()
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
+    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.pnlWildBlue = New System.Windows.Forms.TableLayoutPanel()
     Me.gbUld = New System.Windows.Forms.GroupBox()
     Me.pnlUld = New System.Windows.Forms.TableLayoutPanel()
@@ -104,13 +106,12 @@ Partial Class frmMain
     Me.tmrIcoDelay = New System.Windows.Forms.Timer(Me.components)
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.tmrStatus = New System.Windows.Forms.Timer(Me.components)
-    Me.pctNetTest = New RestrictionTracker.LinkPictureBox()
-    Me.lblRRS = New RestrictionTracker.LinkLabel()
     Me.ttUI = New RestrictionTracker.ToolTip(Me.components)
     Me.ColorDialog1 = New RestrictionTracker.ColorDialog()
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
     Me.gbUsage.SuspendLayout()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNothing.SuspendLayout()
     Me.pnlWildBlue.SuspendLayout()
     Me.gbUld.SuspendLayout()
@@ -139,7 +140,6 @@ Partial Class frmMain
     Me.pnlRuralFree.SuspendLayout()
     Me.pnlRuralTotal.SuspendLayout()
     CType(Me.pctRural, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'pnlDetails
@@ -254,6 +254,16 @@ Partial Class frmMain
     Me.gbUsage.TabIndex = 1
     Me.gbUsage.TabStop = False
     '
+    'pctNetTest
+    '
+    Me.pctNetTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pctNetTest.BackColor = System.Drawing.Color.Transparent
+    Me.pctNetTest.Location = New System.Drawing.Point(400, 0)
+    Me.pctNetTest.Name = "pctNetTest"
+    Me.pctNetTest.Size = New System.Drawing.Size(16, 16)
+    Me.pctNetTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+    Me.pctNetTest.TabIndex = 0
+    '
     'lblStatus
     '
     Me.lblStatus.AutoSize = True
@@ -293,6 +303,18 @@ Partial Class frmMain
     Me.lblNothing.Size = New System.Drawing.Size(406, 37)
     Me.lblNothing.TabIndex = 0
     Me.lblNothing.Text = "Satellite Restriction Tracker"
+    '
+    'lblRRS
+    '
+    Me.lblRRS.AutoSize = True
+    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
+    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
+    Me.lblRRS.Name = "lblRRS"
+    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
+    Me.lblRRS.TabIndex = 1
+    Me.lblRRS.Text = "by RealityRipple Software"
     '
     'pnlWildBlue
     '
@@ -1134,27 +1156,6 @@ Partial Class frmMain
     Me.tmrStatus.Enabled = True
     Me.tmrStatus.Interval = 500
     '
-    'pctNetTest
-    '
-    Me.pctNetTest.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pctNetTest.Location = New System.Drawing.Point(400, 0)
-    Me.pctNetTest.Name = "pctNetTest"
-    Me.pctNetTest.Size = New System.Drawing.Size(16, 16)
-    Me.pctNetTest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-    Me.pctNetTest.TabIndex = 0
-    '
-    'lblRRS
-    '
-    Me.lblRRS.AutoSize = True
-    Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblRRS.Location = New System.Drawing.Point(214, 76)
-    Me.lblRRS.Name = "lblRRS"
-    Me.lblRRS.Size = New System.Drawing.Size(128, 13)
-    Me.lblRRS.TabIndex = 1
-    Me.lblRRS.Text = "by RealityRipple Software"
-    '
     'ttUI
     '
     Me.ttUI.AutoPopDelay = 30000
@@ -1182,6 +1183,7 @@ Partial Class frmMain
     Me.pnlSettings.PerformLayout()
     Me.gbUsage.ResumeLayout(False)
     Me.gbUsage.PerformLayout()
+    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
     Me.pnlWildBlue.ResumeLayout(False)
@@ -1231,7 +1233,6 @@ Partial Class frmMain
     Me.pnlRuralTotal.ResumeLayout(False)
     Me.pnlRuralTotal.PerformLayout()
     CType(Me.pctRural, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub

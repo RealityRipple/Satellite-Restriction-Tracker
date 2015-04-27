@@ -27,7 +27,7 @@ Public Class ToolTip
       End If
     End Set
   End Property
-  Public Shadows Sub SetTooltip(ctl As System.Windows.Forms.Control, caption As String)
+  Public Shadows Sub SetToolTip(ctl As System.Windows.Forms.Control, caption As String)
     If ControlList.Contains(ctl) Then ControlList.Remove(ctl)
     RemoveHandler ctl.MouseEnter, New EventHandler(AddressOf ToolTip_MouseEnter)
     RemoveHandler ctl.MouseLeave, New EventHandler(AddressOf ToolTip_MouseLeave)

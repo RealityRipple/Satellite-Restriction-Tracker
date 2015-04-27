@@ -5,6 +5,7 @@ Public Class LinkPictureBox
   Private oldPos As Point = Point.Empty
   Public Sub New()
     Me.SetStyle(ControlStyles.Selectable, True)
+    Me.SetStyle(ControlStyles.Opaque, False)
     Me.TabStop = True
     Me.TabIndex = 0
   End Sub
