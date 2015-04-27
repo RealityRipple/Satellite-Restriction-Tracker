@@ -126,6 +126,8 @@ Module modFunctions
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error - " & ex.Message
         End If
+      ElseIf ex.Message.StartsWith("Cannot be negative.") And ex.Message.Contains("Parameter name: length") Then
+        Return "Negative Length exception. Check your local network."
       Else
         reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
@@ -165,6 +167,8 @@ Module modFunctions
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
           Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host") Then
+          Return "The server closed the connection. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Cannot open log for source 'Restriction Logger'. You may not have write access") Then
           Return "Error writing to logging service error log."
         Else
@@ -185,6 +189,8 @@ Module modFunctions
               Return "Error in response - " & ex.InnerException.Message
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
               Return "The server closed the connection. Please try again."
+            ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
+              Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Error in response - " & ex.InnerException.Message
@@ -209,6 +215,13 @@ Module modFunctions
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Connection to server failed to read - " & ex.InnerException.Message
+            End If
+          ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection") Then
+            If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
+              Return "The server is too busy to respond. Please try again later."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Connection to server failed to write - " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
             Return "The server closed the connection. Please try again."
@@ -285,6 +298,8 @@ Module modFunctions
           If ex.InnerException.Message.Contains("Error writing headers") Then
             If ex.InnerException.InnerException.Message.Contains("The socket is not connected") Then
               Return "Connection aborted."
+            ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
+              Return "Decryption failed. Please change your Network Security Protocol settings and try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Send Header Error - " & ex.InnerException.Message
