@@ -434,17 +434,19 @@ Public Class frmMain
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
-  Private Sub pctNetworkTest_Click(sender As System.Object, e As System.EventArgs) Handles pctNetworkTest.Click
-    Try
-      If mySettings.NetTestURL.Contains("://") Then
-        Process.Start(mySettings.NetTestURL)
-      Else
-        Process.Start("http://" & mySettings.NetTestURL)
-      End If
-    Catch ex As Exception
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
+  Private Sub pctNetworkTest_MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctNetworkTest.MouseClick
+    If e.Button = Windows.Forms.MouseButtons.Left Then
+      Try
+        If mySettings.NetTestURL.Contains("://") Then
+          Process.Start(mySettings.NetTestURL)
+        Else
+          Process.Start("http://" & mySettings.NetTestURL)
+        End If
+      Catch ex As Exception
+        MakeNotifier(taskNotifier, False)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+      End Try
+    End If
   End Sub
   Protected Overrides Function ProcessKeyPreview(ByRef m As System.Windows.Forms.Message) As Boolean
     Static bDown As Boolean
@@ -2281,6 +2283,7 @@ Public Class frmMain
       pctNetworkTest.Visible = True
     Else
       Dim sHTML As String = e.Result
+      If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
       If sHTML.ToLower.Contains("rel=""icon""") Then
         If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
           sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))

@@ -3,13 +3,17 @@
 Public Class LinkPictureBox
   Inherits System.Windows.Forms.PictureBox
   Protected Overrides Sub OnMouseDown(e As System.Windows.Forms.MouseEventArgs)
-    Me.Top += 1
-    Me.Left += 1
+    If e.Button = Windows.Forms.MouseButtons.Left Then
+      Me.Top += 1
+      Me.Left += 1
+    End If
     MyBase.OnMouseDown(e)
   End Sub
   Protected Overrides Sub OnMouseUp(e As System.Windows.Forms.MouseEventArgs)
-    Me.Top -= 1
-    Me.Left -= 1
+    If e.Button = Windows.Forms.MouseButtons.Left Then
+      Me.Top -= 1
+      Me.Left -= 1
+    End If
     MyBase.OnMouseUp(e)
   End Sub
   Protected Overrides Sub WndProc(ByRef msg As System.Windows.Forms.Message)
