@@ -64,10 +64,8 @@ Public Class LinkPictureBox
   Protected Overrides Sub OnMouseUp(e As System.Windows.Forms.MouseEventArgs)
     If e.Button = Windows.Forms.MouseButtons.Left Then
       If Not oldPos.IsEmpty Then
-        If Me.ClientRectangle.Contains(e.Location) Then
-          Me.Location = oldPos
-          oldPos = Point.Empty
-        End If
+        Me.Location = oldPos
+        oldPos = Point.Empty
       End If
     End If
     MyBase.OnMouseUp(e)
