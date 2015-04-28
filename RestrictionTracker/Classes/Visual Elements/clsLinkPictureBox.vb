@@ -96,16 +96,21 @@ Public Class LinkPictureBox
   End Sub
   Protected Overrides Sub OnPaint(pe As System.Windows.Forms.PaintEventArgs)
     MyBase.OnPaint(pe)
-    If (Me.Focused) Then
+    If Me.Focused And Form.ActiveForm Is Me.FindForm Then
       Dim rc = Me.ClientRectangle
       ControlPaint.DrawFocusRectangle(pe.Graphics, rc)
     End If
+  End Sub
+  Protected Overrides Sub OnGotFocus(e As System.EventArgs)
+    Me.Invalidate()
+    MyBase.OnGotFocus(e)
   End Sub
   Protected Overrides Sub OnLostFocus(e As System.EventArgs)
     If Not oldPos.IsEmpty Then
       Me.Location = oldPos
       oldPos = Point.Empty
     End If
+    Me.Invalidate()
     MyBase.OnLostFocus(e)
   End Sub
   Protected Overrides Sub WndProc(ByRef msg As System.Windows.Forms.Message)
