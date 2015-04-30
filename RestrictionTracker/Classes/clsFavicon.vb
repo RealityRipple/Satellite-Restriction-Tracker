@@ -25,6 +25,7 @@
   Private Sub ConnectToURL(URL As Uri, Optional token As Object = Nothing)
     Try
       wsNetTest = New CookieAwareWebClient
+      wsNetTest.ErrorBypass = True
       wsNetTest.DownloadStringAsync(URL, token)
     Catch ex As Exception
       RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
@@ -33,6 +34,7 @@
   Private Sub ConnectToFile(URL As Uri, Filename As String, Optional token As Object = Nothing)
     Try
       wsNetTest = New CookieAwareWebClient
+      wsNetTest.ErrorBypass = True
       wsNetTest.DownloadFileAsync(URL, Filename, token)
     Catch ex As Exception
       RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))

@@ -104,8 +104,10 @@
     Catch ex As Net.WebException
       If c_ErrorBypass Then
         Dim response As Net.WebResponse = ex.Response
-        ResponseURI = response.ResponseUri
-        Return response
+        If response IsNot Nothing Then
+          ResponseURI = response.ResponseUri
+          Return response
+        End If
       End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
@@ -138,8 +140,10 @@
     Catch ex As Net.WebException
       If c_ErrorBypass Then
         Dim response As Net.WebResponse = ex.Response
-        ResponseURI = response.ResponseUri
-        Return response
+        If response IsNot Nothing Then
+          ResponseURI = response.ResponseUri
+          Return response
+        End If
       End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
