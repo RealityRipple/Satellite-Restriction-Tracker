@@ -87,7 +87,7 @@
               Using ico As New Icon(imgFile, 32, 32)
                 pctPNG32 = GenerateCloneImage(ico)
               End Using
-            Case &H474E5089
+            Case &H474E5089, &H38464947
               Using ico As Image = Image.FromFile(imgFile)
                 pctPNG16 = GenerateCloneImage(ico, 16, 16)
                 pctPNG32 = GenerateCloneImage(ico, 32, 32)
