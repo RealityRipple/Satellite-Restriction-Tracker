@@ -342,6 +342,7 @@
     <None Include="Resources\config\advanced_nettest_edit.png" />
     <None Include="Resources\config\advanced_nettest_error.png" />
     <None Include="Resources\config\advanced_nettest_load.png" />
+    <None Include="Resources\config\advanced_nettest_none.png" />
     <Content Include="Resources\config\prefs_interface.png" />
     <Content Include="Resources\default_alert.png" />
     <Content Include="Resources\default_close.png" />

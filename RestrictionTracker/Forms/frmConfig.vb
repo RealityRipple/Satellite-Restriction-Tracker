@@ -617,7 +617,7 @@
       End If
       txtNetTestCustom.Text = ""
       txtNetTestCustom.Enabled = False
-      SetNetTestImage(My.Resources.advanced_nettest_edit)
+      SetNetTestImage(My.Resources.advanced_nettest_none)
       cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
