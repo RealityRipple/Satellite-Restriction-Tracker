@@ -40,8 +40,6 @@
       RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
     End Try
   End Sub
-
-
   Private Function GenerateCloneImage(fromImage As Image, width As Integer, height As Integer) As Image
     Using newImage As New Bitmap(width, height)
       Using g As Graphics = Graphics.FromImage(newImage)
@@ -136,20 +134,20 @@
     ElseIf e.Cancelled Then
       Return
     Else
-      Dim sHTML As String = e.Result
-      If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
-      If sHTML.ToLower.Contains("rel=""icon""") Then
-        If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
-          sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
-          If sHTML.Contains(">") Then
-            sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
-            If sHTML.ToLower.Contains("href") Then
-              sHTML = sHTML.Substring(sHTML.IndexOf("href"))
-              If sHTML.Contains("""") Then
-                sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
+      Try
+        Dim sHTML As String = e.Result
+        If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
+        If sHTML.ToLower.Contains("rel=""icon""") Then
+          If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
+            sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
+            If sHTML.Contains(">") Then
+              sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
+              If sHTML.ToLower.Contains("href") Then
+                sHTML = sHTML.Substring(sHTML.IndexOf("href"))
                 If sHTML.Contains("""") Then
-                  Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
-                  Try
+                  sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
+                  If sHTML.Contains("""") Then
+                    Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
                     If URL.Contains("://") Then
 
                     ElseIf URL.Contains("//") Then
@@ -166,43 +164,22 @@
                         URL = oldURL & URL
                       End If
                     End If
-                    Dim pathURL As New Uri(URL)
                     ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
-                  Catch ex As Exception
-                    Dim pathURL As New Uri(e.UserState)
-                    ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
-                  End Try
-                Else
-                  Dim pathURL As New Uri(e.UserState)
-                  ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+                    Return
+                  End If
                 End If
-              Else
-                Dim pathURL As New Uri(e.UserState)
-                ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
               End If
-            Else
-              Dim pathURL As New Uri(e.UserState)
-              ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
             End If
-          Else
-            Dim pathURL As New Uri(e.UserState)
-            ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
           End If
-        Else
-          Dim pathURL As New Uri(e.UserState)
-          ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
         End If
-      Else
-        Dim pathURL As New Uri(e.UserState)
-        ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
-      End If
+      Catch ex As Exception
+      End Try
+      Dim pathURL As New Uri(e.UserState)
+      ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
     End If
   End Sub
-
 #Region "IDisposable Support"
-  Private disposedValue As Boolean ' To detect redundant calls
-
-  ' IDisposable
+  Private disposedValue As Boolean
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
@@ -211,28 +188,15 @@
           wsNetTest.Dispose()
           wsNetTest = Nothing
         End If
-        ' TODO: dispose managed state (managed objects).
+        c_icon16 = Nothing
+        c_icon32 = Nothing
       End If
-
-      ' TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
-      ' TODO: set large fields to null.
     End If
     Me.disposedValue = True
   End Sub
-
-  ' TODO: override Finalize() only if Dispose(ByVal disposing As Boolean) above has code to free unmanaged resources.
-  'Protected Overrides Sub Finalize()
-  '    ' Do not change this code.  Put cleanup code in Dispose(ByVal disposing As Boolean) above.
-  '    Dispose(False)
-  '    MyBase.Finalize()
-  'End Sub
-
-  ' This code added by Visual Basic to correctly implement the disposable pattern.
   Public Sub Dispose() Implements IDisposable.Dispose
-    ' Do not change this code.  Put cleanup code in Dispose(ByVal disposing As Boolean) above.
     Dispose(True)
     GC.SuppressFinalize(Me)
   End Sub
 #End Region
-
 End Class
