@@ -50,7 +50,7 @@
   Public Event DownloadingUpdate(sender As Object, e As EventArgs)
   Public Event UpdateProgressChanged(sender As Object, e As ProgressEventArgs)
   Public Event DownloadResult(sender As Object, e As DownloadEventArgs)
-  Private WithEvents wsVer As New CookieAwareWebClient()
+  Private WithEvents wsVer As New WebClientEx()
   Private DownloadURL As String
   Private VerNumber As String
 #Region "IDisposable Support"
@@ -86,7 +86,7 @@
   Public Shared Function QuickCheckVersion() As CheckEventArgs.ResultType
     Dim sVerStr As String
     Dim mySettings As New AppSettings
-    Using wsCheck As New CookieAwareWebClient()
+    Using wsCheck As New WebClientEx()
       wsCheck.Proxy = mySettings.Proxy
       wsCheck.Timeout = mySettings.Timeout
       wsCheck.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)

@@ -12,7 +12,7 @@ Public Class frmMain
   Private WithEvents taskNotifier As TaskbarNotifier
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
-  Private WithEvents wsHostList As CookieAwareWebClient
+  Private WithEvents wsHostList As WebClientEx
   Private WithEvents wsFavicon As clsFavicon
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
@@ -974,7 +974,7 @@ Public Class frmMain
           wsHostList = Nothing
         End If
         Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
-        wsHostList = New CookieAwareWebClient
+        wsHostList = New WebClientEx
         wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
         didHostListSave = True
       Catch ex As Exception

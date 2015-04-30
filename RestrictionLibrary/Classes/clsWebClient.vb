@@ -1,4 +1,4 @@
-﻿Public Class CookieAwareWebClient
+﻿Public Class WebClientEx
   Inherits Net.WebClient
   Sub New()
     Me.New(New Net.CookieContainer)

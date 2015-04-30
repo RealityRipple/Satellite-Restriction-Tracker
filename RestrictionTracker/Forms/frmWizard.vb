@@ -19,7 +19,7 @@ Public Class frmWizard
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
   Private Const WM_GETSYSMENU As Integer = &H313
   Private Const HTCAPTION As Integer = 2
-  Private WithEvents wsHostList As New CookieAwareWebClient()
+  Private WithEvents wsHostList As New WebClientEx()
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
@@ -468,7 +468,7 @@ Public Class frmWizard
       End Try
     End If
   End Sub
-  Private Sub wsHostList_Failure(sender As Object, e As RestrictionLibrary.CookieAwareWebClient.ErrorEventArgs) Handles wsHostList.Failure
+  Private Sub wsHostList_Failure(sender As Object, e As RestrictionLibrary.WebClientEx.ErrorEventArgs) Handles wsHostList.Failure
     DrawStatus(False)
     cmbAccountHost.Text = ""
     cmbAccountHost.Enabled = True

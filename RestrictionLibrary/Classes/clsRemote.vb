@@ -97,7 +97,7 @@ Public Class remoteRestrictionTracker
   End Class
   Public Event Success(sender As Object, e As SuccessEventArgs)
   Public Event OKKey(sender As Object, e As EventArgs)
-  Private WithEvents wsLogin As CookieAwareWebClient
+  Private WithEvents wsLogin As WebClientEx
   Private ReadTimeoutCount As Integer
   Private sDataPath As String
   Private Sub tmrReadTimeout_Tick()
@@ -135,7 +135,7 @@ Public Class remoteRestrictionTracker
     sProduct = ProductKey
     sDataPath = DataPath
     Secret = System.Text.Encoding.UTF8.GetBytes(ProductKey)
-    wsLogin = New CookieAwareWebClient()
+    wsLogin = New WebClientEx()
     wsLogin.Timeout = Timeout
     wsLogin.Proxy = Proxy
     'wsLogin.Encoding = System.Text.Encoding.UTF8
@@ -237,7 +237,7 @@ Public Class remoteRestrictionTracker
       Return mSHA.ComputeHash(bHash)
     End Using
   End Function
-  Private Sub wsLogin_Failure(sender As Object, e As CookieAwareWebClient.ErrorEventArgs) Handles wsLogin.Failure
+  Private Sub wsLogin_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles wsLogin.Failure
     ResetTimeout()
     RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, NetworkErrorToString(e.Error, sDataPath)))
   End Sub

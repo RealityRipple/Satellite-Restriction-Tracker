@@ -384,7 +384,7 @@ Module modFunctions
             ie = Nothing
           End If
           Try
-            Using sckUpload As New CookieAwareWebClient()
+            Using sckUpload As New WebClientEx()
               Dim params As New Collections.Specialized.NameValueCollection
               params.Add("e", e)
               If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)

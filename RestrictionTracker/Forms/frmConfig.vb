@@ -1,6 +1,6 @@
 ﻿Public Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
-  Private WithEvents wsHostList As CookieAwareWebClient
+  Private WithEvents wsHostList As WebClientEx
   Private WithEvents wsFavicon As clsFavicon
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
@@ -700,7 +700,7 @@
   End Sub
 #Region "Host List"
   Private Sub PopulateHostList()
-    wsHostList = New CookieAwareWebClient
+    wsHostList = New WebClientEx
     wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
   End Sub
   Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted

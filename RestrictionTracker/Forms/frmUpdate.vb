@@ -1,5 +1,5 @@
 ﻿Public Class frmUpdate
-  Private WithEvents sckVerInfo As CookieAwareWebClient
+  Private WithEvents sckVerInfo As WebClientEx
   Private Ret As Boolean
   Private Sub frmUpdate_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Ret = False
@@ -67,7 +67,7 @@
     End If
   End Sub
   Private Sub GetVerInfo()
-    sckVerInfo = New CookieAwareWebClient()
+    sckVerInfo = New WebClientEx()
     If lblBETA.Visible Then
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/infob"))
     Else
@@ -94,8 +94,8 @@
       cmdChanges.Focus()
     End If
   End Sub
-  Private Delegate Sub FailureHandler(sender As Object, e As CookieAwareWebClient.ErrorEventArgs)
-  Private Sub sckVerInfo_Failure(sender As Object, e As CookieAwareWebClient.ErrorEventArgs) Handles sckVerInfo.Failure
+  Private Delegate Sub FailureHandler(sender As Object, e As WebClientEx.ErrorEventArgs)
+  Private Sub sckVerInfo_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles sckVerInfo.Failure
     If Me.InvokeRequired Then
       Me.Invoke(New FailureHandler(AddressOf sckVerInfo_Failure), sender, e)
     Else

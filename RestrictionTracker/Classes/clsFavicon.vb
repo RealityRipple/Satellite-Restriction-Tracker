@@ -1,6 +1,6 @@
 ﻿Public Class clsFavicon
   Implements IDisposable
-  Private WithEvents wsNetTest As CookieAwareWebClient
+  Private WithEvents wsNetTest As WebClientEx
   Private c_icon32 As Image
   Private c_icon16 As Image
   Public Class DownloadIconCompletedEventArgs
@@ -24,7 +24,7 @@
   End Sub
   Private Sub ConnectToURL(URL As Uri, Optional token As Object = Nothing)
     Try
-      wsNetTest = New CookieAwareWebClient
+      wsNetTest = New WebClientEx
       wsNetTest.ErrorBypass = True
       wsNetTest.DownloadStringAsync(URL, token)
     Catch ex As Exception
@@ -33,7 +33,7 @@
   End Sub
   Private Sub ConnectToFile(URL As Uri, Filename As String, Optional token As Object = Nothing)
     Try
-      wsNetTest = New CookieAwareWebClient
+      wsNetTest = New WebClientEx
       wsNetTest.ErrorBypass = True
       wsNetTest.DownloadFileAsync(URL, Filename, token)
     Catch ex As Exception

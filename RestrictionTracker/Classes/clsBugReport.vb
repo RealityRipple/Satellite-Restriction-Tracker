@@ -1,5 +1,5 @@
 ﻿Friend Class MantisReporter
-  Private Shared httpSend As CookieAwareWebClient
+  Private Shared httpSend As WebClientEx
   Friend Enum Mantis_Category
     [Select] = 0
     General = 1
@@ -89,7 +89,7 @@
       httpSend.Dispose()
       httpSend = Nothing
     End If
-    httpSend = New CookieAwareWebClient()
+    httpSend = New WebClientEx()
     Dim sTok As String = GetToken(1)
     If String.IsNullOrEmpty(sTok) Then
       httpSend.Dispose()

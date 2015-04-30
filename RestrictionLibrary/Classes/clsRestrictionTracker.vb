@@ -202,7 +202,7 @@
   End Class
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
 #End Region
-  Private WithEvents wsData As CookieAwareWebClient
+  Private WithEvents wsData As WebClientEx
   Private WithEvents acType As DetermineType
   Private tmrReadTimeout As Threading.Timer
   Private mySettings As AppSettings
@@ -325,7 +325,7 @@
       wsData.Dispose()
       wsData = Nothing
     End If
-    wsData = New CookieAwareWebClient
+    wsData = New WebClientEx
     If mySettings IsNot Nothing Then
       wsData.Timeout = mySettings.Timeout
       wsData.Proxy = mySettings.Proxy
@@ -444,7 +444,7 @@
       End Try
     End If
   End Sub
-  Private Sub wsData_Failure(sender As Object, e As CookieAwareWebClient.ErrorEventArgs) Handles wsData.Failure
+  Private Sub wsData_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles wsData.Failure
     ResetTimeout()
     RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & NetworkErrorToString(e.Error, sDataPath)))
     If wsData IsNot Nothing Then
