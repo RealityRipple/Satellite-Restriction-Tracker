@@ -148,11 +148,17 @@
                 If sHTML.Contains("""") Then
                   Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
                   Try
-                    If Not URL.Contains("://") Then
+                    If URL.Contains("://") Then
+
+                    ElseIf URL.Contains("//") Then
                       Dim oldURL As String = e.UserState
-                      If Not oldURL.EndsWith("/") Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
+                      If oldURL.Contains("://") Then oldURL = oldURL.Substring(0, oldURL.IndexOf("://") + 1)
+                      URL = oldURL & URL
+                    Else
+                      Dim oldURL As String = e.UserState
+                      If Not oldURL.EndsWith("/") And oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
                       If URL.StartsWith("/") Then
-                        oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
+                        If oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
                         URL = oldURL & URL
                       Else
                         URL = oldURL & URL
