@@ -515,7 +515,7 @@ Partial Class frmConfig
     Me.txtAccount.Name = "txtAccount"
     Me.txtAccount.Size = New System.Drawing.Size(150, 20)
     Me.txtAccount.TabIndex = 2
-    Me.ttConfig.SetTooltip(Me.txtAccount, "Your ViaSat Username." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were provided with an E-Mail address, this is the f" & _
+    Me.ttConfig.SetToolTip(Me.txtAccount, "Your ViaSat Username." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were provided with an E-Mail address, this is the f" & _
         "irst half of that address.")
     '
     'txtPassword
@@ -526,7 +526,7 @@ Partial Class frmConfig
     Me.txtPassword.Name = "txtPassword"
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
     Me.txtPassword.TabIndex = 4
-    Me.ttConfig.SetTooltip(Me.txtPassword, "The password to your ViaSat account.")
+    Me.ttConfig.SetToolTip(Me.txtPassword, "The password to your ViaSat account.")
     Me.txtPassword.UseSystemPasswordChar = True
     '
     'lblAccountViaSatDescription
@@ -553,7 +553,7 @@ Partial Class frmConfig
     Me.pctPassDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
     Me.pctPassDisplay.TabIndex = 5
     Me.pctPassDisplay.TabStop = False
-    Me.ttConfig.SetTooltip(Me.pctPassDisplay, "Toggle display of the password.")
+    Me.ttConfig.SetToolTip(Me.pctPassDisplay, "Toggle display of the password.")
     '
     'pnlAccountProviderTitle
     '
@@ -633,7 +633,7 @@ Partial Class frmConfig
     Me.chkAccountTypeAuto.Size = New System.Drawing.Size(170, 18)
     Me.chkAccountTypeAuto.TabIndex = 4
     Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
-    Me.ttConfig.SetTooltip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
+    Me.ttConfig.SetToolTip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
         "onnection." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you'd like to choose a type manually, you can uncheck this box an" & _
         "d select an option below.")
     Me.chkAccountTypeAuto.UseVisualStyleBackColor = True
@@ -659,7 +659,7 @@ Partial Class frmConfig
     Me.cmbProvider.Name = "cmbProvider"
     Me.cmbProvider.Size = New System.Drawing.Size(150, 21)
     Me.cmbProvider.TabIndex = 2
-    Me.ttConfig.SetTooltip(Me.cmbProvider, "Your ViaSat Provider domain." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were given an E-Mail address, this is everyt" & _
+    Me.ttConfig.SetToolTip(Me.cmbProvider, "Your ViaSat Provider domain." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were given an E-Mail address, this is everyt" & _
         "hing after the @ symbol." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "You can choose a domain from the dropdown or enter you" & _
         "r own to add it to the list.")
     '
@@ -718,7 +718,7 @@ Partial Class frmConfig
     Me.optAccountTypeWBL.Size = New System.Drawing.Size(73, 18)
     Me.optAccountTypeWBL.TabIndex = 0
     Me.optAccountTypeWBL.Text = "WildBlue"
-    Me.ttConfig.SetTooltip(Me.optAccountTypeWBL, "Legacy WildBlue packages.")
+    Me.ttConfig.SetToolTip(Me.optAccountTypeWBL, "Legacy WildBlue packages.")
     Me.optAccountTypeWBL.UseVisualStyleBackColor = True
     '
     'optAccountTypeWBX
@@ -731,7 +731,7 @@ Partial Class frmConfig
     Me.optAccountTypeWBX.Size = New System.Drawing.Size(61, 18)
     Me.optAccountTypeWBX.TabIndex = 1
     Me.optAccountTypeWBX.Text = "Exede"
-    Me.ttConfig.SetTooltip(Me.optAccountTypeWBX, "Exede, Exede Evolution, and Exede Freedom packages.")
+    Me.ttConfig.SetToolTip(Me.optAccountTypeWBX, "Exede, Exede Evolution, and Exede Freedom packages.")
     Me.optAccountTypeWBX.UseVisualStyleBackColor = True
     '
     'optAccountTypeRPX
@@ -744,7 +744,7 @@ Partial Class frmConfig
     Me.optAccountTypeRPX.Size = New System.Drawing.Size(125, 18)
     Me.optAccountTypeRPX.TabIndex = 4
     Me.optAccountTypeRPX.Text = "Rural Portal (Exede)"
-    Me.ttConfig.SetTooltip(Me.optAccountTypeRPX, "Exede packages through a RuralPortal provider.")
+    Me.ttConfig.SetToolTip(Me.optAccountTypeRPX, "Exede packages through a RuralPortal provider.")
     Me.optAccountTypeRPX.UseVisualStyleBackColor = True
     '
     'optAccountTypeRPL
@@ -757,7 +757,7 @@ Partial Class frmConfig
     Me.optAccountTypeRPL.Size = New System.Drawing.Size(137, 18)
     Me.optAccountTypeRPL.TabIndex = 3
     Me.optAccountTypeRPL.Text = "Rural Portal (WildBlue)"
-    Me.ttConfig.SetTooltip(Me.optAccountTypeRPL, "Legacy WildBlue packages through a RuralPortal provider.")
+    Me.ttConfig.SetToolTip(Me.optAccountTypeRPL, "Legacy WildBlue packages through a RuralPortal provider.")
     Me.optAccountTypeRPL.UseVisualStyleBackColor = True
     '
     'optAccountTypeDNX
@@ -770,7 +770,7 @@ Partial Class frmConfig
     Me.optAccountTypeDNX.Size = New System.Drawing.Size(69, 18)
     Me.optAccountTypeDNX.TabIndex = 2
     Me.optAccountTypeDNX.Text = "DishNet"
-    Me.ttConfig.SetTooltip(Me.optAccountTypeDNX, "Exede package through Dish.")
+    Me.ttConfig.SetToolTip(Me.optAccountTypeDNX, "Exede package through Dish.")
     Me.optAccountTypeDNX.UseVisualStyleBackColor = True
     '
     'lblAccountProviderDescription
@@ -858,7 +858,7 @@ Partial Class frmConfig
     Me.txtKey1.TabIndex = 0
     Me.txtKey1.Text = "@@@@@@"
     Me.txtKey1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetTooltip(Me.txtKey1, "Your Remote Usage Service Product Key.")
+    Me.ttConfig.SetToolTip(Me.txtKey1, "Your Remote Usage Service Product Key.")
     '
     'txtKey2
     '
@@ -873,7 +873,7 @@ Partial Class frmConfig
     Me.txtKey2.TabIndex = 1
     Me.txtKey2.Text = "@@@@"
     Me.txtKey2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetTooltip(Me.txtKey2, "Your Remote Usage Service Product Key.")
+    Me.ttConfig.SetToolTip(Me.txtKey2, "Your Remote Usage Service Product Key.")
     '
     'txtKey3
     '
@@ -888,7 +888,7 @@ Partial Class frmConfig
     Me.txtKey3.TabIndex = 2
     Me.txtKey3.Text = "@@@@"
     Me.txtKey3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetTooltip(Me.txtKey3, "Your Remote Usage Service Product Key.")
+    Me.ttConfig.SetToolTip(Me.txtKey3, "Your Remote Usage Service Product Key.")
     '
     'txtKey4
     '
@@ -903,7 +903,7 @@ Partial Class frmConfig
     Me.txtKey4.TabIndex = 3
     Me.txtKey4.Text = "@@@@"
     Me.txtKey4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetTooltip(Me.txtKey4, "Your Remote Usage Service Product Key.")
+    Me.ttConfig.SetToolTip(Me.txtKey4, "Your Remote Usage Service Product Key.")
     '
     'txtKey5
     '
@@ -918,7 +918,7 @@ Partial Class frmConfig
     Me.txtKey5.TabIndex = 4
     Me.txtKey5.Text = "@@@@@@"
     Me.txtKey5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetTooltip(Me.txtKey5, "Your Remote Usage Service Product Key.")
+    Me.ttConfig.SetToolTip(Me.txtKey5, "Your Remote Usage Service Product Key.")
     '
     'pctAccountKeyIcon
     '
@@ -1113,7 +1113,7 @@ Partial Class frmConfig
     Me.cmdColors.Size = New System.Drawing.Size(110, 21)
     Me.cmdColors.TabIndex = 1
     Me.cmdColors.Text = "Customize &Colors"
-    Me.ttConfig.SetTooltip(Me.cmdColors, "Change the colors of the Main Window, Tray Icon, and History Graphs.")
+    Me.ttConfig.SetToolTip(Me.cmdColors, "Change the colors of the Main Window, Tray Icon, and History Graphs.")
     Me.cmdColors.UseVisualStyleBackColor = True
     '
     'pnlPrefAlert
@@ -1185,7 +1185,7 @@ Partial Class frmConfig
     Me.chkOverAlert.Size = New System.Drawing.Size(129, 18)
     Me.chkOverAlert.TabIndex = 1
     Me.chkOverAlert.Text = "Display Al&ert window"
-    Me.ttConfig.SetTooltip(Me.chkOverAlert, "Check this box to display a balloon alert when you use too much of your allocated" & _
+    Me.ttConfig.SetToolTip(Me.chkOverAlert, "Check this box to display a balloon alert when you use too much of your allocated" & _
         " usage.")
     Me.chkOverAlert.UseVisualStyleBackColor = True
     '
@@ -1210,7 +1210,7 @@ Partial Class frmConfig
     Me.txtOverTime.Size = New System.Drawing.Size(50, 20)
     Me.txtOverTime.TabIndex = 7
     Me.txtOverTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtOverTime, "Enter the duration of time to check for the defined usage (in minutes).")
+    Me.ttConfig.SetToolTip(Me.txtOverTime, "Enter the duration of time to check for the defined usage (in minutes).")
     Me.txtOverTime.Value = New Decimal(New Integer() {15, 0, 0, 0})
     '
     'lblOverSize2
@@ -1234,7 +1234,7 @@ Partial Class frmConfig
     Me.txtOverSize.Size = New System.Drawing.Size(50, 20)
     Me.txtOverSize.TabIndex = 4
     Me.txtOverSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtOverSize, "Enter the amount of usage to display an alert about (in Megabytes).")
+    Me.ttConfig.SetToolTip(Me.txtOverSize, "Enter the amount of usage to display an alert about (in Megabytes).")
     Me.txtOverSize.Value = New Decimal(New Integer() {100, 0, 0, 0})
     '
     'lblOverTime2
@@ -1269,7 +1269,7 @@ Partial Class frmConfig
     Me.cmdAlertStyle.Size = New System.Drawing.Size(110, 20)
     Me.cmdAlertStyle.TabIndex = 2
     Me.cmdAlertStyle.Text = "Set Alert &Style"
-    Me.ttConfig.SetTooltip(Me.cmdAlertStyle, "Choose a style for the Alert Windows used for Usage Alerts and Parse Failures.")
+    Me.ttConfig.SetToolTip(Me.cmdAlertStyle, "Choose a style for the Alert Windows used for Usage Alerts and Parse Failures.")
     Me.cmdAlertStyle.UseVisualStyleBackColor = True
     '
     'pnlPrefAccuracy
@@ -1343,7 +1343,7 @@ Partial Class frmConfig
     Me.txtInterval.Size = New System.Drawing.Size(50, 20)
     Me.txtInterval.TabIndex = 2
     Me.txtInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtInterval, "Interval between meter checks in minutes.")
+    Me.ttConfig.SetToolTip(Me.txtInterval, "Interval between meter checks in minutes.")
     Me.txtInterval.Value = New Decimal(New Integer() {15, 0, 0, 0})
     '
     'lblInterval2
@@ -1375,7 +1375,7 @@ Partial Class frmConfig
     Me.txtAccuracy.Size = New System.Drawing.Size(50, 20)
     Me.txtAccuracy.TabIndex = 5
     Me.txtAccuracy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtAccuracy, "Number of decimal places to display.")
+    Me.ttConfig.SetToolTip(Me.txtAccuracy, "Number of decimal places to display.")
     '
     'lblAccuracy2
     '
@@ -1619,7 +1619,7 @@ Partial Class frmConfig
     Me.chkStartUp.Size = New System.Drawing.Size(270, 18)
     Me.chkStartUp.TabIndex = 0
     Me.chkStartUp.Text = "&Run Satellite Restriction Tracker on system startup"
-    Me.ttConfig.SetTooltip(Me.chkStartUp, "Start Satellite Restriction Tracker with this Windows account.")
+    Me.ttConfig.SetToolTip(Me.chkStartUp, "Start Satellite Restriction Tracker with this Windows account.")
     Me.chkStartUp.UseVisualStyleBackColor = True
     '
     'lblStartWait1
@@ -1643,7 +1643,7 @@ Partial Class frmConfig
     Me.txtStartWait.Size = New System.Drawing.Size(50, 20)
     Me.txtStartWait.TabIndex = 2
     Me.txtStartWait.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtStartWait, "Interval before first meter check in minutes.")
+    Me.ttConfig.SetToolTip(Me.txtStartWait, "Interval before first meter check in minutes.")
     Me.txtStartWait.Value = New Decimal(New Integer() {5, 0, 0, 0})
     '
     'lblStartWait2
@@ -1667,7 +1667,7 @@ Partial Class frmConfig
     Me.chkService.Size = New System.Drawing.Size(316, 18)
     Me.chkService.TabIndex = 7
     Me.chkService.Text = "Run &Logger Service when Satellite Restriction Tracker closes"
-    Me.ttConfig.SetTooltip(Me.chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracke" & _
+    Me.ttConfig.SetToolTip(Me.chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracke" & _
         "r is closed.")
     Me.chkService.UseVisualStyleBackColor = True
     '
@@ -1681,7 +1681,7 @@ Partial Class frmConfig
     Me.chkAutoHide.Size = New System.Drawing.Size(255, 18)
     Me.chkAutoHide.TabIndex = 8
     Me.chkAutoHide.Text = "&Minimize Satellite Restriction Tracker on startup"
-    Me.ttConfig.SetTooltip(Me.chkAutoHide, "Automatically minimize the program when it starts.")
+    Me.ttConfig.SetToolTip(Me.chkAutoHide, "Automatically minimize the program when it starts.")
     Me.chkAutoHide.UseVisualStyleBackColor = True
     '
     'TableLayoutPanel1
@@ -1743,7 +1743,7 @@ Partial Class frmConfig
     Me.chkScaleScreen.Size = New System.Drawing.Size(151, 18)
     Me.chkScaleScreen.TabIndex = 0
     Me.chkScaleScreen.Text = "Scale text to window si&ze"
-    Me.ttConfig.SetTooltip(Me.chkScaleScreen, "Text in the main window of Satellite Restriction Tracker will scale to fit its si" & _
+    Me.ttConfig.SetToolTip(Me.chkScaleScreen, "Text in the main window of Satellite Restriction Tracker will scale to fit its si" & _
         "ze.")
     Me.chkScaleScreen.UseVisualStyleBackColor = True
     '
@@ -1757,7 +1757,7 @@ Partial Class frmConfig
     Me.chkTrayIcon.Size = New System.Drawing.Size(137, 18)
     Me.chkTrayIcon.TabIndex = 7
     Me.chkTrayIcon.Text = "Show system &tray icon"
-    Me.ttConfig.SetTooltip(Me.chkTrayIcon, "Display an icon in the system Notification Area.")
+    Me.ttConfig.SetToolTip(Me.chkTrayIcon, "Display an icon in the system Notification Area.")
     Me.chkTrayIcon.UseVisualStyleBackColor = True
     '
     'chkTrayMin
@@ -1769,7 +1769,7 @@ Partial Class frmConfig
     Me.chkTrayMin.Size = New System.Drawing.Size(130, 18)
     Me.chkTrayMin.TabIndex = 8
     Me.chkTrayMin.Text = "O&nly when minimized"
-    Me.ttConfig.SetTooltip(Me.chkTrayMin, "Display the tray icon only when Satellite Restriction Tracker is minimized.")
+    Me.ttConfig.SetToolTip(Me.chkTrayMin, "Display the tray icon only when Satellite Restriction Tracker is minimized.")
     Me.chkTrayMin.UseVisualStyleBackColor = True
     '
     'tabNetwork
@@ -1880,7 +1880,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolSSL.Size = New System.Drawing.Size(124, 17)
     Me.chkNetworkProtocolSSL.TabIndex = 1
     Me.chkNetworkProtocolSSL.Text = "Use &Legacy SSL 3.0"
-    Me.ttConfig.SetTooltip(Me.chkNetworkProtocolSSL, "Check this box to use the older SSL 3.0 instead of TLS 1.0 for secure connections" & _
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL, "Check this box to use the older SSL 3.0 instead of TLS 1.0 for secure connections" & _
         ".")
     Me.chkNetworkProtocolSSL.UseVisualStyleBackColor = True
     '
@@ -1999,7 +1999,7 @@ Partial Class frmConfig
     Me.cmbUpdateInterval.Name = "cmbUpdateInterval"
     Me.cmbUpdateInterval.Size = New System.Drawing.Size(121, 21)
     Me.cmbUpdateInterval.TabIndex = 1
-    Me.ttConfig.SetTooltip(Me.cmbUpdateInterval, "Select an interval between automatic update checks.")
+    Me.ttConfig.SetToolTip(Me.cmbUpdateInterval, "Select an interval between automatic update checks.")
     '
     'chkUpdateBETA
     '
@@ -2010,7 +2010,7 @@ Partial Class frmConfig
     Me.chkUpdateBETA.Size = New System.Drawing.Size(144, 17)
     Me.chkUpdateBETA.TabIndex = 5
     Me.chkUpdateBETA.Text = "Check for BETA updates"
-    Me.ttConfig.SetTooltip(Me.chkUpdateBETA, "Download potentially unstable updates to help test the next release of Satellite " & _
+    Me.ttConfig.SetToolTip(Me.chkUpdateBETA, "Download potentially unstable updates to help test the next release of Satellite " & _
         "Restriction Tracker.")
     Me.chkUpdateBETA.UseVisualStyleBackColor = True
     '
@@ -2026,7 +2026,7 @@ Partial Class frmConfig
     Me.cmbUpdateAutomation.Name = "cmbUpdateAutomation"
     Me.cmbUpdateAutomation.Size = New System.Drawing.Size(248, 21)
     Me.cmbUpdateAutomation.TabIndex = 6
-    Me.ttConfig.SetTooltip(Me.cmbUpdateAutomation, "Choose how Satellite Restriction Tracker installs updates.")
+    Me.ttConfig.SetToolTip(Me.cmbUpdateAutomation, "Choose how Satellite Restriction Tracker installs updates.")
     '
     'pnlNetworkProxy
     '
@@ -2098,7 +2098,7 @@ Partial Class frmConfig
     Me.txtProxyUser.Name = "txtProxyUser"
     Me.txtProxyUser.Size = New System.Drawing.Size(129, 20)
     Me.txtProxyUser.TabIndex = 7
-    Me.ttConfig.SetTooltip(Me.txtProxyUser, "Optional Username for HTTP Proxy authentication.")
+    Me.ttConfig.SetToolTip(Me.txtProxyUser, "Optional Username for HTTP Proxy authentication.")
     '
     'lblProxyUser
     '
@@ -2117,7 +2117,7 @@ Partial Class frmConfig
     Me.txtProxyPassword.Name = "txtProxyPassword"
     Me.txtProxyPassword.Size = New System.Drawing.Size(129, 20)
     Me.txtProxyPassword.TabIndex = 9
-    Me.ttConfig.SetTooltip(Me.txtProxyPassword, "Optional Password for HTTP Proxy authentication.")
+    Me.ttConfig.SetToolTip(Me.txtProxyPassword, "Optional Password for HTTP Proxy authentication.")
     Me.txtProxyPassword.UseSystemPasswordChar = True
     '
     'lblProxyPassword
@@ -2147,7 +2147,7 @@ Partial Class frmConfig
     Me.txtProxyAddress.Name = "txtProxyAddress"
     Me.txtProxyAddress.Size = New System.Drawing.Size(129, 20)
     Me.txtProxyAddress.TabIndex = 3
-    Me.ttConfig.SetTooltip(Me.txtProxyAddress, "Address of HTTP Proxy to connect through.")
+    Me.ttConfig.SetToolTip(Me.txtProxyAddress, "Address of HTTP Proxy to connect through.")
     '
     'lblProxyPort
     '
@@ -2177,7 +2177,7 @@ Partial Class frmConfig
     Me.txtProxyDomain.Name = "txtProxyDomain"
     Me.txtProxyDomain.Size = New System.Drawing.Size(264, 20)
     Me.txtProxyDomain.TabIndex = 11
-    Me.ttConfig.SetTooltip(Me.txtProxyDomain, "Optional Domain for HTTP Proxy authentication.")
+    Me.ttConfig.SetToolTip(Me.txtProxyDomain, "Optional Domain for HTTP Proxy authentication.")
     '
     'cmbProxyType
     '
@@ -2190,7 +2190,7 @@ Partial Class frmConfig
     Me.cmbProxyType.Name = "cmbProxyType"
     Me.cmbProxyType.Size = New System.Drawing.Size(129, 21)
     Me.cmbProxyType.TabIndex = 1
-    Me.ttConfig.SetTooltip(Me.cmbProxyType, "Type of Proxy to Use" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " None: No Proxy" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " System: Default System Proxy Settings" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " I" & _
+    Me.ttConfig.SetToolTip(Me.cmbProxyType, "Type of Proxy to Use" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " None: No Proxy" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " System: Default System Proxy Settings" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " I" & _
         "P: HTTP Proxy by IP Address and Port" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " URL: HTTP Proxy by Web URL")
     '
     'txtProxyPort
@@ -2203,7 +2203,7 @@ Partial Class frmConfig
     Me.txtProxyPort.Size = New System.Drawing.Size(50, 20)
     Me.txtProxyPort.TabIndex = 5
     Me.txtProxyPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtProxyPort, "Port to connect to HTTP proxy over.")
+    Me.ttConfig.SetToolTip(Me.txtProxyPort, "Port to connect to HTTP proxy over.")
     Me.txtProxyPort.Value = New Decimal(New Integer() {8080, 0, 0, 0})
     '
     'pctNetworkProxyIcon
@@ -2362,7 +2362,7 @@ Partial Class frmConfig
     Me.txtTimeout.Size = New System.Drawing.Size(70, 20)
     Me.txtTimeout.TabIndex = 2
     Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetTooltip(Me.txtTimeout, "Number of seconds to wait between network communications.")
+    Me.ttConfig.SetToolTip(Me.txtTimeout, "Number of seconds to wait between network communications.")
     Me.txtTimeout.Value = New Decimal(New Integer() {60, 0, 0, 0})
     '
     'lblTimeout2
@@ -2528,7 +2528,7 @@ Partial Class frmConfig
     Me.txtPortableDir.Name = "txtPortableDir"
     Me.txtPortableDir.Size = New System.Drawing.Size(217, 20)
     Me.txtPortableDir.TabIndex = 0
-    Me.ttConfig.SetTooltip(Me.txtPortableDir, "Select the location you wish to place a portable copy of Satellite Restriction Tr" & _
+    Me.ttConfig.SetToolTip(Me.txtPortableDir, "Select the location you wish to place a portable copy of Satellite Restriction Tr" & _
         "acker, such as a desktop folder or a flash drive.")
     '
     'cmdPortableDir
@@ -2542,7 +2542,7 @@ Partial Class frmConfig
     Me.cmdPortableDir.Size = New System.Drawing.Size(36, 22)
     Me.cmdPortableDir.TabIndex = 1
     Me.cmdPortableDir.Text = ". . ."
-    Me.ttConfig.SetTooltip(Me.cmdPortableDir, "Browse for a Directory to place the portable application.")
+    Me.ttConfig.SetToolTip(Me.cmdPortableDir, "Browse for a Directory to place the portable application.")
     Me.cmdPortableDir.UseVisualStyleBackColor = True
     '
     'pctAdvancedPortableIcon
@@ -2583,7 +2583,7 @@ Partial Class frmConfig
     Me.cmdMakePortable.Size = New System.Drawing.Size(175, 23)
     Me.cmdMakePortable.TabIndex = 3
     Me.cmdMakePortable.Text = "&Create Portable Application"
-    Me.ttConfig.SetTooltip(Me.cmdMakePortable, "Copy Satellite Restriction Tracker to the selected directory.")
+    Me.ttConfig.SetToolTip(Me.cmdMakePortable, "Copy Satellite Restriction Tracker to the selected directory.")
     Me.cmdMakePortable.UseVisualStyleBackColor = True
     '
     'lblPortableDir
@@ -2721,7 +2721,7 @@ Partial Class frmConfig
     Me.txtHistoryDir.Name = "txtHistoryDir"
     Me.txtHistoryDir.Size = New System.Drawing.Size(200, 20)
     Me.txtHistoryDir.TabIndex = 0
-    Me.ttConfig.SetTooltip(Me.txtHistoryDir, "Directory used to save History Data.")
+    Me.ttConfig.SetToolTip(Me.txtHistoryDir, "Directory used to save History Data.")
     '
     'cmdHistoryDir
     '
@@ -2734,7 +2734,7 @@ Partial Class frmConfig
     Me.cmdHistoryDir.Size = New System.Drawing.Size(36, 22)
     Me.cmdHistoryDir.TabIndex = 1
     Me.cmdHistoryDir.Text = ". . ."
-    Me.ttConfig.SetTooltip(Me.cmdHistoryDir, "Browse for a Directory in which to save History Data.")
+    Me.ttConfig.SetToolTip(Me.cmdHistoryDir, "Browse for a Directory in which to save History Data.")
     Me.cmdHistoryDir.UseVisualStyleBackColor = True
     '
     'lblAdvancedDataDescription
@@ -2763,7 +2763,7 @@ Partial Class frmConfig
     Me.optHistoryCustom.TabIndex = 3
     Me.optHistoryCustom.TabStop = True
     Me.optHistoryCustom.Text = "C&ustom:"
-    Me.ttConfig.SetTooltip(Me.optHistoryCustom, "Save History Data to a custom directory.")
+    Me.ttConfig.SetToolTip(Me.optHistoryCustom, "Save History Data to a custom directory.")
     Me.optHistoryCustom.UseVisualStyleBackColor = True
     '
     'optHistoryProgramData
@@ -2778,7 +2778,7 @@ Partial Class frmConfig
     Me.optHistoryProgramData.TabIndex = 1
     Me.optHistoryProgramData.TabStop = True
     Me.optHistoryProgramData.Text = "&Program Data"
-    Me.ttConfig.SetTooltip(Me.optHistoryProgramData, "Save History Data to the shared Program Data directory.")
+    Me.ttConfig.SetToolTip(Me.optHistoryProgramData, "Save History Data to the shared Program Data directory.")
     Me.optHistoryProgramData.UseVisualStyleBackColor = True
     '
     'optHistoryAppData
@@ -2793,7 +2793,7 @@ Partial Class frmConfig
     Me.optHistoryAppData.TabIndex = 2
     Me.optHistoryAppData.TabStop = True
     Me.optHistoryAppData.Text = "&Application Data"
-    Me.ttConfig.SetTooltip(Me.optHistoryAppData, "Save History Data to your local account's Application Data directory.")
+    Me.ttConfig.SetToolTip(Me.optHistoryAppData, "Save History Data to your local account's Application Data directory.")
     Me.optHistoryAppData.UseVisualStyleBackColor = True
     '
     'cmdHistoryDirOpen
@@ -2806,7 +2806,7 @@ Partial Class frmConfig
     Me.cmdHistoryDirOpen.Size = New System.Drawing.Size(130, 23)
     Me.cmdHistoryDirOpen.TabIndex = 5
     Me.cmdHistoryDirOpen.Text = "&Open Data Directory"
-    Me.ttConfig.SetTooltip(Me.cmdHistoryDirOpen, "Open the directory where your History Data is stored.")
+    Me.ttConfig.SetToolTip(Me.cmdHistoryDirOpen, "Open the directory where your History Data is stored.")
     Me.cmdHistoryDirOpen.UseVisualStyleBackColor = True
     '
     'pnlAdvancedDataTitle
@@ -2975,7 +2975,7 @@ Partial Class frmConfig
     Me.optNetTestCustom.TabIndex = 3
     Me.optNetTestCustom.TabStop = True
     Me.optNetTestCustom.Text = "C&ustom:"
-    Me.ttConfig.SetTooltip(Me.optNetTestCustom, "Show a link to a custom website on the Main window.")
+    Me.ttConfig.SetToolTip(Me.optNetTestCustom, "Show a link to a custom website on the Main window.")
     Me.optNetTestCustom.UseVisualStyleBackColor = True
     '
     'optNetTestNone
@@ -2990,7 +2990,7 @@ Partial Class frmConfig
     Me.optNetTestNone.TabIndex = 1
     Me.optNetTestNone.TabStop = True
     Me.optNetTestNone.Text = "None"
-    Me.ttConfig.SetTooltip(Me.optNetTestNone, "Don't show a link to any Internet Speed Test website.")
+    Me.ttConfig.SetToolTip(Me.optNetTestNone, "Don't show a link to any Internet Speed Test website.")
     Me.optNetTestNone.UseVisualStyleBackColor = True
     '
     'optNetTestTestMyNet
@@ -3005,7 +3005,7 @@ Partial Class frmConfig
     Me.optNetTestTestMyNet.TabIndex = 2
     Me.optNetTestTestMyNet.TabStop = True
     Me.optNetTestTestMyNet.Text = "TestMy.Net"
-    Me.ttConfig.SetTooltip(Me.optNetTestTestMyNet, "Show a link to TestMy.Net on the Main window.")
+    Me.ttConfig.SetToolTip(Me.optNetTestTestMyNet, "Show a link to TestMy.Net on the Main window.")
     Me.optNetTestTestMyNet.UseVisualStyleBackColor = True
     '
     'txtNetTestCustom
@@ -3013,17 +3013,18 @@ Partial Class frmConfig
     Me.txtNetTestCustom.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtNetTestCustom.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
     Me.txtNetTestCustom.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.AllUrl
-    Me.txtNetTestCustom.Location = New System.Drawing.Point(110, 120)
+    Me.txtNetTestCustom.Location = New System.Drawing.Point(78, 120)
     Me.txtNetTestCustom.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtNetTestCustom.Name = "txtNetTestCustom"
-    Me.txtNetTestCustom.Size = New System.Drawing.Size(210, 20)
+    Me.txtNetTestCustom.Size = New System.Drawing.Size(242, 20)
     Me.txtNetTestCustom.TabIndex = 4
-    Me.ttConfig.SetTooltip(Me.txtNetTestCustom, "Enter the URL of the site you want to link to on the Main window.")
+    Me.ttConfig.SetToolTip(Me.txtNetTestCustom, "Enter the URL of the site you want to link to on the Main window.")
     '
     'optNetTestSpeedTest
     '
     Me.optNetTestSpeedTest.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.optNetTestSpeedTest.AutoSize = True
+    Me.pnlAdvancedNetTestInput.SetColumnSpan(Me.optNetTestSpeedTest, 2)
     Me.optNetTestSpeedTest.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.optNetTestSpeedTest.Location = New System.Drawing.Point(3, 96)
     Me.optNetTestSpeedTest.Name = "optNetTestSpeedTest"
@@ -3031,7 +3032,7 @@ Partial Class frmConfig
     Me.optNetTestSpeedTest.TabIndex = 2
     Me.optNetTestSpeedTest.TabStop = True
     Me.optNetTestSpeedTest.Text = "SpeedTest.net"
-    Me.ttConfig.SetTooltip(Me.optNetTestSpeedTest, "Show a link to SpeedTest.net on the Main window.")
+    Me.ttConfig.SetToolTip(Me.optNetTestSpeedTest, "Show a link to SpeedTest.net on the Main window.")
     Me.optNetTestSpeedTest.UseVisualStyleBackColor = True
     '
     'cmdSave
