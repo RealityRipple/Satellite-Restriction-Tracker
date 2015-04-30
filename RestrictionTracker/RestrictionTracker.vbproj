@@ -111,6 +111,7 @@
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="Classes\clsBugReport.vb" />
+    <Compile Include="Classes\clsFavicon.vb" />
     <Compile Include="Classes\clsGlass.vb" />
     <Compile Include="Classes\Visual Elements\clsColorDialog.vb">
       <SubType>Component</SubType>

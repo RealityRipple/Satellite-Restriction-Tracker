@@ -13,7 +13,7 @@ Public Class frmMain
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
   Private WithEvents wsHostList As CookieAwareWebClient
-  Private WithEvents wsNetTest As CookieAwareWebClient
+  Private WithEvents wsFavicon As clsFavicon
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
@@ -373,11 +373,39 @@ Public Class frmMain
           lblRRS.Font = pnlDetails.Font
           lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
         End If
-        If (lblStatus.Height / 2) - (pctNetTest.Height / 2) > 0 Then
-          pctNetTest.Top = (lblStatus.Height / 2) - (pctNetTest.Height / 2)
-        Else
-          pctNetTest.Top = 0
-        End If
+        For i As Integer = 1 To 2
+          If (lblStatus.Height / 2) - (pctNetTest.Height / 2) > 0 Then
+            pctNetTest.Top = (lblStatus.Height / 2) - (pctNetTest.Height / 2)
+          Else
+            pctNetTest.Top = 0
+          End If
+          If pnlWildBlue.Visible Then
+            If pctNetTest.Bottom > pnlWildBlue.Top - 1 Then
+              pctNetTest.Height = pnlWildBlue.Top - 1 - pctNetTest.Top
+              pctNetTest.Width = pctNetTest.Height
+            Else
+              pctNetTest.Height = 16
+              pctNetTest.Width = pctNetTest.Height
+            End If
+          ElseIf pnlExede.Visible Then
+            If pctNetTest.Bottom > pnlExede.Top - 1 Then
+              pctNetTest.Height = pnlExede.Top - 1 - pctNetTest.Top
+              pctNetTest.Width = pctNetTest.Height
+            Else
+              pctNetTest.Height = 16
+              pctNetTest.Width = pctNetTest.Height
+            End If
+          ElseIf pnlRural.Visible Then
+            If pctNetTest.Bottom > pnlRural.Top - 1 Then
+              pctNetTest.Height = pnlRural.Top - 1 - pctNetTest.Top
+              pctNetTest.Width = pctNetTest.Height
+            Else
+              pctNetTest.Height = 16
+              pctNetTest.Width = pctNetTest.Height
+            End If
+          End If
+          pctNetTest.Left = gbUsage.Right - 16 - pctNetTest.Width
+        Next
       End If
     End If
   End Sub
@@ -533,7 +561,7 @@ Public Class frmMain
         End Using
       Else
         pctNetTest.Image = My.Resources.throbber
-        GetNetTestIcon(mySettings.NetTestURL)
+        wsFavicon = New clsFavicon(mySettings.NetTestURL)
       End If
       Dim sNetTestTitle As String = mySettings.NetTestURL
       If sNetTestTitle.Contains("://") Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf("://") + 3)
@@ -2186,181 +2214,18 @@ Public Class frmMain
       mySettings.Colors = GetDefaultColors(mySettings.AccountType)
     End If
   End Sub
-  Private Sub GetNetTestIcon(Optional URL As String = Nothing)
-    If String.IsNullOrEmpty(URL) Then
-      pctNetTest.Image = Nothing
-      pctNetTest.Visible = False
-    Else
-      Try
-        wsNetTest = New CookieAwareWebClient
-        If Not URL.Contains("://") Then URL = "http://" & URL
-        Dim pathURL As New Uri(URL)
-        wsNetTest.DownloadFileAsync(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
-      Catch ex As Exception
-        Try
-          GenNetTestIconFrom(URL)
-        Catch ex2 As Exception
-          pctNetTest.Image = My.Resources.ico_err
-          pctNetTest.Visible = True
-        End Try
-      End Try
-    End If
-  End Sub
-  Private Sub GenNetTestIconFrom(URL As String)
+  Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted
     Try
-      wsNetTest = New CookieAwareWebClient
-      If Not URL.Contains("://") Then URL = "http://" & URL
-      Dim pathURL As New Uri(URL)
-      wsNetTest.DownloadStringAsync(pathURL, URL)
+      pctNetTest.Visible = True
+      If e.Error IsNot Nothing Then
+        pctNetTest.Image = My.Resources.ico_err
+      Else
+        e.Icon16.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
+        pctNetTest.Image = e.Icon16
+      End If
     Catch ex As Exception
       pctNetTest.Image = My.Resources.ico_err
-      pctNetTest.Visible = True
     End Try
   End Sub
-  Private Sub wsNetTest_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsNetTest.DownloadFileCompleted
-    If Me.InvokeRequired Then
-      Me.Invoke(New System.ComponentModel.AsyncCompletedEventHandler(AddressOf wsNetTest_DownloadFileCompleted), sender, e)
-      Return
-    End If
-    If e.Cancelled Then
-      If e.UserState Is Nothing Then
-        pctNetTest.Image = My.Resources.ico_err
-        pctNetTest.Visible = True
-      Else
-        GenNetTestIconFrom(e.UserState)
-        Return
-      End If
-    ElseIf e.Error IsNot Nothing Then
-      If e.UserState Is Nothing Then
-        pctNetTest.Image = My.Resources.ico_err
-        pctNetTest.Visible = True
-      Else
-        GenNetTestIconFrom(e.UserState)
-        Return
-      End If
-    Else
-      Dim imgFile As String = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico")
-      Dim pctPNG As New Bitmap(16, 16)
-      Dim didOK As Boolean = True
-      Using gPNG As Graphics = Graphics.FromImage(pctPNG)
-        Dim imgHeader(3) As Byte
-        Using iStream As IO.FileStream = IO.File.OpenRead(imgFile)
-          iStream.Read(imgHeader, 0, 4)
-        End Using
-        Try
-          Select Case BitConverter.ToUInt32(imgHeader, 0)
-            Case &H10000
-              Using newI As New Icon(imgFile, 16, 16)
-                gPNG.DrawIcon(newI, New Rectangle(0, 0, 16, 16))
-              End Using
-            Case &H474E5089
-              Using newI As Image = Image.FromFile(imgFile)
-                gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
-              End Using
-            Case Else
-              Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
-              Using newI As Image = Image.FromFile(imgFile)
-                gPNG.DrawImage(newI, New Rectangle(0, 0, 16, 16))
-              End Using
-          End Select
-        Catch ex As Exception
-          didOK = False
-        End Try
-      End Using
-      If didOK Then
-        pctPNG.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
-        pctNetTest.Image = pctPNG.Clone
-        pctNetTest.Visible = True
-      Else
-        If e.UserState Is Nothing Then
-          pctNetTest.Image = My.Resources.ico_err
-          pctNetTest.Visible = True
-        Else
-          GenNetTestIconFrom(e.UserState)
-          Return
-        End If
-      End If
-      pctPNG.Dispose()
-      pctPNG = Nothing
-      IO.File.Delete(imgFile)
-    End If
-    If wsNetTest IsNot Nothing Then
-      wsNetTest.Dispose()
-      wsNetTest = Nothing
-    End If
-  End Sub
-  Private Sub wsNetTest_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsNetTest.DownloadStringCompleted
-    If Me.InvokeRequired Then
-      Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsNetTest_DownloadStringCompleted), sender, e)
-      Return
-    End If
-    If e.Cancelled Then
-      pctNetTest.Image = My.Resources.ico_err
-      pctNetTest.Visible = True
-    ElseIf e.Error IsNot Nothing Then
-      pctNetTest.Image = My.Resources.ico_err
-      pctNetTest.Visible = True
-    Else
-      Dim sHTML As String = e.Result
-      If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
-      If sHTML.ToLower.Contains("rel=""icon""") Then
-        If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
-          sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
-          If sHTML.Contains(">") Then
-            sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
-            If sHTML.ToLower.Contains("href") Then
-              sHTML = sHTML.Substring(sHTML.IndexOf("href"))
-              If sHTML.Contains("""") Then
-                sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
-                If sHTML.Contains("""") Then
-                  Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
-                  Try
-                    wsNetTest = New CookieAwareWebClient
-                    If Not URL.Contains("://") Then
-                      Dim oldURL As String = e.UserState
-                      If Not oldURL.EndsWith("/") Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
-                      If URL.StartsWith("/") Then
-                        oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
-                        URL = oldURL & URL
-                      Else
-                        URL = oldURL & URL
-                      End If
-                    End If
-                    Dim pathURL As New Uri(URL)
-                    wsNetTest.DownloadFileAsync(pathURL, IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
-                  Catch ex As Exception
-                    pctNetTest.Image = My.Resources.ico_err
-                    pctNetTest.Visible = True
-                  End Try
-                Else
-                  pctNetTest.Image = My.Resources.ico_err
-                  pctNetTest.Visible = True
-                End If
-              Else
-                pctNetTest.Image = My.Resources.ico_err
-                pctNetTest.Visible = True
-              End If
-            Else
-              pctNetTest.Image = My.Resources.ico_err
-              pctNetTest.Visible = True
-            End If
-          Else
-            pctNetTest.Image = My.Resources.ico_err
-            pctNetTest.Visible = True
-          End If
-        Else
-          pctNetTest.Image = My.Resources.ico_err
-          pctNetTest.Visible = True
-        End If
-      Else
-        pctNetTest.Image = My.Resources.ico_err
-        pctNetTest.Visible = True
-      End If
-    End If
-  End Sub
 #End Region
-
-  Private Sub pctNetTest_Click(sender As System.Object, e As System.EventArgs) Handles pctNetTest.Click
-
-  End Sub
 End Class
