@@ -741,7 +741,7 @@ Module modFunctions
   End Sub
   Public Sub SaveToFTP(sData As String)
     Try
-      Dim sFailFile As String = "WB-ReadFail-" & Now.ToString("G") & "-v" & Application.ProductVersion & ".txt"
+      Dim sFailFile As String = "SRT-ReadFail-" & Now.ToString("G") & "-v" & Application.ProductVersion & ".txt"
       sFailFile = Replace(sFailFile, "/", "-")
       sFailFile = Replace(sFailFile, ":", "-")
       Dim ftpSave As Net.FtpWebRequest = Net.FtpWebRequest.Create("ftp://realityripple.com/" & sFailFile)
