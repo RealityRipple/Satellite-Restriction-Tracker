@@ -14,7 +14,6 @@
       Me.Error = err
     End Sub
   End Class
-  'Public Delegate Sub DownloadIconCompletedEventHandler(sender As Object, e As DownloadIconCompletedEventArgs)
   Public Event DownloadIconCompleted(sender As Object, e As DownloadIconCompletedEventArgs)
   Public Sub New(URL As String)
     c_icon16 = Nothing

@@ -741,6 +741,10 @@
 #End Region
 #Region "Net Test"
   Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted
+    If Me.InvokeRequired Then
+      Me.Invoke(New clsFavicon.DownloadIconCompletedEventHandler(AddressOf wsFavicon_DownloadIconCompleted), sender, e)
+      Return
+    End If
     If e.Error IsNot Nothing Then
       SetNetTestImage(pctAdvancedNetTestIcon.ErrorImage)
     Else
