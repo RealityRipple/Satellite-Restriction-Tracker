@@ -138,6 +138,10 @@ Module modFunctions
           Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
           Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
           Return "The host is unreachable. Check your local network."
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
@@ -166,6 +170,12 @@ Module modFunctions
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An established connection was aborted by the software in your host machine") Then
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
+          Return "Connection to the server timed out. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
           Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host") Then
           Return "The server closed the connection. Please try again."
@@ -212,6 +222,10 @@ Module modFunctions
               Return "Connection to the server timed out. Please try again."
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
               Return "Connection to the server timed out. Please try again."
+            ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
+              Return "Connection to the server timed out. Please try again."
+            ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
+              Return "Connection to the server timed out. Please try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Connection to server failed to read - " & ex.InnerException.Message
@@ -238,6 +252,10 @@ Module modFunctions
             If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
               Return "Connection to the server timed out. Please try again."
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
+              Return "Connection to the server timed out. Please try again."
+            ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
+              Return "Connection to the server timed out. Please try again."
+            ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
               Return "Connection to the server timed out. Please try again."
             ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
               Return "Connection aborted."
@@ -298,6 +316,8 @@ Module modFunctions
           If ex.InnerException.Message.Contains("Error writing headers") Then
             If ex.InnerException.InnerException.Message.Contains("The socket is not connected") Then
               Return "Connection aborted."
+            ElseIf ex.InnerException.InnerException.Message.Contains("The socket has been shut down") Then
+              Return "Connection to server closed. Please try again."
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
               Return "Decryption failed. Please change your Network Security Protocol settings and try again."
             Else
