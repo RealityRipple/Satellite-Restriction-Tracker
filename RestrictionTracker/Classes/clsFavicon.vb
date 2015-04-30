@@ -19,6 +19,7 @@
   Public Sub New(URL As String)
     c_icon16 = Nothing
     c_icon32 = Nothing
+    If String.IsNullOrEmpty(URL) Then Return
     If Not URL.Contains("://") Then URL = "http://" & URL
     ConnectToURL(New Uri(URL), URL)
   End Sub

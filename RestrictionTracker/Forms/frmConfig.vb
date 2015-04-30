@@ -663,8 +663,10 @@
     If optNetTestCustom.Checked Then
       If pctAdvancedNetTestIcon.Tag Is Nothing Then
         tmrIcoWait.Stop()
-        SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-        wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+        If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
+          SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
+          wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+        End If
       End If
     End If
   End Sub
@@ -752,8 +754,12 @@
   Private Sub tmrIcoWait_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcoWait.Tick
     tmrIcoWait.Stop()
     If optNetTestCustom.Checked Then
-      SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-      wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+      If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
+        SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
+        wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+      Else
+        SetNetTestImage(My.Resources.advanced_nettest_edit)
+      End If
     End If
   End Sub
 #End Region
