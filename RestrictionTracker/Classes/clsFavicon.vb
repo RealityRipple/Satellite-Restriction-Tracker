@@ -73,36 +73,34 @@
       Dim pctPNG16 As New Bitmap(16, 16)
       Dim pctPNG32 As New Bitmap(32, 32)
       Dim didOK As Boolean = True
-      Using gPNG As Graphics = Graphics.FromImage(pctPNG16)
-        Dim imgHeader(3) As Byte
-        Using iStream As IO.FileStream = IO.File.OpenRead(imgFile)
-          iStream.Read(imgHeader, 0, 4)
-        End Using
-        Try
-          Select Case BitConverter.ToUInt32(imgHeader, 0)
-            Case &H10000
-              Using ico As New Icon(imgFile, 16, 16)
-                pctPNG16 = GenerateCloneImage(ico)
-              End Using
-              Using ico As New Icon(imgFile, 32, 32)
-                pctPNG32 = GenerateCloneImage(ico)
-              End Using
-            Case &H474E5089, &H38464947
-              Using ico As Image = Image.FromFile(imgFile)
-                pctPNG16 = GenerateCloneImage(ico, 16, 16)
-                pctPNG32 = GenerateCloneImage(ico, 32, 32)
-              End Using
-            Case Else
-              Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
-              Using ico As Image = Image.FromFile(imgFile)
-                pctPNG16 = GenerateCloneImage(ico, 16, 16)
-                pctPNG32 = GenerateCloneImage(ico, 32, 32)
-              End Using
-          End Select
-        Catch ex As Exception
-          didOK = False
-        End Try
+      Dim imgHeader(3) As Byte
+      Using iStream As IO.FileStream = IO.File.OpenRead(imgFile)
+        iStream.Read(imgHeader, 0, 4)
       End Using
+      Try
+        Select Case BitConverter.ToUInt32(imgHeader, 0)
+          Case &H10000
+            Using ico As New Icon(imgFile, 16, 16)
+              pctPNG16 = GenerateCloneImage(ico)
+            End Using
+            Using ico As New Icon(imgFile, 32, 32)
+              pctPNG32 = GenerateCloneImage(ico)
+            End Using
+          Case &H474E5089, &H38464947
+            Using ico As Image = Image.FromFile(imgFile)
+              pctPNG16 = GenerateCloneImage(ico, 16, 16)
+              pctPNG32 = GenerateCloneImage(ico, 32, 32)
+            End Using
+          Case Else
+            Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
+            Using ico As Image = Image.FromFile(imgFile)
+              pctPNG16 = GenerateCloneImage(ico, 16, 16)
+              pctPNG32 = GenerateCloneImage(ico, 32, 32)
+            End Using
+        End Select
+      Catch ex As Exception
+        didOK = False
+      End Try
       If IO.File.Exists(imgFile) Then IO.File.Delete(imgFile)
       If didOK Then
         RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(pctPNG16.Clone, pctPNG32.Clone))
@@ -111,9 +109,6 @@
           RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(Nothing, Nothing, New Exception("Failed to read the icon.")))
         Else
           Dim pathURL As New Uri(e.UserState)
-          Try
-          Catch ex As Exception
-          End Try
           ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), imgFile)
         End If
       End If
