@@ -678,8 +678,33 @@ Public Class frmHistory
         ttHistory.SetTooltip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
       End If
     End If
-    If dtpFrom.MinDate.Year < 2000 Then dtpFrom.MinDate = New Date(2000, 1, 1)
-    If dtpTo.MinDate.Year < 2000 Then dtpTo.MinDate = New Date(2000, 1, 1)
+    If dtpFrom.MinDate.Year < 2000 Then dtpFrom.MinDate = fDate
+    If dtpTo.MinDate.Year < 2000 Then dtpTo.MinDate = fDate
+    If dtpFrom.MinDate = fDate And dtpTo.MinDate = fDate Then
+      lblFrom.Enabled = False
+      dtpFrom.Enabled = False
+      lblTo.Enabled = False
+      dtpTo.Enabled = False
+      optGraph.Enabled = False
+      optGrid.Enabled = False
+      cmdQuery.Enabled = False
+      cmd30Days.Enabled = False
+      cmd60Days.Enabled = False
+      cmdAllTime.Enabled = False
+      cmdExport.Enabled = False
+    Else
+      lblFrom.Enabled = True
+      dtpFrom.Enabled = True
+      lblTo.Enabled = True
+      dtpTo.Enabled = True
+      optGraph.Enabled = True
+      optGrid.Enabled = True
+      cmdQuery.Enabled = True
+      cmd30Days.Enabled = True
+      cmd60Days.Enabled = True
+      cmdAllTime.Enabled = True
+      cmdExport.Enabled = True
+    End If
   End Sub
 #End Region
 #Region "Notices"
