@@ -556,7 +556,7 @@ Public Class frmHistory
     cmdQuery.PerformClick()
   End Sub
   Private Sub cmdImport_Click(sender As System.Object, e As System.EventArgs) Handles cmdImport.Click
-    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) : Exit Sub
+    If (usageDB Is Nothing OrElse usageDB.Count = 0) And Not modDB.LOG_State = 1 Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) : Exit Sub
     Dim cdlOpen As New OpenFileDialog With {.AddExtension = True, .CheckFileExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .ShowReadOnly = False, .Title = "Import History Database"}
     If cdlOpen.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       If fDB Is Nothing Then fDB = New frmDBProgress
@@ -691,7 +691,9 @@ Public Class frmHistory
       cmd30Days.Enabled = False
       cmd60Days.Enabled = False
       cmdAllTime.Enabled = False
+      grpAge.Enabled = False
       cmdExport.Enabled = False
+      chkExportRange.Enabled = False
     Else
       lblFrom.Enabled = True
       dtpFrom.Enabled = True
@@ -703,7 +705,9 @@ Public Class frmHistory
       cmd30Days.Enabled = True
       cmd60Days.Enabled = True
       cmdAllTime.Enabled = True
+      grpAge.Enabled = True
       cmdExport.Enabled = True
+      chkExportRange.Enabled = False
     End If
   End Sub
 #End Region
