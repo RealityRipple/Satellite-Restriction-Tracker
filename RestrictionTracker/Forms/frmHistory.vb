@@ -707,7 +707,7 @@ Public Class frmHistory
       cmdAllTime.Enabled = True
       grpAge.Enabled = True
       cmdExport.Enabled = True
-      chkExportRange.Enabled = False
+      chkExportRange.Enabled = True
     End If
   End Sub
 #End Region
