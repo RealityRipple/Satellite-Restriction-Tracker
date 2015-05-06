@@ -48,6 +48,7 @@ Partial Class frmCustomColors
     Me.pnlHistory = New System.Windows.Forms.TableLayoutPanel()
     Me.grpHistoryDown = New System.Windows.Forms.GroupBox()
     Me.pnlHistoryDown = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctHistoryDownLine = New System.Windows.Forms.PictureBox()
     Me.lblHistoryDownA = New System.Windows.Forms.Label()
     Me.pctHistoryDownA = New System.Windows.Forms.PictureBox()
     Me.pctHistoryDownB = New System.Windows.Forms.PictureBox()
@@ -56,8 +57,10 @@ Partial Class frmCustomColors
     Me.chkHistoryDownB = New System.Windows.Forms.CheckBox()
     Me.lblHistoryDownMax = New System.Windows.Forms.Label()
     Me.pctHistoryDownMax = New System.Windows.Forms.PictureBox()
+    Me.lblHistoryDownLine = New System.Windows.Forms.Label()
     Me.grpHistoryUp = New System.Windows.Forms.GroupBox()
     Me.pnlHistoryUp = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctHistoryUpLine = New System.Windows.Forms.PictureBox()
     Me.lblHistoryUpA = New System.Windows.Forms.Label()
     Me.pctHistoryUpA = New System.Windows.Forms.PictureBox()
     Me.pctHistoryUpB = New System.Windows.Forms.PictureBox()
@@ -66,11 +69,16 @@ Partial Class frmCustomColors
     Me.chkHistoryUpB = New System.Windows.Forms.CheckBox()
     Me.pctHistoryUpMax = New System.Windows.Forms.PictureBox()
     Me.lblHistoryUpMax = New System.Windows.Forms.Label()
+    Me.lblHistoryUpLine = New System.Windows.Forms.Label()
     Me.pnlHistoryStyle = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctHistoryGridD = New System.Windows.Forms.PictureBox()
+    Me.pctHistoryGridL = New System.Windows.Forms.PictureBox()
     Me.pctHistoryBG = New System.Windows.Forms.PictureBox()
     Me.lblHistoryText = New System.Windows.Forms.Label()
     Me.lblHistoryBG = New System.Windows.Forms.Label()
     Me.pctHistoryText = New System.Windows.Forms.PictureBox()
+    Me.lblHistoryGridL = New System.Windows.Forms.Label()
+    Me.lblHistoryGridD = New System.Windows.Forms.Label()
     Me.grpMain = New System.Windows.Forms.GroupBox()
     Me.pnlMain = New System.Windows.Forms.TableLayoutPanel()
     Me.grpMainDown = New System.Windows.Forms.GroupBox()
@@ -124,17 +132,21 @@ Partial Class frmCustomColors
     Me.pnlHistory.SuspendLayout()
     Me.grpHistoryDown.SuspendLayout()
     Me.pnlHistoryDown.SuspendLayout()
+    CType(Me.pctHistoryDownLine, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryDownA, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryDownB, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryDownC, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryDownMax, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpHistoryUp.SuspendLayout()
     Me.pnlHistoryUp.SuspendLayout()
+    CType(Me.pctHistoryUpLine, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryUpA, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryUpB, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryUpC, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryUpMax, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlHistoryStyle.SuspendLayout()
+    CType(Me.pctHistoryGridD, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctHistoryGridL, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryBG, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryText, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpMain.SuspendLayout()
@@ -178,7 +190,7 @@ Partial Class frmCustomColors
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlCustomColors.Size = New System.Drawing.Size(397, 503)
+    Me.pnlCustomColors.Size = New System.Drawing.Size(397, 576)
     Me.pnlCustomColors.TabIndex = 0
     '
     'pctTray
@@ -210,7 +222,7 @@ Partial Class frmCustomColors
     Me.pctHistory.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.pctHistory.BackColor = System.Drawing.Color.Black
     Me.pctHistory.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistory.Location = New System.Drawing.Point(319, 334)
+    Me.pctHistory.Location = New System.Drawing.Point(319, 360)
     Me.pctHistory.Name = "pctHistory"
     Me.pctHistory.Size = New System.Drawing.Size(75, 75)
     Me.pctHistory.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
@@ -466,7 +478,7 @@ Partial Class frmCustomColors
     Me.grpHistory.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.grpHistory.Location = New System.Drawing.Point(3, 285)
     Me.grpHistory.Name = "grpHistory"
-    Me.grpHistory.Size = New System.Drawing.Size(310, 174)
+    Me.grpHistory.Size = New System.Drawing.Size(310, 226)
     Me.grpHistory.TabIndex = 13
     Me.grpHistory.TabStop = False
     Me.grpHistory.Text = "&History Window Graphs"
@@ -489,7 +501,7 @@ Partial Class frmCustomColors
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlHistory.Size = New System.Drawing.Size(304, 155)
+    Me.pnlHistory.Size = New System.Drawing.Size(304, 207)
     Me.pnlHistory.TabIndex = 2
     '
     'grpHistoryDown
@@ -501,7 +513,7 @@ Partial Class frmCustomColors
     Me.grpHistoryDown.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.grpHistoryDown.Location = New System.Drawing.Point(3, 3)
     Me.grpHistoryDown.Name = "grpHistoryDown"
-    Me.grpHistoryDown.Size = New System.Drawing.Size(146, 123)
+    Me.grpHistoryDown.Size = New System.Drawing.Size(146, 149)
     Me.grpHistoryDown.TabIndex = 0
     Me.grpHistoryDown.TabStop = False
     Me.grpHistoryDown.Text = "Download Colors"
@@ -514,32 +526,45 @@ Partial Class frmCustomColors
     Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
     Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
     Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownA, 0, 0)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownA, 2, 0)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownB, 2, 1)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownC, 0, 2)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownC, 2, 2)
-    Me.pnlHistoryDown.Controls.Add(Me.chkHistoryDownB, 0, 1)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownMax, 0, 3)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownMax, 2, 3)
+    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownLine, 2, 0)
+    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownA, 0, 1)
+    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownA, 2, 1)
+    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownB, 2, 2)
+    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownC, 0, 3)
+    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownC, 2, 3)
+    Me.pnlHistoryDown.Controls.Add(Me.chkHistoryDownB, 0, 2)
+    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownMax, 0, 4)
+    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownMax, 2, 4)
+    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownLine, 0, 0)
     Me.pnlHistoryDown.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlHistoryDown.Location = New System.Drawing.Point(3, 16)
     Me.pnlHistoryDown.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryDown.Name = "pnlHistoryDown"
-    Me.pnlHistoryDown.RowCount = 4
+    Me.pnlHistoryDown.RowCount = 5
     Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlHistoryDown.Size = New System.Drawing.Size(140, 104)
+    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryDown.Size = New System.Drawing.Size(140, 130)
     Me.pnlHistoryDown.TabIndex = 0
+    '
+    'pctHistoryDownLine
+    '
+    Me.pctHistoryDownLine.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryDownLine.BackColor = System.Drawing.Color.Blue
+    Me.pctHistoryDownLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryDownLine.Location = New System.Drawing.Point(72, 3)
+    Me.pctHistoryDownLine.Name = "pctHistoryDownLine"
+    Me.pctHistoryDownLine.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryDownLine.TabIndex = 10
+    Me.pctHistoryDownLine.TabStop = False
     '
     'lblHistoryDownA
     '
     Me.lblHistoryDownA.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryDownA.AutoSize = True
-    Me.lblHistoryDownA.Location = New System.Drawing.Point(29, 6)
+    Me.lblHistoryDownA.Location = New System.Drawing.Point(29, 32)
     Me.lblHistoryDownA.Name = "lblHistoryDownA"
     Me.lblHistoryDownA.Size = New System.Drawing.Size(27, 13)
     Me.lblHistoryDownA.TabIndex = 0
@@ -550,7 +575,7 @@ Partial Class frmCustomColors
     Me.pctHistoryDownA.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryDownA.BackColor = System.Drawing.Color.Blue
     Me.pctHistoryDownA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownA.Location = New System.Drawing.Point(72, 3)
+    Me.pctHistoryDownA.Location = New System.Drawing.Point(72, 29)
     Me.pctHistoryDownA.Name = "pctHistoryDownA"
     Me.pctHistoryDownA.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryDownA.TabIndex = 1
@@ -562,7 +587,7 @@ Partial Class frmCustomColors
     Me.pctHistoryDownB.BackColor = System.Drawing.Color.Transparent
     Me.pctHistoryDownB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctHistoryDownB.Enabled = False
-    Me.pctHistoryDownB.Location = New System.Drawing.Point(72, 29)
+    Me.pctHistoryDownB.Location = New System.Drawing.Point(72, 55)
     Me.pctHistoryDownB.Name = "pctHistoryDownB"
     Me.pctHistoryDownB.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryDownB.TabIndex = 3
@@ -572,7 +597,7 @@ Partial Class frmCustomColors
     '
     Me.lblHistoryDownC.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryDownC.AutoSize = True
-    Me.lblHistoryDownC.Location = New System.Drawing.Point(17, 58)
+    Me.lblHistoryDownC.Location = New System.Drawing.Point(17, 84)
     Me.lblHistoryDownC.Name = "lblHistoryDownC"
     Me.lblHistoryDownC.Size = New System.Drawing.Size(39, 13)
     Me.lblHistoryDownC.TabIndex = 4
@@ -583,7 +608,7 @@ Partial Class frmCustomColors
     Me.pctHistoryDownC.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryDownC.BackColor = System.Drawing.Color.Red
     Me.pctHistoryDownC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownC.Location = New System.Drawing.Point(72, 55)
+    Me.pctHistoryDownC.Location = New System.Drawing.Point(72, 81)
     Me.pctHistoryDownC.Name = "pctHistoryDownC"
     Me.pctHistoryDownC.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryDownC.TabIndex = 5
@@ -593,7 +618,7 @@ Partial Class frmCustomColors
     '
     Me.chkHistoryDownB.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.chkHistoryDownB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkHistoryDownB.Location = New System.Drawing.Point(10, 30)
+    Me.chkHistoryDownB.Location = New System.Drawing.Point(10, 56)
     Me.chkHistoryDownB.Name = "chkHistoryDownB"
     Me.chkHistoryDownB.Size = New System.Drawing.Size(46, 18)
     Me.chkHistoryDownB.TabIndex = 6
@@ -604,22 +629,32 @@ Partial Class frmCustomColors
     '
     Me.lblHistoryDownMax.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryDownMax.AutoSize = True
-    Me.lblHistoryDownMax.Location = New System.Drawing.Point(26, 84)
+    Me.lblHistoryDownMax.Location = New System.Drawing.Point(23, 110)
     Me.lblHistoryDownMax.Name = "lblHistoryDownMax"
-    Me.lblHistoryDownMax.Size = New System.Drawing.Size(30, 13)
+    Me.lblHistoryDownMax.Size = New System.Drawing.Size(33, 13)
     Me.lblHistoryDownMax.TabIndex = 7
-    Me.lblHistoryDownMax.Text = "Max:"
+    Me.lblHistoryDownMax.Text = "Max :"
     '
     'pctHistoryDownMax
     '
     Me.pctHistoryDownMax.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryDownMax.BackColor = System.Drawing.Color.Yellow
     Me.pctHistoryDownMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownMax.Location = New System.Drawing.Point(72, 81)
+    Me.pctHistoryDownMax.Location = New System.Drawing.Point(72, 107)
     Me.pctHistoryDownMax.Name = "pctHistoryDownMax"
     Me.pctHistoryDownMax.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryDownMax.TabIndex = 8
     Me.pctHistoryDownMax.TabStop = False
+    '
+    'lblHistoryDownLine
+    '
+    Me.lblHistoryDownLine.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryDownLine.AutoSize = True
+    Me.lblHistoryDownLine.Location = New System.Drawing.Point(23, 6)
+    Me.lblHistoryDownLine.Name = "lblHistoryDownLine"
+    Me.lblHistoryDownLine.Size = New System.Drawing.Size(33, 13)
+    Me.lblHistoryDownLine.TabIndex = 9
+    Me.lblHistoryDownLine.Text = "Line :"
     '
     'grpHistoryUp
     '
@@ -630,7 +665,7 @@ Partial Class frmCustomColors
     Me.grpHistoryUp.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.grpHistoryUp.Location = New System.Drawing.Point(155, 3)
     Me.grpHistoryUp.Name = "grpHistoryUp"
-    Me.grpHistoryUp.Size = New System.Drawing.Size(146, 123)
+    Me.grpHistoryUp.Size = New System.Drawing.Size(146, 149)
     Me.grpHistoryUp.TabIndex = 1
     Me.grpHistoryUp.TabStop = False
     Me.grpHistoryUp.Text = "Upload Colors"
@@ -643,32 +678,45 @@ Partial Class frmCustomColors
     Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
     Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
     Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpA, 0, 0)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpA, 2, 0)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpB, 2, 1)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpC, 0, 2)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpC, 2, 2)
-    Me.pnlHistoryUp.Controls.Add(Me.chkHistoryUpB, 0, 1)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpMax, 2, 3)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpMax, 0, 3)
+    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpLine, 2, 0)
+    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpA, 0, 1)
+    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpA, 2, 1)
+    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpB, 2, 2)
+    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpC, 0, 3)
+    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpC, 2, 3)
+    Me.pnlHistoryUp.Controls.Add(Me.chkHistoryUpB, 0, 2)
+    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpMax, 2, 4)
+    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpMax, 0, 4)
+    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpLine, 0, 0)
     Me.pnlHistoryUp.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlHistoryUp.Location = New System.Drawing.Point(3, 16)
     Me.pnlHistoryUp.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryUp.Name = "pnlHistoryUp"
-    Me.pnlHistoryUp.RowCount = 4
+    Me.pnlHistoryUp.RowCount = 5
     Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlHistoryUp.Size = New System.Drawing.Size(140, 104)
+    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUp.Size = New System.Drawing.Size(140, 130)
     Me.pnlHistoryUp.TabIndex = 0
+    '
+    'pctHistoryUpLine
+    '
+    Me.pctHistoryUpLine.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUpLine.BackColor = System.Drawing.Color.Blue
+    Me.pctHistoryUpLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUpLine.Location = New System.Drawing.Point(72, 3)
+    Me.pctHistoryUpLine.Name = "pctHistoryUpLine"
+    Me.pctHistoryUpLine.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUpLine.TabIndex = 10
+    Me.pctHistoryUpLine.TabStop = False
     '
     'lblHistoryUpA
     '
     Me.lblHistoryUpA.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryUpA.AutoSize = True
-    Me.lblHistoryUpA.Location = New System.Drawing.Point(29, 6)
+    Me.lblHistoryUpA.Location = New System.Drawing.Point(29, 32)
     Me.lblHistoryUpA.Name = "lblHistoryUpA"
     Me.lblHistoryUpA.Size = New System.Drawing.Size(27, 13)
     Me.lblHistoryUpA.TabIndex = 0
@@ -679,7 +727,7 @@ Partial Class frmCustomColors
     Me.pctHistoryUpA.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryUpA.BackColor = System.Drawing.Color.Blue
     Me.pctHistoryUpA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpA.Location = New System.Drawing.Point(72, 3)
+    Me.pctHistoryUpA.Location = New System.Drawing.Point(72, 29)
     Me.pctHistoryUpA.Name = "pctHistoryUpA"
     Me.pctHistoryUpA.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryUpA.TabIndex = 1
@@ -691,7 +739,7 @@ Partial Class frmCustomColors
     Me.pctHistoryUpB.BackColor = System.Drawing.Color.Transparent
     Me.pctHistoryUpB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctHistoryUpB.Enabled = False
-    Me.pctHistoryUpB.Location = New System.Drawing.Point(72, 29)
+    Me.pctHistoryUpB.Location = New System.Drawing.Point(72, 55)
     Me.pctHistoryUpB.Name = "pctHistoryUpB"
     Me.pctHistoryUpB.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryUpB.TabIndex = 3
@@ -701,7 +749,7 @@ Partial Class frmCustomColors
     '
     Me.lblHistoryUpC.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryUpC.AutoSize = True
-    Me.lblHistoryUpC.Location = New System.Drawing.Point(17, 58)
+    Me.lblHistoryUpC.Location = New System.Drawing.Point(17, 84)
     Me.lblHistoryUpC.Name = "lblHistoryUpC"
     Me.lblHistoryUpC.Size = New System.Drawing.Size(39, 13)
     Me.lblHistoryUpC.TabIndex = 4
@@ -712,7 +760,7 @@ Partial Class frmCustomColors
     Me.pctHistoryUpC.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryUpC.BackColor = System.Drawing.Color.Red
     Me.pctHistoryUpC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpC.Location = New System.Drawing.Point(72, 55)
+    Me.pctHistoryUpC.Location = New System.Drawing.Point(72, 81)
     Me.pctHistoryUpC.Name = "pctHistoryUpC"
     Me.pctHistoryUpC.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryUpC.TabIndex = 5
@@ -722,7 +770,7 @@ Partial Class frmCustomColors
     '
     Me.chkHistoryUpB.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.chkHistoryUpB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkHistoryUpB.Location = New System.Drawing.Point(10, 30)
+    Me.chkHistoryUpB.Location = New System.Drawing.Point(10, 56)
     Me.chkHistoryUpB.Name = "chkHistoryUpB"
     Me.chkHistoryUpB.Size = New System.Drawing.Size(46, 18)
     Me.chkHistoryUpB.TabIndex = 6
@@ -734,7 +782,7 @@ Partial Class frmCustomColors
     Me.pctHistoryUpMax.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryUpMax.BackColor = System.Drawing.Color.Yellow
     Me.pctHistoryUpMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpMax.Location = New System.Drawing.Point(72, 81)
+    Me.pctHistoryUpMax.Location = New System.Drawing.Point(72, 107)
     Me.pctHistoryUpMax.Name = "pctHistoryUpMax"
     Me.pctHistoryUpMax.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryUpMax.TabIndex = 9
@@ -744,11 +792,21 @@ Partial Class frmCustomColors
     '
     Me.lblHistoryUpMax.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblHistoryUpMax.AutoSize = True
-    Me.lblHistoryUpMax.Location = New System.Drawing.Point(26, 84)
+    Me.lblHistoryUpMax.Location = New System.Drawing.Point(23, 110)
     Me.lblHistoryUpMax.Name = "lblHistoryUpMax"
-    Me.lblHistoryUpMax.Size = New System.Drawing.Size(30, 13)
+    Me.lblHistoryUpMax.Size = New System.Drawing.Size(33, 13)
     Me.lblHistoryUpMax.TabIndex = 8
-    Me.lblHistoryUpMax.Text = "Max:"
+    Me.lblHistoryUpMax.Text = "Max :"
+    '
+    'lblHistoryUpLine
+    '
+    Me.lblHistoryUpLine.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryUpLine.AutoSize = True
+    Me.lblHistoryUpLine.Location = New System.Drawing.Point(23, 6)
+    Me.lblHistoryUpLine.Name = "lblHistoryUpLine"
+    Me.lblHistoryUpLine.Size = New System.Drawing.Size(33, 13)
+    Me.lblHistoryUpLine.TabIndex = 10
+    Me.lblHistoryUpLine.Text = "Line :"
     '
     'pnlHistoryStyle
     '
@@ -760,18 +818,45 @@ Partial Class frmCustomColors
     Me.pnlHistoryStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlHistoryStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75.0!))
     Me.pnlHistoryStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryGridD, 3, 1)
+    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryGridL, 1, 1)
     Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryBG, 3, 0)
     Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryText, 0, 0)
     Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryBG, 2, 0)
     Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryText, 1, 0)
+    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryGridL, 0, 1)
+    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryGridD, 2, 1)
     Me.pnlHistoryStyle.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlHistoryStyle.Location = New System.Drawing.Point(0, 129)
+    Me.pnlHistoryStyle.Location = New System.Drawing.Point(0, 155)
     Me.pnlHistoryStyle.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryStyle.Name = "pnlHistoryStyle"
-    Me.pnlHistoryStyle.RowCount = 1
+    Me.pnlHistoryStyle.RowCount = 2
     Me.pnlHistoryStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryStyle.Size = New System.Drawing.Size(304, 26)
+    Me.pnlHistoryStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryStyle.Size = New System.Drawing.Size(304, 52)
     Me.pnlHistoryStyle.TabIndex = 2
+    '
+    'pctHistoryGridD
+    '
+    Me.pctHistoryGridD.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryGridD.BackColor = System.Drawing.Color.DarkGray
+    Me.pctHistoryGridD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryGridD.Location = New System.Drawing.Point(230, 29)
+    Me.pctHistoryGridD.Name = "pctHistoryGridD"
+    Me.pctHistoryGridD.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryGridD.TabIndex = 8
+    Me.pctHistoryGridD.TabStop = False
+    '
+    'pctHistoryGridL
+    '
+    Me.pctHistoryGridL.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryGridL.BackColor = System.Drawing.Color.LightGray
+    Me.pctHistoryGridL.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryGridL.Location = New System.Drawing.Point(78, 29)
+    Me.pctHistoryGridL.Name = "pctHistoryGridL"
+    Me.pctHistoryGridL.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryGridL.TabIndex = 7
+    Me.pctHistoryGridL.TabStop = False
     '
     'pctHistoryBG
     '
@@ -813,6 +898,26 @@ Partial Class frmCustomColors
     Me.pctHistoryText.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryText.TabIndex = 1
     Me.pctHistoryText.TabStop = False
+    '
+    'lblHistoryGridL
+    '
+    Me.lblHistoryGridL.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblHistoryGridL.AutoSize = True
+    Me.lblHistoryGridL.Location = New System.Drawing.Point(3, 32)
+    Me.lblHistoryGridL.Name = "lblHistoryGridL"
+    Me.lblHistoryGridL.Size = New System.Drawing.Size(55, 13)
+    Me.lblHistoryGridL.TabIndex = 5
+    Me.lblHistoryGridL.Text = "Light Grid:"
+    '
+    'lblHistoryGridD
+    '
+    Me.lblHistoryGridD.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblHistoryGridD.AutoSize = True
+    Me.lblHistoryGridD.Location = New System.Drawing.Point(155, 32)
+    Me.lblHistoryGridD.Name = "lblHistoryGridD"
+    Me.lblHistoryGridD.Size = New System.Drawing.Size(55, 13)
+    Me.lblHistoryGridD.TabIndex = 6
+    Me.lblHistoryGridD.Text = "Dark Grid:"
     '
     'grpMain
     '
@@ -1134,7 +1239,7 @@ Partial Class frmCustomColors
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(235, 468)
+    Me.pnlButtons.Location = New System.Drawing.Point(235, 531)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -1211,7 +1316,7 @@ Partial Class frmCustomColors
     Me.AutoSize = True
     Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(397, 503)
+    Me.ClientSize = New System.Drawing.Size(397, 576)
     Me.Controls.Add(Me.pnlCustomColors)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -1253,6 +1358,7 @@ Partial Class frmCustomColors
     Me.grpHistoryDown.PerformLayout()
     Me.pnlHistoryDown.ResumeLayout(False)
     Me.pnlHistoryDown.PerformLayout()
+    CType(Me.pctHistoryDownLine, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryDownA, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryDownB, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryDownC, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1261,12 +1367,15 @@ Partial Class frmCustomColors
     Me.grpHistoryUp.PerformLayout()
     Me.pnlHistoryUp.ResumeLayout(False)
     Me.pnlHistoryUp.PerformLayout()
+    CType(Me.pctHistoryUpLine, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryUpA, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryUpB, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryUpC, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryUpMax, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlHistoryStyle.ResumeLayout(False)
     Me.pnlHistoryStyle.PerformLayout()
+    CType(Me.pctHistoryGridD, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctHistoryGridL, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryBG, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.pctHistoryText, System.ComponentModel.ISupportInitialize).EndInit()
     Me.grpMain.ResumeLayout(False)
@@ -1379,4 +1488,12 @@ Partial Class frmCustomColors
   Friend WithEvents mnuGraphDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
   Friend WithEvents pnlButtons As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblHistoryGridL As System.Windows.Forms.Label
+  Friend WithEvents lblHistoryGridD As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryGridD As System.Windows.Forms.PictureBox
+  Friend WithEvents pctHistoryGridL As System.Windows.Forms.PictureBox
+  Friend WithEvents pctHistoryDownLine As System.Windows.Forms.PictureBox
+  Friend WithEvents lblHistoryDownLine As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryUpLine As System.Windows.Forms.PictureBox
+  Friend WithEvents lblHistoryUpLine As System.Windows.Forms.Label
 End Class

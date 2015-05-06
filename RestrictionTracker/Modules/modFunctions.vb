@@ -1081,7 +1081,7 @@ Module modFunctions
     g.Dispose()
     Return iPic
   End Function
-  Public Function DrawRGraph(ByVal Data() As DataBase.DataRow, ByVal ImgSize As Size, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color) As Image
+  Public Function DrawRGraph(ByVal Data() As DataBase.DataRow, ByVal ImgSize As Size, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorLine As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
     Dim yVMax As Long = 0
     For I As Long = 0 To Data.Length - 1
@@ -1112,38 +1112,58 @@ Module modFunctions
       g.DrawString(I.ToString.Trim & " MB", tFont, New SolidBrush(ColorText), lYWidth - g.MeasureString(I.ToString.Trim & " MB", tFont).Width, iY - (g.MeasureString(I.ToString.Trim & " MB", tFont).Height / 2))
       g.DrawLine(New Pen(ColorText), lYWidth - 3, iY, lYWidth, iY)
     Next I
+    For I As Integer = 0 To lMax Step (lMax \ 10)
+      Dim iY As Integer = yTop + yHeight - (I / lMax * yHeight)
+      If I > 0 Then
+        g.DrawLine(New Pen(ColorGridLight), lYWidth + 1, iY, ImgSize.Width - 4, iY)
+      End If
+    Next
+    For I As Integer = 0 To lMax Step (lMax \ 5)
+      Dim iY As Integer = yTop + yHeight - (I / lMax * yHeight)
+      If I > 0 Then
+        g.DrawLine(New Pen(ColorGridDark), lYWidth + 1, iY, ImgSize.Width - 4, iY)
+      End If
+    Next
     Dim lStart As Date = Data(0).DATETIME
     Dim lEnd As Date = Data(Data.Length - 1).DATETIME
     Dim dInterval As DateInterval = DateInterval.Minute
     Dim lInterval As UInteger = 1
+    Dim lBitInterval As Double = 1.0
     Dim lLabelInterval As UInteger = 5
     Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
       Case Is <= 61
         lInterval = 1
+        lBitInterval = 0.5
         lLabelInterval = 5
         dInterval = DateInterval.Minute
       Case Is < 60 * 13
         lInterval = 15
+        lBitInterval = 10
         lLabelInterval = 60
         dInterval = DateInterval.Minute
       Case Is <= 60 * 25
         lInterval = 60
+        lBitInterval = 30
         lLabelInterval = 60 * 6
         dInterval = DateInterval.Minute
       Case Is <= 60 * 24 * 8
         lInterval = 12
+        lBitInterval = 6
         lLabelInterval = 24
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 31
         lInterval = 24
+        lBitInterval = 12
         lLabelInterval = 24 * 7
         dInterval = DateInterval.Hour
       Case Is <= 60 * 24 * 366
         lInterval = 7
+        lBitInterval = 3.5
         lLabelInterval = 30
         dInterval = DateInterval.Day
       Case Else
         lInterval = 30
+        lBitInterval = 7
         lLabelInterval = 365
         dInterval = DateInterval.Day
     End Select
@@ -1151,9 +1171,14 @@ Module modFunctions
     If lMaxTime = 0 Then Return New Bitmap(1, 1)
     Dim lLineWidth As Long = (ImgSize.Width - 4) - lYWidth - 1
     Dim dCompInter As Double = lLineWidth / lMaxTime
+    For I As Double = 0 To lMaxTime Step lBitInterval
+      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
+      If I > 0 Then g.DrawLine(New Pen(ColorGridLight), lX, yTop, lX, ImgSize.Height - (lXHeight + 5))
+    Next
     For I As Long = 0 To lMaxTime Step lInterval
       Dim lX As Integer = lYWidth + (I * dCompInter) + 1
       g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
+      If I > 0 Then g.DrawLine(New Pen(ColorGridDark), lX, yTop, lX, ImgSize.Height - (lXHeight + 5))
     Next I
     Dim lastI As Long = lYWidth + (lMaxTime * dCompInter)
     If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
@@ -1237,7 +1262,7 @@ Module modFunctions
       Next
       If lHigh > 0 And lLow < Long.MaxValue Then lVal = (lHigh + lLow) / 2
       If lVal = -1 And lastLVal > 0 Then lVal = lastLVal
-      lPoints(I).X = lYWidth + (I * dCompInter) + 1
+      lPoints(I).X = lYWidth + (I * dCompInter) + IIf(I > 0, 1, 0)
       lPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lPoints(I - 1).X = 0 And lPoints(I - 1).Y = 0) Then
         Dim J As Long = 1
@@ -1260,12 +1285,18 @@ Module modFunctions
       lTypes(I) = Drawing2D.PathPointType.Line
     Next
     lTypes(lMaxTime + 3) = Drawing2D.PathPointType.Line Or Drawing2D.PathPointType.CloseSubpath
-    Dim fBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(lYWidth, MaxY), New Point(lYWidth, yTop + yHeight), ColorA, ColorB, ColorC)
-    fBrush.WrapMode = Drawing2D.WrapMode.TileFlipX
     g.DrawLines(New Pen(New SolidBrush(ColorMax), 5), lMaxPoints)
-    g.FillPath(fBrush, New Drawing2D.GraphicsPath(lPoints, lTypes))
-    g.FillRectangle(New Drawing2D.HatchBrush(Drawing2D.HatchStyle.DottedGrid, Color.FromArgb(192, ColorBG), Color.Transparent), lYWidth, yTop - 1, ImgSize.Width, MaxY - yTop + 1)
+    Dim gPath As New Drawing2D.GraphicsPath(lPoints, lTypes)
+    Dim fBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(lYWidth, MaxY), New Point(lYWidth, yTop + yHeight), Color.FromArgb(192, ColorA), Color.FromArgb(192, ColorB), Color.FromArgb(192, ColorC))
+    fBrush.WrapMode = Drawing2D.WrapMode.TileFlipX
+    g.FillPath(fBrush, gPath)
+    g.SetClip(gPath)
+    g.FillRectangle(New Drawing2D.HatchBrush(Drawing2D.HatchStyle.LightUpwardDiagonal, Color.FromArgb(192, ColorMax), Color.Transparent), lYWidth + 1, yTop - 1, ImgSize.Width, MaxY - yTop + 1)
+    g.ResetClip()
+    g.DrawPath(New Pen(ColorLine, 1.5), gPath)
     g.DrawLines(New Pen(New SolidBrush(Color.FromArgb(96, ColorMax)), 5), lMaxPoints)
+    g.DrawLine(New Pen(ColorText), lYWidth, yTop, lYWidth, yTop + yHeight)
+    g.DrawLine(New Pen(ColorText), lYWidth, yTop + yHeight, ImgSize.Width, yTop + yHeight)
     g.Dispose()
     Return iPic
   End Function
@@ -1546,6 +1577,141 @@ Module modFunctions
     g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Ceiling(icoX / 2)), icoY - yUsed)
   End Sub
 #End Region
+  Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors, useStyle As localRestrictionTracker.SatHostTypes)
+    Dim defaultColors As AppSettings.AppColors = GetDefaultColors(useStyle)
+    If Colors.MainDownA = Color.Transparent Then
+      Colors.MainDownA = defaultColors.MainDownA
+    ElseIf Colors.MainDownA.A < 255 Then
+      Debug.Print("Low Alpha (MainDownA)")
+    End If
+    If Colors.MainDownB = Color.Transparent Then
+      Colors.MainDownB = defaultColors.MainDownB
+    ElseIf Colors.MainDownB.A < 255 Then
+      Debug.Print("Low Alpha (MainDownB)")
+    End If
+    If Colors.MainDownC = Color.Transparent Then
+      Colors.MainDownC = defaultColors.MainDownC
+    ElseIf Colors.MainDownC.A < 255 Then
+      Debug.Print("Low Alpha (MainDownC)")
+    End If
+    If Colors.MainUpA = Color.Transparent Then
+      Colors.MainUpA = defaultColors.MainUpA
+    ElseIf Colors.MainUpA.A < 255 Then
+      Debug.Print("Low Alpha (MainUpA)")
+    End If
+    If Colors.MainUpB = Color.Transparent Then
+      Colors.MainUpB = defaultColors.MainUpB
+    ElseIf Colors.MainUpB.A < 255 Then
+      Debug.Print("Low Alpha (MainUpB)")
+    End If
+    If Colors.MainUpC = Color.Transparent Then
+      Colors.MainUpC = defaultColors.MainUpC
+    ElseIf Colors.MainUpC.A < 255 Then
+      Debug.Print("Low Alpha (MainUpC)")
+    End If
+    If Colors.MainText = Color.Transparent Then
+      Colors.MainText = defaultColors.MainText
+    ElseIf Colors.MainText.A < 255 Then
+      Debug.Print("Low Alpha (MainText)")
+    End If
+    If Colors.MainBackground = Color.Transparent Then
+      Colors.MainBackground = defaultColors.MainBackground
+    ElseIf Colors.MainBackground.A < 255 Then
+      Debug.Print("Low Alpha (MainBackground)")
+    End If
+
+    If Colors.TrayDownA = Color.Transparent Then
+      Colors.TrayDownA = defaultColors.TrayDownA
+    ElseIf Colors.TrayDownA.A < 255 Then
+      Debug.Print("Low Alpha (TrayDownA)")
+    End If
+    If Colors.TrayDownB = Color.Transparent Then
+      Colors.TrayDownB = defaultColors.TrayDownB
+    ElseIf Colors.TrayDownB.A < 255 Then
+      Debug.Print("Low Alpha (TrayDownB)")
+    End If
+    If Colors.TrayDownC = Color.Transparent Then
+      Colors.TrayDownC = defaultColors.TrayDownC
+    ElseIf Colors.TrayDownC.A < 255 Then
+      Debug.Print("Low Alpha (TrayDownC)")
+    End If
+    If Colors.TrayUpA = Color.Transparent Then
+      Colors.TrayUpA = defaultColors.TrayUpA
+    ElseIf Colors.TrayUpA.A < 255 Then
+      Debug.Print("Low Alpha (TrayUpA)")
+    End If
+    If Colors.TrayUpB = Color.Transparent Then
+      Colors.TrayUpB = defaultColors.TrayUpB
+    ElseIf Colors.TrayUpB.A < 255 Then
+      Debug.Print("Low Alpha (TrayUpB)")
+    End If
+    If Colors.TrayUpC = Color.Transparent Then
+      Colors.TrayUpC = defaultColors.TrayUpC
+    ElseIf Colors.TrayUpC.A < 255 Then
+      Debug.Print("Low Alpha (TrayUpC)")
+    End If
+
+    If Colors.HistoryDownLine = Color.Transparent Then
+      Colors.HistoryDownLine = defaultColors.HistoryDownLine
+    ElseIf Colors.HistoryDownLine.A < 255 Then
+      Debug.Print("Low Alpha (HistoryDownLine)")
+    End If
+    If Colors.HistoryDownA = Color.Transparent Then
+      Colors.HistoryDownA = defaultColors.HistoryDownA
+    ElseIf Colors.HistoryDownA.A < 255 Then
+      Debug.Print("Low Alpha (HistoryDownA)")
+    End If
+    If Colors.HistoryDownB = Color.Transparent Then
+      Colors.HistoryDownB = defaultColors.HistoryDownB
+    ElseIf Colors.HistoryDownB.A < 255 Then
+      Debug.Print("Low Alpha (HistoryDownB)")
+    End If
+    If Colors.HistoryDownC = Color.Transparent Then
+      Colors.HistoryDownC = defaultColors.HistoryDownC
+    ElseIf Colors.HistoryDownC.A < 255 Then
+      Debug.Print("Low Alpha (HistoryDownC)")
+    End If
+    If Colors.HistoryUpLine = Color.Transparent Then
+      Colors.HistoryUpLine = defaultColors.HistoryUpLine
+    ElseIf Colors.HistoryUpLine.A < 255 Then
+      Debug.Print("Low Alpha (HistoryUpLine)")
+    End If
+    If Colors.HistoryUpA = Color.Transparent Then
+      Colors.HistoryUpA = defaultColors.HistoryUpA
+    ElseIf Colors.HistoryUpA.A < 255 Then
+      Debug.Print("Low Alpha (HistoryUpA)")
+    End If
+    If Colors.HistoryUpB = Color.Transparent Then
+      Colors.HistoryUpB = defaultColors.HistoryUpB
+    ElseIf Colors.HistoryUpB.A < 255 Then
+      Debug.Print("Low Alpha (HistoryUpB)")
+    End If
+    If Colors.HistoryUpC = Color.Transparent Then
+      Colors.HistoryUpC = defaultColors.HistoryUpC
+    ElseIf Colors.HistoryUpC.A < 255 Then
+      Debug.Print("Low Alpha (HistoryUpC)")
+    End If
+    If Colors.HistoryText = Color.Transparent Then
+      Colors.HistoryText = defaultColors.HistoryText
+    ElseIf Colors.HistoryText.A < 255 Then
+      Debug.Print("Low Alpha (HistoryText)")
+    End If
+    If Colors.HistoryBackground = Color.Transparent Then
+      Colors.HistoryBackground = defaultColors.HistoryBackground
+    ElseIf Colors.HistoryBackground.A < 255 Then
+      Debug.Print("Low Alpha (HistoryBackground)")
+    End If
+    If Colors.HistoryLightGrid = Color.Transparent Then
+      Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
+    ElseIf Colors.HistoryLightGrid.A < 255 Then
+      Debug.Print("Low Alpha (HistoryLightGrid)")
+    End If
+    If Colors.HistoryDarkGrid = Color.Transparent Then
+      Colors.HistoryDarkGrid = defaultColors.HistoryDarkGrid
+    ElseIf Colors.HistoryDarkGrid.A < 255 Then
+      Debug.Print("Low Alpha (HistoryDarkGrid)")
+    End If
+  End Sub
   Public Function GetDefaultColors(useStyle As localRestrictionTracker.SatHostTypes) As AppSettings.AppColors
     Dim outColors As New AppSettings.AppColors
     Select Case useStyle
@@ -1566,16 +1732,20 @@ Module modFunctions
         outColors.TrayUpB = Color.Blue
         outColors.TrayUpC = Color.Aqua
 
+        outColors.HistoryDownLine = Color.DarkBlue
         outColors.HistoryDownA = Color.DarkBlue
         outColors.HistoryDownB = Color.Blue
         outColors.HistoryDownC = Color.Aqua
         outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpLine = Color.DarkBlue
         outColors.HistoryUpA = Color.DarkBlue
         outColors.HistoryUpB = Color.Blue
         outColors.HistoryUpC = Color.Aqua
         outColors.HistoryUpMax = Color.Yellow
         outColors.HistoryText = Color.Black
         outColors.HistoryBackground = Color.White
+        outColors.HistoryLightGrid = Color.LightGray
+        outColors.HistoryDarkGrid = Color.DarkGray
 
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
         outColors.MainDownA = Color.DarkBlue
@@ -1594,16 +1764,20 @@ Module modFunctions
         outColors.TrayUpB = Color.Transparent
         outColors.TrayUpC = Color.Transparent
 
+        outColors.HistoryDownLine = Color.DarkBlue
         outColors.HistoryDownA = Color.DarkBlue
         outColors.HistoryDownB = Color.Blue
         outColors.HistoryDownC = Color.Aqua
         outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpLine = Color.DarkBlue
         outColors.HistoryUpA = Color.Transparent
         outColors.HistoryUpB = Color.Transparent
         outColors.HistoryUpC = Color.Transparent
         outColors.HistoryUpMax = Color.Transparent
         outColors.HistoryText = Color.Black
         outColors.HistoryBackground = Color.White
+        outColors.HistoryLightGrid = Color.LightGray
+        outColors.HistoryDarkGrid = Color.DarkGray
 
       Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE
         outColors.MainDownA = Color.DarkBlue
@@ -1622,16 +1796,21 @@ Module modFunctions
         outColors.TrayUpB = Color.Blue
         outColors.TrayUpC = Color.Aqua
 
+        outColors.HistoryDownLine = Color.DarkBlue
         outColors.HistoryDownA = Color.DarkBlue
         outColors.HistoryDownB = Color.Blue
         outColors.HistoryDownC = Color.Aqua
         outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpLine = Color.DarkBlue
         outColors.HistoryUpA = Color.DarkBlue
         outColors.HistoryUpB = Color.Blue
         outColors.HistoryUpC = Color.Aqua
         outColors.HistoryUpMax = Color.Yellow
         outColors.HistoryText = Color.Black
         outColors.HistoryBackground = Color.White
+        outColors.HistoryLightGrid = Color.LightGray
+        outColors.HistoryDarkGrid = Color.DarkGray
+
       Case Else
         outColors.MainDownA = Color.DarkBlue
         outColors.MainDownB = Color.Blue
@@ -1649,16 +1828,20 @@ Module modFunctions
         outColors.TrayUpB = Color.Blue
         outColors.TrayUpC = Color.Aqua
 
+        outColors.HistoryDownLine = Color.DarkBlue
         outColors.HistoryDownA = Color.DarkBlue
         outColors.HistoryDownB = Color.Blue
         outColors.HistoryDownC = Color.Aqua
         outColors.HistoryDownMax = Color.Yellow
+        outColors.HistoryUpLine = Color.DarkBlue
         outColors.HistoryUpA = Color.DarkBlue
         outColors.HistoryUpB = Color.Blue
         outColors.HistoryUpC = Color.Aqua
         outColors.HistoryUpMax = Color.Yellow
         outColors.HistoryText = Color.Black
         outColors.HistoryBackground = Color.White
+        outColors.HistoryLightGrid = Color.LightGray
+        outColors.HistoryDarkGrid = Color.DarkGray
 
     End Select
     Return outColors

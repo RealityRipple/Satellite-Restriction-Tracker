@@ -154,7 +154,7 @@ Public Class frmMain
         ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede Then
           mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         End If
-        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+        ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
         mySettings.Save()
         SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
         If localData IsNot Nothing Then
@@ -178,7 +178,7 @@ Public Class frmMain
         SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
       Else
         mySettings.AccountType = e.HostType
-        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+        ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
         mySettings.Save()
         SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
         If localData IsNot Nothing Then
@@ -523,7 +523,7 @@ Public Class frmMain
     mySettings = New AppSettings
     Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
     If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
-    If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
     If mySettings.TopMost Then
@@ -876,7 +876,7 @@ Public Class frmMain
       myPanel = SatHostTypes.DishNet_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -895,7 +895,7 @@ Public Class frmMain
       myPanel = SatHostTypes.RuralPortal_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -914,7 +914,7 @@ Public Class frmMain
       myPanel = SatHostTypes.RuralPortal_LEGACY
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
       mySettings.Save()
-      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -933,7 +933,7 @@ Public Class frmMain
       myPanel = SatHostTypes.WildBlue_LEGACY
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
       mySettings.Save()
-      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -952,7 +952,7 @@ Public Class frmMain
       myPanel = SatHostTypes.WildBlue_EXEDE
       If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       mySettings.Save()
-      If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       DisplayUsage(True, True)
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -1045,7 +1045,7 @@ Public Class frmMain
       End If
       If e IsNot Nothing Then
         If Not mySettings.AccountTypeForced Then mySettings.AccountType = e.Provider
-        If mySettings.Colors.MainDownA = Color.Transparent Then SetDefaultColors()
+        ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
         mySettings.Save()
         Dim iPercent As Integer = 0
         Dim iInterval As Integer = 1
@@ -1570,6 +1570,7 @@ Public Class frmMain
         sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
+          ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
           If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
           frmHistory.DoResize(True)
         End If
@@ -1644,6 +1645,7 @@ Public Class frmMain
       sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
+        ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
         If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
         frmHistory.DoResize(True)
       End If
@@ -2206,13 +2208,6 @@ Public Class frmMain
     Catch ex As Exception
       MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End Try
-  End Sub
-  Private Sub SetDefaultColors()
-    If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
-    Else
-      mySettings.Colors = GetDefaultColors(mySettings.AccountType)
-    End If
   End Sub
   Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted
     If Me.InvokeRequired Then

@@ -6,6 +6,7 @@ Public Class frmHistory
   Private bSizeChange As Boolean
   Private graphSpaceD, graphSpaceU As Rectangle
   Private graphMinX, graphMaxX As Date
+
   Private Delegate Sub ParameterizedInvoker(parameter As Object)
   Private Delegate Sub ParameterizedInvoker2(param1 As Object, param2 As Object)
   Private WithEvents usageTmp As DataBase
@@ -16,7 +17,7 @@ Public Class frmHistory
     mySettings = New AppSettings
     If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     useStyle = mySettings.AccountType
-    If mySettings.Colors.HistoryDownA = Color.Transparent Then SetDefaultColors()
+    ScreenDefaultColors(mySettings.Colors, useStyle)
     ResetDates()
     dtpFrom.Value = dtpFrom.MinDate
     dtpTo.Value = dtpTo.MaxDate
@@ -117,7 +118,7 @@ Public Class frmHistory
         If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bDown, bUp)
       Case 1
-        Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax)
+        Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
         If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bGraph, Nothing)
     End Select
@@ -765,13 +766,6 @@ Public Class frmHistory
           dgvUsage.Columns.Add(colDOWNLOAD)
           dgvUsage.Columns.Add(colUPLOAD)
       End Select
-    End If
-  End Sub
-  Private Sub SetDefaultColors()
-    If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf SetDefaultColors))
-    Else
-      mySettings.Colors = GetDefaultColors(useStyle)
     End If
   End Sub
 End Class

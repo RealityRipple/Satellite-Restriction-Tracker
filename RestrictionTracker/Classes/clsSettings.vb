@@ -770,6 +770,7 @@ Class AppSettings
             Colors.HistoryDownB = Color.Transparent
             Colors.HistoryDownC = Color.Transparent
             Colors.HistoryDownMax = Color.Transparent
+            Colors.HistoryDownLine = Color.Transparent
           Else
             Dim xHistoryDA As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
             If xHistoryDA Is Nothing Then
@@ -815,12 +816,23 @@ Class AppSettings
                 Colors.HistoryDownMax = Color.Transparent
               End Try
             End If
+            Dim xHistoryDLine As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
+            If xHistoryDLine Is Nothing Then
+              Colors.HistoryDownLine = Color.Transparent
+            Else
+              Try
+                Colors.HistoryDownLine = StrToColor(xHistoryDLine.Element("value").Value)
+              Catch ex As Exception
+                Colors.HistoryDownLine = Color.Transparent
+              End Try
+            End If
           End If
           Dim xHistoryUp As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
           If xHistoryUp Is Nothing Then
             Colors.HistoryUpA = Color.Transparent
             Colors.HistoryUpB = Color.Transparent
             Colors.HistoryUpC = Color.Transparent
+            Colors.HistoryUpLine = Color.Transparent
           Else
             Dim xHistoryUA As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
             If xHistoryUA Is Nothing Then
@@ -866,6 +878,17 @@ Class AppSettings
                 Colors.HistoryUpMax = Color.Transparent
               End Try
             End If
+            Dim xHistoryULine As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
+            If xHistoryULine Is Nothing Then
+              Colors.HistoryUpLine = Color.Transparent
+            Else
+              Try
+                Colors.HistoryUpLine = StrToColor(xHistoryULine.Element("value").Value)
+              Catch ex As Exception
+                Colors.HistoryUpLine = Color.Transparent
+              End Try
+            End If
+            
           End If
           Dim xHistoryText As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
           If xHistoryText Is Nothing Then
@@ -886,6 +909,32 @@ Class AppSettings
             Catch ex As Exception
               Colors.HistoryBackground = Color.Transparent
             End Try
+          End If
+          Dim xHistoryGrid As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Grid")
+          If xHistoryGrid Is Nothing Then
+            Colors.HistoryLightGrid = Color.Transparent
+            Colors.HistoryDarkGrid = Color.Transparent
+          Else
+            Dim xHistoryLight As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Light")
+            If xHistoryLight Is Nothing Then
+              Colors.HistoryLightGrid = Color.Transparent
+            Else
+              Try
+                Colors.HistoryLightGrid = StrToColor(xHistoryLight.Element("value").Value)
+              Catch ex As Exception
+                Colors.HistoryLightGrid = Color.Transparent
+              End Try
+            End If
+            Dim xHistoryUDark As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Dark")
+            If xHistoryUDark Is Nothing Then
+              Colors.HistoryDarkGrid = Color.Transparent
+            Else
+              Try
+                Colors.HistoryDarkGrid = StrToColor(xHistoryUDark.Element("value").Value)
+              Catch ex As Exception
+                Colors.HistoryDarkGrid = Color.Transparent
+              End Try
+            End If
           End If
         End If
       End If
@@ -956,12 +1005,16 @@ Class AppSettings
     Colors.HistoryDownB = Color.Transparent
     Colors.HistoryDownC = Color.Transparent
     Colors.HistoryDownMax = Color.Transparent
+    Colors.HistoryDownLine = Color.Transparent
     Colors.HistoryUpA = Color.Transparent
     Colors.HistoryUpB = Color.Transparent
     Colors.HistoryUpC = Color.Transparent
     Colors.HistoryUpMax = Color.Transparent
+    Colors.HistoryUpLine = Color.Transparent
     Colors.HistoryText = Color.Transparent
     Colors.HistoryBackground = Color.Transparent
+    Colors.HistoryLightGrid = Color.Transparent
+    Colors.HistoryDarkGrid = Color.Transparent
   End Sub
   Public Sub Save()
     Dim sAccountType As String = HostTypeToString(m_AccountType)
@@ -1032,14 +1085,19 @@ Class AppSettings
                                                                        New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.HistoryDownA))),
                                                                        New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.HistoryDownB))),
                                                                        New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.HistoryDownC))),
-                                                                       New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryDownMax)))),
+                                                                       New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryDownMax))),
+                                                                       New XElement("setting", New XAttribute("name", "Line"), New XElement("value", ColorToStr(Colors.HistoryDownLine)))),
                                                           New XElement("section", New XAttribute("name", "Upload"),
                                                                        New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.HistoryUpA))),
                                                                        New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.HistoryUpB))),
                                                                        New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.HistoryUpC))),
-                                                                       New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryUpMax)))),
+                                                                       New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryUpMax))),
+                                                                       New XElement("setting", New XAttribute("name", "Line"), New XElement("value", ColorToStr(Colors.HistoryUpLine)))),
                                                           New XElement("setting", New XAttribute("name", "Text"), New XElement("value", ColorToStr(Colors.HistoryText))),
-                                                          New XElement("setting", New XAttribute("name", "Background"), New XElement("value", ColorToStr(Colors.HistoryBackground))))))
+                                                          New XElement("setting", New XAttribute("name", "Background"), New XElement("value", ColorToStr(Colors.HistoryBackground))),
+                                                          New XElement("section", New XAttribute("name", "Grid"),
+                                                                       New XElement("setting", New XAttribute("name", "Light"), New XElement("value", ColorToStr(Colors.HistoryLightGrid))),
+                                                                       New XElement("setting", New XAttribute("name", "Dark"), New XElement("value", ColorToStr(Colors.HistoryDarkGrid)))))))
     If InUseChecker(ConfigFile, IO.FileAccess.Write) Then
       MakeBackup()
       Try
@@ -1474,12 +1532,16 @@ Class AppSettings
     Private c_HistoryDB As Color
     Private c_HistoryDC As Color
     Private c_HistoryDM As Color
+    Private c_HistoryDLine As Color
     Private c_HistoryUA As Color
     Private c_HistoryUB As Color
     Private c_HistoryUC As Color
     Private c_HistoryUM As Color
+    Private c_HistoryULine As Color
     Private c_HistoryText As Color
     Private c_HistoryBG As Color
+    Private c_HistoryLight As Color
+    Private c_HistoryDark As Color
     Public Property MainDownA As Color
       Get
         Return c_MainDA
@@ -1624,6 +1686,14 @@ Class AppSettings
         c_HistoryDM = value
       End Set
     End Property
+    Public Property HistoryDownLine As Color
+      Get
+        Return c_HistoryDLine
+      End Get
+      Set(value As Color)
+        c_HistoryDLine = value
+      End Set
+    End Property
     Public Property HistoryUpA As Color
       Get
         Return c_HistoryUA
@@ -1656,6 +1726,14 @@ Class AppSettings
         c_HistoryUM = value
       End Set
     End Property
+    Public Property HistoryUpLine As Color
+      Get
+        Return c_HistoryULine
+      End Get
+      Set(value As Color)
+        c_HistoryULine = value
+      End Set
+    End Property
     Public Property HistoryText As Color
       Get
         Return c_HistoryText
@@ -1670,6 +1748,22 @@ Class AppSettings
       End Get
       Set(value As Color)
         c_HistoryBG = value
+      End Set
+    End Property
+    Public Property HistoryLightGrid As Color
+      Get
+        Return c_HistoryLight
+      End Get
+      Set(value As Color)
+        c_HistoryLight = value
+      End Set
+    End Property
+    Public Property HistoryDarkGrid As Color
+      Get
+        Return c_HistoryDark
+      End Get
+      Set(value As Color)
+        c_HistoryDark = value
       End Set
     End Property
   End Class

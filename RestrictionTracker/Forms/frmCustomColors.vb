@@ -194,16 +194,20 @@ Public Class frmCustomColors
       SetElColor(pctTrayUpA, mySettings.Colors.TrayUpA)
       SetElColor(pctTrayUpB, mySettings.Colors.TrayUpB)
       SetElColor(pctTrayUpC, mySettings.Colors.TrayUpC)
+      SetElColor(pctHistoryDownLine, mySettings.Colors.HistoryDownLine)
       SetElColor(pctHistoryDownA, mySettings.Colors.HistoryDownA)
       SetElColor(pctHistoryDownB, mySettings.Colors.HistoryDownB)
       SetElColor(pctHistoryDownC, mySettings.Colors.HistoryDownC)
       SetElColor(pctHistoryDownMax, mySettings.Colors.HistoryDownMax)
+      SetElColor(pctHistoryUpLine, mySettings.Colors.HistoryUpLine)
       SetElColor(pctHistoryUpA, mySettings.Colors.HistoryUpA)
       SetElColor(pctHistoryUpB, mySettings.Colors.HistoryUpB)
       SetElColor(pctHistoryUpC, mySettings.Colors.HistoryUpC)
       SetElColor(pctHistoryUpMax, mySettings.Colors.HistoryUpMax)
       SetElColor(pctHistoryText, mySettings.Colors.HistoryText)
       SetElColor(pctHistoryBG, mySettings.Colors.HistoryBackground)
+      SetElColor(pctHistoryGridL, mySettings.Colors.HistoryLightGrid)
+      SetElColor(pctHistoryGridD, mySettings.Colors.HistoryDarkGrid)
     End If
     RedrawImages()
     cmdSave.Enabled = False
@@ -225,16 +229,20 @@ Public Class frmCustomColors
     mySettings.Colors.TrayUpA = pctTrayUpA.BackColor
     mySettings.Colors.TrayUpB = pctTrayUpB.BackColor
     mySettings.Colors.TrayUpC = pctTrayUpC.BackColor
+    mySettings.Colors.HistoryDownLine = pctHistoryDownLine.BackColor
     mySettings.Colors.HistoryDownA = pctHistoryDownA.BackColor
     mySettings.Colors.HistoryDownB = pctHistoryDownB.BackColor
     mySettings.Colors.HistoryDownC = pctHistoryDownC.BackColor
     mySettings.Colors.HistoryDownMax = pctHistoryDownMax.BackColor
+    mySettings.Colors.HistoryUpLine = pctHistoryUpLine.BackColor
     mySettings.Colors.HistoryUpA = pctHistoryUpA.BackColor
     mySettings.Colors.HistoryUpB = pctHistoryUpB.BackColor
     mySettings.Colors.HistoryUpC = pctHistoryUpC.BackColor
     mySettings.Colors.HistoryUpMax = pctHistoryUpMax.BackColor
     mySettings.Colors.HistoryText = pctHistoryText.BackColor
     mySettings.Colors.HistoryBackground = pctHistoryBG.BackColor
+    mySettings.Colors.HistoryLightGrid = pctHistoryGridL.BackColor
+    mySettings.Colors.HistoryDarkGrid = pctHistoryGridD.BackColor
     mySettings.Save()
     cmdSave.Enabled = False
     HasSaved = True
@@ -249,9 +257,9 @@ Public Class frmCustomColors
                                                                                 pctMainText.MouseClick, pctMainBG.MouseClick,
                                                                                 pctTrayDownA.MouseClick, pctTrayDownB.MouseClick, pctTrayDownC.MouseClick,
                                                                                 pctTrayUpA.MouseClick, pctTrayUpB.MouseClick, pctTrayUpC.MouseClick,
-                                                                                pctHistoryDownA.MouseClick, pctHistoryDownB.MouseClick, pctHistoryDownC.MouseClick, pctHistoryDownMax.MouseClick,
-                                                                                pctHistoryUpA.MouseClick, pctHistoryUpB.MouseClick, pctHistoryUpC.MouseClick, pctHistoryUpMax.MouseClick,
-                                                                                pctHistoryText.MouseClick, pctHistoryBG.MouseClick
+                                                                                pctHistoryDownLine.MouseClick, pctHistoryDownA.MouseClick, pctHistoryDownB.MouseClick, pctHistoryDownC.MouseClick, pctHistoryDownMax.MouseClick,
+                                                                                pctHistoryUpLine.MouseClick, pctHistoryUpA.MouseClick, pctHistoryUpB.MouseClick, pctHistoryUpC.MouseClick, pctHistoryUpMax.MouseClick,
+                                                                                pctHistoryText.MouseClick, pctHistoryBG.MouseClick, pctHistoryGridL.MouseClick, pctHistoryGridD.MouseClick
     mnuColorOpts.Tag = sender
     Dim pctColor As PictureBox = sender
     If e.Button = Windows.Forms.MouseButtons.Left Then
@@ -372,9 +380,9 @@ Public Class frmCustomColors
       ColorList = {pctTrayDownA, pctTrayDownB, pctTrayDownC,
                    pctTrayUpA, pctTrayUpB, pctTrayUpC}
     Else
-      ColorList = {pctHistoryDownA, pctHistoryDownB, pctHistoryDownC, pctHistoryDownMax,
-                   pctHistoryUpA, pctHistoryUpB, pctHistoryUpC, pctHistoryUpMax,
-                   pctHistoryText, pctHistoryBG}
+      ColorList = {pctHistoryDownLine, pctHistoryDownA, pctHistoryDownB, pctHistoryDownC, pctHistoryDownMax,
+                   pctHistoryUpLine, pctHistoryUpA, pctHistoryUpB, pctHistoryUpC, pctHistoryUpMax,
+                   pctHistoryText, pctHistoryBG, pctHistoryGridL, pctHistoryGridD}
     End If
     For Each pColor As PictureBox In ColorList
       Dim bColor As Color = DefaultColorForElement(pColor.Name, useStyle)
@@ -391,9 +399,9 @@ Public Class frmCustomColors
                  pctMainText, pctMainBG,
                  pctTrayDownA, pctTrayDownB, pctTrayDownC,
                  pctTrayUpA, pctTrayUpB, pctTrayUpC,
-                 pctHistoryDownA, pctHistoryDownB, pctHistoryDownC, pctHistoryDownMax,
-                 pctHistoryUpA, pctHistoryUpB, pctHistoryUpC, pctHistoryUpMax,
-                 pctHistoryText, pctHistoryBG}
+                 pctHistoryDownLine, pctHistoryDownA, pctHistoryDownB, pctHistoryDownC, pctHistoryDownMax,
+                 pctHistoryUpLine, pctHistoryUpA, pctHistoryUpB, pctHistoryUpC, pctHistoryUpMax,
+                 pctHistoryText, pctHistoryBG, pctHistoryGridL, pctHistoryGridD}
     For Each pColor As PictureBox In ColorList
       Dim bColor As Color = DefaultColorForElement(pColor.Name, useStyle)
       SetElColor(pColor, bColor)
@@ -418,16 +426,20 @@ Public Class frmCustomColors
     If Not mySettings.Colors.TrayUpA.ToArgb = pctTrayUpA.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.TrayUpB.ToArgb = pctTrayUpB.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.TrayUpC.ToArgb = pctTrayUpC.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDownLine.ToArgb = pctHistoryDownLine.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryDownA.ToArgb = pctHistoryDownA.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryDownB.ToArgb = pctHistoryDownB.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryDownC.ToArgb = pctHistoryDownC.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryDownMax.ToArgb = pctHistoryDownMax.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryUpLine.ToArgb = pctHistoryUpLine.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryUpA.ToArgb = pctHistoryUpA.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryUpB.ToArgb = pctHistoryUpB.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryUpC.ToArgb = pctHistoryUpC.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryUpMax.ToArgb = pctHistoryUpMax.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryText.ToArgb = pctHistoryText.BackColor.ToArgb Then Return True
     If Not mySettings.Colors.HistoryBackground.ToArgb = pctHistoryBG.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryLightGrid.ToArgb = pctHistoryGridL.BackColor.ToArgb Then Return True
+    If Not mySettings.Colors.HistoryDarkGrid.ToArgb = pctHistoryGridD.BackColor.ToArgb Then Return True
     Return False
   End Function
   Private Function getControlFromName(ByRef containerObj As Object, ByVal name As String) As Control
@@ -472,16 +484,20 @@ Public Class frmCustomColors
       Case pctTrayUpB.Name : Return myColors.TrayUpB
       Case pctTrayUpC.Name : Return myColors.TrayUpC
 
+      Case pctHistoryDownLine.Name : Return myColors.HistoryDownLine
       Case pctHistoryDownA.Name : Return myColors.HistoryDownA
       Case pctHistoryDownB.Name : Return myColors.HistoryDownB
       Case pctHistoryDownC.Name : Return myColors.HistoryDownC
       Case pctHistoryDownMax.Name : Return myColors.HistoryDownMax
+      Case pctHistoryUpLine.Name : Return myColors.HistoryUpLine
       Case pctHistoryUpA.Name : Return myColors.HistoryUpA
       Case pctHistoryUpB.Name : Return myColors.HistoryUpB
       Case pctHistoryUpC.Name : Return myColors.HistoryUpC
       Case pctHistoryUpMax.Name : Return myColors.HistoryUpMax
       Case pctHistoryText.Name : Return myColors.HistoryText
       Case pctHistoryBG.Name : Return myColors.HistoryBackground
+      Case pctHistoryGridL.Name : Return myColors.HistoryLightGrid
+      Case pctHistoryGridD.Name : Return myColors.HistoryDarkGrid
       Case Else : Return Color.Transparent
     End Select
 
@@ -504,16 +520,20 @@ Public Class frmCustomColors
       Case pctTrayUpB.Name : Return "Tray Upload 50% Color"
       Case pctTrayUpC.Name : Return "Tray Upload 100% Color"
 
+      Case pctHistoryDownLine.Name : Return "History Download Data Line"
       Case pctHistoryDownA.Name : Return "History Download 0% Color"
       Case pctHistoryDownB.Name : Return "History Download 50% Color"
       Case pctHistoryDownC.Name : Return "History Download 100% Color"
       Case pctHistoryDownMax.Name : Return "History Download Max Limit Color"
+      Case pctHistoryUpLine.Name : Return "History Upload Data Line"
       Case pctHistoryUpA.Name : Return "History Upload 0% Color"
       Case pctHistoryUpB.Name : Return "History Upload 50% Color"
       Case pctHistoryUpC.Name : Return "History Upload 100% Color"
       Case pctHistoryUpMax.Name : Return "History Upload Max Limit Color"
       Case pctHistoryText.Name : Return "History Text Color"
       Case pctHistoryBG.Name : Return "History Background Color"
+      Case pctHistoryGridL.Name : Return "History Grid Lines Light Color"
+      Case pctHistoryGridD.Name : Return "History Grid Lines Dark Color"
 
       Case Else : Return name & " color"
     End Select
@@ -680,7 +700,7 @@ Public Class frmCustomColors
         End Using
         pctHistory.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
-        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
+        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryDownLine.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
@@ -757,14 +777,59 @@ Public Class frmCustomColors
       End If
       pnlHistory.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 50)
       pnlHistory.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
+      pnlHistoryDown.ColumnCount = 3
+      pnlHistoryDown.RowCount = 5
+      pnlHistoryDown.SetRow(lblHistoryDownMax, 4)
+      pnlHistoryDown.SetColumn(lblHistoryDownMax, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownMax, 4)
+      pnlHistoryDown.SetColumn(pctHistoryDownMax, 2)
+      pnlHistoryDown.SetRow(lblHistoryDownC, 3)
+      pnlHistoryDown.SetColumn(lblHistoryDownC, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownC, 3)
+      pnlHistoryDown.SetColumn(pctHistoryDownC, 2)
+      pnlHistoryDown.SetRow(chkHistoryDownB, 2)
+      pnlHistoryDown.SetColumn(chkHistoryDownB, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownB, 2)
+      pnlHistoryDown.SetColumn(pctHistoryDownB, 2)
+      pnlHistoryDown.SetRow(lblHistoryDownA, 1)
+      pnlHistoryDown.SetColumn(lblHistoryDownA, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownA, 1)
+      pnlHistoryDown.SetColumn(pctHistoryDownA, 2)
+      pnlHistoryDown.SetRow(lblHistoryDownLine, 0)
+      pnlHistoryDown.SetColumn(lblHistoryDownLine, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownLine, 0)
+      pnlHistoryDown.SetColumn(pctHistoryDownLine, 2)
       If Not pnlHistory.Controls.Contains(grpHistoryUp) Then pnlHistory.Controls.Add(grpHistoryUp, 1, 0)
+      pnlHistoryUp.ColumnCount = 3
+      pnlHistoryUp.RowCount = 5
+      pnlHistoryUp.SetRow(lblHistoryUpMax, 4)
+      pnlHistoryUp.SetColumn(lblHistoryUpMax, 0)
+      pnlHistoryUp.SetRow(pctHistoryUpMax, 4)
+      pnlHistoryUp.SetColumn(pctHistoryUpMax, 2)
+      pnlHistoryUp.SetRow(lblHistoryUpC, 3)
+      pnlHistoryUp.SetColumn(lblHistoryUpC, 0)
+      pnlHistoryUp.SetRow(pctHistoryUpC, 3)
+      pnlHistoryUp.SetColumn(pctHistoryUpC, 2)
+      pnlHistoryUp.SetRow(chkHistoryUpB, 2)
+      pnlHistoryUp.SetColumn(chkHistoryUpB, 0)
+      pnlHistoryUp.SetRow(pctHistoryUpB, 2)
+      pnlHistoryUp.SetColumn(pctHistoryUpB, 2)
+      pnlHistoryUp.SetRow(lblHistoryUpA, 1)
+      pnlHistoryUp.SetColumn(lblHistoryUpA, 0)
+      pnlHistoryUp.SetRow(pctHistoryUpA, 1)
+      pnlHistoryUp.SetColumn(pctHistoryUpA, 2)
+      pnlHistoryUp.SetRow(lblHistoryUpLine, 0)
+      pnlHistoryUp.SetColumn(lblHistoryUpLine, 0)
+      pnlHistoryUp.SetRow(pctHistoryUpLine, 0)
+      pnlHistoryUp.SetColumn(pctHistoryUpLine, 2)
       pnlHistoryStyle.ColumnCount = 4
       pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.Absolute, 75)
       pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
       pnlHistoryStyle.ColumnStyles(2) = New ColumnStyle(SizeType.Absolute, 75)
       pnlHistoryStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 50)
-      pnlHistoryStyle.RowCount = 1
+      pnlHistoryStyle.RowCount = 2
       pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
+      pnlHistoryStyle.RowStyles(1) = New RowStyle(SizeType.AutoSize)
       pnlHistoryStyle.SetColumn(lblHistoryText, 0)
       pnlHistoryStyle.SetRow(lblHistoryText, 0)
       pnlHistoryStyle.SetColumn(pctHistoryText, 1)
@@ -773,6 +838,15 @@ Public Class frmCustomColors
       pnlHistoryStyle.SetRow(lblHistoryBG, 0)
       pnlHistoryStyle.SetColumn(pctHistoryBG, 3)
       pnlHistoryStyle.SetRow(pctHistoryBG, 0)
+
+      pnlHistoryStyle.SetColumn(lblHistoryGridL, 0)
+      pnlHistoryStyle.SetRow(lblHistoryGridL, 1)
+      pnlHistoryStyle.SetColumn(pctHistoryGridL, 1)
+      pnlHistoryStyle.SetRow(pctHistoryGridL, 1)
+      pnlHistoryStyle.SetColumn(lblHistoryGridD, 2)
+      pnlHistoryStyle.SetRow(lblHistoryGridD, 1)
+      pnlHistoryStyle.SetColumn(pctHistoryGridD, 3)
+      pnlHistoryStyle.SetRow(pctHistoryGridD, 1)
 
       pnlCustomColors.SetRow(grpTray, 1)
       pnlCustomColors.SetColumn(grpTray, 0)
@@ -897,8 +971,29 @@ Public Class frmCustomColors
         pnlTray.Controls.Add(pctTray, 0, 0)
         pctTray.Size = preSize
       End If
-
       If pnlHistory.Controls.Contains(grpHistoryUp) Then pnlHistory.Controls.Remove(grpHistoryUp)
+      pnlHistoryDown.ColumnCount = 6
+      pnlHistoryDown.RowCount = 3
+      pnlHistoryDown.SetRow(lblHistoryDownMax, 2)
+      pnlHistoryDown.SetColumn(lblHistoryDownMax, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownMax, 2)
+      pnlHistoryDown.SetColumn(pctHistoryDownMax, 2)
+      pnlHistoryDown.SetRow(lblHistoryDownC, 2)
+      pnlHistoryDown.SetColumn(lblHistoryDownC, 4)
+      pnlHistoryDown.SetRow(pctHistoryDownC, 2)
+      pnlHistoryDown.SetColumn(pctHistoryDownC, 6)
+      pnlHistoryDown.SetRow(chkHistoryDownB, 1)
+      pnlHistoryDown.SetColumn(chkHistoryDownB, 4)
+      pnlHistoryDown.SetRow(pctHistoryDownB, 1)
+      pnlHistoryDown.SetColumn(pctHistoryDownB, 6)
+      pnlHistoryDown.SetRow(lblHistoryDownA, 0)
+      pnlHistoryDown.SetColumn(lblHistoryDownA, 4)
+      pnlHistoryDown.SetRow(pctHistoryDownA, 0)
+      pnlHistoryDown.SetColumn(pctHistoryDownA, 6)
+      pnlHistoryDown.SetRow(lblHistoryDownLine, 0)
+      pnlHistoryDown.SetColumn(lblHistoryDownLine, 0)
+      pnlHistoryDown.SetRow(pctHistoryDownLine, 0)
+      pnlHistoryDown.SetColumn(pctHistoryDownLine, 2)
       pnlHistory.ColumnStyles(0) = New ColumnStyle(SizeType.Percent, 100)
       pnlHistory.ColumnStyles(1) = New ColumnStyle(SizeType.AutoSize)
       If pnlCustomColors.Controls.Contains(pctHistory) Then
@@ -911,14 +1006,16 @@ Public Class frmCustomColors
         Else
           pnlHistory.RowStyles(2) = New RowStyle(SizeType.AutoSize)
         End If
-        pnlMain.SetRow(pnlHistoryStyle, 2)
+        pnlHistory.SetRow(pnlHistoryStyle, 2)
         pnlHistory.SetRow(grpHistoryDown, 1)
         pnlHistory.Controls.Add(pctHistory, 0, 0)
         pctHistory.Size = preSize
       End If
-      pnlHistoryStyle.ColumnCount = 2
+      pnlHistoryStyle.ColumnCount = 4
       pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.AutoSize)
       pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
+      pnlHistoryStyle.ColumnStyles(2) = New ColumnStyle(SizeType.AutoSize)
+      pnlHistoryStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 100)
       pnlHistoryStyle.RowCount = 2
       pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
       If pnlHistoryStyle.RowStyles.Count = 1 Then
@@ -926,6 +1023,7 @@ Public Class frmCustomColors
       Else
         pnlHistoryStyle.RowStyles(1) = New RowStyle(SizeType.AutoSize)
       End If
+
       pnlHistoryStyle.SetColumn(lblHistoryText, 0)
       pnlHistoryStyle.SetRow(lblHistoryText, 0)
       pnlHistoryStyle.SetColumn(pctHistoryText, 1)
@@ -934,6 +1032,15 @@ Public Class frmCustomColors
       pnlHistoryStyle.SetRow(lblHistoryBG, 1)
       pnlHistoryStyle.SetColumn(pctHistoryBG, 1)
       pnlHistoryStyle.SetRow(pctHistoryBG, 1)
+
+      pnlHistoryStyle.SetColumn(lblHistoryGridL, 2)
+      pnlHistoryStyle.SetRow(lblHistoryGridL, 0)
+      pnlHistoryStyle.SetColumn(pctHistoryGridL, 3)
+      pnlHistoryStyle.SetRow(pctHistoryGridL, 0)
+      pnlHistoryStyle.SetColumn(lblHistoryGridD, 2)
+      pnlHistoryStyle.SetRow(lblHistoryGridD, 1)
+      pnlHistoryStyle.SetColumn(pctHistoryGridD, 3)
+      pnlHistoryStyle.SetRow(pctHistoryGridD, 1)
 
       pnlCustomColors.SetColumn(grpTray, 1)
       pnlCustomColors.SetRow(grpTray, 0)
