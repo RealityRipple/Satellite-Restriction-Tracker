@@ -885,19 +885,38 @@ Module modFunctions
       Return closestRow
     End If
   End Function
-  Public Function DrawLineGraph(ByVal Data() As DataBase.DataRow, ByVal Down As Boolean, ByVal ImgSize As Size, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color) As Image
+  Public Function DrawRGraph(Data() As DataBase.DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+    Return DrawGraph(Data, TriState.UseDefault, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+  End Function
+  Public Function DrawLineGraph(Data() As DataBase.DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+    Return DrawGraph(Data, IIf(Down, TriState.True, TriState.False), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+  End Function
+  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, Down As TriState, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
-    Dim yDMax As Long = 0
-    Dim yUMax As Long = 0
-    For I As Long = 0 To Data.Length - 1
-      If yDMax < Data(I).DOWNLOAD Then yDMax = Data(I).DOWNLOAD
-      If yUMax < Data(I).UPLOAD Then yUMax = Data(I).UPLOAD
-      If yDMax < Data(I).DOWNLIM Then yDMax = Data(I).DOWNLIM
-      If yUMax < Data(I).UPLIM Then yUMax = Data(I).UPLIM
-    Next
-    Dim yMax As Long = IIf(yDMax > yUMax, yDMax, yUMax)
-    If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-    Dim lMax As Long = IIf(Down, yDMax, yUMax)
+    Dim yMax As Long = 0
+    Dim lMax As Long = 0
+    If Down = TriState.UseDefault Then
+      Dim yVMax As Long = 0
+      For I As Long = 0 To Data.Length - 1
+        If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
+        If yVMax < Data(I).DOWNLIM Then yVMax = Data(I).DOWNLIM
+      Next
+      yMax = yVMax
+      If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
+      lMax = yVMax
+    Else
+      Dim yDMax As Long = 0
+      Dim yUMax As Long = 0
+      For I As Long = 0 To Data.Length - 1
+        If yDMax < Data(I).DOWNLOAD Then yDMax = Data(I).DOWNLOAD
+        If yUMax < Data(I).UPLOAD Then yUMax = Data(I).UPLOAD
+        If yDMax < Data(I).DOWNLIM Then yDMax = Data(I).DOWNLIM
+        If yUMax < Data(I).UPLIM Then yUMax = Data(I).UPLIM
+      Next
+      yMax = IIf(yDMax > yUMax, yDMax, yUMax)
+      If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
+      lMax = IIf(Down = TriState.True, yDMax, yUMax)
+    End If
     If Not lMax Mod 1000 = 0 Then lMax = (lMax \ 1000) * 1000 + 1000
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
@@ -908,201 +927,13 @@ Module modFunctions
     g.Clear(ColorBG)
     Dim yTop As Integer = lXHeight / 2
     Dim yHeight As Integer = ImgSize.Height - (lXHeight * 1.5)
-    If Down Then
-      dGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
-      dData = Data
-    Else
+    If Down = TriState.False Then
       uGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
       uData = Data
+    Else
+      dGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
+      dData = Data
     End If
-    g.DrawLine(New Pen(ColorText), lYWidth, yTop, lYWidth, yTop + yHeight)
-    g.DrawLine(New Pen(ColorText), lYWidth, yTop + yHeight, ImgSize.Width, yTop + yHeight)
-    oldDate = Data.First.DATETIME
-    newDate = Data.Last.DATETIME
-    For I As Integer = 0 To lMax Step (((lMax \ (yHeight \ (tFont.Size + 12)))) \ 100) * 100
-      Dim iY As Integer = yTop + yHeight - (I / lMax * yHeight)
-      g.DrawString(I.ToString.Trim & " MB", tFont, New SolidBrush(ColorText), lYWidth - g.MeasureString(I.ToString.Trim & " MB", tFont).Width, iY - (g.MeasureString(I.ToString.Trim & " MB", tFont).Height / 2))
-      g.DrawLine(New Pen(ColorText), lYWidth - 3, iY, lYWidth, iY)
-    Next I
-    Dim lStart As Date = Data(0).DATETIME
-    Dim lEnd As Date = Data(Data.Length - 1).DATETIME
-    Dim dInterval As DateInterval = DateInterval.Minute
-    Dim lInterval As UInteger = 1
-    Dim lLabelInterval As UInteger = 5
-    Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
-      Case Is <= 61
-        lInterval = 1
-        lLabelInterval = 5
-        dInterval = DateInterval.Minute
-      Case Is < 60 * 13
-        lInterval = 15
-        lLabelInterval = 60
-        dInterval = DateInterval.Minute
-      Case Is <= 60 * 25
-        lInterval = 60
-        lLabelInterval = 60 * 6
-        dInterval = DateInterval.Minute
-      Case Is <= 60 * 24 * 8
-        lInterval = 12
-        lLabelInterval = 24
-        dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 31
-        lInterval = 24
-        lLabelInterval = 24 * 7
-        dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 366
-        lInterval = 7
-        lLabelInterval = 30
-        dInterval = DateInterval.Day
-      Case Else
-        lInterval = 30
-        lLabelInterval = 365
-        dInterval = DateInterval.Day
-    End Select
-    Dim lMaxTime As Long = Math.Abs(DateDiff(dInterval, lStart, lEnd))
-    If lMaxTime = 0 Then Return New Bitmap(1, 1)
-    Dim lLineWidth As Long = (ImgSize.Width - 4) - lYWidth - 1
-    Dim dCompInter As Double = lLineWidth / lMaxTime
-    For I As Long = 0 To lMaxTime Step lInterval
-      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
-    Next I
-    Dim lastI As Long = lYWidth + (lMaxTime * dCompInter)
-    If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
-    Dim sDispV As String = "g"
-    Select Case DateDiff(DateInterval.Day, lStart, lEnd)
-      Case Is > 1 : sDispV = "d"
-      Case Is < 1 : sDispV = "t"
-      Case Else : sDispV = "g"
-    End Select
-    Dim sLastDisp As String = lEnd.ToString(sDispV)
-    Dim iLastDispWidth As Single = g.MeasureString(sLastDisp, tFont).Width
-    For I As Long = 0 To lMaxTime Step lLabelInterval
-      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      If lX >= (ImgSize.Width - 4) Then
-        lX = (ImgSize.Width - 4)
-        g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
-        Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
-        g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - g.MeasureString(sDisp, tFont).Width, ImgSize.Height - lXHeight + 5)
-      Else
-        g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
-        Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
-        g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - (g.MeasureString(sDisp, tFont).Width / 2), ImgSize.Height - lXHeight + 5)
-      End If
-      If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
-    Next I
-    If lastI > -1 Then
-      g.DrawLine(New Pen(ColorText), lastI, ImgSize.Height - (lXHeight - 5), lastI, ImgSize.Height - lXHeight)
-      g.DrawString(sLastDisp, tFont, New SolidBrush(ColorText), lastI - iLastDispWidth + 3, ImgSize.Height - lXHeight + 5)
-    End If
-    Dim MaxY As Integer = yTop + yHeight - (IIf(Down, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
-    Dim lMaxPoints(lMaxTime) As Point
-    Dim lPoints(lMaxTime + 3) As Point
-    Dim lTypes(lMaxTime + 3) As Byte
-    Dim lastLVal As Long = 0
-    For I As Long = 0 To lMaxTime
-      Dim lVal As Long = -1
-      Dim lLow As Long = Long.MaxValue
-      Dim lHigh As Long = 0
-      For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
-          Dim jLim As Long = IIf(Down, Data(J).DOWNLIM, Data(J).UPLIM)
-          If lHigh < jLim Then
-            lHigh = jLim
-          End If
-          If lLow > jLim Then
-            lLow = jLim
-          End If
-        End If
-      Next
-      If lHigh > 0 And lLow < Long.MaxValue Then lVal = (lHigh + lLow) / 2
-      If lVal = -1 And lastLVal > 0 Then lVal = lastLVal
-      lMaxPoints(I).X = lYWidth + (I * dCompInter) + 1
-      lMaxPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
-      If I > 0 AndAlso (lMaxPoints(I - 1).X = 0 And lMaxPoints(I - 1).Y = 0) Then
-        Dim J As Long = 1
-        While lMaxPoints(I - J).Y = 0
-          J += 1
-        End While
-        For K As Long = 1 To J - 1
-          lMaxPoints(I - K).X = lYWidth + ((I - K) * dCompInter) + 1
-          lMaxPoints(I - K).Y = (lMaxPoints(I - J).Y + lMaxPoints(I).Y) / 2
-        Next
-      End If
-      lastLVal = lVal
-    Next I
-    lastLVal = 0
-    For I As Long = 0 To lMaxTime
-      Dim lVal As Long = -1
-      Dim lLow As Long = Long.MaxValue
-      Dim lHigh As Long = 0
-      For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
-          Dim jVal As Long = IIf(Down, Data(J).DOWNLOAD, Data(J).UPLOAD)
-          If lHigh < jVal Then
-            lHigh = jVal
-          End If
-          If lLow > jVal Then
-            lLow = jVal
-          End If
-        End If
-      Next
-      If lHigh > 0 And lLow < Long.MaxValue Then lVal = (lHigh + lLow) / 2
-      If lVal = -1 And lastLVal > 0 Then lVal = lastLVal
-      lPoints(I).X = lYWidth + (I * dCompInter) + 1
-      lPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
-      If I > 0 AndAlso (lPoints(I - 1).X = 0 And lPoints(I - 1).Y = 0) Then
-        Dim J As Long = 1
-        While lPoints(I - J).Y = 0
-          J += 1
-        End While
-        For K As Long = 1 To J - 1
-          lPoints(I - K).X = lYWidth + ((I - K) * dCompInter) + 1
-          lPoints(I - K).Y = (lPoints(I - J).Y + lPoints(I).Y) / 2
-        Next
-      End If
-      lastLVal = lVal
-    Next I
-    If lPoints(lMaxTime).IsEmpty Then lPoints(lMaxTime) = New Point(ImgSize.Width, yTop + yHeight)
-    lPoints(lMaxTime + 1) = New Point(ImgSize.Width, yTop + yHeight)
-    lPoints(lMaxTime + 2) = New Point(lYWidth, yTop + yHeight)
-    lPoints(lMaxTime + 3) = lPoints(0)
-    lTypes(0) = Drawing2D.PathPointType.Start
-    For I As Long = 1 To lMaxTime + 2
-      lTypes(I) = Drawing2D.PathPointType.Line
-    Next
-    lTypes(lMaxTime + 3) = Drawing2D.PathPointType.Line Or Drawing2D.PathPointType.CloseSubpath
-    Dim fBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(lYWidth, MaxY), New Point(lYWidth, yTop + yHeight), ColorA, ColorB, ColorC)
-    fBrush.WrapMode = Drawing2D.WrapMode.TileFlipX
-    g.DrawLines(New Pen(New SolidBrush(ColorMax), 5), lMaxPoints)
-    g.FillPath(fBrush, New Drawing2D.GraphicsPath(lPoints, lTypes))
-    g.FillRectangle(New Drawing2D.HatchBrush(Drawing2D.HatchStyle.DottedGrid, Color.FromArgb(192, ColorBG), Color.Transparent), lYWidth, yTop - 1, ImgSize.Width, MaxY - yTop + 1)
-    g.DrawLines(New Pen(New SolidBrush(Color.FromArgb(96, ColorMax)), 5), lMaxPoints)
-    g.Dispose()
-    Return iPic
-  End Function
-  Public Function DrawRGraph(ByVal Data() As DataBase.DataRow, ByVal ImgSize As Size, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorLine As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
-    Dim yVMax As Long = 0
-    For I As Long = 0 To Data.Length - 1
-      If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
-      If yVMax < Data(I).DOWNLIM Then yVMax = Data(I).DOWNLIM
-    Next
-    Dim yMax As Long = yVMax
-    If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-    Dim lMax As Long = yVMax
-    If Not lMax Mod 1000 = 0 Then lMax = (lMax \ 1000) * 1000 + 1000
-    Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
-    Dim g As Graphics = Graphics.FromImage(iPic)
-    Dim tFont As New Font(FontFamily.GenericSansSerif, 7)
-    g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-    Dim lYWidth As Integer = g.MeasureString(yMax.ToString.Trim & " MB", tFont).Width + 10
-    Dim lXHeight As Integer = g.MeasureString(Now.ToString("g"), tFont).Height + 10
-    g.Clear(ColorBG)
-    Dim yTop As Integer = lXHeight / 2
-    Dim yHeight As Integer = ImgSize.Height - (lXHeight * 1.5)
-    dGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
-    dData = Data
     g.DrawLine(New Pen(ColorText), lYWidth, yTop, lYWidth, yTop + yHeight)
     g.DrawLine(New Pen(ColorText), lYWidth, yTop + yHeight, ImgSize.Width, yTop + yHeight)
     oldDate = Data.First.DATETIME
@@ -1132,38 +963,73 @@ Module modFunctions
     Dim lLabelInterval As UInteger = 5
     Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
       Case Is <= 61
-        lInterval = 1
-        lBitInterval = 0.5
-        lLabelInterval = 5
+        lInterval = 5
+        lBitInterval = 1
+        lLabelInterval = 10
         dInterval = DateInterval.Minute
       Case Is < 60 * 13
-        lInterval = 15
-        lBitInterval = 10
-        lLabelInterval = 60
-        dInterval = DateInterval.Minute
-      Case Is <= 60 * 25
         lInterval = 60
         lBitInterval = 30
-        lLabelInterval = 60 * 6
+        lLabelInterval = 60 * 2
         dInterval = DateInterval.Minute
-      Case Is <= 60 * 24 * 8
+      Case Is <= 60 * 24
+        lInterval = 6
+        lBitInterval = 1
+        lLabelInterval = 6
+        dInterval = DateInterval.Hour
+      Case Is <= 60 * 24 * 2
         lInterval = 12
         lBitInterval = 6
         lLabelInterval = 24
         dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 31
+      Case Is <= 60 * 24 * 6
         lInterval = 24
         lBitInterval = 12
-        lLabelInterval = 24 * 7
+        lLabelInterval = 24
         dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 366
-        lInterval = 7
-        lBitInterval = 3.5
+      Case Is <= 60 * 24 * 12
+        lInterval = 2
+        lBitInterval = 1
+        lLabelInterval = 2
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 20
+        lInterval = 2
+        lBitInterval = 1
+        lLabelInterval = 4
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 27
+        lInterval = 2
+        lBitInterval = 1
+        lLabelInterval = 7
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 40
+        lInterval = 4
+        lBitInterval = 2
+        lLabelInterval = 7
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 90
+        lInterval = 14
+        lBitInterval = 7
+        lLabelInterval = 14
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 240
+        lInterval = 30
+        lBitInterval = 15
         lLabelInterval = 30
         dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 365
+        lInterval = 60
+        lBitInterval = 30
+        lLabelInterval = 90
+        dInterval = DateInterval.Day
+      Case Is <= 60 * 24 * 365 * 2
+        lInterval = 90
+        lBitInterval = 60
+        lLabelInterval = 180
+        dInterval = DateInterval.Day
       Case Else
-        lInterval = 30
-        lBitInterval = 7
+        lInterval = 365
+        lBitInterval = 180
         lLabelInterval = 365
         dInterval = DateInterval.Day
     End Select
@@ -1192,14 +1058,13 @@ Module modFunctions
     Dim iLastDispWidth As Single = g.MeasureString(sLastDisp, tFont).Width
     For I As Long = 0 To lMaxTime Step lLabelInterval
       Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      If lX >= (ImgSize.Width - 4) Then
-        lX = (ImgSize.Width - 4)
-        g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
-        Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
-        g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - g.MeasureString(sDisp, tFont).Width, ImgSize.Height - lXHeight + 5)
+      Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
+      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
+      If lX >= (ImgSize.Width - (g.MeasureString(sDisp, tFont).Width / 2)) Then
+        g.DrawString(sDisp, tFont, New SolidBrush(ColorText), (ImgSize.Width - g.MeasureString(sDisp, tFont).Width), ImgSize.Height - lXHeight + 5)
+      ElseIf lX - (g.MeasureString(sDisp, tFont).Width / 2) < lYWidth Then
+        g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lYWidth - (g.MeasureString(sDisp, tFont).Width / sDisp.Length), ImgSize.Height - lXHeight + 5)
       Else
-        g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
-        Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), lX - (g.MeasureString(sDisp, tFont).Width / 2), ImgSize.Height - lXHeight + 5)
       End If
       If lX >= lastI - (iLastDispWidth * 1.6) Then lastI = -1
@@ -1208,7 +1073,12 @@ Module modFunctions
       g.DrawLine(New Pen(ColorText), lastI, ImgSize.Height - (lXHeight - 5), lastI, ImgSize.Height - lXHeight)
       g.DrawString(sLastDisp, tFont, New SolidBrush(ColorText), lastI - iLastDispWidth + 3, ImgSize.Height - lXHeight + 5)
     End If
-    Dim MaxY As Integer = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
+    Dim MaxY As Integer = 0
+    If Down = TriState.UseDefault Then
+      MaxY = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
+    Else
+      MaxY = yTop + yHeight - (IIf(Down = TriState.True, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
+    End If
     Dim lMaxPoints(lMaxTime) As Point
     Dim lPoints(lMaxTime + 3) As Point
     Dim lTypes(lMaxTime + 3) As Byte
@@ -1219,7 +1089,12 @@ Module modFunctions
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
-          Dim jLim As Long = Data(J).DOWNLIM
+          Dim jLim As Long = 0
+          If Down = TriState.False Then
+            jLim = Data(J).UPLIM
+          Else
+            jLim = Data(J).DOWNLIM
+          End If
           If lHigh < jLim Then
             lHigh = jLim
           End If
@@ -1251,7 +1126,12 @@ Module modFunctions
       Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
-          Dim jVal As Long = Data(J).DOWNLOAD
+          Dim jVal As Long = 0
+          If Down = TriState.False Then
+            jVal = Data(J).UPLOAD
+          Else
+            jVal = Data(J).DOWNLOAD
+          End If
           If lHigh < jVal Then
             lHigh = jVal
           End If

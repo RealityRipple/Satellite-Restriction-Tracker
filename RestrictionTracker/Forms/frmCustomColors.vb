@@ -685,8 +685,8 @@ Public Class frmCustomColors
     Dim FakeHRect As New Rectangle(0, 0, 500, 200)
     Select Case DisplayAs
       Case SatHostTypes.WildBlue_LEGACY
-        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
+        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
+        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
@@ -700,7 +700,7 @@ Public Class frmCustomColors
         End Using
         pctHistory.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
-        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryDownLine.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
+        Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
@@ -717,8 +717,8 @@ Public Class frmCustomColors
         End Using
         pctHistory.Image = fakeI
       Case SatHostTypes.DishNet_EXEDE
-        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor)
-        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor)
+        Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
+        Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
