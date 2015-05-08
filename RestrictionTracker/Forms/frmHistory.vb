@@ -80,6 +80,47 @@ Public Class frmHistory
     mySettings.Save()
     frmMain.ReLoadSettings()
   End Sub
+  Private Sub ChangeStyle()
+    If Me.InvokeRequired Then
+      Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
+    Else
+      Select Case useStyle
+        Case SatHostTypes.DishNet_EXEDE
+          cmd30Days.Text = "This Period"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
+          cmd60Days.Text = "Last Period"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
+          dgvUsage.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Anytime"
+          colUPLOAD.HeaderText = "Off-Peak"
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+          cmd30Days.Text = "This Period"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
+          cmd60Days.Text = "Last Period"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last last 60 days.")
+          dgvUsage.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Used"
+          colUPLOAD.HeaderText = "Total"
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
+        Case Else
+          cmd30Days.Text = "30 Days"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
+          cmd60Days.Text = "60 Days"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
+          dgvUsage.Columns.Clear()
+          colDOWNLOAD.HeaderText = "Download"
+          colUPLOAD.HeaderText = "Upload"
+          dgvUsage.Columns.Add(colDATETIME)
+          dgvUsage.Columns.Add(colDOWNLOAD)
+          dgvUsage.Columns.Add(colUPLOAD)
+      End Select
+    End If
+  End Sub
 #End Region
 #Region "Graph"
   Private Sub DidResize(downRet As Bitmap, upRet As Bitmap)
@@ -738,45 +779,4 @@ Public Class frmHistory
     Return iPic
   End Function
 #End Region
-  Private Sub ChangeStyle()
-    If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
-    Else
-      Select Case useStyle
-        Case SatHostTypes.DishNet_EXEDE
-          cmd30Days.Text = "This Period"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-          cmd60Days.Text = "Last Period"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Anytime"
-          colUPLOAD.HeaderText = "Off-Peak"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
-          cmd30Days.Text = "This Period"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
-          cmd60Days.Text = "Last Period"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last last 60 days.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Used"
-          colUPLOAD.HeaderText = "Total"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-        Case Else
-          cmd30Days.Text = "30 Days"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-          cmd60Days.Text = "60 Days"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Download"
-          colUPLOAD.HeaderText = "Upload"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-      End Select
-    End If
-  End Sub
 End Class
