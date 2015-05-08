@@ -421,7 +421,10 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) Then
+            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And
+              ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And
+              Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) And
+              Not (usageDB(I + 1).DOWNLOAD = usageDB(I - 1).DOWNLOAD And usageDB(I + 1).UPLOAD = usageDB(I - 1).UPLOAD) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 0 Then
                 If usageDB(I).DATETIME > dtpFrom.MaxDate Then
                   From30DaysAgo = dtpFrom.MaxDate
@@ -497,7 +500,10 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) Then
+            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And
+              ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And
+              Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) And
+              Not (usageDB(I + 1).DOWNLOAD = usageDB(I - 1).DOWNLOAD And usageDB(I + 1).UPLOAD = usageDB(I - 1).UPLOAD) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 0 Then
                 Finds += 1
                 If Finds = 2 Then
@@ -739,7 +745,9 @@ Public Class frmHistory
       Select Case useStyle
         Case SatHostTypes.DishNet_EXEDE
           cmd30Days.Text = "This Period"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
           cmd60Days.Text = "Last Period"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
           dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Anytime"
           colUPLOAD.HeaderText = "Off-Peak"
@@ -748,7 +756,9 @@ Public Class frmHistory
           dgvUsage.Columns.Add(colUPLOAD)
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
           cmd30Days.Text = "This Period"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
           cmd60Days.Text = "Last Period"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last last 60 days.")
           dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Used"
           colUPLOAD.HeaderText = "Total"
@@ -757,7 +767,9 @@ Public Class frmHistory
           dgvUsage.Columns.Add(colUPLOAD)
         Case Else
           cmd30Days.Text = "30 Days"
+          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
           cmd60Days.Text = "60 Days"
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
           dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Download"
           colUPLOAD.HeaderText = "Upload"

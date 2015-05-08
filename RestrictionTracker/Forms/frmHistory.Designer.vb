@@ -364,7 +364,7 @@ Partial Class frmHistory
     Me.cmd60Days.Size = New System.Drawing.Size(62, 22)
     Me.cmd60Days.TabIndex = 9
     Me.cmd60Days.Text = "&60 Days"
-    Me.ttHistory.SetToolTip(Me.cmd60Days, "Query the database to get the last 60 days' history.")
+    Me.ttHistory.SetToolTip(Me.cmd60Days, "Query the database to get the history of the last 60 days.")
     Me.cmd60Days.UseVisualStyleBackColor = True
     '
     'cmd30Days
@@ -376,7 +376,7 @@ Partial Class frmHistory
     Me.cmd30Days.Size = New System.Drawing.Size(61, 22)
     Me.cmd30Days.TabIndex = 8
     Me.cmd30Days.Text = "&30 Days"
-    Me.ttHistory.SetToolTip(Me.cmd30Days, "Query the database to get the last 30 days' history.")
+    Me.ttHistory.SetToolTip(Me.cmd30Days, "Query the database to get the history of the last 30 days.")
     Me.cmd30Days.UseVisualStyleBackColor = True
     '
     'cmdToday
