@@ -6,7 +6,6 @@ Public Class frmHistory
   Private bSizeChange As Boolean
   Private graphSpaceD, graphSpaceU As Rectangle
   Private graphMinX, graphMaxX As Date
-
   Private Delegate Sub ParameterizedInvoker(parameter As Object)
   Private Delegate Sub ParameterizedInvoker2(param1 As Object, param2 As Object)
   Private WithEvents usageTmp As DataBase
