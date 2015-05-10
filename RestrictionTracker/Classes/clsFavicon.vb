@@ -150,8 +150,10 @@
                     If URL.StartsWith("/") Then
                       If oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
                       URL = oldURL & URL
-                    Else
+                    ElseIf oldURL.EndsWith("/") Then
                       URL = oldURL & URL
+                    Else
+                      URL = oldURL & "/" & URL
                     End If
                   End If
                   ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
