@@ -39,9 +39,8 @@ Partial Class frmConfig
     Me.lblAccount = New System.Windows.Forms.Label()
     Me.lblPassword = New System.Windows.Forms.Label()
     Me.txtAccount = New System.Windows.Forms.TextBox()
-    Me.txtPassword = New System.Windows.Forms.TextBox()
+    Me.txtPassword = New RestrictionTracker.PasswordBox()
     Me.lblAccountViaSatDescription = New System.Windows.Forms.Label()
-    Me.pctPassDisplay = New System.Windows.Forms.PictureBox()
     Me.pnlAccountProviderTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblAccountProviderTitle = New System.Windows.Forms.Label()
     Me.lnAccountProviderTitle = New RestrictionTracker.LineBreak()
@@ -148,7 +147,7 @@ Partial Class frmConfig
     Me.lblProxyType = New System.Windows.Forms.Label()
     Me.txtProxyUser = New System.Windows.Forms.TextBox()
     Me.lblProxyUser = New System.Windows.Forms.Label()
-    Me.txtProxyPassword = New System.Windows.Forms.TextBox()
+    Me.txtProxyPassword = New RestrictionTracker.PasswordBox()
     Me.lblProxyPassword = New System.Windows.Forms.Label()
     Me.lblProxyAddr = New System.Windows.Forms.Label()
     Me.txtProxyAddress = New System.Windows.Forms.TextBox()
@@ -218,8 +217,8 @@ Partial Class frmConfig
     Me.pnlConfig = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlButtons = New System.Windows.Forms.TableLayoutPanel()
     Me.fswController = New System.IO.FileSystemWatcher()
-    Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
     Me.tmrIcoWait = New System.Windows.Forms.Timer(Me.components)
+    Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -228,7 +227,6 @@ Partial Class frmConfig
     Me.pnlAccountViaSat.SuspendLayout()
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAccountViaSatInput.SuspendLayout()
-    CType(Me.pctPassDisplay, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAccountProviderTitle.SuspendLayout()
     Me.pnlAccountProvider.SuspendLayout()
     CType(Me.pctAccountProviderIcon, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -477,7 +475,6 @@ Partial Class frmConfig
     Me.pnlAccountViaSatInput.Controls.Add(Me.txtAccount, 1, 1)
     Me.pnlAccountViaSatInput.Controls.Add(Me.txtPassword, 1, 2)
     Me.pnlAccountViaSatInput.Controls.Add(Me.lblAccountViaSatDescription, 0, 0)
-    Me.pnlAccountViaSatInput.Controls.Add(Me.pctPassDisplay, 2, 2)
     Me.pnlAccountViaSatInput.Location = New System.Drawing.Point(56, 0)
     Me.pnlAccountViaSatInput.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlAccountViaSatInput.Name = "pnlAccountViaSatInput"
@@ -521,13 +518,13 @@ Partial Class frmConfig
     'txtPassword
     '
     Me.txtPassword.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.txtPassword.BackColor = System.Drawing.SystemColors.Window
     Me.txtPassword.Location = New System.Drawing.Point(67, 48)
-    Me.txtPassword.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
     Me.txtPassword.Name = "txtPassword"
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
     Me.txtPassword.TabIndex = 4
-    Me.ttConfig.SetToolTip(Me.txtPassword, "The password to your ViaSat account.")
-    Me.txtPassword.UseSystemPasswordChar = True
+    Me.ttConfig.SetToolTip(Me.txtPassword.txtPasswordBox, "The password to your ViaSat account.")
+    Me.ttConfig.SetToolTip(Me.txtPassword.pctPasswordEye, "Toggle display of the password.")
     '
     'lblAccountViaSatDescription
     '
@@ -541,19 +538,6 @@ Partial Class frmConfig
     Me.lblAccountViaSatDescription.Size = New System.Drawing.Size(296, 13)
     Me.lblAccountViaSatDescription.TabIndex = 0
     Me.lblAccountViaSatDescription.Text = "This account information should match your meter page login."
-    '
-    'pctPassDisplay
-    '
-    Me.pctPassDisplay.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctPassDisplay.Image = Global.RestrictionTracker.My.Resources.Resources.pass
-    Me.pctPassDisplay.Location = New System.Drawing.Point(221, 50)
-    Me.pctPassDisplay.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
-    Me.pctPassDisplay.Name = "pctPassDisplay"
-    Me.pctPassDisplay.Size = New System.Drawing.Size(9, 16)
-    Me.pctPassDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
-    Me.pctPassDisplay.TabIndex = 5
-    Me.pctPassDisplay.TabStop = False
-    Me.ttConfig.SetToolTip(Me.pctPassDisplay, "Toggle display of the password.")
     '
     'pnlAccountProviderTitle
     '
@@ -2078,7 +2062,7 @@ Partial Class frmConfig
     Me.pnlProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlProxy.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlProxy.Size = New System.Drawing.Size(270, 144)
+    Me.pnlProxy.Size = New System.Drawing.Size(274, 144)
     Me.pnlProxy.TabIndex = 1
     '
     'lblProxyType
@@ -2113,12 +2097,12 @@ Partial Class frmConfig
     'txtProxyPassword
     '
     Me.txtProxyPassword.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtProxyPassword.BackColor = System.Drawing.SystemColors.Window
     Me.txtProxyPassword.Location = New System.Drawing.Point(138, 82)
     Me.txtProxyPassword.Name = "txtProxyPassword"
-    Me.txtProxyPassword.Size = New System.Drawing.Size(129, 20)
+    Me.txtProxyPassword.Size = New System.Drawing.Size(133, 20)
     Me.txtProxyPassword.TabIndex = 9
     Me.ttConfig.SetToolTip(Me.txtProxyPassword, "Optional Password for HTTP Proxy authentication.")
-    Me.txtProxyPassword.UseSystemPasswordChar = True
     '
     'lblProxyPassword
     '
@@ -2175,7 +2159,7 @@ Partial Class frmConfig
     Me.pnlProxy.SetColumnSpan(Me.txtProxyDomain, 2)
     Me.txtProxyDomain.Location = New System.Drawing.Point(3, 121)
     Me.txtProxyDomain.Name = "txtProxyDomain"
-    Me.txtProxyDomain.Size = New System.Drawing.Size(264, 20)
+    Me.txtProxyDomain.Size = New System.Drawing.Size(268, 20)
     Me.txtProxyDomain.TabIndex = 11
     Me.ttConfig.SetToolTip(Me.txtProxyDomain, "Optional Domain for HTTP Proxy authentication.")
     '
@@ -2188,7 +2172,7 @@ Partial Class frmConfig
     Me.cmbProxyType.Items.AddRange(New Object() {"None", "System", "IP", "URL"})
     Me.cmbProxyType.Location = New System.Drawing.Point(138, 3)
     Me.cmbProxyType.Name = "cmbProxyType"
-    Me.cmbProxyType.Size = New System.Drawing.Size(129, 21)
+    Me.cmbProxyType.Size = New System.Drawing.Size(133, 21)
     Me.cmbProxyType.TabIndex = 1
     Me.ttConfig.SetToolTip(Me.cmbProxyType, "Type of Proxy to Use" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " None: No Proxy" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " System: Default System Proxy Settings" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " I" & _
         "P: HTTP Proxy by IP Address and Port" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & " URL: HTTP Proxy by Web URL")
@@ -3096,16 +3080,16 @@ Partial Class frmConfig
     Me.fswController.EnableRaisingEvents = True
     Me.fswController.SynchronizingObject = Me
     '
+    'tmrIcoWait
+    '
+    Me.tmrIcoWait.Interval = 4000
+    '
     'ttConfig
     '
     Me.ttConfig.AutoPopDelay = 30000
     Me.ttConfig.InitialDelay = 300
     Me.ttConfig.Persistant = True
     Me.ttConfig.ReshowDelay = 100
-    '
-    'tmrIcoWait
-    '
-    Me.tmrIcoWait.Interval = 4000
     '
     'frmConfig
     '
@@ -3136,7 +3120,6 @@ Partial Class frmConfig
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAccountViaSatInput.ResumeLayout(False)
     Me.pnlAccountViaSatInput.PerformLayout()
-    CType(Me.pctPassDisplay, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAccountProviderTitle.ResumeLayout(False)
     Me.pnlAccountProviderTitle.PerformLayout()
     Me.pnlAccountProvider.ResumeLayout(False)
@@ -3281,7 +3264,7 @@ Partial Class frmConfig
   Friend WithEvents lblProxyType As System.Windows.Forms.Label
   Friend WithEvents txtProxyUser As System.Windows.Forms.TextBox
   Friend WithEvents lblProxyUser As System.Windows.Forms.Label
-  Friend WithEvents txtProxyPassword As System.Windows.Forms.TextBox
+  Friend WithEvents txtProxyPassword As PasswordBox
   Friend WithEvents lblProxyPassword As System.Windows.Forms.Label
   Friend WithEvents lblProxyAddr As System.Windows.Forms.Label
   Friend WithEvents txtProxyAddress As System.Windows.Forms.TextBox
@@ -3350,9 +3333,8 @@ Partial Class frmConfig
   Friend WithEvents lblAccount As System.Windows.Forms.Label
   Friend WithEvents lblPassword As System.Windows.Forms.Label
   Friend WithEvents txtAccount As System.Windows.Forms.TextBox
-  Friend WithEvents txtPassword As System.Windows.Forms.TextBox
+  Friend WithEvents txtPassword As PasswordBox
   Friend WithEvents lblAccountViaSatDescription As System.Windows.Forms.Label
-  Friend WithEvents pctPassDisplay As System.Windows.Forms.PictureBox
   Friend WithEvents pnlAccountProviderTitle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblAccountProviderTitle As System.Windows.Forms.Label
   Friend WithEvents lnAccountProviderTitle As RestrictionTracker.LineBreak

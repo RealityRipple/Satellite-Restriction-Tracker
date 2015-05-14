@@ -30,7 +30,6 @@
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
-    txtPassword.UseSystemPasswordChar = True
     Select Case mySettings.AccountType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
@@ -356,12 +355,6 @@
     Else
       KeyCheck()
     End If
-  End Sub
-  Private Sub pctPassDisplay_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctPassDisplay.MouseDown
-    If e.Button = Windows.Forms.MouseButtons.Left Then txtPassword.UseSystemPasswordChar = False
-  End Sub
-  Private Sub pctPassDisplay_MouseUp(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctPassDisplay.MouseUp
-    If e.Button = Windows.Forms.MouseButtons.Left Then txtPassword.UseSystemPasswordChar = True
   End Sub
   Private Sub chkAccountTypeAuto_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkAccountTypeAuto.CheckedChanged
     optAccountTypeWBL.Enabled = Not chkAccountTypeAuto.Checked
@@ -1419,13 +1412,11 @@
 #End Region
   Private Sub RepadAllItems(Parent As Object)
     For Each ctl As Control In Parent.Controls
-      If ctl.HasChildren Then
+      If ctl.HasChildren And Not ctl.GetType = GetType(PasswordBox) Then
         RepadAllItems(ctl)
       End If
       If ctl.GetType = GetType(TextBox) Then
-        If ctl.Name = txtPassword.Name Then
-          ctl.Margin = New Padding(3, 3, 1, 3)
-        ElseIf ctl.Name.StartsWith("txtKey") Then
+        If ctl.Name.StartsWith("txtKey") Then
           ctl.Margin = New Padding(1, 3, 1, 3)
         Else
           ctl.Margin = New Padding(3)
@@ -1443,9 +1434,7 @@
           ctl.Margin = New Padding(3)
         End If
       ElseIf ctl.GetType = GetType(PictureBox) Then
-        If ctl.Name = pctPassDisplay.Name Then
-          ctl.Margin = New Padding(1, 3, 3, 3)
-        ElseIf ctl.Name = pctKeyState.Name Then
+        If ctl.Name = pctKeyState.Name Then
           ctl.Margin = New Padding(1, 3, 3, 3)
         Else
           ctl.Margin = New Padding(21, 3, 3, 3)

@@ -141,6 +141,12 @@
     <Compile Include="Classes\Visual Elements\clsLinkLabel.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\Visual Elements\clsPasswordBox.Designer.vb">
+      <DependentUpon>clsPasswordBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Visual Elements\clsPasswordBox.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Forms\frmAbout.Designer.vb">
       <DependentUpon>frmAbout.vb</DependentUpon>
     </Compile>
@@ -225,6 +231,9 @@
     <EmbeddedResource Include="Classes\Visual Elements\clsLineBreak.resx">
       <DependentUpon>clsLineBreak.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Classes\Visual Elements\clsPasswordBox.resx">
+      <DependentUpon>clsPasswordBox.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
@@ -346,6 +355,9 @@
     <Content Include="Resources\config\prefs_interface.png" />
     <Content Include="Resources\default_alert.png" />
     <Content Include="Resources\default_close.png" />
+    <None Include="Resources\pass\norm.png" />
+    <None Include="Resources\pass\active.png" />
+    <None Include="Resources\pass\hover.png" />
     <Content Include="Resources\tray_16\free.ico" />
     <Content Include="Resources\tray_16\norm.ico" />
     <Content Include="Resources\tray_16\restricted.ico" />
