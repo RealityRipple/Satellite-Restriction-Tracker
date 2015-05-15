@@ -223,6 +223,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property net_security() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("net_security", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property net_update_bad() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("net_update_bad", resourceCulture)
@@ -256,26 +266,6 @@ Namespace My.Resources
         Friend ReadOnly Property net_update_warn() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("net_update_warn", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property network_security() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("network_security", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  Looks up a localized resource of type System.Drawing.Bitmap.
-        '''</summary>
-        Friend ReadOnly Property pass() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("pass", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

@@ -23,7 +23,6 @@ Partial Class frmConfig
   <System.Diagnostics.DebuggerStepThrough()> _
   Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
-    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConfig))
     Me.tbsConfig = New System.Windows.Forms.TabControl()
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
@@ -521,6 +520,7 @@ Partial Class frmConfig
     Me.txtPassword.BackColor = System.Drawing.SystemColors.Window
     Me.txtPassword.Location = New System.Drawing.Point(67, 48)
     Me.txtPassword.Name = "txtPassword"
+    Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
     Me.txtPassword.TabIndex = 4
     Me.ttConfig.SetToolTip(Me.txtPassword, "The Password to your ViaSat account.")
@@ -1814,7 +1814,7 @@ Partial Class frmConfig
     'pctNetworkProtocolIcon
     '
     Me.pctNetworkProtocolIcon.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.pctNetworkProtocolIcon.Image = CType(resources.GetObject("pctNetworkProtocolIcon.Image"), System.Drawing.Image)
+    Me.pctNetworkProtocolIcon.Image = Global.RestrictionTracker.My.Resources.Resources.net_security
     Me.pctNetworkProtocolIcon.Location = New System.Drawing.Point(21, 3)
     Me.pctNetworkProtocolIcon.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
     Me.pctNetworkProtocolIcon.Name = "pctNetworkProtocolIcon"
@@ -2099,6 +2099,7 @@ Partial Class frmConfig
     Me.txtProxyPassword.BackColor = System.Drawing.SystemColors.Window
     Me.txtProxyPassword.Location = New System.Drawing.Point(138, 82)
     Me.txtProxyPassword.Name = "txtProxyPassword"
+    Me.txtProxyPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
     Me.txtProxyPassword.Size = New System.Drawing.Size(133, 20)
     Me.txtProxyPassword.TabIndex = 9
     Me.ttConfig.SetToolTip(Me.txtProxyPassword, "Optional Password for HTTP Proxy authentication.")

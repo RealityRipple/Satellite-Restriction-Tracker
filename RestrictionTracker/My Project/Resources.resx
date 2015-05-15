@@ -262,9 +262,6 @@
   <data name="net_update_warn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\config\net_update_warn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="pass" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\config\pass.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="prefs_accuracy" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\config\prefs_accuracy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -283,9 +280,6 @@
   <data name="prefs_interface" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\config\prefs_interface.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="network_security" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\config\network_security.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="advanced_nettest_edit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\config\advanced_nettest_edit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -297,5 +291,8 @@
   </data>
   <data name="advanced_nettest_none" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\config\advanced_nettest_none.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="net_security" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\config\net_security.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
