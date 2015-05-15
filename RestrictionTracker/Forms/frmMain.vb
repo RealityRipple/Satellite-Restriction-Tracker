@@ -1609,20 +1609,29 @@ Public Class frmMain
     Catch ex As Exception
       myProc = 0
     End Try
-    If myProc = 0 Then
-      Dim myTitle As String = String.Empty
+    If Not myProc = 0 Then
       Try
-        myTitle = Me.Text
+        AppActivate(myProc)
+        Return
       Catch ex As Exception
-        myTitle = String.Empty
       End Try
-      If String.IsNullOrEmpty(myTitle) Then
-        Me.Activate()
-      Else
-        AppActivate(myTitle)
-      End If
+    End If
+    Dim myTitle As String = String.Empty
+    Try
+      myTitle = Me.Text
+    Catch ex As Exception
+      myTitle = String.Empty
+    End Try
+    If String.IsNullOrEmpty(myTitle) Then
+      Me.Activate()
+    ElseIf myTitle = "{0}" Then
+      Me.Activate()
     Else
-      AppActivate(myProc)
+      Try
+        AppActivate(myTitle)
+      Catch ex As Exception
+        Me.Activate()
+      End Try
     End If
   End Sub
   Private Sub mnuAbout_Click(sender As System.Object, e As System.EventArgs) Handles mnuAbout.Click
