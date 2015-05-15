@@ -523,8 +523,8 @@ Partial Class frmConfig
     Me.txtPassword.Name = "txtPassword"
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
     Me.txtPassword.TabIndex = 4
-    Me.ttConfig.SetToolTip(Me.txtPassword.txtPasswordBox, "The password to your ViaSat account.")
-    Me.ttConfig.SetToolTip(Me.txtPassword.pctPasswordEye, "Toggle display of the password.")
+    Me.ttConfig.SetToolTip(Me.txtPassword, "The password to your ViaSat account.")
+    Me.ttConfig.SetToolTip(Me.txtPassword.Button, "Toggle display of the password.")
     '
     'lblAccountViaSatDescription
     '

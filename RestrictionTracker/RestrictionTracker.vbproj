@@ -131,6 +131,9 @@
     </Compile>
     <Compile Include="Classes\clsSettings.vb" />
     <Compile Include="Classes\clsShellLink.vb" />
+    <Compile Include="Classes\Visual Elements\clsPasswordBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\Visual Elements\clsTaskbarNotifier.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -140,12 +143,6 @@
     <Compile Include="Classes\clsUpdate.vb" />
     <Compile Include="Classes\Visual Elements\clsLinkLabel.vb">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\Visual Elements\clsPasswordBox.Designer.vb">
-      <DependentUpon>clsPasswordBox.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\Visual Elements\clsPasswordBox.vb">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\frmAbout.Designer.vb">
       <DependentUpon>frmAbout.vb</DependentUpon>
@@ -231,9 +228,6 @@
     <EmbeddedResource Include="Classes\Visual Elements\clsLineBreak.resx">
       <DependentUpon>clsLineBreak.vb</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes\Visual Elements\clsPasswordBox.resx">
-      <DependentUpon>clsPasswordBox.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.vb</DependentUpon>
