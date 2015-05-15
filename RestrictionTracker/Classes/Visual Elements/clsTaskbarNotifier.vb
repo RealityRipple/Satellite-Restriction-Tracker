@@ -548,7 +548,7 @@ Public Class TaskBarPosition
     Dim cbSize As Integer
     Dim hwnd As IntPtr
     Dim uCallbackMessage As Integer
-    Dim uEdge As Integer
+    Dim uEdge As ABEdge
     Dim rc As RECT
     Dim lParam As Integer
   End Structure
@@ -558,6 +558,12 @@ Public Class TaskBarPosition
     Dim Right As Integer
     Dim Bottom As Integer
   End Structure
+  Public Enum ABEdge
+    ABE_LEFT = 0
+    ABE_TOP
+    ABE_RIGHT
+    ABE_BOTTOM
+  End Enum
   Const ABM_GETTASKBARPOS = &H5
   Const ABM_GETSTATE = &H4
   Shared Function GetTaskBarPosition(ByRef CoordinateRectangle As Rectangle, ByVal hwnd As IntPtr) As Boolean
@@ -569,6 +575,16 @@ Public Class TaskBarPosition
       Return True
     Catch ex As Exception
       Return False
+    End Try
+  End Function
+  Shared Function GetTaskBarEdge(ByVal hwnd As IntPtr) As ABEdge
+    Try
+      Dim abd As New APPBARDATA
+      abd.hwnd = hwnd
+      SHAppBarMessage(ABM_GETTASKBARPOS, abd)
+      Return abd.uEdge
+    Catch ex As Exception
+      Return 0
     End Try
   End Function
 End Class

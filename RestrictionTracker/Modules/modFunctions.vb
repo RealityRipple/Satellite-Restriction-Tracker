@@ -848,6 +848,54 @@ Module modFunctions
     Dim p As New Security.Principal.WindowsPrincipal(id)
     Return p.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator)
   End Function
+  Public ReadOnly Property MinAnimation As Boolean
+    Get
+      Dim ai As NativeMethods.ANIMATIONINFO
+      ai.Size = Len(ai)
+      NativeMethods.SystemParametersInfo(NativeMethods.SPI_GETANIMATION, ai.Size, ai, 0)
+      MinAnimation = ai.MinAnimate
+    End Get
+  End Property
+  Public Sub AnimateWindow(window As Form, ToTray As Boolean)
+    If MinAnimation Then
+      Dim screenRect As Rectangle = Screen.GetBounds(window.RestoreBounds.Location)
+      Dim destPoint As Point
+      Select Case TaskBarPosition.GetTaskBarEdge(window.Handle)
+        Case TaskBarPosition.ABEdge.ABE_BOTTOM
+          destPoint = New Point(screenRect.Width - 96, screenRect.Height - 16)
+        Case TaskBarPosition.ABEdge.ABE_TOP
+          destPoint = New Point(screenRect.Width - 96, 16)
+        Case TaskBarPosition.ABEdge.ABE_LEFT
+          destPoint = New Point(16, screenRect.Height - 96)
+        Case TaskBarPosition.ABEdge.ABE_RIGHT
+          destPoint = New Point(screenRect.Width - 16, screenRect.Height - 96)
+      End Select
+      Dim a, b, s As Single
+      If ToTray Then
+        a = 0
+        b = 1
+        s = 0.4
+      Else
+        a = 1
+        b = 0
+        s = -0.4
+      End If
+      Dim curPoint As Point, curSize As Size
+      Dim startPoint As Point = window.RestoreBounds.Location
+      Dim dWidth As Integer = destPoint.X - startPoint.X
+      Dim dHeight As Integer = destPoint.Y - startPoint.Y
+      Dim startWidth As Integer = window.RestoreBounds.Width
+      Dim startHeight As Integer = window.RestoreBounds.Height
+      For I As Single = a To b Step s
+        curPoint = New Point(startPoint.X + I * dWidth, startPoint.Y + I * dHeight)
+        curSize = New Size((1 - I) * startWidth, (1 - I) * startHeight)
+        Dim drawRect As New Rectangle(curPoint, curSize)
+        ControlPaint.DrawReversibleFrame(drawRect, window.BackColor, FrameStyle.Thick)
+        System.Threading.Thread.Sleep(1)
+        ControlPaint.DrawReversibleFrame(drawRect, window.BackColor, FrameStyle.Thick)
+      Next
+    End If
+  End Sub
 #Region "Graphs"
 #Region "History"
   Private dGraph, uGraph As Rectangle

@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Public NotInheritable Class NativeMethods
   Public Const WM_SYSCOMMAND As Integer = &H112
+  Public Const SPI_GETANIMATION As Integer = &H48
   <Flags()> _
   Public Enum MenuFlags As Integer
     MF_BYCOMMAND = &H0
@@ -118,7 +119,10 @@ Public NotInheritable Class NativeMethods
     SM_CONVERTIBLESLATEMODE = &H2003
     SM_SYSTEMDOCKED = &H2004
   End Enum
-
+  Public Structure ANIMATIONINFO
+    Public Size As Integer
+    Public MinAnimate As Integer
+  End Structure
   Public Const BCM_SETSHIELD As Integer = &H160C
   <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
   Public Shared Function GetSystemMenu(hWnd As IntPtr, bRevert As Boolean) As IntPtr
@@ -156,7 +160,10 @@ Public NotInheritable Class NativeMethods
   <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
   Public Shared Function DestroyIcon(ByVal hWnd As IntPtr) As Boolean
   End Function
-  <Runtime.InteropServices.DllImport("user32", CharSet:=Runtime.InteropServices.CharSet.Auto, setlasterror:=True)>
+  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
   Public Shared Function SendMessage(hWnd As IntPtr, msg As UInt32, wParam As UInt32, lParam As UInt32) As UInt32
+  End Function
+  <DllImport("user32", CharSet:=CharSet.Auto, SetLastError:=True)>
+  Public Shared Function SystemParametersInfo(uAction As UInteger, uParam As UInteger, ByRef lpvParam As ANIMATIONINFO, fuWinIni As UInteger) As UInteger
   End Function
 End Class

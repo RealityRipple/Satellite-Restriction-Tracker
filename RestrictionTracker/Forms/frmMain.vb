@@ -247,9 +247,12 @@ Public Class frmMain
         Me.ShowInTaskbar = True
         Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
         If mySettings.AutoHide Then
-          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then Me.Hide()
+          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+            Me.Hide()
+          Else
+            Me.WindowState = FormWindowState.Minimized
+          End If
           mnuRestore.Text = "&Restore"
-          Me.WindowState = FormWindowState.Minimized
         End If
         If Me.Opacity = 0 Then Me.Opacity = 1
         SetStatusText("Initializing", "Beginning application initialization process...", False)
@@ -295,7 +298,7 @@ Public Class frmMain
     NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, 0, String.Empty)
   End Sub
   Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
-    MyBase.WndProc(m)
+
     If m.Msg = NativeMethods.WM_SYSCOMMAND Then
       Select Case m.WParam.ToInt64
         Case TOPMOST_MENU_ID
@@ -317,8 +320,17 @@ Public Class frmMain
           Else
             NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
           End If
+        Case &HF020 'Minimize
+          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+            Me.Opacity = 0
+            AnimateWindow(Me, True)
+            Me.Hide()
+            Me.Opacity = 1
+            Return
+          End If
       End Select
     End If
+    MyBase.WndProc(m)
   End Sub
   Private Sub frmMain_SizeChanged(sender As Object, e As System.EventArgs) Handles Me.SizeChanged
     If Me.InvokeRequired Then
@@ -326,10 +338,8 @@ Public Class frmMain
     Else
       If Me.WindowState = FormWindowState.Minimized Then
         If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
-          Me.Hide()
         ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
           trayIcon.Visible = True
-          Me.Hide()
         End If
         mnuRestore.Text = "&Restore"
       Else
@@ -847,6 +857,7 @@ Public Class frmMain
           DisplayUsage(False, False)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
           If Me.WindowState = FormWindowState.Minimized Then
+            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then AnimateWindow(Me, False)
             Me.WindowState = FormWindowState.Normal
             mnuRestore.Text = "&Focus"
           End If
@@ -1597,9 +1608,10 @@ Public Class frmMain
 #Region "Tray"
   Private Sub mnuRestore_Click(sender As System.Object, e As System.EventArgs) Handles mnuRestore.Click
     If Not Me.Visible Then
-      Me.Show()
+      AnimateWindow(Me, False)
       mnuRestore.Text = "&Focus"
       Me.WindowState = FormWindowState.Normal
+      Me.Show()
       If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
       Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
     End If
