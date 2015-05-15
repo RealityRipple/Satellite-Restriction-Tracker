@@ -144,9 +144,10 @@ Partial Class frmHistory
     '
     Me.chkExportRange.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.chkExportRange.AutoSize = True
-    Me.chkExportRange.Location = New System.Drawing.Point(267, 7)
+    Me.chkExportRange.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkExportRange.Location = New System.Drawing.Point(267, 6)
     Me.chkExportRange.Name = "chkExportRange"
-    Me.chkExportRange.Size = New System.Drawing.Size(136, 17)
+    Me.chkExportRange.Size = New System.Drawing.Size(142, 18)
     Me.chkExportRange.TabIndex = 15
     Me.chkExportRange.Text = "Export Selected &Range"
     Me.ttHistory.SetToolTip(Me.chkExportRange, "Export only the data within the Age Parameters range.")

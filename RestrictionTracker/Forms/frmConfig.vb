@@ -65,15 +65,15 @@
     If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
       pctKeyState.Tag = 0
       pctKeyState.Image = Nothing
-      ttConfig.SetTooltip(pctKeyState, String.Empty)
+      ttConfig.SetToolTip(pctKeyState, String.Empty)
       lblPurchaseKey.Text = LINK_PURCHASE
-      ttConfig.SetTooltip(lblPurchaseKey, LINK_PURCHASE_TT)
+      ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
     Else
       pctKeyState.Tag = 1
       pctKeyState.Image = My.Resources.ico_ok
-      ttConfig.SetTooltip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & Application.ProductName & "!")
+      ttConfig.SetToolTip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & Application.ProductName & "!")
       lblPurchaseKey.Text = LINK_PANEL
-      ttConfig.SetTooltip(lblPurchaseKey, LINK_PANEL_TT)
+      ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
     End If
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
@@ -295,7 +295,7 @@
     pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
     pnlAdvanced.MouseMove,
     pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
-    pnlButtons.MouseMove, pnlPrefInterfaceInput.MouseMove, TableLayoutPanel1.MouseMove, pnlAdvancedNetTestInput.MouseMove, pnlAdvancedNetTest.MouseMove
+    pnlButtons.MouseMove, pnlPrefInterface.MouseMove, pnlAdvancedNetTestInput.MouseMove, pnlAdvancedNetTest.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -1427,6 +1427,11 @@
         ctl.Margin = New Padding(3)
       ElseIf ctl.GetType = GetType(CheckBox) Then
         ctl.Margin = New Padding(3)
+        If Environment.OSVersion.Version.Major = 5 Then
+          CType(ctl, Checkbox).FlatStyle = FlatStyle.Standard
+        Else
+          CType(ctl, Checkbox).FlatStyle = FlatStyle.System
+        End If
       ElseIf ctl.GetType = GetType(NumericUpDownIncrementable) Then
         ctl.Margin = New Padding(3)
       ElseIf ctl.GetType = GetType(Button) Then

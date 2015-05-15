@@ -15,8 +15,8 @@
     PassChar = (New TextBox() With {.UseSystemPasswordChar = True}).PasswordChar
     MyBase.PasswordChar = PassChar
     passButton = New PictureBox() With {.Cursor = Cursors.Default,
-                                        .Width = 16, .Height = 16,
                                         .Margin = New Padding(1)}
+    OnResize(New EventArgs)
     SetPassImage(MouseState.Normal)
     Me.Controls.Add(passButton)
     passButton.Width = passButton.Height
@@ -64,8 +64,8 @@
   End Sub
   Protected Overrides Sub OnResize(e As EventArgs)
     MyBase.OnResize(e)
-    passButton.Size = New Size(16, 16)
-    passButton.Location = New Point(Me.ClientSize.Width - passButton.Width - 1, 0)
+    passButton.Size = New Size(Me.ClientRectangle.Height, Me.ClientRectangle.Height)
+    passButton.Location = New Point(Me.ClientRectangle.Width - passButton.Width - 1, (Me.ClientRectangle.Height / 2) - (passButton.Height / 2))
     SetMargin()
   End Sub
   Private Sub SetMargin()
@@ -81,7 +81,7 @@
           BG = SystemColors.Window
         Case MouseState.Hover
           FG = SystemColors.WindowText
-          BG = SystemColors.ButtonFace
+          BG = SystemColors.Control
         Case MouseState.Active
           FG = SystemColors.Window
           BG = SystemColors.WindowText
@@ -93,7 +93,8 @@
       FG = SystemColors.GrayText
       BG = SystemColors.ButtonFace
     End If
-    Using bmpEye As New Bitmap(16, 16)
+    Dim res As Size = passButton.Size
+    Using bmpEye As New Bitmap(res.Width, res.Height)
       Using g As Graphics = Graphics.FromImage(bmpEye)
         g.CompositingQuality = Drawing2D.CompositingQuality.HighQuality
         g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
@@ -101,11 +102,11 @@
         g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
         g.Clear(BG)
         Dim curve(2) As PointF
-        curve(0) = New PointF(2.5, 8)
-        curve(1) = New PointF(7, 5.5)
-        curve(2) = New PointF(11.5, 8)
-        g.DrawCurve(New Pen(FG, 2), curve)
-        g.FillEllipse(New SolidBrush(FG), New RectangleF(5, 7, 4, 3.5))
+        curve(0) = New PointF(res.Width * 0.15625, res.Height * 0.5)
+        curve(1) = New PointF(res.Width * 0.4375, res.Height * 0.34375)
+        curve(2) = New PointF(res.Width * 0.71875, res.Height * 0.5)
+        g.DrawCurve(New Pen(FG, ((res.Width + res.Height) / 2) * 0.125), curve)
+        g.FillEllipse(New SolidBrush(FG), New RectangleF(res.Width * 0.3125, res.Height * 0.4375, res.Width * 0.25, res.Height * 0.21875))
       End Using
       passButton.Image = bmpEye.Clone
     End Using
