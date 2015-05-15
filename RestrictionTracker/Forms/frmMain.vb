@@ -230,7 +230,7 @@ Public Class frmMain
             trayIcon.Visible = True
           ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
             If myState = LoadStates.Loaded Then
-              If Me.WindowState = FormWindowState.Minimized Then trayIcon.Visible = True
+              If Me.WindowState = FormWindowState.Minimized Or Not Me.Visible Then trayIcon.Visible = True
             Else
               If mySettings.AutoHide Then trayIcon.Visible = True
               trayIcon.Visible = mySettings.AutoHide
@@ -324,6 +324,8 @@ Public Class frmMain
           If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
             Me.Opacity = 0
             AnimateWindow(Me, True)
+            If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
+            mnuRestore.Text = "&Restore"
             Me.Hide()
             Me.Opacity = 1
             Return
@@ -337,10 +339,6 @@ Public Class frmMain
       Me.BeginInvoke(New EventHandler(AddressOf frmMain_SizeChanged), sender, e)
     Else
       If Me.WindowState = FormWindowState.Minimized Then
-        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
-        ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
-          trayIcon.Visible = True
-        End If
         mnuRestore.Text = "&Restore"
       Else
         If mySettings Is Nothing Then
@@ -549,7 +547,7 @@ Public Class frmMain
     If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
       trayIcon.Visible = True
     ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
-      trayIcon.Visible = Me.WindowState = FormWindowState.Minimized
+      trayIcon.Visible = Me.WindowState = FormWindowState.Minimized Or Not Me.Visible
     Else
       trayIcon.Visible = False
     End If
@@ -856,20 +854,26 @@ Public Class frmMain
           If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
           DisplayUsage(False, False)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
-          If Me.WindowState = FormWindowState.Minimized Then
-            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then AnimateWindow(Me, False)
-            Me.WindowState = FormWindowState.Normal
-            mnuRestore.Text = "&Focus"
+          If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+            If Me.WindowState = FormWindowState.Minimized Then
+              Me.WindowState = FormWindowState.Normal
+              mnuRestore.Text = "&Focus"
+            End If
+          Else
+            If Not Me.Visible Then
+              AnimateWindow(Me, False)
+              mnuRestore.Text = "&Focus"
+            End If
           End If
           cmdConfig.Focus()
           MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
-          If mySettings.AccountTypeForced Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
-          Else
-            SetStatusText("Analyzing Account", "Determining your account type...", False)
-            TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
-          End If
+            If mySettings.AccountTypeForced Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+            Else
+              SetStatusText("Analyzing Account", "Determining your account type...", False)
+              TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+            End If
       End Select
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -1608,12 +1612,12 @@ Public Class frmMain
 #Region "Tray"
   Private Sub mnuRestore_Click(sender As System.Object, e As System.EventArgs) Handles mnuRestore.Click
     If Not Me.Visible Then
-      AnimateWindow(Me, False)
+      Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+      If Not ClosingTime Then AnimateWindow(Me, False)
       mnuRestore.Text = "&Focus"
       Me.WindowState = FormWindowState.Normal
       Me.Show()
       If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
-      Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
     End If
     Dim myProc As Integer = 0
     Try

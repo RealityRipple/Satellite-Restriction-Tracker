@@ -858,7 +858,7 @@ Module modFunctions
   End Property
   Public Sub AnimateWindow(window As Form, ToTray As Boolean)
     If MinAnimation Then
-      Dim screenRect As Rectangle = Screen.GetBounds(window.RestoreBounds.Location)
+      Dim screenRect As Rectangle = Screen.GetBounds(window.Bounds.Location)
       Dim destPoint As Point
       Select Case TaskBarPosition.GetTaskBarEdge(window.Handle)
         Case TaskBarPosition.ABEdge.ABE_BOTTOM
@@ -881,11 +881,11 @@ Module modFunctions
         s = -0.4
       End If
       Dim curPoint As Point, curSize As Size
-      Dim startPoint As Point = window.RestoreBounds.Location
+      Dim startPoint As Point = window.Bounds.Location
       Dim dWidth As Integer = destPoint.X - startPoint.X
       Dim dHeight As Integer = destPoint.Y - startPoint.Y
-      Dim startWidth As Integer = window.RestoreBounds.Width
-      Dim startHeight As Integer = window.RestoreBounds.Height
+      Dim startWidth As Integer = window.Bounds.Width
+      Dim startHeight As Integer = window.Bounds.Height
       For I As Single = a To b Step s
         curPoint = New Point(startPoint.X + I * dWidth, startPoint.Y + I * dHeight)
         curSize = New Size((1 - I) * startWidth, (1 - I) * startHeight)

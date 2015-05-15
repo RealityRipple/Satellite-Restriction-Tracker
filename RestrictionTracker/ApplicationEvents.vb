@@ -1,7 +1,10 @@
 ﻿Namespace My
   Partial Friend Class MyApplication
     Private Sub MyApplication_Startup(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
-      If e.CommandLine.Contains("/stop") Then End
+      If e.CommandLine.Contains("/stop") Then
+        e.Cancel = True
+        Return
+      End If
       EnableVisualStyles = True
       Dim AppDataWB As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
       Dim AppDataSRT As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
@@ -108,7 +111,14 @@
       End If
     End Sub
     Private Sub MyApplication_StartupNextInstance(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.StartupNextInstanceEventArgs) Handles Me.StartupNextInstance
-      If e.CommandLine.Contains("/stop") Then End
+      If e.CommandLine.Contains("/stop") Then
+        If frmMain.IsHandleCreated Then
+          frmMain.Close()
+        Else
+          End
+        End If
+        Return
+      End If
       If frmMain.IsHandleCreated Then
         If Not frmMain.Visible Then frmMain.mnuRestore.PerformClick()
         e.BringToForeground = True
