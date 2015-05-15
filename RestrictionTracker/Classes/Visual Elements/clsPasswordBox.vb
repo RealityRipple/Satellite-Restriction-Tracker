@@ -18,6 +18,7 @@
                                         .Margin = New Padding(1)}
     OnResize(New EventArgs)
     SetPassImage(MouseState.Normal)
+    passButton.Visible = False
     Me.Controls.Add(passButton)
     passButton.Width = passButton.Height
   End Sub
@@ -62,14 +63,22 @@
   Private Sub passButton_SizeChanged(sender As Object, e As System.EventArgs) Handles passButton.SizeChanged
     OnResize(e)
   End Sub
+  Protected Overrides Sub OnTextChanged(e As System.EventArgs)
+    MyBase.OnTextChanged(e)
+    If String.IsNullOrEmpty(MyBase.Text) Then
+      passButton.Visible = False
+    Else
+      passButton.Visible = True
+    End If
+  End Sub
   Protected Overrides Sub OnResize(e As EventArgs)
     MyBase.OnResize(e)
     passButton.Size = New Size(Me.ClientRectangle.Height, Me.ClientRectangle.Height)
-    passButton.Location = New Point(Me.ClientRectangle.Width - passButton.Width - 1, (Me.ClientRectangle.Height / 2) - (passButton.Height / 2))
+    passButton.Location = New Point(Me.ClientRectangle.Width - passButton.Width, (Me.ClientRectangle.Height / 2) - (passButton.Height / 2))
     SetMargin()
   End Sub
   Private Sub SetMargin()
-    SendMessage(Me.Handle, &HD3, New IntPtr(2), New IntPtr((passButton.Width + 2) << 16))
+    SendMessage(Me.Handle, &HD3, New IntPtr(2), New IntPtr((passButton.Width) << 16))
   End Sub
   Private Sub SetPassImage(PassState As MouseState)
     Dim FG As Color = Color.Black
