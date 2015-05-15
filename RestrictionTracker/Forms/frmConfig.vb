@@ -27,6 +27,7 @@
     txtAccount.Text = sUsername
     UseDefaultHostList()
     cmbProvider.Text = sProvider
+    ttConfig.SetToolTip(txtPassword.Button, "Toggle display of the Password.")
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
@@ -114,6 +115,7 @@
         chkTrayMin.Checked = False
     End Select
     chkTrayIcon_CheckedChanged(New Object, New EventArgs)
+    ttConfig.SetToolTip(txtProxyPassword.Button, "Toggle display of the HTTP Proxy Password.")
     If mySettings.Proxy Is Nothing Then
       cmbProxyType.SelectedIndex = 0
       txtProxyAddress.Text = String.Empty
