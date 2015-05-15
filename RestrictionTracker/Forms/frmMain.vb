@@ -704,9 +704,18 @@ Public Class frmMain
       Me.Invoke(New MethodInvoker(AddressOf GetUsage))
     Else
       If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Or Not sAccount.Contains("@") Then
-        If Not Me.Visible Then
-          Me.Show()
-          mnuRestore.Text = "&Focus"
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+          If Me.WindowState = FormWindowState.Minimized Then
+            Me.WindowState = FormWindowState.Normal
+            mnuRestore.Text = "&Focus"
+          End If
+        Else
+          If Not Me.Visible Then
+            Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+            AnimateWindow(Me, False)
+            Me.Show()
+            mnuRestore.Text = "&Focus"
+          End If
         End If
         cmdConfig.Focus()
         MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
@@ -861,7 +870,9 @@ Public Class frmMain
             End If
           Else
             If Not Me.Visible Then
+              Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
               AnimateWindow(Me, False)
+              Me.Show()
               mnuRestore.Text = "&Focus"
             End If
           End If
@@ -1516,9 +1527,18 @@ Public Class frmMain
       Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
       UsageInvoker.BeginInvoke(Nothing, Nothing)
     Else
-      If Not Me.Visible Then
-        Me.Show()
-        mnuRestore.Text = "&Focus"
+      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+        If Me.WindowState = FormWindowState.Minimized Then
+          Me.WindowState = FormWindowState.Normal
+          mnuRestore.Text = "&Focus"
+        End If
+      Else
+        If Not Me.Visible Then
+          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+          AnimateWindow(Me, False)
+          Me.Show()
+          mnuRestore.Text = "&Focus"
+        End If
       End If
       cmdConfig.Focus()
       MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
