@@ -1,6 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
 Public NotInheritable Class NativeMethods
+  Public Const WM_WINDOWPOSCHANGING As Integer = &H46
   Public Const WM_SYSCOMMAND As Integer = &H112
+  Public Const SC_MINIMIZE As Integer = &HF020
   Public Const SPI_GETANIMATION As Integer = &H48
   <Flags()> _
   Public Enum MenuFlags As Integer
@@ -54,9 +56,9 @@ Public NotInheritable Class NativeMethods
     SM_CXMINTRACK = 34
     SM_CYMINTRACK = 35
     SM_CXDOUBLECLICK = 36
-    SM_CYDOUBLECLICK = 37 
+    SM_CYDOUBLECLICK = 37
     SM_CXICONSPACING = 38
-    SM_CYICONSPACING = 39 
+    SM_CYICONSPACING = 39
     SM_MENUDROPALIGNMENT = 40
     SM_PENWINDOWS = 41
     SM_DBCSENABLED = 42
@@ -124,6 +126,79 @@ Public NotInheritable Class NativeMethods
     Public MinAnimate As Integer
   End Structure
   Public Const BCM_SETSHIELD As Integer = &H160C
+  <Flags()>
+  Public Enum WINDOWPOS_FLAGS As UInteger
+    ''' <summary>
+    '''  Retains the current size (ignores the cx and cy members).
+    ''' </summary>
+    SWP_NOSIZE = &H1
+    ''' <summary>
+    '''  Retains the current position (ignores the x and y members).
+    ''' </summary>
+    SWP_NOMOVE = &H2
+    ''' <summary>
+    '''  Retains the current Z order (ignores the hwndInsertAfter member).
+    ''' </summary>
+    SWP_NOZORDER = &H4
+    ''' <summary>
+    '''  Does not redraw changes. If this flag is set, no repainting of any kind occurs. This applies to the client area, the nonclient area (including the title bar and scroll bars), and any part of the parent window uncovered as a result of the window being moved. When this flag is set, the application must explicitly invalidate or redraw any parts of the window and parent window that need redrawing.
+    ''' </summary>
+    SWP_NOREDRAW = &H8
+    ''' <summary>
+    '''  Does not activate the window. If this flag is not set, the window is activated and moved to the top of either the topmost or non-topmost group (depending on the setting of the hwndInsertAfter member).
+    ''' </summary>
+    SWP_NOACTIVATE = &H10
+    ''' <summary>
+    '''  Draws a frame (defined in the window's class description) around the window.
+    ''' </summary>
+    ''' <remarks>Also known as SWP_FRAMECHANGED, which sends a WM_NCCALCSIZE message to the window, even if the window's size is not being changed. If this flag is not specified, WM_NCCALCSIZE is sent only when the window's size is being changed.</remarks>
+    SWP_DRAWFRAME = &H20
+    ''' <summary>
+    '''  Displays the window.
+    ''' </summary>
+    SWP_SHOWWINDOW = &H40
+    ''' <summary>
+    '''  Hides the window.
+    ''' </summary>
+    SWP_HIDEWINDOW = &H80
+    ''' <summary>
+    '''  Discards the entire contents of the client area. If this flag is not specified, the valid contents of the client area are saved and copied back into the client area after the window is sized or repositioned.
+    ''' </summary>
+    SWP_NOCOPYBITS = &H100
+    ''' <summary>
+    '''  Does not change the owner window's position in the Z order.
+    ''' </summary>
+    ''' <remarks>Also known as NOREPOSITION.
+    SWP_NOOWNERZORDER = &H200
+    ''' <summary>
+    '''  Prevents the window from receiving the WM_WINDOWPOSCHANGING message.
+    ''' </summary>
+    SWP_NOSENDCHANGING = &H400
+    ''' <summary>
+    '''  Used by Windows to determine if WM_SIZE needs to be sent.
+    ''' </summary>
+    ''' <remarks>Undocumented.</remarks>
+    SWP_NOCLIENTSIZE = &H800
+    ''' <summary>
+    '''  Used by Windows to determine if WM_MOVE needs to be sent.
+    ''' </summary>
+    ''' <remarks>Undocumented.</remarks>
+    SWP_NOCLIENTMOVE = &H1000
+    ''' <summary>
+    '''  Indicates that the window state is changing or has changed.
+    ''' </summary>
+    ''' <remarks>Undocumented.</remarks>
+    SWP_STATECHANGED = &H8000
+  End Enum
+  Public Structure WINDOWPOS
+    Public hWnd As IntPtr
+    Public hWndInsertAfter As IntPtr
+    Public X As Integer
+    Public Y As Integer
+    Public Width As Integer
+    Public Height As Integer
+    Public Flags As WINDOWPOS_FLAGS
+  End Structure
   <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
   Public Shared Function GetSystemMenu(hWnd As IntPtr, bRevert As Boolean) As IntPtr
   End Function

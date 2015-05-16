@@ -298,41 +298,60 @@ Public Class frmMain
     NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, 0, String.Empty)
   End Sub
   Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
-
-    If m.Msg = NativeMethods.WM_SYSCOMMAND Then
-      Select Case m.WParam.ToInt64
-        Case TOPMOST_MENU_ID
-          Me.TopMost = Not Me.TopMost
-          mySettings.TopMost = Me.TopMost
-          Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
-          If Me.TopMost Then
-            NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
-          Else
-            NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
-          End If
-        Case SCALE_MENU_ID
-          mySettings.ScaleScreen = Not mySettings.ScaleScreen
-          Dim sizeChangeInvoker As New EventHandler(AddressOf frmMain_SizeChanged)
-          sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
-          Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
-          If mySettings.ScaleScreen Then
-            NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
-          Else
-            NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
-          End If
-        Case &HF020 'Minimize
+    Select m.Msg
+      Case NativeMethods.WM_SYSCOMMAND
+        Select Case m.WParam.ToInt64
+          Case TOPMOST_MENU_ID
+            Me.TopMost = Not Me.TopMost
+            mySettings.TopMost = Me.TopMost
+            Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
+            If Me.TopMost Then
+              NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
+            Else
+              NativeMethods.ModifyMenu(hSysMenu, TOPMOST_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, TOPMOST_MENU_ID, TOPMOST_MENU_TEXT)
+            End If
+          Case SCALE_MENU_ID
+            mySettings.ScaleScreen = Not mySettings.ScaleScreen
+            Dim sizeChangeInvoker As New EventHandler(AddressOf frmMain_SizeChanged)
+            sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
+            Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
+            If mySettings.ScaleScreen Then
+              NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_CHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
+            Else
+              NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
+            End If
+          Case NativeMethods.SC_MINIMIZE
+            'If Me.Visible And Me.Opacity = 1 Then
+            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then m.Result = New IntPtr(-1)
+            'Else
+            'Debug.Print("WOT")
+            'End If
+        End Select
+      Case NativeMethods.WM_WINDOWPOSCHANGING
+        Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
+        If CBool((wndPos.Flags And NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) = NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) And wndPos.X = -32000 And wndPos.Y = -32000 Then
           If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
             Me.Opacity = 0
-            AnimateWindow(Me, True)
+            If Me.Visible Then AnimateWindow(Me, True)
             If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
             mnuRestore.Text = "&Restore"
             Me.Hide()
             Me.Opacity = 1
-            Return
+            wndPos.Flags = NativeMethods.WINDOWPOS_FLAGS.SWP_NOMOVE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSIZE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOACTIVATE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSENDCHANGING 'Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOCOPYBITS Or NativeMethods.WINDOWPOS_FLAGS.SWP_DRAWFRAME
+            System.Runtime.InteropServices.Marshal.StructureToPtr(wndPos, m.LParam, True)
           End If
-      End Select
-    End If
+        End If
+    End Select
     MyBase.WndProc(m)
+  End Sub
+  Private Sub HideLater()
+    If Me.InvokeRequired Then
+      Me.Invoke(New MethodInvoker(AddressOf HideLater))
+      Return
+    End If
+    Threading.Thread.Sleep(100)
+    Me.Hide()
+    Me.Opacity = 1
   End Sub
   Private Sub frmMain_SizeChanged(sender As Object, e As System.EventArgs) Handles Me.SizeChanged
     If Me.InvokeRequired Then
