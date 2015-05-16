@@ -118,7 +118,7 @@ Partial Class frmDonate
     Me.cmdClose.Size = New System.Drawing.Size(136, 29)
     Me.cmdClose.TabIndex = 2
     Me.cmdClose.Text = "No Thank You"
-    Me.ttButtons.SetToolTip(Me.cmdClose, "Close this nag screen and never see it again.")
+    Me.ttButtons.SetToolTip(Me.cmdClose, "Close this nag screen and see it again in a little over half a year.")
     Me.cmdClose.UseVisualStyleBackColor = True
     '
     'cmdSignUp
