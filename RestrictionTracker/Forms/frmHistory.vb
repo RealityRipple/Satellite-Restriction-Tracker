@@ -462,17 +462,22 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And
-              ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And
-              Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) And
-              Not (usageDB(I + 1).DOWNLOAD = usageDB(I - 1).DOWNLOAD And usageDB(I + 1).UPLOAD = usageDB(I - 1).UPLOAD) Then
-              If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 0 Then
-                If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+            Dim thisDB As DataBase.DataRow = usageDB(I)
+            Dim lastDB As DataBase.DataRow = thisDB
+            If I > 0 Then lastDB = usageDB(I - 1)
+            Dim nextDB As DataBase.DataRow = thisDB
+            If I < usageDB.Count - 1 Then nextDB = usageDB(I + 1)
+            If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
+              ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
+              Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
+              Not (nextDB.DOWNLOAD = lastDB.DOWNLOAD And nextDB.UPLOAD = lastDB.UPLOAD) Then
+              If DateDiff(DateInterval.Day, thisDB.DATETIME, Today) > 0 Then
+                If thisDB.DATETIME > dtpFrom.MaxDate Then
                   From30DaysAgo = dtpFrom.MaxDate
-                ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
                   From30DaysAgo = dtpFrom.MinDate
                 Else
-                  From30DaysAgo = usageDB(I).DATETIME
+                  From30DaysAgo = thisDB.DATETIME
                 End If
                 Exit For
               End If
@@ -541,19 +546,24 @@ Public Class frmHistory
               fDB.SetProgress(usageDB.Count - I, usageDB.Count)
             Catch
             End Try
-            If ((usageDB(I).DOWNLOAD < usageDB(I - 1).DOWNLOAD) Or (usageDB(I).DOWNLOAD = 0 And usageDB(I - 1).DOWNLOAD = 0)) And
-              ((usageDB(I).UPLOAD < usageDB(I - 1).UPLOAD) Or (usageDB(I).UPLOAD = 0 And usageDB(I - 1).UPLOAD = 0)) And
-              Not (usageDB(I - 1).DOWNLOAD = 0 And usageDB(I - 1).UPLOAD = 0) And
-              Not (usageDB(I + 1).DOWNLOAD = usageDB(I - 1).DOWNLOAD And usageDB(I + 1).UPLOAD = usageDB(I - 1).UPLOAD) Then
+            Dim thisDB As DataBase.DataRow = usageDB(I)
+            Dim lastDB As DataBase.DataRow = thisDB
+            If I > 0 Then lastDB = usageDB(I - 1)
+            Dim nextDB As DataBase.DataRow = thisDB
+            If I < usageDB.Count - 1 Then nextDB = usageDB(I + 1)
+            If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
+              ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
+              Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
+              Not (nextDB.DOWNLOAD = lastDB.DOWNLOAD And nextDB.UPLOAD = lastDB.UPLOAD) Then
               If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 0 Then
                 Finds += 1
                 If Finds = 2 Then
-                  If usageDB(I).DATETIME > dtpFrom.MaxDate Then
+                  If thisDB.DATETIME > dtpFrom.MaxDate Then
                     From60DaysAgo = dtpFrom.MaxDate
-                  ElseIf usageDB(I).DATETIME < dtpFrom.MinDate Then
+                  ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
                     From60DaysAgo = dtpFrom.MinDate
                   Else
-                    From60DaysAgo = usageDB(I).DATETIME
+                    From60DaysAgo = thisDB.DATETIME
                   End If
                   Exit For
                 End If
