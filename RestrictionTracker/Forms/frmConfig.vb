@@ -1127,24 +1127,16 @@
       If IO.File.Exists(sNetTestIco) Then IO.File.Delete(sNetTestIco)
     Catch ex As Exception
     End Try
+    If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
+      Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
+      netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
+    End If
     If optNetTestTestMyNet.Checked Then
       mySettings.NetTestURL = "http://testmy.net"
-      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
-        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
-        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
-      End If
     ElseIf optNetTestSpeedTest.Checked Then
       mySettings.NetTestURL = "http://speedtest.net"
-      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
-        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
-        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
-      End If
     ElseIf optNetTestCustom.Checked Then
       mySettings.NetTestURL = txtNetTestCustom.Text
-      If pctAdvancedNetTestIcon.Tag IsNot Nothing Then
-        Dim netTestImg As Image = pctAdvancedNetTestIcon.Tag
-        netTestImg.Save(sNetTestIco, Drawing.Imaging.ImageFormat.Png)
-      End If
     Else
       mySettings.NetTestURL = Nothing
       Try
