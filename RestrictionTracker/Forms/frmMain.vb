@@ -2118,7 +2118,7 @@ Public Class frmMain
           If Now.Month = 5 Or Now.Month = 9 Or Now.Month = 12 Then
             If Now.DayOfWeek = DayOfWeek.Saturday Or Now.DayOfWeek = DayOfWeek.Sunday Then
               Dim lastAsk As Long = DateDiff(DateInterval.Month, mySettings.LastNag, Now)
-              If lastAsk > 3 Or lastAsk < -12 Then
+              If lastAsk > 6 Or lastAsk < -24 Then
                 mySettings.LastNag = Today
                 mySettings.Save()
                 frmDonate.Show()
@@ -2132,7 +2132,7 @@ Public Class frmMain
   End Sub
   Public Sub ClickedDonate()
     Try
-      mySettings.LastNag = DateAdd(DateInterval.Month, 12, Today)
+      mySettings.LastNag = DateAdd(DateInterval.Month, 24, Today)
       mySettings.Save()
     Catch ex As Exception
     End Try
