@@ -173,11 +173,31 @@ Public Class frmHistory
             fDB.SetAction("Drawing Graph...", "Collecting data, estimating, and resizing...")
           End If
           Dim lItems() As DataBase.DataRow = pnlGraph.Tag
-          If (lItems Is Nothing OrElse lItems.Count = 0) Or (usageDB Is Nothing OrElse usageDB.Count = 0) Then
+          If usageDB Is Nothing OrElse usageDB.Count = 0 Then
             pnlGraph.RowStyles(0).Height = 100
             pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
-            pctDld.Image = NoDataNote(pctDld.Size)
+            pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            If fDB.Visible Then fDB.Close()
+            If fDB IsNot Nothing Then
+              fDB.Dispose()
+              fDB = Nothing
+            End If
+          ElseIf lItems Is Nothing OrElse lItems.Count = 0 Then
+            pnlGraph.RowStyles(0).Height = 100
+            pnlGraph.RowStyles(1).Height = 0
+            lastRect = Me.Bounds
+            pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            If fDB.Visible Then fDB.Close()
+            If fDB IsNot Nothing Then
+              fDB.Dispose()
+              fDB = Nothing
+            End If
+          ElseIf lItems.Count = 1 Then
+            pnlGraph.RowStyles(0).Height = 100
+            pnlGraph.RowStyles(1).Height = 0
+            lastRect = Me.Bounds
+            pctDld.Image = BadDataNote(BadDataNotes.One, pctDld.Size)
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
@@ -769,12 +789,22 @@ Public Class frmHistory
   End Sub
 #End Region
 #Region "Notices"
-  Private Function NoDataNote(ImgSize As Size) As Image
+  Private Enum BadDataNotes
+    Null
+    None
+    One
+  End Enum
+  Private Function BadDataNote(Note As BadDataNotes, ImgSize As Size) As Image
     If ImgSize.Width = 0 Or ImgSize.Height = 0 Then Return Nothing
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
-    Const sNote As String = "No data has yet been accumulated."
     g.Clear(SystemColors.ButtonFace)
+    Dim sNote As String = Nothing
+    Select Case Note
+      Case BadDataNotes.Null : sNote = "No data has been accumulated yet." & vbNewLine & "Please wait until you have a little more data accumulated."
+      Case BadDataNotes.None : sNote = "No data was found for the specified range." & vbNewLine & "Please try a different range."
+      Case BadDataNotes.One : sNote = "Not enough data has been accumulated yet." & vbNewLine & "Please try a different range."
+    End Select
     g.DrawString(sNote, SystemFonts.DefaultFont, SystemBrushes.ControlText, (ImgSize.Width / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Width / 2), (ImgSize.Height / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Height / 2))
     g.Dispose()
     Return iPic
