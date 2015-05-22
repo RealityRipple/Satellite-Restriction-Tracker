@@ -107,7 +107,6 @@ Partial Class frmMain
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.tmrStatus = New System.Windows.Forms.Timer(Me.components)
     Me.ttUI = New RestrictionTracker.ToolTip(Me.components)
-    Me.ColorDialog1 = New RestrictionTracker.ColorDialog()
     Me.pnlDetails.SuspendLayout()
     Me.pnlSettings.SuspendLayout()
     Me.gbUsage.SuspendLayout()
@@ -1161,10 +1160,6 @@ Partial Class frmMain
     Me.ttUI.InitialDelay = 500
     Me.ttUI.ReshowDelay = 100
     '
-    'ColorDialog1
-    '
-    Me.ColorDialog1.Title = ""
-    '
     'frmMain
     '
     Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1319,5 +1314,4 @@ Partial Class frmMain
   Friend WithEvents mnuGraphColors As System.Windows.Forms.MenuItem
   Friend WithEvents mnuGraphInvert As System.Windows.Forms.MenuItem
   Friend WithEvents pctNetTest As LinkPictureBox
-  Friend WithEvents ColorDialog1 As RestrictionTracker.ColorDialog
 End Class
