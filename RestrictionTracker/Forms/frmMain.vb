@@ -1120,6 +1120,9 @@ Public Class frmMain
         mySettings.Save()
         DisplayUsage(True, True)
       Else
+        If LOG_GetCount() = 0 Then
+          SetStatusText("No History", "No data received from the server!", True)
+        End If
         DisplayUsage(True, True)
       End If
       If remoteData IsNot Nothing Then
