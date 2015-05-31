@@ -1013,9 +1013,9 @@ Public Class frmCustomColors
       End If
       pnlHistoryStyle.ColumnCount = 4
       pnlHistoryStyle.ColumnStyles(0) = New ColumnStyle(SizeType.AutoSize)
-      pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 100)
+      pnlHistoryStyle.ColumnStyles(1) = New ColumnStyle(SizeType.Percent, 50)
       pnlHistoryStyle.ColumnStyles(2) = New ColumnStyle(SizeType.AutoSize)
-      pnlHistoryStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 100)
+      pnlHistoryStyle.ColumnStyles(3) = New ColumnStyle(SizeType.Percent, 50)
       pnlHistoryStyle.RowCount = 2
       pnlHistoryStyle.RowStyles(0) = New RowStyle(SizeType.AutoSize)
       If pnlHistoryStyle.RowStyles.Count = 1 Then
