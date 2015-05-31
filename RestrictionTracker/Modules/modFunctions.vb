@@ -1507,138 +1507,34 @@ Module modFunctions
 #End Region
   Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors, useStyle As localRestrictionTracker.SatHostTypes)
     Dim defaultColors As AppSettings.AppColors = GetDefaultColors(useStyle)
-    If Colors.MainDownA = Color.Transparent Then
-      Colors.MainDownA = defaultColors.MainDownA
-    ElseIf Colors.MainDownA.A < 255 Then
-      Debug.Print("Low Alpha (MainDownA)")
-    End If
-    If Colors.MainDownB = Color.Transparent Then
-      Colors.MainDownB = defaultColors.MainDownB
-    ElseIf Colors.MainDownB.A < 255 Then
-      Debug.Print("Low Alpha (MainDownB)")
-    End If
-    If Colors.MainDownC = Color.Transparent Then
-      Colors.MainDownC = defaultColors.MainDownC
-    ElseIf Colors.MainDownC.A < 255 Then
-      Debug.Print("Low Alpha (MainDownC)")
-    End If
-    If Colors.MainUpA = Color.Transparent Then
-      Colors.MainUpA = defaultColors.MainUpA
-    ElseIf Colors.MainUpA.A < 255 Then
-      Debug.Print("Low Alpha (MainUpA)")
-    End If
-    If Colors.MainUpB = Color.Transparent Then
-      Colors.MainUpB = defaultColors.MainUpB
-    ElseIf Colors.MainUpB.A < 255 Then
-      Debug.Print("Low Alpha (MainUpB)")
-    End If
-    If Colors.MainUpC = Color.Transparent Then
-      Colors.MainUpC = defaultColors.MainUpC
-    ElseIf Colors.MainUpC.A < 255 Then
-      Debug.Print("Low Alpha (MainUpC)")
-    End If
-    If Colors.MainText = Color.Transparent Then
-      Colors.MainText = defaultColors.MainText
-    ElseIf Colors.MainText.A < 255 Then
-      Debug.Print("Low Alpha (MainText)")
-    End If
-    If Colors.MainBackground = Color.Transparent Then
-      Colors.MainBackground = defaultColors.MainBackground
-    ElseIf Colors.MainBackground.A < 255 Then
-      Debug.Print("Low Alpha (MainBackground)")
-    End If
+    If Colors.MainDownA = Color.Transparent Or Colors.MainDownA.A < 255 Then Colors.MainDownA = defaultColors.MainDownA
+    If Colors.MainDownB = Color.Transparent Or Colors.MainDownB.A < 255 Then Colors.MainDownB = defaultColors.MainDownB
+    If Colors.MainDownC = Color.Transparent Or Colors.MainDownC.A < 255 Then Colors.MainDownC = defaultColors.MainDownC
+    If Colors.MainUpA = Color.Transparent Or Colors.MainUpA.A < 255 Then Colors.MainUpA = defaultColors.MainUpA
+    If Colors.MainUpB = Color.Transparent Or Colors.MainUpB.A < 255 Then Colors.MainUpB = defaultColors.MainUpB
+    If Colors.MainUpC = Color.Transparent Or Colors.MainUpC.A < 255 Then Colors.MainUpC = defaultColors.MainUpC
+    If Colors.MainText = Color.Transparent Or Colors.MainText.A < 255 Then Colors.MainText = defaultColors.MainText
+    If Colors.MainBackground = Color.Transparent Or Colors.MainBackground.A < 255 Then Colors.MainBackground = defaultColors.MainBackground
 
-    If Colors.TrayDownA = Color.Transparent Then
-      Colors.TrayDownA = defaultColors.TrayDownA
-    ElseIf Colors.TrayDownA.A < 255 Then
-      Debug.Print("Low Alpha (TrayDownA)")
-    End If
-    If Colors.TrayDownB = Color.Transparent Then
-      Colors.TrayDownB = defaultColors.TrayDownB
-    ElseIf Colors.TrayDownB.A < 255 Then
-      Debug.Print("Low Alpha (TrayDownB)")
-    End If
-    If Colors.TrayDownC = Color.Transparent Then
-      Colors.TrayDownC = defaultColors.TrayDownC
-    ElseIf Colors.TrayDownC.A < 255 Then
-      Debug.Print("Low Alpha (TrayDownC)")
-    End If
-    If Colors.TrayUpA = Color.Transparent Then
-      Colors.TrayUpA = defaultColors.TrayUpA
-    ElseIf Colors.TrayUpA.A < 255 Then
-      Debug.Print("Low Alpha (TrayUpA)")
-    End If
-    If Colors.TrayUpB = Color.Transparent Then
-      Colors.TrayUpB = defaultColors.TrayUpB
-    ElseIf Colors.TrayUpB.A < 255 Then
-      Debug.Print("Low Alpha (TrayUpB)")
-    End If
-    If Colors.TrayUpC = Color.Transparent Then
-      Colors.TrayUpC = defaultColors.TrayUpC
-    ElseIf Colors.TrayUpC.A < 255 Then
-      Debug.Print("Low Alpha (TrayUpC)")
-    End If
+    If Colors.TrayDownA = Color.Transparent Or Colors.TrayDownA.A < 255 Then Colors.TrayDownA = defaultColors.TrayDownA
+    If Colors.TrayDownB = Color.Transparent Or Colors.TrayDownB.A < 255 Then Colors.TrayDownB = defaultColors.TrayDownB
+    If Colors.TrayDownC = Color.Transparent Or Colors.TrayDownC.A < 255 Then Colors.TrayDownC = defaultColors.TrayDownC
+    If Colors.TrayUpA = Color.Transparent Or Colors.TrayUpA.A < 255 Then Colors.TrayUpA = defaultColors.TrayUpA
+    If Colors.TrayUpB = Color.Transparent Or Colors.TrayUpB.A < 255 Then Colors.TrayUpB = defaultColors.TrayUpB
+    If Colors.TrayUpC = Color.Transparent Or Colors.TrayUpC.A < 255 Then Colors.TrayUpC = defaultColors.TrayUpC
 
-    If Colors.HistoryDownLine = Color.Transparent Then
-      Colors.HistoryDownLine = defaultColors.HistoryDownLine
-    ElseIf Colors.HistoryDownLine.A < 255 Then
-      Debug.Print("Low Alpha (HistoryDownLine)")
-    End If
-    If Colors.HistoryDownA = Color.Transparent Then
-      Colors.HistoryDownA = defaultColors.HistoryDownA
-    ElseIf Colors.HistoryDownA.A < 255 Then
-      Debug.Print("Low Alpha (HistoryDownA)")
-    End If
-    If Colors.HistoryDownB = Color.Transparent Then
-      Colors.HistoryDownB = defaultColors.HistoryDownB
-    ElseIf Colors.HistoryDownB.A < 255 Then
-      Debug.Print("Low Alpha (HistoryDownB)")
-    End If
-    If Colors.HistoryDownC = Color.Transparent Then
-      Colors.HistoryDownC = defaultColors.HistoryDownC
-    ElseIf Colors.HistoryDownC.A < 255 Then
-      Debug.Print("Low Alpha (HistoryDownC)")
-    End If
-    If Colors.HistoryUpLine = Color.Transparent Then
-      Colors.HistoryUpLine = defaultColors.HistoryUpLine
-    ElseIf Colors.HistoryUpLine.A < 255 Then
-      Debug.Print("Low Alpha (HistoryUpLine)")
-    End If
-    If Colors.HistoryUpA = Color.Transparent Then
-      Colors.HistoryUpA = defaultColors.HistoryUpA
-    ElseIf Colors.HistoryUpA.A < 255 Then
-      Debug.Print("Low Alpha (HistoryUpA)")
-    End If
-    If Colors.HistoryUpB = Color.Transparent Then
-      Colors.HistoryUpB = defaultColors.HistoryUpB
-    ElseIf Colors.HistoryUpB.A < 255 Then
-      Debug.Print("Low Alpha (HistoryUpB)")
-    End If
-    If Colors.HistoryUpC = Color.Transparent Then
-      Colors.HistoryUpC = defaultColors.HistoryUpC
-    ElseIf Colors.HistoryUpC.A < 255 Then
-      Debug.Print("Low Alpha (HistoryUpC)")
-    End If
-    If Colors.HistoryText = Color.Transparent Then
-      Colors.HistoryText = defaultColors.HistoryText
-    ElseIf Colors.HistoryText.A < 255 Then
-      Debug.Print("Low Alpha (HistoryText)")
-    End If
-    If Colors.HistoryBackground = Color.Transparent Then
-      Colors.HistoryBackground = defaultColors.HistoryBackground
-    ElseIf Colors.HistoryBackground.A < 255 Then
-      Debug.Print("Low Alpha (HistoryBackground)")
-    End If
-    If Colors.HistoryLightGrid = Color.Transparent Then
-      Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
-    ElseIf Colors.HistoryLightGrid.A < 255 Then
-      Debug.Print("Low Alpha (HistoryLightGrid)")
-    End If
-    If Colors.HistoryDarkGrid = Color.Transparent Then
-      Colors.HistoryDarkGrid = defaultColors.HistoryDarkGrid
-    ElseIf Colors.HistoryDarkGrid.A < 255 Then
-      Debug.Print("Low Alpha (HistoryDarkGrid)")
-    End If
+    If Colors.HistoryDownLine = Color.Transparent Or Colors.HistoryDownLine.A < 255 Then Colors.HistoryDownLine = defaultColors.HistoryDownLine
+    If Colors.HistoryDownA = Color.Transparent Or Colors.HistoryDownA.A < 255 Then Colors.HistoryDownA = defaultColors.HistoryDownA
+    If Colors.HistoryDownB = Color.Transparent Or Colors.HistoryDownB.A < 255 Then Colors.HistoryDownB = defaultColors.HistoryDownB
+    If Colors.HistoryDownC = Color.Transparent Or Colors.HistoryDownC.A < 255 Then Colors.HistoryDownC = defaultColors.HistoryDownC
+    If Colors.HistoryUpLine = Color.Transparent Or Colors.HistoryUpLine.A < 255 Then Colors.HistoryUpLine = defaultColors.HistoryUpLine
+    If Colors.HistoryUpA = Color.Transparent Or Colors.HistoryUpA.A < 255 Then Colors.HistoryUpA = defaultColors.HistoryUpA
+    If Colors.HistoryUpB = Color.Transparent Or Colors.HistoryUpB.A < 255 Then Colors.HistoryUpB = defaultColors.HistoryUpB
+    If Colors.HistoryUpC = Color.Transparent Or Colors.HistoryUpC.A < 255 Then Colors.HistoryUpC = defaultColors.HistoryUpC
+    If Colors.HistoryText = Color.Transparent Or Colors.HistoryText.A < 255 Then Colors.HistoryText = defaultColors.HistoryText
+    If Colors.HistoryBackground = Color.Transparent Or Colors.HistoryBackground.A < 255 Then Colors.HistoryBackground = defaultColors.HistoryBackground
+    If Colors.HistoryLightGrid = Color.Transparent Or Colors.HistoryLightGrid.A < 255 Then Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
+    If Colors.HistoryDarkGrid = Color.Transparent Or Colors.HistoryDarkGrid.A < 255 Then Colors.HistoryDarkGrid = defaultColors.HistoryDarkGrid
   End Sub
   Public Function GetDefaultColors(useStyle As localRestrictionTracker.SatHostTypes) As AppSettings.AppColors
     Dim outColors As New AppSettings.AppColors
