@@ -934,18 +934,18 @@ Module modFunctions
     End If
   End Function
   Public Function DrawRGraph(Data() As DataBase.DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, TriState.UseDefault, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+    Return DrawGraph(Data, 0, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
   Public Function DrawLineGraph(Data() As DataBase.DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, IIf(Down, TriState.True, TriState.False), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+    Return DrawGraph(Data, IIf(Down, 1, 255), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
-  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, Down As TriState, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, Down As Byte, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
     Dim yMax As Long = 0
     Dim lMax As Long = 0
-    If Down = TriState.UseDefault Then
+    If Down = 0 Then
       Dim yVMax As Long = 0
-      For I As Long = 0 To Data.Length - 1
+      For I As Integer = 0 To Data.Length - 1
         If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
         If yVMax < Data(I).DOWNLIM Then yVMax = Data(I).DOWNLIM
       Next
@@ -955,7 +955,7 @@ Module modFunctions
     Else
       Dim yDMax As Long = 0
       Dim yUMax As Long = 0
-      For I As Long = 0 To Data.Length - 1
+      For I As Integer = 0 To Data.Length - 1
         If yDMax < Data(I).DOWNLOAD Then yDMax = Data(I).DOWNLOAD
         If yUMax < Data(I).UPLOAD Then yUMax = Data(I).UPLOAD
         If yDMax < Data(I).DOWNLIM Then yDMax = Data(I).DOWNLIM
@@ -963,7 +963,7 @@ Module modFunctions
       Next
       yMax = IIf(yDMax > yUMax, yDMax, yUMax)
       If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-      lMax = IIf(Down = TriState.True, yDMax, yUMax)
+      lMax = IIf(Down = 1, yDMax, yUMax)
     End If
     If Not lMax Mod 1000 = 0 Then lMax = (lMax \ 1000) * 1000 + 1000
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
@@ -975,7 +975,7 @@ Module modFunctions
     g.Clear(ColorBG)
     Dim yTop As Integer = lXHeight / 2
     Dim yHeight As Integer = ImgSize.Height - (lXHeight * 1.5)
-    If Down = TriState.False Then
+    If Down = 255 Then
       uGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
       uData = Data
     Else
@@ -1122,10 +1122,10 @@ Module modFunctions
       g.DrawString(sLastDisp, tFont, New SolidBrush(ColorText), lastI - iLastDispWidth + 3, ImgSize.Height - lXHeight + 5)
     End If
     Dim MaxY As Integer = 0
-    If Down = TriState.UseDefault Then
+    If Down = 0 Then
       MaxY = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
     Else
-      MaxY = yTop + yHeight - (IIf(Down = TriState.True, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
+      MaxY = yTop + yHeight - (IIf(Down = 1, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
     End If
     Dim lMaxPoints(lMaxTime) As Point
     Dim lPoints(lMaxTime + 3) As Point
@@ -1138,7 +1138,7 @@ Module modFunctions
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jLim As Long = 0
-          If Down = TriState.False Then
+          If Down = 255 Then
             jLim = Data(J).UPLIM
           Else
             jLim = Data(J).DOWNLIM
@@ -1175,7 +1175,7 @@ Module modFunctions
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jVal As Long = 0
-          If Down = TriState.False Then
+          If Down = 255 Then
             jVal = Data(J).UPLOAD
           Else
             jVal = Data(J).DOWNLOAD
