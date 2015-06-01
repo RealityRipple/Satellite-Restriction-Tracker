@@ -797,16 +797,16 @@ Public Class frmHistory
   Private Function BadDataNote(Note As BadDataNotes, ImgSize As Size) As Image
     If ImgSize.Width = 0 Or ImgSize.Height = 0 Then Return Nothing
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
-    Dim g As Graphics = Graphics.FromImage(iPic)
-    g.Clear(SystemColors.ButtonFace)
-    Dim sNote As String = Nothing
-    Select Case Note
-      Case BadDataNotes.Null : sNote = "No data has been accumulated yet." & vbNewLine & "Please wait until you have a little more data accumulated."
-      Case BadDataNotes.None : sNote = "No data was found for the specified range." & vbNewLine & "Please try a different range."
-      Case BadDataNotes.One : sNote = "Not enough data has been accumulated yet." & vbNewLine & "Please try a different range."
-    End Select
-    g.DrawString(sNote, SystemFonts.DefaultFont, SystemBrushes.ControlText, (ImgSize.Width / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Width / 2), (ImgSize.Height / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Height / 2))
-    g.Dispose()
+    Using g As Graphics = Graphics.FromImage(iPic)
+      g.Clear(SystemColors.ButtonFace)
+      Dim sNote As String = Nothing
+      Select Case Note
+        Case BadDataNotes.Null : sNote = "No data has been accumulated yet." & vbNewLine & "Please wait until you have a little more data accumulated."
+        Case BadDataNotes.None : sNote = "No data was found for the specified range." & vbNewLine & "Please try a different range."
+        Case BadDataNotes.One : sNote = "Not enough data has been accumulated yet." & vbNewLine & "Please try a different range."
+      End Select
+      g.DrawString(sNote, SystemFonts.DefaultFont, SystemBrushes.ControlText, (ImgSize.Width / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Width / 2), (ImgSize.Height / 2) - (g.MeasureString(sNote, SystemFonts.DefaultFont).Height / 2))
+    End Using
     Return iPic
   End Function
   Private Function ResizingNote(ImgSize As Size) As Image
