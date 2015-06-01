@@ -111,7 +111,7 @@ Public Class frmHistory
           cmd30Days.Text = "30 Days"
           ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
           cmd60Days.Text = "60 Days"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last last 60 days.")
+          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last 60 days.")
           dgvUsage.Columns.Clear()
           colDOWNLOAD.HeaderText = "Download"
           colUPLOAD.HeaderText = "Upload"
