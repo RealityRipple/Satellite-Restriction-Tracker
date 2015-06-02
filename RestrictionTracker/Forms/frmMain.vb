@@ -1654,11 +1654,21 @@ Public Class frmMain
 #Region "Tray"
   Private Sub mnuRestore_Click(sender As System.Object, e As System.EventArgs) Handles mnuRestore.Click
     If Not Me.Visible Then
-      Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+      Dim bMax As Boolean = False
+      If Me.WindowState = FormWindowState.Maximized Then
+        bMax = True
+      Else
+        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+      End If
       If Not ClosingTime Then AnimateWindow(Me, False)
       mnuRestore.Text = "&Focus"
-      Me.WindowState = FormWindowState.Normal
+      If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
       Me.Show()
+      If bMax Then
+        Me.WindowState = FormWindowState.Normal
+        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        Me.WindowState = FormWindowState.Maximized
+      End If
       If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
     End If
     Dim myProc As Integer = 0
