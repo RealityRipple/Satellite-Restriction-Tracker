@@ -15,10 +15,29 @@
   Public Event DownloadIconCompleted(sender As Object, e As DownloadIconCompletedEventArgs)
   Public Sub New(URL As String)
     If String.IsNullOrEmpty(URL) Then Return
+    Dim connectThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf BeginConnection))
+    connectThread.Start(URL)
+  End Sub
+  Private Sub BeginConnection(o As Object)
+    Dim URL As String = o
     If Not URL.Contains("://") Then URL = "http://" & URL
     ConnectToURL(New Uri(URL), URL)
   End Sub
   Private Sub ConnectToURL(URL As Uri, Optional token As Object = Nothing)
+    If URL.Host = "192.168.100.1" Then
+      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.modem16, My.Resources.modem32))
+      Return
+    End If
+    Try
+      Dim urlRes = Net.Dns.GetHostAddresses(URL.Host)
+      For Each addr In urlRes
+        If addr.ToString = "192.168.100.1" Then
+          RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.modem16, My.Resources.modem32))
+          Return
+        End If
+      Next
+    Catch ex As Exception
+    End Try
     Try
       wsNetTest = New WebClientEx
       wsNetTest.ErrorBypass = True

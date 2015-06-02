@@ -594,7 +594,8 @@ Public Class frmMain
       If sNetTestTitle.Contains("://") Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf("://") + 3)
       If sNetTestTitle.StartsWith("www.") Then sNetTestTitle = sNetTestTitle.Substring(4)
       If sNetTestTitle.Contains("/") Then sNetTestTitle = sNetTestTitle.Substring(0, sNetTestTitle.IndexOf("/"))
-      ttUI.SetTooltip(pctNetTest, "Visit " & sNetTestTitle & ".")
+      If sNetTestTitle = "192.168.100.1" Or CompareImages(pctNetTest.Image, My.Resources.modem16) Then sNetTestTitle = "ViaSat Modem"
+      ttUI.SetToolTip(pctNetTest, "Visit " & sNetTestTitle & ".")
     End If
   End Sub
   Private Sub ReInit()
@@ -2303,5 +2304,14 @@ Public Class frmMain
       pctNetTest.Image = My.Resources.ico_err
     End Try
   End Sub
+  Public Function CompareImages(Image1 As Bitmap, Image2 As Bitmap) As Boolean
+    If Not Image1.Size.Width = Image2.Size.Width Or Not Image1.Size.Height = Image2.Size.Height Then Return False
+    For Y As Integer = 0 To Image1.Size.Height - 1
+      For X As Integer = 0 To Image1.Size.Width - 1
+        If Not Image1.GetPixel(X, Y) = Image2.GetPixel(X, Y) Then Return False
+      Next
+    Next
+    Return True
+  End Function
 #End Region
 End Class

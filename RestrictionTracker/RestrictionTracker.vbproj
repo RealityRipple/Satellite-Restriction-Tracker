@@ -347,6 +347,8 @@
     <Content Include="Resources\config\prefs_interface.png" />
     <Content Include="Resources\default_alert.png" />
     <Content Include="Resources\default_close.png" />
+    <None Include="Resources\modem16.png" />
+    <None Include="Resources\modem32.png" />
     <Content Include="Resources\tray_16\free.ico" />
     <Content Include="Resources\tray_16\norm.ico" />
     <Content Include="Resources\tray_16\restricted.ico" />

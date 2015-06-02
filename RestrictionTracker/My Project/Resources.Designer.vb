@@ -203,6 +203,26 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property modem16() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("modem16", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property modem32() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("modem32", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property net_network() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("net_network", resourceCulture)
