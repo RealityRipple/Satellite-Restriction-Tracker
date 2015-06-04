@@ -21,7 +21,13 @@
   Private Sub BeginConnection(o As Object)
     Dim URL As String = o
     If Not URL.Contains("://") Then URL = "http://" & URL
-    ConnectToURL(New Uri(URL), URL)
+    Dim URI As Uri
+    Try
+      URI = New Uri(URL)
+    Catch ex As Exception
+      Return
+    End Try
+    ConnectToURL(URI, URL)
   End Sub
   Private Sub ConnectToURL(URL As Uri, Optional token As Object = Nothing)
     If URL.Host = "192.168.100.1" Then
