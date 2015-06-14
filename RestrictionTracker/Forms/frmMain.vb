@@ -2305,7 +2305,13 @@ Public Class frmMain
     End Try
   End Sub
   Public Function CompareImages(Image1 As Bitmap, Image2 As Bitmap) As Boolean
-    If Not Image1.Size.Width = Image2.Size.Width Or Not Image1.Size.Height = Image2.Size.Height Then Return False
+    If Image1 Is Nothing Then Return False
+    If Image2 Is Nothing Then Return False
+    Try
+      If Not Image1.Size.Width = Image2.Size.Width Or Not Image1.Size.Height = Image2.Size.Height Then Return False
+    Catch ex As Exception
+      Return False
+    End Try
     For Y As Integer = 0 To Image1.Size.Height - 1
       For X As Integer = 0 To Image1.Size.Width - 1
         If Not Image1.GetPixel(X, Y) = Image2.GetPixel(X, Y) Then Return False
