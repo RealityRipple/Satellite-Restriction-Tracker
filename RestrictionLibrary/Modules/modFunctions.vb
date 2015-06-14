@@ -179,8 +179,36 @@ Module modFunctions
           Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host") Then
           Return "The server closed the connection. Please try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full.") Then
+          Return "Network buffer error. Please free up your computer's resources and try again."
         ElseIf ex.InnerException.Message.StartsWith("Cannot open log for source 'Restriction Logger'. You may not have write access") Then
           Return "Error writing to logging service error log."
+        ElseIf ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
+          Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("There were not enough free threads in the ThreadPool to complete the operation") Then
+          Return "Network threading error. Please free up your computer's resources and try again."
+        ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("The message or signature supplied for verification has been altered") Then
+              Return "Decryption failure. The message or signature has been altered."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Decryption failure - " & ex.InnerException.InnerException.Message
+            End If
+          Else
+            Return "Decryption failure, but no details are available."
+          End If
+        ElseIf ex.InnerException.Message.StartsWith("EndRead failure") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("Connection reset by peer") Then
+              Return "The server closed the connection. Please try again."
+            Else
+              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "The server closed the connection - " & ex.InnerException.InnerException.Message
+            End If
+          Else
+            Return "The server closed the connection. Please try again."
+          End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
@@ -218,6 +246,8 @@ Module modFunctions
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
               Return "The server is too busy to respond. Please try again later."
+            ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
+              Return "Connection aborted."
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
               Return "Connection to the server timed out. Please try again."
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
@@ -308,6 +338,8 @@ Module modFunctions
             Return "Your computer's network is down. Check your networking settings."
           ElseIf ex.InnerException.Message.Contains("The requested address is not valid in this context") Then
             Return "Invalid address. Check your Provider in the Configuration."
+          ElseIf ex.InnerException.Message.Contains("System call failed") Then
+            Return "System call failed. Please check your installation."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
@@ -319,7 +351,7 @@ Module modFunctions
             ElseIf ex.InnerException.InnerException.Message.Contains("The socket has been shut down") Then
               Return "Connection to server closed. Please try again."
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
-              Return "Decryption failed. Please change your Network Security Protocol settings and try again."
+              Return "Decryption failure. Please change your Network Security Protocol settings and try again."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Send Header Error - " & ex.InnerException.Message
@@ -334,6 +366,8 @@ Module modFunctions
         End If
       ElseIf ex.Message.StartsWith("An error occurred performing a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
+          Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("The object was used after being disposed") Then
           Return "Connection aborted."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
