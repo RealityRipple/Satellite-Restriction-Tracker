@@ -82,8 +82,11 @@
       If e.UserState Is Nothing Then
         RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(Nothing, Nothing, New Exception("Failed to get an icon.")))
       Else
-        Dim pathURL As New Uri(e.UserState)
-        ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+        Try
+          Dim pathURL As New Uri(e.UserState)
+          ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+        Catch ex As Exception
+        End Try
       End If
       Return
     ElseIf e.Cancelled Then
@@ -128,8 +131,12 @@
       If e.UserState Is Nothing Then
         RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(Nothing, Nothing, New Exception("Failed to read the icon.")))
       Else
-        Dim pathURL As New Uri(e.UserState)
-        ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), imgFile)
+        Try
+          Dim pathURL As New Uri(e.UserState)
+          ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), imgFile)
+        Catch ex As Exception
+          Return
+        End Try
       End If
     End If
     If pctPNG16 IsNot Nothing Then
@@ -143,8 +150,11 @@
   End Sub
   Private Sub wsNetTest_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsNetTest.DownloadStringCompleted
     If e.Error IsNot Nothing Then
-      Dim defPathURL As New Uri(e.UserState)
-      ConnectToFile(New Uri(defPathURL.Scheme & "://" & defPathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+      Try
+        Dim defPathURL As New Uri(e.UserState)
+        ConnectToFile(New Uri(defPathURL.Scheme & "://" & defPathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+      Catch ex As Exception
+      End Try
       Return
     ElseIf e.Cancelled Then
       Return
@@ -181,7 +191,11 @@
                       URL = oldURL & "/" & URL
                     End If
                   End If
-                  ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
+                  Try
+                    ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
+                  Catch ex As Exception
+
+                  End Try
                   Return
                 End If
               End If
@@ -191,8 +205,11 @@
       End If
     Catch ex As Exception
     End Try
-    Dim pathURL As New Uri(e.UserState)
-    ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+    Try
+      Dim pathURL As New Uri(e.UserState)
+      ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+    Catch ex As Exception
+    End Try
   End Sub
 #Region "IDisposable Support"
   Private disposedValue As Boolean
