@@ -316,6 +316,7 @@ Public Class DataBase
     Return sDB
   End Function
   Public Function Save(Path As String, withDisplay As Boolean) As Boolean
+    If data Is Nothing Then Return False
     Dim bDelBack As Boolean = False
     If My.Computer.FileSystem.FileExists(Path) Then
       My.Computer.FileSystem.RenameFile(Path, IO.Path.GetFileName(Path) & ".bak")
