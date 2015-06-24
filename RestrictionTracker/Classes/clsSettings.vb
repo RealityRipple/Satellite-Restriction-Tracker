@@ -21,10 +21,12 @@ Class SvcSettings
       Try
         xConfig.Save(AppDataAll & "\user.config")
       Catch ex As Exception
-        MessageBox.Show("Failed to save Service settings!" & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+        MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        'MessageBox.Show("Failed to save settings!" & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try
     Else
-      MessageBox.Show("Failed to save Service settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & AppDataAll & "\user.config"" may be in use.", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      'MessageBox.Show("Failed to save Service settings!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Public Sub New()
@@ -888,7 +890,6 @@ Class AppSettings
                 Colors.HistoryUpLine = Color.Transparent
               End Try
             End If
-            
           End If
           Dim xHistoryText As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
           If xHistoryText Is Nothing Then
@@ -1103,10 +1104,12 @@ Class AppSettings
       Try
         xConfig.Save(ConfigFile)
       Catch ex As Exception
-        MessageBox.Show("Failed to save settings!" & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+        MsgDlg(Nothing, "There was an error saving the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        'MessageBox.Show("Failed to save settings!" & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try
     Else
-      MessageBox.Show("Failed to save settings!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & ConfigFile & """ may be in use.", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      'MessageBox.Show("Failed to save settings!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Private Function ColorToStr(c As Color) As String

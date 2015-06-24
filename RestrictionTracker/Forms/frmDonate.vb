@@ -7,7 +7,7 @@
       Me.Close()
     Catch ex As Exception
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com/donate.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com/donate.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub cmdSignUp_Click(sender As System.Object, e As System.EventArgs) Handles cmdSignUp.Click
@@ -17,7 +17,7 @@
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click

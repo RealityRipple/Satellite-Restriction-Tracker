@@ -10,7 +10,8 @@ Public Class frmCustomColors
   Private FakeData As Collections.Generic.List(Of DataBase.DataRow)
   Private Sub frmCustomColors_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If cmdSave.Enabled Then
-      Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your color scheme?", Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+      Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your color scheme?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+      'Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your color scheme?", My.Application.Info.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
       If saveRet = Windows.Forms.DialogResult.Yes Then
         cmdSave.PerformClick()
       ElseIf saveRet = Windows.Forms.DialogResult.No Then

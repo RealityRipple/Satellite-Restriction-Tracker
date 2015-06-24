@@ -633,7 +633,11 @@ Public Class frmHistory
     cmdQuery.PerformClick()
   End Sub
   Private Sub cmdImport_Click(sender As System.Object, e As System.EventArgs) Handles cmdImport.Click
-    If (usageDB Is Nothing OrElse usageDB.Count = 0) And Not modDB.LOG_State = 1 Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) : Exit Sub
+    If (usageDB Is Nothing OrElse usageDB.Count = 0) And Not modDB.LOG_State = 1 Then
+      MsgDlg(Me, "The Database has not been loaded yet, please wait.", "Unable to import data.", "Database not Loaded", MessageBoxButtons.OK, TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Warning)
+      'MessageBox.Show("The Database has not been loaded yet, please wait.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      Exit Sub
+    End If
     Dim cdlOpen As New OpenFileDialog With {.AddExtension = True, .CheckFileExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .ShowReadOnly = False, .Title = "Import History Database"}
     If cdlOpen.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       If fDB Is Nothing Then fDB = New frmDBProgress
@@ -658,7 +662,8 @@ Public Class frmHistory
           fDB.Dispose()
           fDB = Nothing
         End If
-        MessageBox.Show(IO.Path.GetFileName(cdlOpen.FileName) & " has been merged into your history database.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, IO.Path.GetFileName(cdlOpen.FileName) & " has been merged into your history database.", "The data was successfully imported.", "Database Merged", MessageBoxButtons.OK, TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Information)
+        'MessageBox.Show(IO.Path.GetFileName(cdlOpen.FileName) & " has been merged into your history database.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
         Application.DoEvents()
         ResetDates()
       Else
@@ -667,13 +672,18 @@ Public Class frmHistory
           fDB.Dispose()
           fDB = Nothing
         End If
-        MessageBox.Show("Could not import " & IO.Path.GetFileName(cdlOpen.FileName), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "Could not import " & IO.Path.GetFileName(cdlOpen.FileName) & ".", "Unable to import data.", "Database not Loaded", MessageBoxButtons.OK, TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Error)
+        'MessageBox.Show("Could not import " & IO.Path.GetFileName(cdlOpen.FileName), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End If
       usageTmp = Nothing
     End If
   End Sub
   Private Sub cmdExport_Click(sender As System.Object, e As System.EventArgs) Handles cmdExport.Click
-    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then MessageBox.Show("The Database has not been loaded yet, please wait.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) : Exit Sub
+    If (usageDB Is Nothing OrElse usageDB.Count = 0) Then
+      MsgDlg(Me, "The Database has not been loaded yet, please wait.", "Unable to export data.", "Database not Loaded", MessageBoxButtons.OK, TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Warning)
+      'MessageBox.Show("The Database has not been loaded yet, please wait.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      Exit Sub
+    End If
     Dim cdlSave As New SaveFileDialog With {.AddExtension = True, .CheckPathExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .Title = "Export History Database"}
     If cdlSave.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       If fDB Is Nothing Then fDB = New frmDBProgress
@@ -698,7 +708,8 @@ Public Class frmHistory
         fDB.Dispose()
         fDB = Nothing
       End If
-      MessageBox.Show("Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName) & ".", "The data was successfully exported.", "Database Exported", MessageBoxButtons.OK, TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Information)
+      'MessageBox.Show("Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Private Sub usageTmp_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageTmp.ProgressState

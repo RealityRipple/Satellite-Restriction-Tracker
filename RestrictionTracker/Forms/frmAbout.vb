@@ -6,8 +6,8 @@
 #Region "Form Events"
   Private Sub frmAbout_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
     Dim ApplicationTitle As String
-    If My.Application.Info.Title <> "" Then
-      ApplicationTitle = My.Application.Info.Title
+    If Not String.IsNullOrEmpty(My.Application.Info.ProductName) Then
+      ApplicationTitle = My.Application.Info.ProductName
     Else
       ApplicationTitle = System.IO.Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
     End If
@@ -36,7 +36,8 @@
       Try
         If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, UpdateParam)
       Catch ex As Exception
-        MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        'MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try
     Else
       Try
@@ -77,7 +78,7 @@
       frmMain.ClickedDonate()
     Catch ex As Exception
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com/donate.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com/donate.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub lblCompany_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblCompany.LinkClicked
@@ -86,7 +87,7 @@
         Process.Start("http://realityripple.com")
       Catch ex As Exception
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -96,7 +97,7 @@
         Process.Start("http://srt.realityripple.com")
       Catch ex As Exception
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -106,7 +107,7 @@
         Process.Start("http://srt.realityripple.com/changes.php")
       Catch ex As Exception
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/changes.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/changes.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -184,7 +185,7 @@
       pnlAbout.Controls.Add(cmdUpdate, 1, 2)
       cmdUpdate.Visible = True
       cmdUpdate.Text = "Apply &Update"
-      ttAbout.SetTooltip(cmdUpdate, Application.ProductName & " must restart before the update can be applied.")
+      ttAbout.SetToolTip(cmdUpdate, My.Application.Info.ProductName & " must restart before the update can be applied.")
       If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
     End If
   End Sub

@@ -1,4 +1,6 @@
 ﻿Imports System.IO
+Imports Microsoft.WindowsAPICodePack.Dialogs
+
 Module modFunctions
   Public Function HostTypeToString(ht As localRestrictionTracker.SatHostTypes) As String
     Select Case ht
@@ -272,7 +274,7 @@ Module modFunctions
       Return sRet
     End Function
     Private Function ReadBByte(inBytes() As Byte) As Byte
-      Dim sRet As String = ReadBString(inBytes) 
+      Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
         Return Byte.Parse(sRet)
       Else
@@ -372,7 +374,7 @@ Module modFunctions
   End Sub
   Public ReadOnly Property AppDataPath As String
     Get
-      Return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName & "\"
+      Return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
     End Get
   End Property
   Public ReadOnly Property AppData As String
@@ -392,7 +394,7 @@ Module modFunctions
   End Property
   Public ReadOnly Property AppDataAllPath As String
     Get
-      Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName & "\" & Application.ProductName & "\"
+      Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
     End Get
   End Property
   Public ReadOnly Property AppDataAll As String
@@ -412,12 +414,14 @@ Module modFunctions
 
       ElseIf ADDOK Then
         If Not OneAlert Then
-          MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
+          'MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           OneAlert = True
         End If
       Else
         If Not OneAlert Then
-          MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.Title & " as Administrator to correct this problem.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
+          'MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           OneAlert = True
         End If
       End If
@@ -1671,6 +1675,468 @@ Module modFunctions
     Return outColors
   End Function
 #End Region
+#Region "Task Dialogs"
+  Public Enum TaskDialogIcon
+    None = 0
+    Space = &H1
+    File = &H2
+    OpenFolder = &H3
+    OpenFolder2 = &H4
+    ClosedFolder = &H5
+    FolderOpening = &H6
+    SearchCatalog = &H8
+    CatalogFolder = &H9
+    CatalogFolderOpening = &HA
+    Games = &HE
+    EXE = &HF
+    SearchFolder = &H12
+    AlignedTextFile = &H13
+    Envelope = &H14
+    PictureViewer = &H15
+    MusicSheet = &H16
+    VideoClip = &H17
+    DefaultPrograms = &H18
+    Internet = &H19
+    PrinterFolder = &H1A
+    ControlPanel = &H1B
+    FloppyDrive35 = &H1C
+    FloppyDrive525 = &H1D
+    CDDrive = &H1E
+    NetworkDriveDisconnected = &H1F
+    HardDrive = &H20
+    NetworkDrive = &H21
+    MemoryChip = &H22
+    RemovableDrive = &H23
+    WindowsDrive = &H24
+    DVDDrive = &H25
+    DVDR = &H26
+    DVDRAM = &H27
+    DVDROM = &H28
+    DVDRW = &H29
+    ZipDrive = &H2A
+    TapeDrive = &H2B
+    BluDrive = &H2C
+    PrinterInternet = &H2D
+    Camcorder = &H2E
+    Phone = &H2F
+    PrinterDefaultFloppy = &H30
+    PrinterDefault = &H31
+    PrinterDefaultNetwork = &H32
+    Printer = &H33
+    PrinterFloppy = &H34
+    PrinterNetwork = &H35
+    TrashFull = &H36
+    TrashEmpty = &H37
+    DVD = &H38
+    Camera = &H39
+    CardReader = &H3A
+    Padlock = &H3B
+    SDCard = &H3C
+    CD = &H3D
+    CDR = &H3E
+    CDROM = &H3F
+    CDRW = &H40
+    JewelCase = &H41
+    MP3Player = &H42
+    DLL = &H43
+    Batch = &H44
+    INI = &H45
+    GIF = &H46
+    BMP = &H47
+    JPEG = &H48
+    InternetFolder = &H49
+    InternetFolderOpen = &H4A
+    UnknownDrive = &H4B
+    Fax = &H4C
+    Fonts = &H4D
+    ShieldUAC = &H4E
+    UserAccount = &H4F
+    StartMenu = &H50
+    Information = &H51
+    Key = &H52
+    PNG = &H53
+    Warning = &H54
+    CDMusic = &H55
+    Accessibility = &H56
+    WindowsUpdate = &H57
+    UserAccount2 = &H58
+    Delete = &H59
+    RichText = &H5A
+    WhiteFloppyDrive = &H5B
+    SilverScreen = &H5C
+    PDA = &H5D
+    TextSelection = &H5E
+    Scanner = &H5F
+    ExternalChip = &H60
+    Disabled = &H61
+    [Error] = &H62
+    Question = &H63
+    Run = &H64
+    Sleep = &H65
+    BlankTextFile = &H66
+    Projector = &H67
+    ShieldQuestion = &H68
+    ShieldError = &H69
+    ShieldOK = &H6A
+    ShieldWarning = &H6B
+    MusicFolder = &H6C
+    Computer = &H6D
+    Desktop = &H6E
+    Defrag = &H6F
+    DocumentsFolder = &H70
+    PicturesFolder = &H71
+    Options = &H72
+    FavoritesFolder = &H73
+    TaskDialog = &H74
+    Recent = &H75
+    InternetNetwork = &H78
+    UserFolder = &H7B
+    FontBigA = &H7C
+    FontTTCert = &H7D
+    FontTCCert = &H7E
+    FontOCert = &H7F
+    FontLittleA = &H80
+    Fonts2 = &H81
+    GuestUser = &H82
+    MusicFile = &H83
+    PictureFile = &H84
+    VideoFile = &H85
+    MediaFile = &H86
+    DVDMusic = &H87
+    DVDVideo = &H88
+    CDMusic2 = &H89
+    DVDVideoClip = &H8A
+    HDDVDVideoClip = &H8B
+    BluRayVideoClip = &H8C
+    VCDVideoClip = &H8D
+    SVCDVideoClip = &H8E
+    NetworkFolder = &H8F
+    InternetTime = &H90
+    SearchComputer = &H91
+    CDUnknown = &H92
+    ComputerTransfer = &H93
+    LibraryStack = &H94
+    SystemProperties = &H95
+    ResourceMonitor = &H96
+    Personalize = &H97
+    Network = &H98
+    CDBurn = &H9B
+    [Default] = &H9D
+    FontTT = &H9E
+    FontTC = &H9F
+    FontO = &HA0
+    WindowsUpdate2 = &HA1
+    FolderFull = &HA2
+    Shortcut = &HA3
+    [Shared] = &HA4
+    Preferences = &HA5
+    FolderPreferences = &HA6
+    ZipDriveDisconnected = &HA7
+    WindowsPhotoFile = &HA8
+    Download = &HA9
+    Bad = &HAA
+    MoveToNetwork = &HAB
+    DVDPlusR = &HAC
+    DVDPlusRW = &HAD
+    ZipFile = &HAE
+    CompressedFile = &HAF
+    Sound = &HB0
+    Search = &HB1
+    UserAccountsFolder = &HB2
+    InternetRJ45 = &HB3
+    CDMusicPlus = &HB4
+    ContactsFolder = &HB5
+    Keyboard = &HB6
+    DesktopFolder = &HB7
+    DownloadsFolder = &HB8
+    LinksFolder = &HB9
+    GamesFolder = &HBA
+    VideoFolder = &HBD
+    GreenFolder = &HBE
+    EmptyBox = &HBF
+    BorderedBox = &HC0
+    VideoStandard = &HC1
+    VideoWide = &HC2
+    ShieldUpdateTime = &HC3
+    PrinterSound = &HC4
+    PersonalizeComputer = &HC5
+    Library = &H3E9
+    LibraryDocuments = &H3EA
+    LibraryPictures = &H3EB
+    LibraryMusic = &H3EC
+    LibraryVideos = &H3ED
+    TV = &H3F0
+    Users = &H3F2
+    Homegroup = &H3F5
+    Library2 = &H3F6
+    FavoritesFolder2 = &H3FC
+    ComputerDialog = &H3FD
+    ComputerTasks = &H3FE
+    Libraries = &H3FF
+    Favorites = &H400
+    SearchesFolder = &H401
+    Album = &H402
+    No = &H403
+    User = &H405
+    DriveUnlocked = &H406
+    DriveLocked = &H407
+    DriveUnlockedError = &H408
+    DriveUnlockedWindows = &H409
+    DriveUnlcokedErrorWindows = &H40A
+    DriveUnlockedRemovable = &H40B
+    DriveLockedRemovable = &H40C
+    DriveUnlockedErrorRemovable = &H40D
+    TaskDialog2 = &HFF9C
+    ShieldUAC2 = &HFFF7
+    ShieldOK2 = &HFFF8
+    ShieldError2 = &HFFF9
+    ShieldWarning2 = &HFFFA
+    ShieldUAC3 = &HFFFB
+    ShieldUAC4 = &HFFFC
+    Information2 = &HFFFD
+    Error2 = &HFFFE
+    Warning2 = &HFFFF
+  End Enum
+  Public Function MsgDlg(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As TaskDialogIcon = TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As TaskDialogExpandedDetailsLocation = TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
+    If TaskDialog.IsPlatformSupported Then
+      Using dlgMessage As New TaskDialog
+        dlgMessage.Cancelable = True
+        dlgMessage.Caption = My.Application.Info.ProductName & " - " & Caption
+        dlgMessage.InstructionText = Title
+        dlgMessage.Text = Text
+        dlgMessage.Icon = Icon
+        dlgMessage.HyperlinksEnabled = True
+        AddHandler dlgMessage.HyperlinkClick, AddressOf SelectionDialogHyperlink_Click
+        Select Case Buttons
+          Case MessageBoxButtons.OK
+            Dim cmdOK As New TaskDialogButton("cmdOK", "&OK")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdOK.Default = True
+            Else
+              cmdOK.Default = False
+            End If
+            AddHandler cmdOK.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdOK)
+          Case MessageBoxButtons.YesNo
+            Dim cmdYes As New TaskDialogButton("cmdYes", "&Yes")
+            Dim cmdNo As New TaskDialogButton("cmdNo", "&No")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdYes.Default = True
+              cmdNo.Default = False
+            ElseIf DefaultButton = MessageBoxDefaultButton.Button2 Then
+              cmdYes.Default = False
+              cmdNo.Default = True
+            Else
+              cmdYes.Default = False
+              cmdNo.Default = False
+            End If
+            AddHandler cmdYes.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdNo.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdYes)
+            dlgMessage.Controls.Add(cmdNo)
+          Case MessageBoxButtons.YesNoCancel
+            Dim cmdYes As New TaskDialogButton("cmdYes", "&Yes")
+            Dim cmdNo As New TaskDialogButton("cmdNo", "&No")
+            Dim cmdCancel As New TaskDialogButton("cmdCancel", "&Cancel")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdYes.Default = True
+              cmdNo.Default = False
+              cmdCancel.Default = False
+            ElseIf DefaultButton = MessageBoxDefaultButton.Button2 Then
+              cmdYes.Default = False
+              cmdNo.Default = True
+              cmdCancel.Default = False
+            Else
+              cmdYes.Default = False
+              cmdNo.Default = False
+              cmdCancel.Default = True
+            End If
+            AddHandler cmdYes.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdNo.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdCancel.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdYes)
+            dlgMessage.Controls.Add(cmdNo)
+            dlgMessage.Controls.Add(cmdCancel)
+          Case MessageBoxButtons.OKCancel
+            Dim cmdOK As New TaskDialogButton("cmdOK", "&OK")
+            Dim cmdCancel As New TaskDialogButton("cmdCancel", "&Cancel")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdOK.Default = True
+              cmdCancel.Default = False
+            ElseIf DefaultButton = MessageBoxDefaultButton.Button2 Then
+              cmdOK.Default = False
+              cmdCancel.Default = True
+            Else
+              cmdOK.Default = False
+              cmdCancel.Default = False
+            End If
+            AddHandler cmdOK.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdCancel.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdOK)
+            dlgMessage.Controls.Add(cmdCancel)
+          Case MessageBoxButtons.RetryCancel
+            Dim cmdRetry As New TaskDialogButton("cmdRetry", "&Retry")
+            Dim cmdCancel As New TaskDialogButton("cmdCancel", "&Cancel")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdRetry.Default = True
+              cmdCancel.Default = False
+            ElseIf DefaultButton = MessageBoxDefaultButton.Button2 Then
+              cmdRetry.Default = False
+              cmdCancel.Default = True
+            Else
+              cmdRetry.Default = False
+              cmdCancel.Default = False
+            End If
+            AddHandler cmdRetry.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdCancel.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdRetry)
+            dlgMessage.Controls.Add(cmdCancel)
+          Case MessageBoxButtons.AbortRetryIgnore
+            Dim cmdAbort As New TaskDialogButton("cmdNo", "&Abort")
+            Dim cmdRetry As New TaskDialogButton("cmdRetry", "&Retry")
+            Dim cmdIgnore As New TaskDialogButton("cmdClose", "&Ignore")
+            If DefaultButton = MessageBoxDefaultButton.Button1 Then
+              cmdAbort.Default = True
+              cmdRetry.Default = False
+              cmdIgnore.Default = False
+            ElseIf DefaultButton = MessageBoxDefaultButton.Button2 Then
+              cmdAbort.Default = False
+              cmdRetry.Default = True
+              cmdIgnore.Default = False
+            Else
+              cmdAbort.Default = False
+              cmdRetry.Default = False
+              cmdIgnore.Default = True
+            End If
+            AddHandler cmdAbort.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdRetry.Click, AddressOf SelectionDialogButton_Click
+            AddHandler cmdIgnore.Click, AddressOf SelectionDialogButton_Click
+            dlgMessage.Controls.Add(cmdAbort)
+            dlgMessage.Controls.Add(cmdRetry)
+            dlgMessage.Controls.Add(cmdIgnore)
+        End Select
+        If Not String.IsNullOrEmpty(Details) Then
+          dlgMessage.DetailsExpanded = False
+          dlgMessage.DetailsCollapsedLabel = ShowDetails
+          dlgMessage.DetailsExpandedLabel = HideDetails
+          dlgMessage.DetailsExpandedText = Details
+          dlgMessage.ExpansionMode = DetailsMode
+        End If
+        If owner IsNot Nothing Then dlgMessage.OwnerWindowHandle = owner.Handle
+        AddHandler dlgMessage.Opened, AddressOf RefreshDlg
+        Dim ret As TaskDialogResult
+        Try
+          ret = dlgMessage.Show()
+        Catch ex As Exception
+          Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+        End Try
+        Select Case ret
+          Case TaskDialogResult.Yes : Return DialogResult.Yes
+          Case TaskDialogResult.No : Return IIf(Buttons = MessageBoxButtons.AbortRetryIgnore, DialogResult.Abort, DialogResult.No)
+          Case TaskDialogResult.Ok : Return DialogResult.OK
+          Case TaskDialogResult.Cancel : Return DialogResult.Cancel
+          Case TaskDialogResult.Close : Return DialogResult.Ignore
+          Case TaskDialogResult.Retry : Return DialogResult.Retry
+        End Select
+        Return DialogResult.None
+      End Using
+    Else
+      Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+    End If
+  End Function
+  Private Sub SelectionDialogButton_Click(sender As TaskDialogButton, e As EventArgs)
+    Select Case sender.Name
+      Case "cmdYes" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Yes)
+      Case "cmdNo" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.No)
+      Case "cmdCancel" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Cancel)
+      Case "cmdClose" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Close)
+      Case "cmdAbort" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.CustomButtonClicked)
+      Case "cmdOK" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Ok)
+      Case "cmdRetry" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Retry)
+    End Select
+  End Sub
+  Private Sub RefreshDlg(sender As Object, e As EventArgs)
+    Dim dlg As TaskDialog = sender
+    dlg.Icon = dlg.Icon
+    dlg.InstructionText = dlg.InstructionText
+  End Sub
+  Private Function MsgDlgLegacy(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional HelpLink As Boolean = False) As DialogResult
+    Dim Content As String
+    Dim Link As String = Nothing
+    Dim LinkText As String = Nothing
+    If String.IsNullOrEmpty(Title) And String.IsNullOrEmpty(Text) Then
+      Content = String.Empty
+    ElseIf String.IsNullOrEmpty(Title) Then
+      Content = Text
+    ElseIf String.IsNullOrEmpty(Text) Then
+      Content = Title
+    Else
+      If HelpLink Then
+        If Text.Contains("<a") Then
+          Link = Text.Substring(Text.IndexOf("<a"))
+          Link = Link.Substring(Link.IndexOf("""") + 1)
+          Link = Link.Substring(0, Link.IndexOf(""""))
+          LinkText = Text.Substring(Text.IndexOf("<a"))
+          LinkText = LinkText.Substring(LinkText.IndexOf(">") + 1)
+          LinkText = LinkText.Substring(0, LinkText.IndexOf("<"))
+          Text = Text.Substring(0, Text.IndexOf("<a")) & Text.Substring(Text.IndexOf("</a>") + 4)
+          If Not Text.EndsWith(vbNewLine & vbNewLine) Then Text &= vbNewLine & vbNewLine
+          Text &= "Click ""Help"" to " & LinkText & "."
+        End If
+      Else
+        Do While Text.Contains("<a")
+          Link = Text.Substring(Text.IndexOf("<a"))
+          Link = Link.Substring(Link.IndexOf("""") + 1)
+          Link = Link.Substring(0, Link.IndexOf(""""))
+          LinkText = Text.Substring(Text.IndexOf("<a"))
+          LinkText = LinkText.Substring(LinkText.IndexOf(">") + 1)
+          LinkText = LinkText.Substring(0, LinkText.IndexOf("<"))
+          Text = Text.Substring(0, Text.IndexOf("<a")) & LinkText & Text.Substring(Text.IndexOf("</a>") + 4)
+          Link = Nothing
+          LinkText = Nothing
+        Loop
+        If Text.EndsWith(vbNewLine & vbNewLine) Then Text = Text.Substring(0, Text.Length - 4)
+      End If
+      Content = Title & vbNewLine & vbNewLine & Text
+      End If
+      If Not String.IsNullOrEmpty(Details) Then
+        If String.IsNullOrEmpty(Content) Then
+          Content = Details
+        Else
+          Content &= vbNewLine & vbNewLine & Details
+        End If
+      End If
+      'Dim msgIcon As MessageBoxIcon = MessageBoxIcon.None
+      'msgIcon = Icon
+      If String.IsNullOrEmpty(Link) And String.IsNullOrEmpty(LinkText) Then
+        Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton)
+      Else
+        Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton, Nothing, Link, HelpNavigator.Index)
+      End If
+  End Function
+  Private Function LinkSplitPath(Path As String, Optional Separator As String = "\") As String
+    If Path.EndsWith(Separator) Then Path = Path.Substring(0, Path.Length - Separator.Length)
+    Dim PathStr As String = Nothing
+    Dim sParts() As String = Split(Path, Separator)
+    Dim Chunk As String = Nothing
+    For Each part In sParts
+      Chunk &= part & Separator
+      If Not String.IsNullOrEmpty(part) Then
+        If part = "http:" Or
+          part = "ftp:" Or
+          part = "file:" Then
+          PathStr &= part & Separator
+        Else
+          PathStr &= "<a href=""explorer " & Chunk & """>" & part & Separator & "</a>"
+        End If
+      Else
+        PathStr &= Separator
+      End If
+    Next
+    If PathStr.EndsWith(Separator & "</a>") Then PathStr = PathStr.Substring(0, PathStr.Length - (4 + Separator.Length)) & "</a>"
+    Return PathStr
+  End Function
+#End Region
   ''' <summary>
   ''' Attempts to see if a file is in use, waiting up to five seconds for it to be freed.
   ''' </summary>
@@ -1708,4 +2174,30 @@ Module modFunctions
   Public Function TickCount() As Long
     Return (Stopwatch.GetTimestamp / Stopwatch.Frequency) * 1000
   End Function
+  Public Function PadHex(Val As ULong) As String
+    Dim sHex As String = Hex(Val)
+    Select Case sHex.Length
+      Case 0 : Return "00"
+      Case 1, 3, 5, 7 : Return "0" & sHex
+      Case 2, 4, 6, 8 : Return sHex
+      Case Is < 17 : Return StrDup(16 - sHex.Length, "0") & sHex
+      Case Is < 33 : Return StrDup(32 - sHex.Length, "0") & sHex
+      Case Is < 65 : Return StrDup(64 - sHex.Length, "0") & sHex
+      Case Else : Return sHex
+    End Select
+  End Function
+  Private Sub SelectionDialogHyperlink_Click(sender As Object, e As TaskDialogHyperlinkClickedEventArgs)
+    Try
+      If String.IsNullOrEmpty(e.LinkText) Then Return
+      If e.LinkText.Contains(" ") Then
+        ShellEx(e.LinkText.Substring(0, e.LinkText.IndexOf(" ")), e.LinkText.Substring(e.LinkText.IndexOf(" ") + 1))
+      Else
+        Process.Start(e.LinkText)
+      End If
+    Catch ex As Exception
+      Dim taskNotifier As TaskbarNotifier = Nothing
+      MakeNotifier(taskNotifier, False)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+    End Try
+  End Sub
 End Module

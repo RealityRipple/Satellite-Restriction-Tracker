@@ -456,7 +456,7 @@ Public Class frmMain
         trayIcon.Icon = CreateRTrayIcon(r_used, r_lim)
       End If
     ElseIf myPanel = SatHostTypes.Other Then
-      lblNothing.Text = Application.ProductName
+      lblNothing.Text = My.Application.Info.ProductName
       lblRRS.Text = "by " & Application.CompanyName
       ttUI.SetTooltip(lblRRS, "Visit realityripple.com.")
     End If
@@ -491,7 +491,7 @@ Public Class frmMain
       Process.Start("http://realityripple.com")
     Catch ex As Exception
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub pctNetTest_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles pctNetTest.KeyUp
@@ -504,7 +504,7 @@ Public Class frmMain
         End If
       Catch ex As Exception
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -518,7 +518,7 @@ Public Class frmMain
         End If
       Catch ex As Exception
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -537,7 +537,7 @@ Public Class frmMain
             Process.Start("http://srt.realityripple.com/faq.php")
           Catch ex As Exception
             MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+            If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
           End Try
         End If
     End Select
@@ -738,7 +738,8 @@ Public Class frmMain
           End If
         End If
         cmdConfig.Focus()
-        MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Warning)
+        'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       Else
         If cmdRefresh.Enabled Then
           cmdRefresh.Enabled = False
@@ -897,14 +898,15 @@ Public Class frmMain
             End If
           End If
           cmdConfig.Focus()
-          MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+          'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
-            If mySettings.AccountTypeForced Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
-            Else
-              SetStatusText("Analyzing Account", "Determining your account type...", False)
-              TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
-            End If
+          If mySettings.AccountTypeForced Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+          Else
+            SetStatusText("Analyzing Account", "Determining your account type...", False)
+            TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+          End If
       End Select
       If localData IsNot Nothing Then
         localData.Dispose()
@@ -1486,14 +1488,14 @@ Public Class frmMain
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", Application.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", My.Application.Info.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
                 lastBalloon = TickCount()
                 Exit For
               ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", Application.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", My.Application.Info.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
                 lastBalloon = TickCount()
                 Exit For
               End If
@@ -1502,7 +1504,7 @@ Public Class frmMain
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
                 lastBalloon = TickCount()
                 Exit For
               End If
@@ -1511,14 +1513,14 @@ Public Class frmMain
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", Application.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
                 lastBalloon = TickCount()
                 Exit For
               ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", Application.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", My.Application.Info.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
                 lastBalloon = TickCount()
                 Exit For
               End If
@@ -1564,7 +1566,8 @@ Public Class frmMain
         End If
       End If
       cmdConfig.Focus()
-      MessageBox.Show("Please enter your account details in the configuration window.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+      'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Private Sub cmdHistory_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistory.Click
@@ -2083,7 +2086,8 @@ Public Class frmMain
             ShellEx(sEXEPath, UpdateParam)
             Application.Exit()
           Catch ex As Exception
-            MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & Application.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldWarning, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+            'MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1))
             SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
             NextGrabTick = Long.MinValue
           End Try
@@ -2177,9 +2181,9 @@ Public Class frmMain
       MakeNotifier(taskNotifier, False)
       If taskNotifier IsNot Nothing Then
         If sRet Then
-          taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & Application.ProductName & "!", 200, 15 * 1000, 100)
+          taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & My.Application.Info.ProductName & "!", 200, 15 * 1000, 100)
         Else
-          taskNotifier.Show("Error Reporting Error", Application.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 1000, 100)
+          taskNotifier.Show("Error Reporting Error", My.Application.Info.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 1000, 100)
         End If
       End If
     End If
@@ -2188,7 +2192,7 @@ Public Class frmMain
     If clsUpdate.QuickCheckVersion = clsUpdate.CheckEventArgs.ResultType.NoUpdate Then
       sFailTray = sFail
       MakeNotifier(taskNotifier, True)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Error Reading Page Data", Application.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Error Reading Page Data", My.Application.Info.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
     End If
   End Sub
 #End Region
@@ -2279,12 +2283,14 @@ Public Class frmMain
           ControllerProps.WindowStyle = ProcessWindowStyle.Hidden
           Process.Start(ControllerProps)
         Else
-          MessageBox.Show("The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please reinstall " & Application.ProductName & ".", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not be found!" & vbNewLine & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & " with the ""Windows Service"" component selected.", "Service Controller not found.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error)
+          'MessageBox.Show("The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & ".", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           mySettings.Service = False
         End If
       End If
     Catch ex As Exception
-      MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not start!", "Service Controller failed to start.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      'MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End Try
   End Sub
   Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted

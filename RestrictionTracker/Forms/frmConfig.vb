@@ -71,7 +71,7 @@
     Else
       pctKeyState.Tag = 1
       pctKeyState.Image = My.Resources.ico_ok
-      ttConfig.SetToolTip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & Application.ProductName & "!")
+      ttConfig.SetToolTip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & My.Application.Info.ProductName & "!")
       lblPurchaseKey.Text = LINK_PANEL
       ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
     End If
@@ -261,7 +261,8 @@
           Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
       ElseIf cmdSave.Enabled Then
-        Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", Application.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+        Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your configuration?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+        'Dim saveRet As DialogResult = MessageBox.Show("Some settings have been changed but not saved." & vbNewLine & vbNewLine & "Do you want to save the changes to your configuration?", My.Application.Info.ProductName, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
         If saveRet = Windows.Forms.DialogResult.Yes Then
           cmdSave.PerformClick()
           If bAccount Then
@@ -770,7 +771,7 @@
       Catch ex As Exception
         Dim taskNotifier As TaskbarNotifier = Nothing
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     ElseIf lblPurchaseKey.Text = LINK_PANEL Then
       Try
@@ -778,7 +779,7 @@
       Catch ex As Exception
         Dim taskNotifier As TaskbarNotifier = Nothing
         MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""wb.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""wb.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
       End Try
     End If
   End Sub
@@ -901,19 +902,22 @@
       If My.Computer.FileSystem.DirectoryExists(AppDataAllPath) Then
         Process.Start(AppDataAllPath)
       Else
-        MessageBox.Show("The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        'MessageBox.Show("The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End If
     ElseIf optHistoryAppData.Checked Then
       If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
         Process.Start(AppDataPath)
       Else
-        MessageBox.Show("The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        'MessageBox.Show("The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End If
     Else
       If My.Computer.FileSystem.DirectoryExists(txtHistoryDir.Text) Then
         Process.Start(txtHistoryDir.Text)
       Else
-        MessageBox.Show("The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        MsgDlg(Me, "The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        'MessageBox.Show("The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Missing Directory", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End If
     End If
   End Sub
@@ -956,10 +960,12 @@
           file.CopyTo(sPath & "Config\" & file.Name, True)
         Next
       End If
-      MessageBox.Show(Application.ProductName & " has been ported to """ & sPath & """!", "Files Copied!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, My.Application.Info.ProductName & " has been ported to """ & sPath & """!", "Portable application created.", "Files Copied", MessageBoxButtons.OK, TaskDialogIcon.RemovableDrive, MessageBoxIcon.Information)
+      'MessageBox.Show(My.Application.Info.ProductName & " has been ported to """ & sPath & """!", "Files Copied!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
     Catch ex As Exception
       txtPortableDir.Focus()
-      MessageBox.Show("There was an error trying to create a portable install in """ & sPath & """!" & vbNewLine & ex.Message, "Drive Error", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "There was an error trying to create a portable install in """ & sPath & """!", "Portable application creation error.", "Drive Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLockedRemovable, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      'MessageBox.Show("There was an error trying to create a portable install in """ & sPath & """!" & vbNewLine & ex.Message, "Drive Error", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       Exit Sub
     End Try
   End Sub
@@ -987,24 +993,44 @@
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     If String.IsNullOrEmpty(txtAccount.Text) Then
-      MessageBox.Show("Please enter your ViaSat account Username.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "You must enter your ViaSat account Username before saving the Configuration.", "Please enter your Username.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Information)
+      'MessageBox.Show("Please enter your ViaSat account Username.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtAccount.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
-      MessageBox.Show("Please enter your ViaSat account Password.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "You must enter your ViaSat account Password before saving the Configuration.", "Please enter your Password.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.Padlock, MessageBoxIcon.Information)
+      'MessageBox.Show("Please enter your ViaSat account Password.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       txtPassword.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(cmbProvider.Text) Then
-      MessageBox.Show("Please enter your ViaSat Provider address or select one from the list.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "Please enter your ViaSat Provider domain or select one from the list before saving the Configuration.", "Please select your Provider.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.Internet, MessageBoxIcon.Information)
+      'MessageBox.Show("Please enter your ViaSat Provider address or select one from the list.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
       cmbProvider.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
     For Each c As Char In IO.Path.GetInvalidPathChars
       If txtHistoryDir.Text.Contains(c) Then
-        MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        Dim sHD As String = txtHistoryDir.Text
+        Dim sC As String = c.ToString
+        Select Case c
+          Case vbNullChar
+            sC = "Null"
+            sHD = Replace(sHD, c, "[Null]")
+          Case vbCr
+            sC = "Carriage Return"
+            sHD = Replace(sHD, c, "[CR]")
+          Case vbLf
+            sC = "Line Feed"
+            sHD = Replace(sHD, c, "[LF]")
+          Case vbTab
+            sC = "Tab"
+            sHD = Replace(sHD, c, "[Tab]")
+        End Select
+        MsgDlg(Me, "The directory you have entered contains invalid characters. You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , "Directory: """ & sHD & """" & vbNewLine & "Invalid Character: " & sC & " (0x" & PadHex(AscW(c)) & ")", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Directory Details", "Hide Directory Details")
+        'MessageBox.Show("The directory you have entered contains invalid characters. Please choose a different directory.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         txtHistoryDir.Focus()
         Exit Sub
       End If
@@ -1088,7 +1114,8 @@
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
       Case 2
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
+          'MessageBox.Show("Please enter a Proxy address or choose a different option.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -1103,7 +1130,8 @@
         End If
       Case 3
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MessageBox.Show("Please enter a Proxy address or choose a different option.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
+          'MessageBox.Show("Please enter a Proxy address or choose a different option.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -1168,7 +1196,8 @@
         Try
           My.Computer.FileSystem.CreateDirectory(txtHistoryDir.Text)
         Catch ex As Exception
-          MessageBox.Show("The directory you selected could not be created!", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "The directory you selected could not be created! You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+          'MessageBox.Show("The directory you selected could not be created!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           optHistoryCustom.Checked = True
           txtHistoryDir.Enabled = True
           txtHistoryDir.Focus()
@@ -1176,25 +1205,65 @@
         End Try
       End If
       LOG_Terminate(True)
+      Dim sSkipFiles() As String = {"user.config",
+                                    "del.bat",
+                                    "restrictioncontroller.exe",
+                                    "restrictionlogger.exe",
+                                    "restrictiontracker.exe",
+                                    "restrictiontracker.pdb",
+                                    "restrictiontrackerlib.dll",
+                                    "restrictiontrackerlib.pdb",
+                                    "unins*"}
       If sOldFiles IsNot Nothing AndAlso sOldFiles.Count > 0 Then
         If sNewFiles IsNot Nothing AndAlso sNewFiles.Count > 0 Then
           Dim sOverWrites As New Collections.Generic.List(Of String)
           For Each sOld In sOldFiles
             For Each sNew In sNewFiles
               If String.Compare(IO.Path.GetFileName(sNew), IO.Path.GetFileName(sOld), True) = 0 Then
-                If IO.Path.GetFileName(sNew).ToLower = "user.config" Then Continue For
-                If IO.Path.GetFileName(sNew).ToLower = "del.bat" Then Continue For
+                Dim DoSkip As Boolean = False
+                For Each sSkip In sSkipFiles
+                  If sSkip.Contains("*") Then
+                    If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sNew).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.StartsWith("*") Then
+                      If IO.Path.GetFileName(sNew).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sNew).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    End If
+                  Else
+                    If IO.Path.GetFileName(sNew).ToLower = sSkip Then DoSkip = True : Exit For
+                  End If
+                Next
+                If DoSkip Then Continue For
+                'If IO.Path.GetFileName(sNew).ToLower = "user.config" Then Continue For
+                'If IO.Path.GetFileName(sNew).ToLower = "del.bat" Then Continue For
                 sOverWrites.Add(IO.Path.GetFileName(sNew))
               End If
             Next
           Next
           If sOverWrites.Count > 0 Then
-            If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
+            If MsgDlg(Me, "Do you want to overwrite the files that already exist in the new Data Directory?", "Files exist in the new directory.", "Overwrite Files?", MessageBoxButtons.YesNo, TaskDialogIcon.FolderFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, "The following files will be overwritten:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files") = Windows.Forms.DialogResult.Yes Then
+              'If MessageBox.Show("Files exist in the new Data Directory:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine) & vbNewLine & vbNewLine & "Overwrite them?", My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
               Dim sFails As New Collections.Generic.List(Of String)
               Dim sNoMove As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
-                If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
-                If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
+                Dim DoSkip As Boolean = False
+                For Each sSkip In sSkipFiles
+                  If sSkip.Contains("*") Then
+                    If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.StartsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    End If
+                  Else
+                    If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                  End If
+                Next
+                If DoSkip Then Continue For
+                'If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
+                'If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
                 Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
                 Try
                   My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
@@ -1203,14 +1272,35 @@
                 End Try
                 If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-              If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              If sFails.Count > 0 Then
+                MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                'MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              End If
+              If sNoMove.Count > 0 Then
+                MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                'MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              End If
             Else
               Dim sFails As New Collections.Generic.List(Of String)
               Dim sNoMove As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
-                If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
-                If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
+                Dim DoSkip As Boolean = False
+                For Each sSkip In sSkipFiles
+                  If sSkip.Contains("*") Then
+                    If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.StartsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    ElseIf sSkip.EndsWith("*") Then
+                      If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    End If
+                  Else
+                    If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                  End If
+                Next
+                If DoSkip Then Continue For
+                'If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
+                'If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
                 Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
                 If My.Computer.FileSystem.FileExists(sNewFile) Then Continue For
                 Try
@@ -1220,15 +1310,36 @@
                 End Try
                 If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-              If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              If sFails.Count > 0 Then
+                MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                'MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              End If
+              If sNoMove.Count > 0 Then
+                MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                'MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+              End If
             End If
           Else
             Dim sFails As New Collections.Generic.List(Of String)
             Dim sNoMove As New Collections.Generic.List(Of String)
             For Each sFile In sOldFiles
-              If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
-              If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
+              Dim DoSkip As Boolean = False
+              For Each sSkip In sSkipFiles
+                If sSkip.Contains("*") Then
+                  If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
+                    If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  ElseIf sSkip.StartsWith("*") Then
+                    If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  ElseIf sSkip.EndsWith("*") Then
+                    If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  End If
+                Else
+                  If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                End If
+              Next
+              If DoSkip Then Continue For
+              'If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
+              'If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
               Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
               Try
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile)
@@ -1237,15 +1348,36 @@
               End Try
               If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
-            If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-            If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            If sFails.Count > 0 Then
+              MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+              'MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            End If
+            If sNoMove.Count > 0 Then
+              MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+              'MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            End If
           End If
         Else
           Dim sFails As New Collections.Generic.List(Of String)
           Dim sNoMove As New Collections.Generic.List(Of String)
           For Each sFile In sOldFiles
-            If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
-            If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
+            Dim DoSkip As Boolean = False
+            For Each sSkip In sSkipFiles
+              If sSkip.Contains("*") Then
+                If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
+                  If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                ElseIf sSkip.StartsWith("*") Then
+                  If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                ElseIf sSkip.EndsWith("*") Then
+                  If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                End If
+              Else
+                If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+              End If
+            Next
+            If DoSkip Then Continue For
+            'If IO.Path.GetFileName(sFile).ToLower = "user.config" Then Continue For
+            'If IO.Path.GetFileName(sFile).ToLower = "del.bat" Then Continue For
             Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
             Try
               My.Computer.FileSystem.MoveFile(sFile, sNewFile)
@@ -1254,8 +1386,14 @@
             End Try
             If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
-          If sFails.Count > 0 Then MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.Title & " as Administrator to enable full permission control.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-          If sNoMove.Count > 0 Then MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          If sFails.Count > 0 Then
+            MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+            'MessageBox.Show("Failed to set permissions for the following files:" & vbNewLine & Join(sFails.ToArray, vbNewLine) & "Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          End If
+          If sNoMove.Count > 0 Then
+            MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+            'MessageBox.Show("Failed to move the following files:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          End If
         End If
       End If
       mySettings.HistoryDir = txtHistoryDir.Text
@@ -1377,7 +1515,7 @@
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
       If AppDataPath = Application.StartupPath & "\Config\" Then
-        ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & Application.ProductName & ".")
+        ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
         txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
@@ -1390,7 +1528,7 @@
         txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
-        ttConfig.SetTooltip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & Application.ProductName & " if you wish to use this feature.")
+        ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & My.Application.Info.ProductName & " if you wish to use this feature.")
       End If
     Else
       txtInterval.Minimum = 30

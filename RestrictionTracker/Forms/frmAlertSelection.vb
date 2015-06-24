@@ -136,7 +136,8 @@
       Dim sTitle As String = lstStyles.SelectedItem
       If index = 0 Then
         Beep()
-      ElseIf MessageBox.Show("Do you want to remove the """ & sTitle & """ Alert Window Style?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
+      ElseIf MsgDlg(Me, "Do you want to remove the """ & sTitle & """ style?", "Are you sure?", "Remove Alert Window Style?", MessageBoxButtons.YesNo, TaskDialogIcon.Personalize, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
+        'ElseIf MessageBox.Show("Do you want to remove the """ & sTitle & """ Alert Window Style?", My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
         If IO.File.Exists(AppDataPath & sTitle & ".tar.gz") Then
           lstStyles.SelectedIndex = 0
           IO.File.Delete(AppDataPath & sTitle & ".tar.gz")
@@ -150,7 +151,8 @@
           IO.File.Delete(AppDataPath & sTitle & ".tar")
           lstStyles.Items.RemoveAt(index)
         Else
-          MessageBox.Show("No file by that name was found! Alert Window Style may already be removed.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "The """ & sTitle & """ Alert Window style could not be found. The file may already be removed.", "Unable to find Alert Window style.", "Style not Found", MessageBoxButtons.OK, TaskDialogIcon.Preferences, MessageBoxIcon.Warning)
+          'MessageBox.Show("No file by that name was found! Alert Window Style may already be removed.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
           lstStyles.SelectedIndex = 0
           lstStyles.Items.RemoveAt(index)
         End If
@@ -222,7 +224,7 @@
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to srt.realityripple.com/changes.php!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to srt.realityripple.com/changes.php!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
 End Class

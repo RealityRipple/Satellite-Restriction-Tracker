@@ -37,7 +37,7 @@ Public Class frmWizard
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub cmdNext_Click(sender As System.Object, e As System.EventArgs) Handles cmdNext.Click
@@ -123,7 +123,8 @@ Public Class frmWizard
           If Not pnlKey.Tag = 1 Then
             tbsWizardPages.SelectedIndex = 2
             optRemote.Focus()
-            MessageBox.Show("Please verify your Remote Usage Service Product Key before continuing.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+            MsgDlg(Me, "Please verify your Remote Usage Service Product Key before continuing.", "Your Product Key has not been validated.", "Verify your Product Key", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
+            'MessageBox.Show("Please verify your Remote Usage Service Product Key before continuing.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
             Me.DialogResult = Windows.Forms.DialogResult.None
           End If
         ElseIf optLocal.Checked Then
@@ -344,7 +345,7 @@ Public Class frmWizard
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", Application.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
   Private Sub optServices_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optRemote.CheckedChanged, optLocal.CheckedChanged, optNone.CheckedChanged
@@ -490,14 +491,16 @@ Public Class frmWizard
       tbsWizardPages.SelectedIndex = 1
       txtAccountUsername.Focus()
       DrawStatus(False)
-      MessageBox.Show("You must enter an Account Username before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+      'MessageBox.Show("You must enter an Account Username before validating your Product Key!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Exit Sub
     End If
     If String.IsNullOrEmpty(cmbAccountHost.Text) Then
       tbsWizardPages.SelectedIndex = 1
       cmbAccountHost.Focus()
       DrawStatus(False)
-      MessageBox.Show("You must select a Provider before validating your Product Key!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
+      'MessageBox.Show("You must select a Provider before validating your Product Key!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Exit Sub
     End If
     If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
@@ -537,10 +540,12 @@ Public Class frmWizard
       End If
       Select Case e.Type
         Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
-          MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Warning)
+          'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
         Case Else
           optNone.Checked = True
-          MessageBox.Show(sErr, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
+          'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       End Select
       DrawStatus(False)
       pnlKey.Tag = 0
@@ -604,13 +609,17 @@ Public Class frmWizard
       AccountType = SatHostTypes.Other
       Select Case e.Type
         Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
-          MessageBox.Show("Connection to Server Timed Out!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+          'MessageBox.Show("Connection to Server Timed Out!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.LoginFailure
-          MessageBox.Show("Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          'MessageBox.Show("Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
-          MessageBox.Show("Fatal Login Failure: " & e.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          'MessageBox.Show("Fatal Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
-          MessageBox.Show("Missing account information!", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+          MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+          'MessageBox.Show("Missing account information!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
         Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
           tbsWizardPages.SelectedIndex += 1
       End Select

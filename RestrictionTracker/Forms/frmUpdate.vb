@@ -13,17 +13,17 @@
   End Sub
   Public Sub NewUpdate(Version As String, BETA As Boolean, UACIcon As Boolean)
     If BETA Then
-      Me.Text = "New BETA Version Available - " & Application.ProductName
-      lblTitle.Text = Application.ProductName & " BETA Update"
+      Me.Text = "New BETA Version Available - " & My.Application.Info.ProductName
+      lblTitle.Text = My.Application.Info.ProductName & " BETA Update"
     Else
-      Me.Text = "New Version Available - " & Application.ProductName
-      lblTitle.Text = Application.ProductName & " Update"
+      Me.Text = "New Version Available - " & My.Application.Info.ProductName
+      lblTitle.Text = My.Application.Info.ProductName & " Update"
     End If
     Dim newVer As String = "Version %v has been released and is available for download." & vbNewLine &
              "To keep up-to-date with the latest features, improvements, bug fixes, and" & vbNewLine &
              "meter compliance, please update %p immediately."
     newVer = newVer.Replace("%v", DisplayVersion(Version))
-    newVer = newVer.Replace("%p", Application.ProductName)
+    newVer = newVer.Replace("%p", My.Application.Info.ProductName)
     lblNewVer.Text = newVer
     txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
     lblBETA.Visible = BETA
