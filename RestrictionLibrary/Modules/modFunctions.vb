@@ -156,6 +156,8 @@ Module modFunctions
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.Contains("An operation was attempted on something that is not a socket") Then
           Return "Unable to connect. Check your local network and firewall settings."
+        ElseIf ex.InnerException.Message.Contains("An invalid argument was supplied") Then
+          Return "Unable to connect. An invalid argument was supplied. This may mean the provider you entered is invalid or that you have a network or firewall issue. If you figure it out, tell me."
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
@@ -179,18 +181,20 @@ Module modFunctions
           Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host") Then
           Return "The server closed the connection. Please try again."
-        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full.") Then
-          Return "Network buffer error. Please free up your computer's resources and try again."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
+          Return "Too many connections open. Check your network activity or restart your computer."
         ElseIf ex.InnerException.Message.StartsWith("Cannot open log for source 'Restriction Logger'. You may not have write access") Then
           Return "Error writing to logging service error log."
         ElseIf ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("There were not enough free threads in the ThreadPool to complete the operation") Then
-          Return "Network threading error. Please free up your computer's resources and try again."
+          Return "Too many threads running. Check your network activity or restart your computer."
         ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("The message or signature supplied for verification has been altered") Then
               Return "Decryption failure. The message or signature has been altered."
+            ElseIf ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
+              Return "Decryption failure. Data could not be decrypted."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
@@ -315,7 +319,7 @@ Module modFunctions
           End If
         ElseIf ex.Message.Contains("Unable to connect to the remote server") Then
           If ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
-            Return "The server is busy with other requests. Please try again later."
+            Return "Too many connections open. Check your network activity or restart your computer."
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Can't connect to the server - " & ex.InnerException.Message
