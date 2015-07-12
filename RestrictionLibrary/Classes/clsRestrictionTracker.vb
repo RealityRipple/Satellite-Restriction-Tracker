@@ -1119,6 +1119,8 @@
         bReset = False
       ElseIf sRet.Contains("Concurrent requests limit exceeded.") Then
         sErrMsg = "Dashboard Load Failed: Too many requests. Check for usage data less often."
+      ElseIf sRet.Contains("maintenance") Then
+        sErrMsg = "Dashboard Load Failed: Server Down for Maintenance."
       Else
         sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
         sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
