@@ -1007,6 +1007,9 @@
         ElseIf sRet.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
           sErrMsg = "Login Failed: Exede Account Locked. Check your username and password."
           bReset = False
+        ElseIf sRet.ToLower.Contains("your session has timed out.") Then
+          sErrMsg = "Login Failed: Session timed out. Please try again."
+          bReset = False
         Else
           sErrMsg = "Unknown Login Error."
           sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
