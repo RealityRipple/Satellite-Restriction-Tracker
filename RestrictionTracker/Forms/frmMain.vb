@@ -247,7 +247,10 @@ Public Class frmMain
         Me.ShowInTaskbar = True
         Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
         If mySettings.AutoHide Then
-          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+          If (Not mySettings.TrayIconAnimation) Then
+            Me.Hide()
+            Me.WindowState = FormWindowState.Minimized
+          ElseIf (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
             Me.Hide()
           Else
             Me.WindowState = FormWindowState.Minimized
@@ -322,7 +325,7 @@ Public Class frmMain
             End If
           Case NativeMethods.SC_MINIMIZE
             'If Me.Visible And Me.Opacity = 1 Then
-            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then m.Result = New IntPtr(-1)
+            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never and mySettings.TrayIconAnimation Then m.Result = New IntPtr(-1)
             'Else
             'Debug.Print("WOT")
             'End If
@@ -330,9 +333,9 @@ Public Class frmMain
       Case NativeMethods.WM_WINDOWPOSCHANGING
         Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
         If CBool((wndPos.Flags And NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) = NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) And wndPos.X = -32000 And wndPos.Y = -32000 Then
-          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never And mySettings.TrayIconAnimation Then
             Me.Opacity = 0
-            If Me.Visible Then AnimateWindow(Me, True)
+            If Me.Visible And mySettings.TrayIconAnimation Then AnimateWindow(Me, True)
             If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
             mnuRestore.Text = "&Restore"
             Me.Hide()
@@ -358,6 +361,14 @@ Public Class frmMain
       Me.BeginInvoke(New EventHandler(AddressOf frmMain_SizeChanged), sender, e)
     Else
       If Me.WindowState = FormWindowState.Minimized Then
+        If Not mySettings.TrayIconAnimation Then
+          If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
+            Me.Hide()
+          ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
+            trayIcon.Visible = True
+            Me.Hide()
+          End If
+        End If
         mnuRestore.Text = "&Restore"
       Else
         If mySettings Is Nothing Then
@@ -462,6 +473,11 @@ Public Class frmMain
     End If
   End Sub
   Private Sub frmMain_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    If e.CloseReason = CloseReason.UserClosing And mySettings.TrayIconOnClose Then
+      Me.WindowState = FormWindowState.Minimized
+      e.Cancel = True
+      Return
+    End If
     ClosingTime = True
     tmrUpdate.Stop()
     StopSong()
@@ -732,7 +748,7 @@ Public Class frmMain
         Else
           If Not Me.Visible Then
             Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-            AnimateWindow(Me, False)
+            If mySettings.TrayIconAnimation Then AnimateWindow(Me, False)
             Me.Show()
             mnuRestore.Text = "&Focus"
           End If
@@ -892,7 +908,11 @@ Public Class frmMain
           Else
             If Not Me.Visible Then
               Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-              AnimateWindow(Me, False)
+              If mySettings.TrayIconAnimation Then
+                AnimateWindow(Me, False)
+              Else
+                Me.WindowState = FormWindowState.Normal
+              End If
               Me.Show()
               mnuRestore.Text = "&Focus"
             End If
@@ -1560,7 +1580,7 @@ Public Class frmMain
       Else
         If Not Me.Visible Then
           Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-          AnimateWindow(Me, False)
+          If mySettings.TrayIconAnimation Then AnimateWindow(Me, False)
           Me.Show()
           mnuRestore.Text = "&Focus"
         End If
@@ -1658,22 +1678,36 @@ Public Class frmMain
 #Region "Tray"
   Private Sub mnuRestore_Click(sender As System.Object, e As System.EventArgs) Handles mnuRestore.Click
     If Not Me.Visible Then
-      Dim bMax As Boolean = False
-      If Me.WindowState = FormWindowState.Maximized Then
-        bMax = True
+      If mySettings.TrayIconAnimation Then
+        Dim bMax As Boolean = False
+        If Me.WindowState = FormWindowState.Maximized Then
+          bMax = True
+        Else
+          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        End If
+        If mySettings.TrayIconAnimation Then
+          If Not ClosingTime Then AnimateWindow(Me, False)
+          mnuRestore.Text = "&Focus"
+          If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
+          Me.Show()
+        Else
+          Me.Show()
+          mnuRestore.Text = "&Focus"
+          If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
+        End If
+        If bMax Then
+          Me.WindowState = FormWindowState.Normal
+          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+          Me.WindowState = FormWindowState.Maximized
+        End If
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
       Else
-        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-      End If
-      If Not ClosingTime Then AnimateWindow(Me, False)
-      mnuRestore.Text = "&Focus"
-      If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
-      Me.Show()
-      If bMax Then
+        Me.Show()
+        mnuRestore.Text = "&Focus"
         Me.WindowState = FormWindowState.Normal
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
         Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-        Me.WindowState = FormWindowState.Maximized
       End If
-      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
     End If
     Dim myProc As Integer = 0
     Try

@@ -183,6 +183,8 @@ Class AppSettings
   Private m_Overtime As Integer
   Private m_AlertStyle As String
   Private m_TrayIcon As TrayStyles
+  Private m_TrayAnim As Boolean
+  Private m_TrayClose As Boolean
   Private m_AutoHide As Boolean
   Private m_ProxySetting As String
   Private m_LastNag As Date
@@ -504,13 +506,48 @@ Class AppSettings
         m_TrayIcon = TrayStyles.Always
       Else
         Try
-          Select Case xTrayIcon.Element("value").Value
-            Case "Never" : m_TrayIcon = TrayStyles.Never
-            Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
-            Case Else : m_TrayIcon = TrayStyles.Always
-          End Select
+          Dim xTrayStyle As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Style")
+          If xTrayStyle Is Nothing Then
+            Try
+              Select Case xTrayIcon.Element("value").Value
+                Case "Never" : m_TrayIcon = TrayStyles.Never
+                Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+                Case Else : m_TrayIcon = TrayStyles.Always
+              End Select
+            Catch ex As Exception
+              m_TrayIcon = TrayStyles.Always
+            End Try
+          Else
+            Select Case xTrayStyle.Element("value").Value
+              Case "Never" : m_TrayIcon = TrayStyles.Never
+              Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+              Case Else : m_TrayIcon = TrayStyles.Always
+            End Select
+          End If
+          Dim xTrayAnim As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Animation")
+          If xTrayAnim Is Nothing Then
+            m_TrayAnim = True
+          Else
+            m_TrayAnim = xTrayAnim.Element("value").Value = "True"
+          End If
+          Dim xTrayClose As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "OnClose")
+          If xTrayClose Is Nothing Then
+            m_TrayClose = False
+          Else
+            m_TrayClose = xTrayClose.Element("value").Value = "True"
+          End If
         Catch ex As Exception
-          m_TrayIcon = TrayStyles.Always
+          Try
+            Select Case xTrayIcon.Element("value").Value
+              Case "Never" : m_TrayIcon = TrayStyles.Never
+              Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+              Case Else : m_TrayIcon = TrayStyles.Always
+            End Select
+          Catch ex2 As Exception
+            m_TrayIcon = TrayStyles.Always
+          End Try
+          m_TrayAnim = True
+          m_TrayClose = False
         End Try
       End If
       Dim xAutoHide As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AutoHide")
@@ -970,6 +1007,8 @@ Class AppSettings
     m_Overtime = 60
     m_AlertStyle = "Default"
     m_TrayIcon = TrayStyles.Always
+    m_TrayAnim = True
+    m_TrayClose = False
     m_AutoHide = True
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
@@ -1054,7 +1093,10 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Overuse"), New XElement("value", m_Overuse)),
                                                           New XElement("setting", New XAttribute("name", "Overtime"), New XElement("value", m_Overtime)),
                                                           New XElement("setting", New XAttribute("name", "AlertStyle"), New XElement("value", m_AlertStyle)),
-                                                          New XElement("setting", New XAttribute("name", "TrayIcon"), New XElement("value", sTrayIcon)),
+                                                          New XElement("section", New XAttribute("name", "TrayIcon"),
+                                                                       New XElement("setting", New XAttribute("name", "Style"), New XElement("value", sTrayIcon)),
+                                                                       New XElement("setting", New XAttribute("name", "Animation"), New XElement("value", IIf(m_TrayAnim, "True", "False"))),
+                                                                       New XElement("setting", New XAttribute("name", "OnClose"), New XElement("value", IIf(m_TrayClose, "True", "False")))),
                                                           New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
@@ -1396,6 +1438,22 @@ Class AppSettings
     End Get
     Set(value As TrayStyles)
       m_TrayIcon = value
+    End Set
+  End Property
+  Public Property TrayIconAnimation As Boolean
+    Get
+      Return m_TrayAnim
+    End Get
+    Set(value As Boolean)
+      m_TrayAnim = value
+    End Set
+  End Property
+  Public Property TrayIconOnClose As Boolean
+    Get
+      Return m_TrayClose
+    End Get
+    Set(value As Boolean)
+      m_TrayClose = value
     End Set
   End Property
   Public Property AutoHide

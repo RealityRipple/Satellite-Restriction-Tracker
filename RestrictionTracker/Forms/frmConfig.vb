@@ -115,6 +115,8 @@
         chkTrayMin.Checked = False
     End Select
     chkTrayIcon_CheckedChanged(New Object, New EventArgs)
+    chkTrayAnim.Checked = mySettings.TrayIconAnimation
+    chkTrayClose.Checked = mySettings.TrayIconOnClose
     ttConfig.SetToolTip(txtProxyPassword.Button, "Toggle display of the HTTP Proxy Password.")
     If mySettings.Proxy Is Nothing Then
       cmbProxyType.SelectedIndex = 0
@@ -335,7 +337,8 @@
                                                                              txtProxyPassword.TextChanged,
                                                                              txtProxyDomain.TextChanged,
                                                                              cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged,
-                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkScaleScreen.CheckedChanged, chkTrayMin.CheckedChanged
+                                                                             txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkScaleScreen.CheckedChanged,
+                                                                             chkTrayMin.CheckedChanged, chkTrayAnim.CheckedChanged, chkTrayClose.CheckedChanged
 
     cmdSave.Enabled = SettingsChanged()
   End Sub
@@ -486,7 +489,9 @@
   End Sub
   Private Sub chkTrayIcon_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTrayIcon.CheckedChanged
     chkTrayMin.Enabled = chkTrayIcon.Checked
+    chkTrayAnim.Enabled = chkTrayIcon.Checked
     If Not chkTrayMin.Enabled Then chkTrayMin.Checked = False
+    If Not chkTrayAnim.Enabled Then chkTrayAnim.Checked = False
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
@@ -1108,6 +1113,8 @@
     Else
       mySettings.TrayIconStyle = AppSettings.TrayStyles.Never
     End If
+    mySettings.TrayIconAnimation = chkTrayAnim.Checked
+    mySettings.TrayIconOnClose = chkTrayClose.Checked
     mySettings.Timeout = txtTimeout.Value
     Select Case cmbProxyType.SelectedIndex
       Case 0 : mySettings.Proxy = Nothing
@@ -1455,6 +1462,8 @@
       Case AppSettings.TrayStyles.Minimized : If Not chkTrayIcon.Checked Or Not chkTrayMin.Checked Then Return True
       Case AppSettings.TrayStyles.Never : If chkTrayIcon.Checked Or chkTrayMin.Checked Then Return True
     End Select
+    If Not mySettings.TrayIconAnimation = chkTrayAnim.Checked Then Return True
+    If Not mySettings.TrayIconOnClose = chkTrayClose.Checked Then Return True
     If Not mySettings.UpdateBETA = chkUpdateBETA.Checked Then Return True
     Select Case cmbUpdateAutomation.SelectedIndex
       Case 0 : If Not mySettings.UpdateType = AppSettings.UpdateTypes.Auto Then Return True
@@ -1579,5 +1588,17 @@
         End If
       End If
     Next
+  End Sub
+
+  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyEventArgs)
+
+  End Sub
+
+  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.ScrollEventArgs)
+
+  End Sub
+
+  Private Sub ValuesChanged(sender As System.Object, e As System.Windows.Forms.KeyPressEventArgs)
+
   End Sub
 End Class
