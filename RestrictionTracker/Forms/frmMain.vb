@@ -247,13 +247,15 @@ Public Class frmMain
         Me.ShowInTaskbar = True
         Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
         If mySettings.AutoHide Then
-          If (Not mySettings.TrayIconAnimation) Then
+          If (Not mySettings.TrayIconAnimation) And (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
             Me.Hide()
             Me.WindowState = FormWindowState.Minimized
           ElseIf (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
             Me.Hide()
           Else
+            Me.Hide()
             Me.WindowState = FormWindowState.Minimized
+            Me.Show()
           End If
           mnuRestore.Text = "&Restore"
         End If
@@ -474,9 +476,11 @@ Public Class frmMain
   End Sub
   Private Sub frmMain_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If e.CloseReason = CloseReason.UserClosing And mySettings.TrayIconOnClose Then
-      Me.WindowState = FormWindowState.Minimized
-      e.Cancel = True
-      Return
+      If Me.Visible And Not Me.WindowState = FormWindowState.Minimized Then
+        Me.WindowState = FormWindowState.Minimized
+        e.Cancel = True
+        Return
+      End If
     End If
     ClosingTime = True
     tmrUpdate.Stop()
