@@ -1531,10 +1531,12 @@ Module modFunctions
     If Colors.HistoryDownA = Color.Transparent Or Colors.HistoryDownA.A < 255 Then Colors.HistoryDownA = defaultColors.HistoryDownA
     If Colors.HistoryDownB = Color.Transparent Or Colors.HistoryDownB.A < 255 Then Colors.HistoryDownB = defaultColors.HistoryDownB
     If Colors.HistoryDownC = Color.Transparent Or Colors.HistoryDownC.A < 255 Then Colors.HistoryDownC = defaultColors.HistoryDownC
+    If Colors.HistoryDownMax = Color.Transparent Or Colors.HistoryDownMax.A < 255 Then Colors.HistoryDownMax = defaultColors.HistoryDownMax
     If Colors.HistoryUpLine = Color.Transparent Or Colors.HistoryUpLine.A < 255 Then Colors.HistoryUpLine = defaultColors.HistoryUpLine
     If Colors.HistoryUpA = Color.Transparent Or Colors.HistoryUpA.A < 255 Then Colors.HistoryUpA = defaultColors.HistoryUpA
     If Colors.HistoryUpB = Color.Transparent Or Colors.HistoryUpB.A < 255 Then Colors.HistoryUpB = defaultColors.HistoryUpB
     If Colors.HistoryUpC = Color.Transparent Or Colors.HistoryUpC.A < 255 Then Colors.HistoryUpC = defaultColors.HistoryUpC
+    If Colors.HistoryUpMax = Color.Transparent Or Colors.HistoryUpMax.A < 255 Then Colors.HistoryUpMax = defaultColors.HistoryUpMax
     If Colors.HistoryText = Color.Transparent Or Colors.HistoryText.A < 255 Then Colors.HistoryText = defaultColors.HistoryText
     If Colors.HistoryBackground = Color.Transparent Or Colors.HistoryBackground.A < 255 Then Colors.HistoryBackground = defaultColors.HistoryBackground
     If Colors.HistoryLightGrid = Color.Transparent Or Colors.HistoryLightGrid.A < 255 Then Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
