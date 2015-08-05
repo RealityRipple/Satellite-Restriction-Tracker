@@ -1555,7 +1555,7 @@ Partial Class frmConfig
     Me.chkTrayAnim.Name = "chkTrayAnim"
     Me.chkTrayAnim.Size = New System.Drawing.Size(169, 18)
     Me.chkTrayAnim.TabIndex = 9
-    Me.chkTrayAnim.Text = "Show tray minimize animation"
+    Me.chkTrayAnim.Text = "Show tra&y minimize animation"
     Me.ttConfig.SetToolTip(Me.chkTrayAnim, "See the Main Window go to the System Tray instead of the default minimize animati" & _
         "on.")
     Me.chkTrayAnim.UseVisualStyleBackColor = True
@@ -1569,7 +1569,7 @@ Partial Class frmConfig
     Me.chkTrayClose.Name = "chkTrayClose"
     Me.chkTrayClose.Size = New System.Drawing.Size(157, 18)
     Me.chkTrayClose.TabIndex = 10
-    Me.chkTrayClose.Text = "Minimize instead of closing"
+    Me.chkTrayClose.Text = "Minimize instead of closin&g"
     Me.ttConfig.SetToolTip(Me.chkTrayClose, "Instead of closing the program, pressing the X button will minimize the program.")
     Me.chkTrayClose.UseVisualStyleBackColor = True
     '
