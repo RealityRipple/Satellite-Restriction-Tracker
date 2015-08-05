@@ -187,7 +187,9 @@
           csf.LineAlignment = StringAlignment.Center
           csf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces
           csf.Trimming = StringTrimming.Word
-          g.DrawString("This alert is just an example to display what an actual alert would look like using the """ & lstStyles.SelectedItem & """ style.", New Font("Arial", 11, FontStyle.Regular, GraphicsUnit.Pixel), New SolidBrush(notifyTest.ContentColor), notifyTest.ContentLocation, csf)
+          Dim sTitle As String = "Default"
+          If Not lstStyles.SelectedItem Is Nothing Then sTitle = lstStyles.SelectedItem
+          g.DrawString("This alert is just an example to display what an actual alert would look like using the """ & sTitle & """ style.", New Font("Arial", 11, FontStyle.Regular, GraphicsUnit.Pixel), New SolidBrush(notifyTest.ContentColor), notifyTest.ContentLocation, csf)
         End Using
         pctPreview.Image = bmpTest.Clone
       End Using
@@ -199,7 +201,11 @@
         pctPreview.BackgroundImage = bmpBG.Clone
       End Using
       pctPreview.Size = pctPreview.BackgroundImage.Size
-      cmdSave.Enabled = Not (lstStyles.SelectedItem.ToLower = AlertStyle.ToLower)
+      If lstStyles.SelectedItem Is Nothing Then
+        cmdSave.Enabled = False
+      Else
+        cmdSave.Enabled = Not (lstStyles.SelectedItem.ToLower = AlertStyle.ToLower)
+      End If
     Catch ex As Exception
       pctPreview.BackgroundImage = Nothing
       pctPreview.Image = pctPreview.ErrorImage.Clone
