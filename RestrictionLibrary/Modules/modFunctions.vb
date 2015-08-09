@@ -195,6 +195,8 @@ Module modFunctions
               Return "Decryption failure. The message or signature has been altered."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
               Return "Decryption failure. Data could not be decrypted."
+            ElseIf ex.InnerException.InnerException.Message.StartsWith("The token supplied to the function is invalid") Then
+              Return "Decryption failure. Invalid token."
             Else
               reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
@@ -306,6 +308,17 @@ Module modFunctions
             End If
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
             Return "The server closed the connection. Please change your Network Security Protocol settings and try again."
+          ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
+            If ex.InnerException.InnerException IsNot Nothing Then
+              If ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
+                Return "Decryption failure. Data could not be decrypted."
+              Else
+                reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+                Return "Decryption failure - " & ex.InnerException.InnerException.Message
+              End If
+            Else
+              Return "Decryption failure, but no details are available."
+            End If
           Else
             reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Receive failure - " & ex.InnerException.Message
