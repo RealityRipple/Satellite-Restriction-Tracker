@@ -763,7 +763,7 @@ Public Class frmMain
       Else
         If cmdRefresh.Enabled Then
           cmdRefresh.Enabled = False
-          NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
+          NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
           If KeyCheck(mySettings.RemoteKey) Then
             Dim remoteCallback As New MethodInvoker(AddressOf GetRemoteUsage)
             remoteCallback.BeginInvoke(Nothing, Nothing)
@@ -1100,7 +1100,7 @@ Public Class frmMain
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteData_OKKey), sender, e)
     Else
-      NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       SetStatusText(LOG_GetLast.ToString("g"), "Account Accessed! Getting Usage...", False)
     End If
   End Sub
