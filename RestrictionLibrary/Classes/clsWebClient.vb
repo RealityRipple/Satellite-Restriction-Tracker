@@ -5,6 +5,7 @@
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   Sub New(c As Net.CookieContainer)
+    'MyBase.New()
     Me.CookieJar = c
     c_Timeout = 60
     c_HTVer = Net.HttpVersion.Version10
