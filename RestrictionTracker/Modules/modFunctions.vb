@@ -504,23 +504,11 @@ Module modFunctions
     End Try
   End Function
   Public Function ByteSize(ByVal InBytes As UInt64) As String
-    If InBytes >= 1000 Then
-      If InBytes / 1024 >= 1000 Then
-        If InBytes / 1024 / 1024 >= 1000 Then
-          If InBytes / 1024 / 1024 / 1024 >= 1000 Then
-            Return Format((InBytes) / 1024 / 1024 / 1024 / 1024, "0.##") & " TB"
-          Else
-            Return Format((InBytes) / 1024 / 1024 / 1024, "0.##") & " GB"
-          End If
-        Else
-          Return Format((InBytes) / 1024 / 1024, "0.##") & " MB"
-        End If
-      Else
-        Return Format((InBytes) / 1024, "0.#") & " KB"
-      End If
-    Else
-      Return InBytes & " B"
-    End If
+    If InBytes < 1000 Then Return InBytes & " B"
+    If InBytes / 1024 < 1000 Then Return Format((InBytes) / 1024, "0.#") & " KB"
+    If InBytes / 1024 / 1024 < 1000 Then Return Format((InBytes) / 1024 / 1024, "0.##") & " MB"
+    If InBytes / 1024 / 1024 / 1024 < 1000 Then Return Format((InBytes) / 1024 / 1024 / 1024, "0.##") & " GB"
+    Return Format((InBytes) / 1024 / 1024 / 1024 / 1024, "0.##") & " TB"
   End Function
   Public Function ConvertTime(ByVal lngMS As UInt64, Optional ByVal Abbreviated As Boolean = False, Optional ByVal Trimmed As Boolean = True) As String
     Dim lngSeconds As UInt64 = lngMS \ 1000
