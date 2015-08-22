@@ -215,6 +215,16 @@ Module modFunctions
           Else
             Return "The server closed the connection. Please try again."
           End If
+        ElseIf ex.InnerException.Message.StartsWith("Error writing request") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("The socket has been shut down") Then
+              Return "Connection aborted."
+            Else
+              Return "The server closed the connection - " & ex.InnerException.InnerException.Message
+            End If
+          Else
+            Return "The server closed the connection. Please try again."
+          End If
         Else
           reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
