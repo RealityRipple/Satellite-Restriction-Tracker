@@ -332,10 +332,11 @@
     End If
   End Sub
   Private Sub Login(sUID As String, sPass As String)
-    PrepareLogin()
-    ContinueLogin(sUID, sPass)
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf ContinueLogin), New Object() {sUID, sPass}, 250, System.Threading.Timeout.Infinite)
   End Sub
-  Private Sub ContinueLogin(sUID As String, sPass As String)
+  Private Sub ContinueLogin(state As Object)
+    Dim sUID As String = state(0)
+    Dim sPass As String = state(1)
     PrepareLogin()
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : ContinueLoginWB(sUID, sPass)

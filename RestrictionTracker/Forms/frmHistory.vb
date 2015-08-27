@@ -83,67 +83,67 @@ Public Class frmHistory
   Private Sub ChangeStyle()
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
-    Else
-      Select Case useStyle
-        Case SatHostTypes.DishNet_EXEDE
-          cmd30Days.Text = "This Period"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-          cmd60Days.Text = "Last Period"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Anytime"
-          colUPLOAD.HeaderText = "Off-Peak"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
-          cmd30Days.Text = "This Period"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-          cmd60Days.Text = "Last Period"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Used"
-          colUPLOAD.HeaderText = "Total"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-        Case Else
-          cmd30Days.Text = "30 Days"
-          ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
-          cmd60Days.Text = "60 Days"
-          ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last 60 days.")
-          dgvUsage.Columns.Clear()
-          colDOWNLOAD.HeaderText = "Download"
-          colUPLOAD.HeaderText = "Upload"
-          dgvUsage.Columns.Add(colDATETIME)
-          dgvUsage.Columns.Add(colDOWNLOAD)
-          dgvUsage.Columns.Add(colUPLOAD)
-      End Select
+      Return
     End If
+    Select Case useStyle
+      Case SatHostTypes.DishNet_EXEDE
+        cmd30Days.Text = "This Period"
+        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
+        cmd60Days.Text = "Last Period"
+        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
+        dgvUsage.Columns.Clear()
+        colDOWNLOAD.HeaderText = "Anytime"
+        colUPLOAD.HeaderText = "Off-Peak"
+        dgvUsage.Columns.Add(colDATETIME)
+        dgvUsage.Columns.Add(colDOWNLOAD)
+        dgvUsage.Columns.Add(colUPLOAD)
+      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+        cmd30Days.Text = "This Period"
+        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
+        cmd60Days.Text = "Last Period"
+        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
+        dgvUsage.Columns.Clear()
+        colDOWNLOAD.HeaderText = "Used"
+        colUPLOAD.HeaderText = "Total"
+        dgvUsage.Columns.Add(colDATETIME)
+        dgvUsage.Columns.Add(colDOWNLOAD)
+        dgvUsage.Columns.Add(colUPLOAD)
+      Case Else
+        cmd30Days.Text = "30 Days"
+        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
+        cmd60Days.Text = "60 Days"
+        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last 60 days.")
+        dgvUsage.Columns.Clear()
+        colDOWNLOAD.HeaderText = "Download"
+        colUPLOAD.HeaderText = "Upload"
+        dgvUsage.Columns.Add(colDATETIME)
+        dgvUsage.Columns.Add(colDOWNLOAD)
+        dgvUsage.Columns.Add(colUPLOAD)
+    End Select
   End Sub
 #End Region
 #Region "Graph"
   Private Sub DidResize(downRet As Bitmap, upRet As Bitmap)
     If Me.InvokeRequired Then
       Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), downRet, upRet)
-    Else
-      If downRet Is Nothing Then
-        pctDld.Image = Nothing
-      ElseIf pctDld.Size.Equals(downRet.Size) Then
-        pctDld.Image = downRet
-      End If
-      If upRet Is Nothing Then
-        pctUld.Image = Nothing
-      ElseIf pctUld.Size.Equals(upRet.Size) Then
-        pctUld.Image = upRet
-      End If
-      graphSpaceD = GetGraphRect(True, graphMinX, graphMaxX)
-      graphSpaceU = GetGraphRect(False, Nothing, Nothing)
-      If fDB IsNot Nothing Then
-        If fDB.Visible Then fDB.Close()
-        fDB.Dispose()
-        fDB = Nothing
-      End If
+      Return
+    End If
+    If downRet Is Nothing Then
+      pctDld.Image = Nothing
+    ElseIf pctDld.Size.Equals(downRet.Size) Then
+      pctDld.Image = downRet
+    End If
+    If upRet Is Nothing Then
+      pctUld.Image = Nothing
+    ElseIf pctUld.Size.Equals(upRet.Size) Then
+      pctUld.Image = upRet
+    End If
+    graphSpaceD = GetGraphRect(True, graphMinX, graphMaxX)
+    graphSpaceU = GetGraphRect(False, Nothing, Nothing)
+    If fDB IsNot Nothing Then
+      If fDB.Visible Then fDB.Close()
+      fDB.Dispose()
+      fDB = Nothing
     End If
   End Sub
   Private Sub DoGraph(state As Object)

@@ -19,7 +19,7 @@ Public Class frmWizard
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
   Private Const WM_GETSYSMENU As Integer = &H313
   Private Const HTCAPTION As Integer = 2
-  Private WithEvents wsHostList As New WebClientEx()
+  Private WithEvents wsHostList As WebClientEx
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
@@ -210,8 +210,8 @@ Public Class frmWizard
           DrawStatus(True, "Loading Host List...")
           cmbAccountHost.Text = ""
           cmbAccountHost.Enabled = False
-          Dim popInvoker As New MethodInvoker(AddressOf PopulateHostList)
-          popInvoker.BeginInvoke(Nothing, Nothing)
+          wsHostList = New WebClientEx()
+          Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf PopulateHostList), Nothing, 250, System.Threading.Timeout.Infinite)
         End If
       Case 2
         pctLeftBox.Image = My.Resources.wizService
@@ -400,30 +400,30 @@ Public Class frmWizard
   Private Sub DrawStatus(Busy As Boolean, Optional Message As String = Nothing)
     If Me.InvokeRequired Then
       Me.Invoke(New DrawStatusInvoker(AddressOf DrawStatus), Busy, Message)
+      Return
+    End If
+    If Busy Then
+      cmdPrevious.Enabled = False
+      cmdNext.Enabled = False
+      lblActivity.Text = Message
+      cmdClose.Focus()
     Else
-      If Busy Then
-        cmdPrevious.Enabled = False
-        cmdNext.Enabled = False
-        lblActivity.Text = Message
-        cmdClose.Focus()
+      cmdPrevious.Enabled = Not tbsWizardPages.SelectedIndex = 0
+      cmdNext.Enabled = Not tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1
+      lblActivity.Text = Nothing
+      If cmdNext.Enabled Then
+        cmdNext.Focus()
       Else
-        cmdPrevious.Enabled = Not tbsWizardPages.SelectedIndex = 0
-        cmdNext.Enabled = Not tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1
-        lblActivity.Text = Nothing
-        If cmdNext.Enabled Then
-          cmdNext.Focus()
-        Else
-          cmdClose.Focus()
-        End If
+        cmdClose.Focus()
       End If
     End If
   End Sub
   Private Sub PopulateHostList()
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New MethodInvoker(AddressOf PopulateHostList))
-    Else
-      wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"))
+      Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
+      Return
     End If
+    wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"))
   End Sub
   Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
     DrawStatus(False)
@@ -519,54 +519,54 @@ Public Class frmWizard
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
-    Else
-      Dim sErr As String = "There was an error verifying your key!"
-      Select Case e.Type
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
-      End Select
-      If pChecker IsNot Nothing Then
-        pChecker.Dispose()
-        pChecker = Nothing
-      End If
-      If remoteTest IsNot Nothing Then
-        remoteTest.Dispose()
-        remoteTest = Nothing
-      End If
-      Select Case e.Type
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
-          MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Warning)
-          'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
-        Case Else
-          optNone.Checked = True
-          MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
-          'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-      End Select
-      DrawStatus(False)
-      pnlKey.Tag = 0
+      Return
     End If
+    Dim sErr As String = "There was an error verifying your key!"
+    Select Case e.Type
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
+    End Select
+    If pChecker IsNot Nothing Then
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
+    If remoteTest IsNot Nothing Then
+      remoteTest.Dispose()
+      remoteTest = Nothing
+    End If
+    Select Case e.Type
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
+        MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Warning)
+        'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
+      Case Else
+        optNone.Checked = True
+        MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
+        'MessageBox.Show(sErr, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+    End Select
+    DrawStatus(False)
+    pnlKey.Tag = 0
   End Sub
   Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
-    Else
-      If pChecker IsNot Nothing Then
-        pChecker.Dispose()
-        pChecker = Nothing
-      End If
-      If remoteTest IsNot Nothing Then
-        remoteTest.Dispose()
-        remoteTest = Nothing
-      End If
-      DrawStatus(True)
-      pnlKey.Tag = 1
-      tbsWizardPages.SelectedIndex += 1
+      Return
     End If
+    If pChecker IsNot Nothing Then
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
+    If remoteTest IsNot Nothing Then
+      remoteTest.Dispose()
+      remoteTest = Nothing
+    End If
+    DrawStatus(True)
+    pnlKey.Tag = 1
+    tbsWizardPages.SelectedIndex += 1
   End Sub
   Private Sub UsageTest()
     If localTest IsNot Nothing Then
@@ -589,46 +589,46 @@ Public Class frmWizard
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
-    Else
-      If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
-      AccountType = acct
-      DrawStatus(False)
-      tbsWizardPages.SelectedIndex += 1
-      wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
+      Me.Invoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
+      Return
     End If
+    If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
+    AccountType = acct
+    DrawStatus(False)
+    tbsWizardPages.SelectedIndex += 1
+    wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
     LocalComplete(SatHostTypes.DishNet_EXEDE)
   End Sub
   Private Sub localTest_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
-    Else
-      If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
-      AccountType = SatHostTypes.Other
-      Select Case e.Type
-        Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
-          MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-          'MessageBox.Show("Connection to Server Timed Out!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case ConnectionFailureEventArgs.FailureType.LoginFailure
-          MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-          'MessageBox.Show("Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
-          MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-          'MessageBox.Show("Fatal Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
-          MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
-          'MessageBox.Show("Missing account information!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
-        Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
-          tbsWizardPages.SelectedIndex += 1
-      End Select
-      If localTest IsNot Nothing Then
-        localTest.Dispose()
-        localTest = Nothing
-      End If
-      DrawStatus(False)
+      Me.Invoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
+      Return
     End If
+    If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
+    AccountType = SatHostTypes.Other
+    Select Case e.Type
+      Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
+        MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+        'MessageBox.Show("Connection to Server Timed Out!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      Case ConnectionFailureEventArgs.FailureType.LoginFailure
+        MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+        'MessageBox.Show("Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
+        MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+        'MessageBox.Show("Fatal Login Failure: " & e.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+        MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+        'MessageBox.Show("Missing account information!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+      Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
+        tbsWizardPages.SelectedIndex += 1
+    End Select
+    If localTest IsNot Nothing Then
+      localTest.Dispose()
+      localTest = Nothing
+    End If
+    DrawStatus(False)
   End Sub
   Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
     LocalComplete(SatHostTypes.RuralPortal_LEGACY)

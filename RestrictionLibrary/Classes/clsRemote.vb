@@ -145,9 +145,9 @@ Public Class remoteRestrictionTracker
     wsLogin.Proxy = Proxy
     iTimeout = Timeout
     'wsLogin.Encoding = System.Text.Encoding.UTF8
-    BeginLogin()
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginLogin), Nothing, 250, System.Threading.Timeout.Infinite)
   End Sub
-  Private Sub BeginLogin()
+  Private Sub BeginLogin(state As Object)
     ResetTimeout(True)
     If wsLogin Is Nothing Then
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated prematurely"))

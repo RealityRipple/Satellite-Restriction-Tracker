@@ -50,7 +50,7 @@
   Public Event DownloadingUpdate(sender As Object, e As EventArgs)
   Public Event UpdateProgressChanged(sender As Object, e As ProgressEventArgs)
   Public Event DownloadResult(sender As Object, e As DownloadEventArgs)
-  Private WithEvents wsVer As New WebClientEx()
+  Private WithEvents wsVer As WebClientEx
   Private DownloadURL As String
   Private VerNumber As String
 #Region "IDisposable Support"
@@ -76,12 +76,16 @@
 #End Region
   Public Sub CheckVersion()
     Dim myS As New AppSettings
+    wsVer = New WebClientEx()
     wsVer.Proxy = myS.Proxy
     wsVer.Timeout = myS.Timeout
     myS = Nothing
     wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
-    wsVer.DownloadStringAsync(New Uri(VersionURL), "INFO")
     RaiseEvent CheckingVersion(Me, New EventArgs)
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginCheck), Nothing, 250, System.Threading.Timeout.Infinite)
+  End Sub
+  Private Sub BeginCheck(state As Object)
+    wsVer.DownloadStringAsync(New Uri(VersionURL), "INFO")
   End Sub
   Public Shared Function QuickCheckVersion() As CheckEventArgs.ResultType
     Dim sVerStr As String

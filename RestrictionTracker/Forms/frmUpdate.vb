@@ -68,7 +68,11 @@
   End Sub
   Private Sub GetVerInfo()
     sckVerInfo = New WebClientEx()
-    If lblBETA.Visible Then
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginGetVerInfo), lblBETA.Visible, 250, System.Threading.Timeout.Infinite)
+  End Sub
+  Private Sub BeginGetVerInfo(state As Object)
+    Dim doBeta As Boolean = state
+    If doBeta Then
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/infob"))
     Else
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/info"))
@@ -77,36 +81,39 @@
   Private Sub sckVerInfo_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles sckVerInfo.DownloadStringCompleted
     If Me.InvokeRequired Then
       Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf sckVerInfo_DownloadStringCompleted), sender, e)
-    Else
-      pctThrobber.Visible = False
-      If e.Cancelled Then
-        txtInfo.Text = "Info Request Cancelled"
-      ElseIf e.Error IsNot Nothing Then
-        txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
-      Else
-        txtInfo.Text = e.Result
-      End If
-      If sckVerInfo IsNot Nothing Then
-        sckVerInfo.Dispose()
-        sckVerInfo = Nothing
-      End If
-      cmdChanges.Enabled = True
-      cmdChanges.Focus()
+      Return
     End If
+    pctThrobber.Visible = False
+    If e.Cancelled Then
+      txtInfo.Text = "Info Request Cancelled"
+    ElseIf e.Error IsNot Nothing Then
+      txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
+    Else
+      txtInfo.Text = e.Result
+    End If
+    If sckVerInfo IsNot Nothing Then
+      sckVerInfo.Dispose()
+      sckVerInfo = Nothing
+    End If
+    cmdChanges.Enabled = True
+    cmdChanges.Focus()
   End Sub
   Private Delegate Sub FailureHandler(sender As Object, e As WebClientEx.ErrorEventArgs)
   Private Sub sckVerInfo_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles sckVerInfo.Failure
     If Me.InvokeRequired Then
       Me.Invoke(New FailureHandler(AddressOf sckVerInfo_Failure), sender, e)
-    Else
-      pctThrobber.Visible = False
-      txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
-      If sckVerInfo IsNot Nothing Then
-        sckVerInfo.Dispose()
-        sckVerInfo = Nothing
-      End If
-      cmdChanges.Enabled = True
-      cmdChanges.Focus()
+      Return
     End If
+    pctThrobber.Visible = False
+    txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
+    If sckVerInfo IsNot Nothing Then
+      sckVerInfo.Dispose()
+      sckVerInfo = Nothing
+    End If
+    cmdChanges.Enabled = True
+    cmdChanges.Focus()
   End Sub
+
+
+
 End Class

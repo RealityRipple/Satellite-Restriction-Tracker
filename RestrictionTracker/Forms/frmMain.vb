@@ -1048,11 +1048,15 @@ Public Class frmMain
       End If
       Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
       wsHostList = New WebClientEx
-      wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
+      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf SaveToHostList), myProvider, 250, System.Threading.Timeout.Infinite)
       didHostListSave = True
     Catch ex As Exception
       didHostListSave = False
     End Try
+  End Sub
+  Private Sub SaveToHostList(state As Object)
+    Dim myProvider As String = state
+    wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
   End Sub
 #End Region
 #End Region

@@ -228,21 +228,21 @@
     fswController.NotifyFilter = IO.NotifyFilters.Attributes Or IO.NotifyFilters.CreationTime Or IO.NotifyFilters.DirectoryName Or IO.NotifyFilters.FileName Or IO.NotifyFilters.LastAccess Or IO.NotifyFilters.LastWrite Or IO.NotifyFilters.Security Or IO.NotifyFilters.Size
     fswController.EnableRaisingEvents = True
     bLoaded = True
-    Dim popInvoker As New MethodInvoker(AddressOf PopulateHostList)
-    popInvoker.BeginInvoke(Nothing, Nothing)
+    wsHostList = New WebClientEx
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf PopulateHostList), Nothing, 250, System.Threading.Timeout.Infinite)
   End Sub
   Private Sub RunAccountTest(sKey As String)
     If Me.InvokeRequired Then
-      Me.BeginInvoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
-    Else
-      If pChecker IsNot Nothing Then
-        pChecker.Dispose()
-        pChecker = Nothing
-      Else
-        Exit Sub
-      End If
-      remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
+      Me.Invoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
+      Return
     End If
+    If pChecker IsNot Nothing Then
+      pChecker.Dispose()
+      pChecker = Nothing
+    Else
+      Exit Sub
+    End If
+    remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then
@@ -701,7 +701,6 @@
   End Sub
 #Region "Host List"
   Private Sub PopulateHostList()
-    wsHostList = New WebClientEx
     wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
   End Sub
   Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
@@ -712,23 +711,23 @@
         Catch ex As Exception
 
         End Try
-      Else
-        If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
-          Try
-            If e.Result.Contains(vbLf) Then
-              Dim HostList() As String = Split(e.Result, vbLf)
-              bLoaded = False
-              cmbProvider.Items.Clear()
-              cmbProvider.Items.AddRange(HostList)
-              If mySettings.Account.Contains("@") Then
-                Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
-                cmbProvider.Text = sProvider
-              End If
-              bLoaded = True
+        Return
+      End If
+      If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
+        Try
+          If e.Result.Contains(vbLf) Then
+            Dim HostList() As String = Split(e.Result, vbLf)
+            bLoaded = False
+            cmbProvider.Items.Clear()
+            cmbProvider.Items.AddRange(HostList)
+            If mySettings.Account.Contains("@") Then
+              Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+              cmbProvider.Text = sProvider
             End If
-          Catch ex As Exception
-          End Try
-        End If
+            bLoaded = True
+          End If
+        Catch ex As Exception
+        End Try
       End If
     End If
   End Sub
@@ -809,58 +808,58 @@
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
-    Else
-      Dim bToSave As Boolean = True
-      If Not CheckState Then bToSave = False
-      If SettingsChanged() Then bToSave = True
-      pctKeyState.Tag = 0
-      pctKeyState.Image = My.Resources.ico_err
-      Dim sErr As String = "There was an error verifying your key!"
-      Select Case e.Type
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-        Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-      End Select
-      If pChecker IsNot Nothing Then
-        pChecker.Dispose()
-        pChecker = Nothing
-      End If
-      If remoteTest IsNot Nothing Then
-        remoteTest.Dispose()
-        remoteTest = Nothing
-      End If
-      ttConfig.SetTooltip(pctKeyState, sErr)
-      DoCheck()
-      cmdSave.Enabled = bToSave
+      Return
     End If
+    Dim bToSave As Boolean = True
+    If Not CheckState Then bToSave = False
+    If SettingsChanged() Then bToSave = True
+    pctKeyState.Tag = 0
+    pctKeyState.Image = My.Resources.ico_err
+    Dim sErr As String = "There was an error verifying your key!"
+    Select Case e.Type
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!"
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
+      Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
+    End Select
+    If pChecker IsNot Nothing Then
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
+    If remoteTest IsNot Nothing Then
+      remoteTest.Dispose()
+      remoteTest = Nothing
+    End If
+    ttConfig.SetToolTip(pctKeyState, sErr)
+    DoCheck()
+    cmdSave.Enabled = bToSave
   End Sub
   Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
-    Else
-      Dim bToSave As Boolean = True
-      If CheckState Then bToSave = False
-      If SettingsChanged() Then bToSave = True
-      pctKeyState.Tag = 1
-      pctKeyState.Image = My.Resources.ico_ok
-      ttConfig.SetTooltip(pctKeyState, "Your key has been verified!")
-      lblPurchaseKey.Text = LINK_PANEL
-      If pChecker IsNot Nothing Then
-        pChecker.Dispose()
-        pChecker = Nothing
-      End If
-      If remoteTest IsNot Nothing Then
-        remoteTest.Dispose()
-        remoteTest = Nothing
-      End If
-      ttConfig.SetTooltip(lblPurchaseKey, LINK_PANEL_TT)
-      DoCheck()
-      cmdSave.Enabled = bToSave
+      Return
     End If
+    Dim bToSave As Boolean = True
+    If CheckState Then bToSave = False
+    If SettingsChanged() Then bToSave = True
+    pctKeyState.Tag = 1
+    pctKeyState.Image = My.Resources.ico_ok
+    ttConfig.SetToolTip(pctKeyState, "Your key has been verified!")
+    lblPurchaseKey.Text = LINK_PANEL
+    If pChecker IsNot Nothing Then
+      pChecker.Dispose()
+      pChecker = Nothing
+    End If
+    If remoteTest IsNot Nothing Then
+      remoteTest.Dispose()
+      remoteTest = Nothing
+    End If
+    ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
+    DoCheck()
+    cmdSave.Enabled = bToSave
   End Sub
 #End Region
 #Region "Buttons"

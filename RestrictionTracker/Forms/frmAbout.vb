@@ -155,39 +155,36 @@
   Private Sub ResetUpdate()
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf ResetUpdate))
-    Else
-      If tReset Is Nothing Then
-        Exit Sub
-      Else
-        tReset.Dispose()
-        tReset = Nothing
-      End If
-      lblUpdate.Visible = False
-      pnlAbout.Controls.Remove(lblUpdate)
-      pnlAbout.Controls.Add(cmdUpdate, 1, 2)
-      cmdUpdate.Visible = True
-      cmdUpdate.Text = "Check for &Updates"
-      ttAbout.SetTooltip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
+      Return
     End If
+    If tReset Is Nothing Then Return
+    tReset.Dispose()
+    tReset = Nothing
+    lblUpdate.Visible = False
+    pnlAbout.Controls.Remove(lblUpdate)
+    pnlAbout.Controls.Add(cmdUpdate, 1, 2)
+    cmdUpdate.Visible = True
+    cmdUpdate.Text = "Check for &Updates"
+    ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
   End Sub
   Private Sub NewUpdate()
     If Me.InvokeRequired Then
       Me.Invoke(New MethodInvoker(AddressOf NewUpdate))
-    Else
-      If tReset Is Nothing Then
-        Exit Sub
-      Else
-        tReset.Dispose()
-        tReset = Nothing
-      End If
-      lblUpdate.Visible = False
-      pnlAbout.Controls.Remove(lblUpdate)
-      pnlAbout.Controls.Add(cmdUpdate, 1, 2)
-      cmdUpdate.Visible = True
-      cmdUpdate.Text = "Apply &Update"
-      ttAbout.SetToolTip(cmdUpdate, My.Application.Info.ProductName & " must restart before the update can be applied.")
-      If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
+      Return
     End If
+    If tReset Is Nothing Then
+      Exit Sub
+    Else
+      tReset.Dispose()
+      tReset = Nothing
+    End If
+    lblUpdate.Visible = False
+    pnlAbout.Controls.Remove(lblUpdate)
+    pnlAbout.Controls.Add(cmdUpdate, 1, 2)
+    cmdUpdate.Visible = True
+    cmdUpdate.Text = "Apply &Update"
+    ttAbout.SetToolTip(cmdUpdate, My.Application.Info.ProductName & " must restart before the update can be applied.")
+    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
   End Sub
   Private Sub BeginCheck()
     updateChecker = New clsUpdate
@@ -210,51 +207,75 @@
   Private Sub updateChecker_CheckingVersion(sender As Object, e As System.EventArgs) Handles updateChecker.CheckingVersion
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_CheckingVersion), sender, e)
-    Else
-      SetUpdateValue("Checking for Updates", True)
+      Return
     End If
+    SetUpdateValue("Checking for Updates", True)
   End Sub
   Private Sub updateChecker_CheckProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.CheckProgressChanged
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_CheckProgressChanged), sender, e)
-    Else
-      Dim sProgress As String = "(" & e.ProgressPercentage & "%)"
-      SetUpdateValue("Checking for Updates " & sProgress, True)
+      Return
     End If
+    Dim sProgress As String = "(" & e.ProgressPercentage & "%)"
+    SetUpdateValue("Checking for Updates " & sProgress, True)
   End Sub
   Private Sub updateChecker_CheckResult(sender As Object, e As clsUpdate.CheckEventArgs) Handles updateChecker.CheckResult
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
-    Else
-      If tReset IsNot Nothing Then
-        tReset.Dispose()
-        tReset = Nothing
-      End If
-      If e.Error IsNot Nothing Then
-        If e.Error.Message.Contains("The remote name could not be resolved") Then
-          SetUpdateValue("Unable to Connect: Server not Found")
-          lblUpdate.Link = False
-          tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-        Else
-          SetUpdateValue(e.Error.Message)
-          lblUpdate.Link = False
-          tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-        End If
-      ElseIf e.Cancelled Then
-        SetUpdateValue("Update Check Cancelled")
+      Return
+    End If
+    If tReset IsNot Nothing Then
+      tReset.Dispose()
+      tReset = Nothing
+    End If
+    If e.Error IsNot Nothing Then
+      If e.Error.Message.Contains("The remote name could not be resolved") Then
+        SetUpdateValue("Unable to Connect: Server not Found")
         lblUpdate.Link = False
         tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
       Else
-        Dim mySettings As New AppSettings
-        If mySettings.UpdateType = AppSettings.UpdateTypes.Ask Then
-          Dim fUpdate As New frmUpdate
-          fUpdate.TopMost = Me.TopMost
-          Select Case e.Result
-            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-              SetUpdateValue("New Update Available", , "Click to begin download.")
+        SetUpdateValue(e.Error.Message)
+        lblUpdate.Link = False
+        tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+      End If
+    ElseIf e.Cancelled Then
+      SetUpdateValue("Update Check Cancelled")
+      lblUpdate.Link = False
+      tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+    Else
+      Dim mySettings As New AppSettings
+      If mySettings.UpdateType = AppSettings.UpdateTypes.Ask Then
+        Dim fUpdate As New frmUpdate
+        fUpdate.TopMost = Me.TopMost
+        Select Case e.Result
+          Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+            SetUpdateValue("New Update Available", , "Click to begin download.")
+            lblUpdate.Link = True
+            Application.DoEvents()
+            fUpdate.NewUpdate(e.Version, False, False)
+            Select Case fUpdate.ShowDialog()
+              Case Windows.Forms.DialogResult.Yes
+                lblUpdate.Link = False
+                updateChecker.DownloadUpdate(sEXEPath)
+              Case Windows.Forms.DialogResult.No
+
+              Case Windows.Forms.DialogResult.OK
+                lblUpdate.Link = False
+                updateChecker.DownloadUpdate(sEXEPath)
+                mySettings.UpdateBETA = False
+                mySettings.Save()
+              Case Windows.Forms.DialogResult.Cancel
+                mySettings.UpdateBETA = False
+                mySettings.Save()
+              Case Else
+
+            End Select
+          Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+            If mySettings.UpdateBETA Then
+              SetUpdateValue("New BETA Available", , "Click to begin download.")
               lblUpdate.Link = True
               Application.DoEvents()
-              fUpdate.NewUpdate(e.Version, False, False)
+              fUpdate.NewUpdate(e.Version, True, False)
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
                   lblUpdate.Link = False
@@ -269,104 +290,80 @@
                 Case Windows.Forms.DialogResult.Cancel
                   mySettings.UpdateBETA = False
                   mySettings.Save()
+                  SetUpdateValue("No New Updates")
+                  lblUpdate.Link = False
                 Case Else
 
               End Select
-            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-              If mySettings.UpdateBETA Then
-                SetUpdateValue("New BETA Available", , "Click to begin download.")
-                lblUpdate.Link = True
-                Application.DoEvents()
-                fUpdate.NewUpdate(e.Version, True, False)
-                Select Case fUpdate.ShowDialog()
-                  Case Windows.Forms.DialogResult.Yes
-                    lblUpdate.Link = False
-                    updateChecker.DownloadUpdate(sEXEPath)
-                  Case Windows.Forms.DialogResult.No
-
-                  Case Windows.Forms.DialogResult.OK
-                    lblUpdate.Link = False
-                    updateChecker.DownloadUpdate(sEXEPath)
-                    mySettings.UpdateBETA = False
-                    mySettings.Save()
-                  Case Windows.Forms.DialogResult.Cancel
-                    mySettings.UpdateBETA = False
-                    mySettings.Save()
-                    SetUpdateValue("No New Updates")
-                    lblUpdate.Link = False
-                  Case Else
-
-                End Select
-              Else
-                SetUpdateValue("No New Updates")
-                lblUpdate.Link = False
-                tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-              End If
-            Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
+            Else
               SetUpdateValue("No New Updates")
               lblUpdate.Link = False
               tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-          End Select
-        Else
-          Select Case e.Result
-            Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-              SetUpdateValue("New Update Available")
+            End If
+          Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
+            SetUpdateValue("No New Updates")
+            lblUpdate.Link = False
+            tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+        End Select
+      Else
+        Select Case e.Result
+          Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
+            SetUpdateValue("New Update Available")
+            lblUpdate.Link = False
+            Application.DoEvents()
+            updateChecker.DownloadUpdate(sEXEPath)
+          Case clsUpdate.CheckEventArgs.ResultType.NewBeta
+            If mySettings.UpdateBETA Then
+              SetUpdateValue("New BETA Available")
               lblUpdate.Link = False
               Application.DoEvents()
               updateChecker.DownloadUpdate(sEXEPath)
-            Case clsUpdate.CheckEventArgs.ResultType.NewBeta
-              If mySettings.UpdateBETA Then
-                SetUpdateValue("New BETA Available")
-                lblUpdate.Link = False
-                Application.DoEvents()
-                updateChecker.DownloadUpdate(sEXEPath)
-              Else
-                SetUpdateValue("No New Updates")
-                lblUpdate.Link = False
-                tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-              End If
-            Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
+            Else
               SetUpdateValue("No New Updates")
               lblUpdate.Link = False
               tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
-          End Select
-        End If
-        mySettings = Nothing
+            End If
+          Case clsUpdate.CheckEventArgs.ResultType.NoUpdate
+            SetUpdateValue("No New Updates")
+            lblUpdate.Link = False
+            tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
+        End Select
       End If
+      mySettings = Nothing
     End If
   End Sub
   Private Sub updateChecker_DownloadingUpdate(sender As Object, e As System.EventArgs) Handles updateChecker.DownloadingUpdate
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
-    Else
-      tmrSpeed.Enabled = True
-      SetUpdateValue("Downloading Update", True)
-      lblUpdate.Link = False
+      Return
     End If
+    tmrSpeed.Enabled = True
+    SetUpdateValue("Downloading Update", True)
+    lblUpdate.Link = False
   End Sub
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+      Return
+    End If
+    tmrSpeed.Enabled = False
+    If e.Error IsNot Nothing Then
+      SetUpdateValue(e.Error.Message)
+    ElseIf e.Cancelled Then
+      updateChecker.Dispose()
+      SetUpdateValue("Download Cancelled")
     Else
-      tmrSpeed.Enabled = False
-      If e.Error IsNot Nothing Then
-        SetUpdateValue(e.Error.Message)
-      ElseIf e.Cancelled Then
-        updateChecker.Dispose()
-        SetUpdateValue("Download Cancelled")
-      Else
-        updateChecker.Dispose()
-        SetUpdateValue("Download Complete")
-        Application.DoEvents()
-        If My.Computer.FileSystem.FileExists(sEXEPath) Then
-          If tReset IsNot Nothing Then
-            tReset.Dispose()
-            tReset = Nothing
-          End If
-          tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf NewUpdate), Nothing, 1000, 2000)
-        Else
-          SetUpdateValue("Update Failure")
+      updateChecker.Dispose()
+      SetUpdateValue("Download Complete")
+      Application.DoEvents()
+      If My.Computer.FileSystem.FileExists(sEXEPath) Then
+        If tReset IsNot Nothing Then
+          tReset.Dispose()
+          tReset = Nothing
         End If
+        tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf NewUpdate), Nothing, 1000, 2000)
+      Else
+        SetUpdateValue("Update Failure")
       End If
     End If
   End Sub
@@ -377,11 +374,11 @@
   Private Sub updateChecker_UpdateProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.UpdateProgressChanged
     If Me.InvokeRequired Then
       Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
-    Else
-      CurSize = e.BytesReceived
-      TotalSize = e.TotalBytesToReceive
-      CurPercent = e.ProgressPercentage
+      Return
     End If
+    CurSize = e.BytesReceived
+    TotalSize = e.TotalBytesToReceive
+    CurPercent = e.ProgressPercentage
   End Sub
   Private LastSize As Long
   Private Sub tmrSpeed_Tick(sender As Object, e As System.EventArgs) Handles tmrSpeed.Tick

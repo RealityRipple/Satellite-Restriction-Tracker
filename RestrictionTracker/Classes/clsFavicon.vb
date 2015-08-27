@@ -47,6 +47,15 @@
     Try
       wsNetTest = New WebClientEx
       wsNetTest.ErrorBypass = True
+      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadString), New Object() {URL, token}, 250, System.Threading.Timeout.Infinite)
+    Catch ex As Exception
+      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
+    End Try
+  End Sub
+  Private Sub DownloadString(state As Object)
+    Dim URL As Uri = state(0)
+    Dim token As Object = state(1)
+    Try
       wsNetTest.DownloadStringAsync(URL, token)
     Catch ex As Exception
       RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
@@ -56,6 +65,16 @@
     Try
       wsNetTest = New WebClientEx
       wsNetTest.ErrorBypass = True
+      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadFile), New Object() {URL, Filename, token}, 250, System.Threading.Timeout.Infinite)
+    Catch ex As Exception
+      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
+    End Try
+  End Sub
+  Private Sub DownloadFile(state As Object)
+    Dim URL As Uri = state(0)
+    Dim Filename As String = state(1)
+    Dim token As Object = state(2)
+    Try
       wsNetTest.DownloadFileAsync(URL, Filename, token)
     Catch ex As Exception
       RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
