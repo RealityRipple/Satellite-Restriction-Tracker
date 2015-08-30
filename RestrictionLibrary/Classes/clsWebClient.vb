@@ -1,19 +1,13 @@
 ﻿Public Class WebClientEx
   Inherits Net.WebClient
   Sub New()
-    Me.New(New Net.CookieContainer)
-    System.Net.ServicePointManager.Expect100Continue = False
-  End Sub
-  Sub New(c As Net.CookieContainer)
-    Me.CookieJar = c
+    MyBase.New()
+    Me.CookieJar = New Net.CookieContainer
     c_Timeout = 60
     c_HTVer = Net.HttpVersion.Version10
     c_ErrorBypass = False
     c_ManualRedirect = False
-  End Sub
-  Sub New(v As Version)
-    Me.New(New Net.CookieContainer)
-    c_HTVer = v
+    System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   Public CookieJar As Net.CookieContainer
   Public ResponseURI As Uri
