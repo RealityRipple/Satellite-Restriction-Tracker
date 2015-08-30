@@ -488,14 +488,14 @@
     Dim bReset As Boolean = False
     If e.Error IsNot Nothing Then
       If e.Error.InnerException Is Nothing Then
-        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
+        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
         bReset = False
       Else
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
         Else
-          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
+          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
           bReset = False
         End If
       End If
@@ -565,14 +565,14 @@
     Dim bReset As Boolean = False
     If e.Error IsNot Nothing Then
       If e.Error.InnerException Is Nothing Then
-        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
+        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
         bReset = False
       Else
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
         Else
-          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
+          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
           bReset = False
         End If
       End If
@@ -650,7 +650,7 @@
             WB_Download_Table(sHost, sRet, sErrMsg, sFailText, bReset)
             CloseSocket = True
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.WildBlue_EXEDE
@@ -678,11 +678,11 @@
                 EX_Download_Table(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
                 CloseSocket = True
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE
@@ -694,14 +694,14 @@
               Case ConnectionSubStates.AuthenticateRetry
                 RP_Login_AuthenticateRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case ConnectionStates.TableDownload
             RP_Download_Table(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
             CloseSocket = True
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.DishNet_EXEDE
@@ -717,7 +717,7 @@
               Case ConnectionSubStates.Verify
                 DN_Login_Verify(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case ConnectionStates.TableDownload
@@ -730,11 +730,11 @@
                 DN_Download_TableRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
                 CloseSocket = True
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")]) loading " & sAttemptedURL
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case Else
