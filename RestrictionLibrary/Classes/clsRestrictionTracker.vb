@@ -1105,7 +1105,7 @@
       wsData.DownloadStringAsync(New Uri(sURI), aState)
     ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Or sPath.ToLower.Contains("/ssoerror") Then
       sErrMsg = "Authentication Failed: The server may be down."
-      bReset = True
+      bReset = False
     Else
       sErrMsg = "Authentication Failed: Could not understand response."
       sFailText = "Exede Authentication Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
@@ -1347,17 +1347,17 @@
           Else
             sErrMsg = "Usage Failed: Could not parse usage meter table."
             sFailText = "RuralPortal Parse Error = " & sErrMsg & vbNewLine & sRet
-            bReset = True
+            bReset = False
           End If
         Else
           sErrMsg = "Usage Failed: Could not find usage meter table."
           sFailText = "RuralPortal Meter Error = " & sErrMsg & vbNewLine & sRet
-          bReset = True
+          bReset = False
         End If
       Else
         sErrMsg = "Usage Failed: Could not find usage meter."
         sFailText = "RuralPortal Parse Error = " & sErrMsg & vbNewLine & sRet
-        bReset = True
+        bReset = False
       End If
     Else
       sErrMsg = "Usage Failed: Failed to log in."
