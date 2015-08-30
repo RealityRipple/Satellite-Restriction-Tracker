@@ -18,6 +18,7 @@
   Public CookieJar As Net.CookieContainer
   Public ResponseURI As Uri
   Public Class ErrorEventArgs
+    Inherits EventArgs
     Public [Error] As Exception
     Public Sub New(Err As Exception)
       [Error] = Err
