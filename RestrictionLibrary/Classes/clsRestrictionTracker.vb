@@ -348,6 +348,11 @@
   Private Sub ContinueLoginWB(sUID As String, sPass As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
     wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
     Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
@@ -372,6 +377,11 @@
   End Sub
   Private Sub ContinueLoginExede(sUID As String, sPass As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     Dim uriString As String = "https://my.exede.net/login"
     Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     myUID = sUID
@@ -397,6 +407,11 @@
   End Sub
   Private Sub ContinueLoginRP(sUID As String, sPass As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, "login")
     wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
@@ -423,6 +438,11 @@
   End Sub
   Private Sub ContinueLoginDN(sUID As String, sPass As String)
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
     Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     myUID = sUID
@@ -469,20 +489,25 @@
     If e.Error IsNot Nothing Then
       If e.Error.InnerException Is Nothing Then
         sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-        bReset = True
+        bReset = False
       Else
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
         Else
           sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-          bReset = True
+          bReset = False
         End If
       End If
     ElseIf e.Cancelled Then
       sErrMsg = "Login Error: Request Cancelled"
       bReset = False
     Else
+      If wsData Is Nothing Then
+        ResetTimeout()
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+        Return
+      End If
       Dim sHost As String
       Try
         sHost = wsData.ResponseURI.Host.ToLower
@@ -541,20 +566,25 @@
     If e.Error IsNot Nothing Then
       If e.Error.InnerException Is Nothing Then
         sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-        bReset = True
+        bReset = False
       Else
         If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
           sErrMsg = Nothing
           bReset = False
         Else
           sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & " loading " & sAttemptedURL
-          bReset = True
+          bReset = False
         End If
       End If
     ElseIf e.Cancelled Then
       sErrMsg = "Login Error: Request Cancelled"
       bReset = False
     Else
+      If wsData Is Nothing Then
+        ResetTimeout()
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+        Return
+      End If
       Dim sHost As String
       Try
         sHost = wsData.ResponseURI.Host.ToLower
@@ -603,6 +633,11 @@
     End If
   End Sub
   Private Sub HandleResponse(LoginState As ConnectionStates, LoginSubState As ConnectionSubStates, LoginSubPercent As Decimal, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     iHist += 1
     ResetTimeout(True)
     Dim CloseSocket As Boolean = False
@@ -715,6 +750,11 @@
     End If
   End Sub
   Private Sub LoadUsage(File As String)
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     Dim cJar As Net.CookieContainer = wsData.CookieJar
     PrepareLogin()
     wsData.CookieJar = cJar
@@ -733,6 +773,11 @@
     End Select
   End Sub
   Private Sub ReadUsage(Table As String)
+    If wsData Is Nothing Then
+      ResetTimeout()
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
+      Return
+    End If
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
