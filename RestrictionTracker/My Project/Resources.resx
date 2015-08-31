@@ -301,4 +301,32 @@
   <data name="modem32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\modem32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="HostList" xml:space="preserve">
+    <value>exede.net
+wildblue.net
+dish.net
+dishmail.net
+kitcarson.net
+plateauwb.net
+wbaccess.net
+novecnet.com
+northlc.com
+oecblue.net
+seidata.com
+oecblue.com
+hcecwildblue.com
+trueband.net
+trueband.com
+fhrd.net
+scpwildblue.com
+oeccwildblue.com
+bessi.net
+mlecwb.net
+erec.net
+winntelwb.coop
+coopsone.com
+kiamichiwb.org
+kmwb.net
+directv.net</value>
+  </data>
 </root>
