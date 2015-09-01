@@ -1076,6 +1076,8 @@
       wsData.DownloadStringAsync(New Uri(sURI), aState)
     ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Or sPath.ToLower.Contains("/ssoerror") Then
       sErrMsg = "Authentication Failed: The server may be down."
+    ElseIf sRet.Contains("maintenance") Then
+      sErrMsg = "Authentication Failed: Server Down for Maintenance."
     Else
       sErrMsg = "Authentication Failed: Could not understand response."
       sFailText = "Exede Authentication Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
@@ -1138,6 +1140,8 @@
         sErrMsg = "Dashboard Load Failed: Too many requests. Check for usage data less often."
       ElseIf sRet.Contains("maintenance") Then
         sErrMsg = "Dashboard Load Failed: Server Down for Maintenance."
+      ElseIf sRet.Contains("window.location.href") Then
+        sErrMsg = "Dashboard Load Failed: Sent back to login page. Please try again."
       Else
         sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
         sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
