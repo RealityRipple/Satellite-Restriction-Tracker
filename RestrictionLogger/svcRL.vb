@@ -153,7 +153,7 @@ Public Class svcRL
     End Try
     Try
       DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
-      tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), tmrCheck, 5000, 1000)
+      tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), DataPath, 5000, 1000)
       MySettings = New Settings(DataPath & "\user.config")
       If MySettings Is Nothing Then
         If myLog IsNot Nothing Then myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
@@ -189,21 +189,21 @@ Public Class svcRL
     MyBase.OnPause()
   End Sub
   Protected Overrides Sub OnContinue()
-    tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), tmrCheck, 5000, 1000)
+    tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), DataPath, 5000, 1000)
     MyBase.OnContinue()
   End Sub
   Private Sub tmrCheck_Tick(state As Object)
     Static iChecks As Integer
     iChecks += 1
     If iChecks = MySettings.Interval * 60 Or iChecks = 1 Then
+      Dim dataPath As String = state
       iChecks = 1
       InitAccount()
-      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker.Connect()
+      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker = New localRestrictionTracker(dataPath)
     End If
   End Sub
   Private Sub InitAccount()
     Try
-      tracker = New localRestrictionTracker(DataPath)
       MySettings = New Settings(DataPath & "\user.config")
       If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
         sPassword = StoredPassword.DecryptLogger(MySettings.PassCrypt)
@@ -246,7 +246,6 @@ Public Class svcRL
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
   Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
-    'If myLog IsNot Nothing Then myLog.WriteEntry(e.Status.ToString, EventLogEntryType.Information, 16)
   End Sub
   Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY

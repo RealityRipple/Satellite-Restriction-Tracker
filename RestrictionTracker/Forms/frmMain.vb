@@ -163,8 +163,6 @@ Public Class frmMain
         localData = Nothing
       End If
       localData = New localRestrictionTracker(AppData)
-      Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-      connectInvoker.BeginInvoke(Nothing, Nothing)
     End If
   End Sub
   Private Sub TypeDeterminationOffline_TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs) Handles TypeDeterminationOffline.TypeDetermined
@@ -187,8 +185,6 @@ Public Class frmMain
         localData = Nothing
       End If
       localData = New localRestrictionTracker(AppData)
-      Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-      connectInvoker.BeginInvoke(Nothing, Nothing)
     End If
   End Sub
 #End Region
@@ -326,11 +322,7 @@ Public Class frmMain
               NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
             End If
           Case NativeMethods.SC_MINIMIZE
-            'If Me.Visible And Me.Opacity = 1 Then
             If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never and mySettings.TrayIconAnimation Then m.Result = New IntPtr(-1)
-            'Else
-            'Debug.Print("WOT")
-            'End If
         End Select
       Case NativeMethods.WM_WINDOWPOSCHANGING
         Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
@@ -342,7 +334,7 @@ Public Class frmMain
             mnuRestore.Text = "&Restore"
             Me.Hide()
             Me.Opacity = 1
-            wndPos.Flags = NativeMethods.WINDOWPOS_FLAGS.SWP_NOMOVE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSIZE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOACTIVATE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSENDCHANGING 'Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOCOPYBITS Or NativeMethods.WINDOWPOS_FLAGS.SWP_DRAWFRAME
+            wndPos.Flags = NativeMethods.WINDOWPOS_FLAGS.SWP_NOMOVE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSIZE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOACTIVATE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSENDCHANGING
             System.Runtime.InteropServices.Marshal.StructureToPtr(wndPos, m.LParam, True)
           End If
         End If
@@ -760,7 +752,6 @@ Public Class frmMain
       End If
       cmdConfig.Focus()
       MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Warning)
-      'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
     Else
       If cmdRefresh.Enabled Then
         cmdRefresh.Enabled = False
@@ -774,8 +765,6 @@ Public Class frmMain
             localData = Nothing
           End If
           localData = New localRestrictionTracker(AppData)
-          Dim connectInvoker As New MethodInvoker(AddressOf localData.Connect)
-          connectInvoker.BeginInvoke(Nothing, Nothing)
         End If
       Else
         If remoteData IsNot Nothing Then
@@ -924,7 +913,6 @@ Public Class frmMain
         End If
         cmdConfig.Focus()
         MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
-        'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
         If mySettings.AccountTypeForced Then
           SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
@@ -955,7 +943,8 @@ Public Class frmMain
       localData.Dispose()
       localData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub localData_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
@@ -974,7 +963,8 @@ Public Class frmMain
       localData.Dispose()
       localData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub localData_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
     If Me.InvokeRequired Then
@@ -993,7 +983,8 @@ Public Class frmMain
       localData.Dispose()
       localData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub localData_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
     If Me.InvokeRequired Then
@@ -1012,7 +1003,8 @@ Public Class frmMain
       localData.Dispose()
       localData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub localData_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
@@ -1031,7 +1023,8 @@ Public Class frmMain
       localData.Dispose()
       localData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
 #Region "Host List"
   Private didHostListSave As Boolean = False
@@ -1043,20 +1036,18 @@ Public Class frmMain
     If didHostListSave Then Exit Sub
     Try
       If wsHostList IsNot Nothing Then
+        If wsHostList.IsBusy Then wsHostList.CancelAsync()
         wsHostList.Dispose()
         wsHostList = Nothing
       End If
-      Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
       wsHostList = New WebClientEx
-      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf SaveToHostList), myProvider, 250, System.Threading.Timeout.Infinite)
+      Application.DoEvents()
+      Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
+      wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
       didHostListSave = True
     Catch ex As Exception
       didHostListSave = False
     End Try
-  End Sub
-  Private Sub SaveToHostList(state As Object)
-    Dim myProvider As String = state
-    wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
   End Sub
 #End Region
 #End Region
@@ -1161,7 +1152,8 @@ Public Class frmMain
       remoteData.Dispose()
       remoteData = Nothing
     End If
-    SaveToHostList()
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
 #End Region
 #Region "Graphs"
@@ -1357,8 +1349,8 @@ Public Class frmMain
     End If
     gbDld.Text = "Anytime (" & AccuratePercent(lDown / lDownLim) & ")"
     gbUld.Text = "Off-Peak (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetTooltip(pctDld, "Graph representing your Anytime usage.")
-    ttUI.SetTooltip(pctUld, "Graph representing your Off-Peak usage (used between 2am and 8am).")
+    ttUI.SetToolTip(pctDld, "Graph representing your Anytime usage.")
+    ttUI.SetToolTip(pctUld, "Graph representing your Off-Peak usage (used between 2am and 8am).")
     pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     Dim atFree, opFree As String
@@ -1434,8 +1426,8 @@ Public Class frmMain
     End If
     gbDld.Text = "Download (" & AccuratePercent(lDown / lDownLim) & ")"
     gbUld.Text = "Upload (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetTooltip(pctDld, "Graph representing your download usage.")
-    ttUI.SetTooltip(pctUld, "Graph representing your upload usage.")
+    ttUI.SetToolTip(pctDld, "Graph representing your download usage.")
+    ttUI.SetToolTip(pctUld, "Graph representing your upload usage.")
     pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     Dim dFree, uFree As String
@@ -1595,7 +1587,6 @@ Public Class frmMain
       End If
       cmdConfig.Focus()
       MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
-      'MessageBox.Show("Please enter your account details in the configuration window.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End If
   End Sub
   Private Sub cmdHistory_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistory.Click
@@ -2130,7 +2121,6 @@ Public Class frmMain
           Application.Exit()
         Catch ex As Exception
           MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldWarning, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-          'MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1))
           SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
           NextGrabTick = Long.MinValue
         End Try
@@ -2269,9 +2259,9 @@ Public Class frmMain
     Dim lNext As Long = NextGrabTick
     Dim lNow As Long = TickCount()
     If lNext = Long.MaxValue Then
-      ttUI.SetTooltip(lblStatus, "Update Temporarily Paused")
+      ttUI.SetToolTip(lblStatus, "Update Temporarily Paused")
     ElseIf lNext = Long.MinValue Then
-      ttUI.SetTooltip(lblStatus, "Next Update is Being Calculated")
+      ttUI.SetToolTip(lblStatus, "Next Update is Being Calculated")
     Else
       sDisp = sDISPLAY.Replace("%lt", sDisp_LT)
       If lNext - lNow >= 1000 Then
@@ -2313,7 +2303,7 @@ Public Class frmMain
         lblStatus.Text = sDisp
         sDispTT = sDisp_TT_M
       End If
-      ttUI.SetTooltip(lblStatus, sDispTT)
+      ttUI.SetToolTip(lblStatus, sDispTT)
     End If
   End Sub
   Private Sub ControlService(Run As Boolean)
@@ -2326,13 +2316,11 @@ Public Class frmMain
           Process.Start(ControllerProps)
         Else
           MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not be found!" & vbNewLine & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & " with the ""Windows Service"" component selected.", "Service Controller not found.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error)
-          'MessageBox.Show("The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & ".", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           mySettings.Service = False
         End If
       End If
     Catch ex As Exception
       MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not start!", "Service Controller failed to start.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-      'MessageBox.Show("Could not start the Satellite Restriction Logger Service Controller!" & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
     End Try
   End Sub
   Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted

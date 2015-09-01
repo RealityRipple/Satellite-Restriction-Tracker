@@ -100,7 +100,7 @@ Public Class remoteRestrictionTracker
   Private WithEvents wsLogin As WebClientEx
   Private ReadTimeoutCount As Integer
   Private sDataPath As String
-  Private Sub tmrReadTimeout_Tick()
+  Private Sub tmrReadTimeout_Tick(state As Object)
     ReadTimeoutCount += 1
     Dim TimeOutTime As Integer = iTimeout
     If TimeOutTime < 60 * 3 Then TimeOutTime = 60 * 3
@@ -124,7 +124,7 @@ Public Class remoteRestrictionTracker
       tmrReadTimeout = Nothing
     End If
     ReadTimeoutCount = 0
-    If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), New Object, 1000, 1000)
+    If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), Nothing, 1000, 1000)
   End Sub
   Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As IWebProxy, Timeout As Integer, UpdateFrom As Date, DataPath As String)
     ResetTimeout()
@@ -144,10 +144,10 @@ Public Class remoteRestrictionTracker
     wsLogin.Timeout = Timeout
     wsLogin.Proxy = Proxy
     iTimeout = Timeout
-    'wsLogin.Encoding = System.Text.Encoding.UTF8
-    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginLogin), Nothing, 250, System.Threading.Timeout.Infinite)
+    System.Windows.Forms.Application.DoEvents()
+    Login()
   End Sub
-  Private Sub BeginLogin(state As Object)
+  Private Sub Login()
     ResetTimeout(True)
     If wsLogin Is Nothing Then
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated prematurely"))
@@ -256,12 +256,12 @@ Public Class remoteRestrictionTracker
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, NetworkErrorToString(e.Error, sDataPath)))
       Return
     End If
-    If wsLogin Is Nothing Then Return
-    If e.Cancelled Then Return
     If Not wsLogin.ResponseURI.Host = "wb.realityripple.com" Then
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Redirected to """ & wsLogin.ResponseURI.OriginalString & """."))
       Return
     End If
+    If wsLogin Is Nothing Then Return
+    If e.Cancelled Then Return
     Select Case e.UserState
       Case "LOGIN"
         Dim sRet As String = e.Result
@@ -442,7 +442,7 @@ Public Class remoteRestrictionTracker
     End Using
   End Function
 #Region "IDisposable Support"
-  Private disposedValue As Boolean 
+  Private disposedValue As Boolean
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then

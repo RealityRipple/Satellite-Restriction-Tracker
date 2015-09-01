@@ -67,12 +67,13 @@
     End If
   End Sub
   Private Sub GetVerInfo()
+    If Me.InvokeRequired Then
+      Me.Invoke(New MethodInvoker(AddressOf GetVerInfo))
+      Return
+    End If
     sckVerInfo = New WebClientEx()
-    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginGetVerInfo), lblBETA.Visible, 250, System.Threading.Timeout.Infinite)
-  End Sub
-  Private Sub BeginGetVerInfo(state As Object)
-    Dim doBeta As Boolean = state
-    If doBeta Then
+    Application.DoEvents()
+    If lblBETA.Visible Then
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/infob"))
     Else
       sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/info"))
@@ -113,7 +114,4 @@
     cmdChanges.Enabled = True
     cmdChanges.Focus()
   End Sub
-
-
-
 End Class
