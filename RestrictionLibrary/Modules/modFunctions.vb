@@ -171,6 +171,8 @@ Module modFunctions
           Return "The server closed the connection. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An established connection was aborted by the software in your host machine") Then
           Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An established connection was aborted by the software in your host machine") Then
+          Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
           Return "Connection to the server timed out. Please try again."
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
