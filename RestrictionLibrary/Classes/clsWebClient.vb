@@ -59,7 +59,7 @@
     Try
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
       If request.GetType Is GetType(Net.HttpWebRequest) Then
-        CType(request, Net.HttpWebRequest).UserAgent = "Mozilla/5.0 (" & Environment.OSVersion.VersionString & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
+        CType(request, Net.HttpWebRequest).UserAgent = "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & Environment.Version.ToString & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
         CType(request, Net.HttpWebRequest).ReadWriteTimeout = 3 * 60 * 60 * 1000
         CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
         CType(request, Net.HttpWebRequest).CookieContainer = Me.CookieJar
