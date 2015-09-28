@@ -213,7 +213,7 @@
   Private sAttemptedURL As String
   Private AttemptedTag As ConnectionStates
   Private AttemptedSub As ConnectionSubStates
-  Private AttemptedVal As Decimal
+  Private AttemptedStage As Integer
   Private bCancelled, bErrored As Boolean
   Private imSlowed As Boolean
   Private imFree As Boolean
@@ -625,7 +625,7 @@
       End If
     End If
   End Sub
-  Private Sub HandleResponse(LoginState As ConnectionStates, LoginSubState As ConnectionSubStates, LoginSubPercent As Decimal, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
+  Private Sub HandleResponse(LoginState As ConnectionStates, LoginSubState As ConnectionSubStates, LoginStage As Integer, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
     If wsData Is Nothing Then
       ResetTimeout()
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
@@ -643,7 +643,7 @@
             WB_Download_Table(sHost, sRet, sErrMsg, sFailText, bReset)
             CloseSocket = True
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.WildBlue_EXEDE
@@ -660,22 +660,20 @@
               Case ConnectionSubStates.LoadHome
                 EX_Download_Homepage(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
               Case ConnectionSubStates.LoadAJAX
-                Select Case LoginSubPercent
-                  Case (1 / 5) : EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "2")
-                  Case (2 / 5) : EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "5")
-                  Case (3 / 5) : EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "6")
-                  Case (4 / 5) : EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "4")
-                  Case (5 / 5) : EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "3")
-                End Select
+                If LoginStage = 1 Then
+                  EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "2")
+                Else
+                  EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "3")
+                End If
               Case ConnectionSubStates.LoadTable
                 EX_Download_Table(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
                 CloseSocket = True
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE
@@ -687,14 +685,14 @@
               Case ConnectionSubStates.AuthenticateRetry
                 RP_Login_AuthenticateRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case ConnectionStates.TableDownload
             RP_Download_Table(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
             CloseSocket = True
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case SatHostTypes.DishNet_EXEDE
@@ -710,7 +708,7 @@
               Case ConnectionSubStates.Verify
                 DN_Login_Verify(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case ConnectionStates.TableDownload
@@ -723,11 +721,11 @@
                 DN_Download_TableRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
                 CloseSocket = True
               Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
                 bReset = True
             End Select
           Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedVal & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
+            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
             bReset = True
         End Select
       Case Else
@@ -1072,7 +1070,7 @@
       sErrMsg = "Authentication Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
     ElseIf sPath = "/secur/frontdoor.jsp" Then
       Dim sURI As String = "https://" & sHost & "/dashboard"
-      Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, (1 / 5), sURI)
+      Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
       wsData.DownloadStringAsync(New Uri(sURI), aState)
     ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Or sPath.ToLower.Contains("/ssoerror") Then
       sErrMsg = "Authentication Failed: The server may be down."
@@ -1113,26 +1111,12 @@
                "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
                "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
         Dim sURI As String = "https://" & sHost & "/dashboard?refURL=https%3A%2F%2F" & sHost & "%2Fdashboard"
-        Dim subState As ConnectionSubStates = ConnectionSubStates.None
-        Dim subVal As Decimal = 0
-        Select Case AjaxID
-          Case "2"
-            subState = ConnectionSubStates.LoadAJAX
-            subVal = (2 / 5)
-          Case "5"
-            subState = ConnectionSubStates.LoadAJAX
-            subVal = (3 / 5)
-          Case "6"
-            subState = ConnectionSubStates.LoadAJAX
-            subVal = (4 / 5)
-          Case "4"
-            subState = ConnectionSubStates.LoadAJAX
-            subVal = (5 / 5)
-          Case "3"
-            subState = ConnectionSubStates.LoadTable
-            subVal = 0
-        End Select
-        Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, subState, subVal, sURI)
+        Dim aState As Object = Nothing
+        If AjaxID = "2" Then
+          aState = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 2, sURI)
+        Else
+          aState = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
+        End If
         wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
       ElseIf sRet.Contains("https://myexede.force.com/atlasPlanInvalid") Or sRet.Contains("https://my.exede.net/atlasPlanInvalid") Then
         sErrMsg = "Dashboard Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists."
@@ -1734,13 +1718,13 @@
 #End Region
 #End Region
 #Region "Useful Functions"
-  Private Function BeginAttempt(state As ConnectionStates, substate As ConnectionSubStates, subval As Decimal, URL As String) As Object
+  Private Function BeginAttempt(state As ConnectionStates, substate As ConnectionSubStates, stage As Integer, URL As String) As Object
     sAttemptedURL = URL
     AttemptedTag = state
     AttemptedSub = substate
-    AttemptedVal = subval
-    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(state, substate, subval))
-    Return {state, substate, subval}
+    AttemptedStage = stage
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(state, substate, stage))
+    Return {state, substate, stage}
   End Function
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
