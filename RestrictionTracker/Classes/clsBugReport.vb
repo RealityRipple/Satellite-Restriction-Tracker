@@ -1,5 +1,4 @@
 ﻿Friend Class MantisReporter
-  Private Shared httpSend As WebClientEx
   Friend Enum Mantis_Category
     [Select] = 0
     General = 1
@@ -37,9 +36,10 @@
     pD1.Add("ref", "bug_report_page.php")
     pD1.Add("project_id", Project_ID.ToString.Trim)
     pD1.Add("make_default", Nothing)
-    httpSend.Headers.Add(Net.HttpRequestHeader.Referer, "http://bugs.realityripple.com/login_select_proj_page.php?bug_report_page.php")
-    Dim bTok() As Byte = httpSend.UploadValues("http://bugs.realityripple.com/set_project.php", "POST", pD1)
-    Dim sTok As String = System.Text.Encoding.GetEncoding(28591).GetString(bTok)
+    Dim httpToken As New WebClientEx
+    httpToken.SendHeaders.Add(Net.HttpRequestHeader.Referer, "http://bugs.realityripple.com/login_select_proj_page.php?bug_report_page.php")
+    Dim sTok As String = httpToken.UploadValues("http://bugs.realityripple.com/set_project.php", "POST", pD1)
+    If sTok.StartsWith("Error: ") Then Return Nothing
     If sTok.Contains("bug_report_token") Then
       sTok = sTok.Substring(sTok.IndexOf("bug_report_token") + 25)
       sTok = sTok.Substring(0, sTok.IndexOf("""/"))
@@ -66,16 +66,10 @@
     pData.Add("additional_info", Info)
     pData.Add("view_state", IIf([Public], "10", "50"))
     pData.Add("report_stay", Nothing)
-    Dim bRet() As Byte
-    Try
-      bRet = httpSend.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
-    Catch ex As Exception
-      Return "Failed to Send Report - " & ex.Message
-    Finally
-      httpSend.Dispose()
-      httpSend = Nothing
-    End Try
-    Dim sRet As String = System.Text.Encoding.GetEncoding(28591).GetString(bRet)
+    Dim sRet As String
+    Dim httpReport As New WebClientEx
+    sRet = httpReport.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
+    If sRet.StartsWith("Error: ") Then Return "Failed to Send Report - " & sRet.Substring(7)
     If sRet.Contains("Operation successful.") Then
       Return "OK"
     Else
@@ -85,17 +79,8 @@
     End If
   End Function
   Friend Shared Function ReportIssue(e As Exception) As String
-    If httpSend IsNot Nothing Then
-      httpSend.Dispose()
-      httpSend = Nothing
-    End If
-    httpSend = New WebClientEx()
     Dim sTok As String = GetToken(1)
-    If String.IsNullOrEmpty(sTok) Then
-      httpSend.Dispose()
-      httpSend = Nothing
-      Return "No token was supplied by the server."
-    End If
+    If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
     Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
     Dim sSum As String = e.Message
     If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."

@@ -1,6 +1,5 @@
 ﻿Imports System.Security.Cryptography
 Imports System.IO.Compression
-Imports System.Net
 Public Class remoteRestrictionTracker
   Implements IDisposable
   Private ServerChallenge() As Byte
@@ -17,8 +16,6 @@ Public Class remoteRestrictionTracker
   Private sPassword As String
   Private sProduct As String
   Private dFrom As Date
-  Private tmrReadTimeout As Threading.Timer
-  Private iTimeout As Integer
   Public Class FailureEventArgs
     Inherits EventArgs
     Public Enum FailType
@@ -97,37 +94,14 @@ Public Class remoteRestrictionTracker
   End Class
   Public Event Success(sender As Object, e As SuccessEventArgs)
   Public Event OKKey(sender As Object, e As EventArgs)
-  Private WithEvents wsLogin As WebClientEx
-  Private ReadTimeoutCount As Integer
+  Private ClosingTime As Boolean
+  Private tLogin As Threading.Thread
+  Private c_Timeout As Integer
+  Private c_Proxy As Net.IWebProxy
+  Private c_Jar As Net.CookieContainer
   Private sDataPath As String
-  Private Sub tmrReadTimeout_Tick(state As Object)
-    ReadTimeoutCount += 1
-    Dim TimeOutTime As Integer = iTimeout
-    If TimeOutTime < 60 * 3 Then TimeOutTime = 60 * 3
-    If ReadTimeoutCount >= TimeOutTime Then
-      If tmrReadTimeout IsNot Nothing Then
-        tmrReadTimeout.Dispose()
-        tmrReadTimeout = Nothing
-      End If
-      ReadTimeoutCount = 0
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "The Remote Service timed out!"))
-      If wsLogin IsNot Nothing Then
-        wsLogin.CancelAsync()
-        wsLogin.Dispose()
-        wsLogin = Nothing
-      End If
-    End If
-  End Sub
-  Private Sub ResetTimeout(Optional enable As Boolean = False)
-    If tmrReadTimeout IsNot Nothing Then
-      tmrReadTimeout.Dispose()
-      tmrReadTimeout = Nothing
-    End If
-    ReadTimeoutCount = 0
-    If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), Nothing, 1000, 1000)
-  End Sub
-  Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As IWebProxy, Timeout As Integer, UpdateFrom As Date, DataPath As String)
-    ResetTimeout()
+  Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As Net.IWebProxy, Timeout As Integer, UpdateFrom As Date, ConfigPath As String)
+    ClosingTime = False
     If Username.Contains("@") Then
       sUsername = Split(Username, "@", 2)(0)
       sServer = Split(Username, "@", 2)(1)
@@ -138,38 +112,70 @@ Public Class remoteRestrictionTracker
     sPassword = Password
     dFrom = UpdateFrom
     sProduct = ProductKey
-    sDataPath = DataPath
+    sDataPath = ConfigPath
     Secret = System.Text.Encoding.UTF8.GetBytes(ProductKey)
-    wsLogin = New WebClientEx()
-    wsLogin.Timeout = Timeout
-    wsLogin.Proxy = Proxy
-    iTimeout = Timeout
-    System.Windows.Forms.Application.DoEvents()
-    Login()
+    c_Timeout = Timeout
+    c_Proxy = Proxy
+    tLogin = New Threading.Thread(AddressOf Login)
+    tLogin.Start()
   End Sub
   Private Sub Login()
-    ResetTimeout(True)
-    If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated prematurely"))
-      Exit Sub
-    End If
-    wsLogin.Headers.Clear()
-    wsLogin.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+    c_Jar = New Net.CookieContainer
+    Dim wsLogin As WebClientEx = MakeSocket()
     Dim sPost As String = "s=init&user=" & sUsername & "@" & sServer & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
-    wsLogin.UploadStringAsync(New Uri(URLPath), "POST", sPost, "LOGIN")
+    Dim sRet As String = wsLogin.UploadString(URLPath, "POST", sPost)
+    If ClosingTime Then Return
+    If CheckForErrors(sRet, wsLogin.ResponseURI) Then Return
+    LoginResponse(sRet)
   End Sub
+  Private Sub LoginResponse(response As String)
+    If response = "NOUSER" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
+    Else
+      Try
+        ServerChallenge = Convert.FromBase64String(response)
+      Catch ex As Exception
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, response))
+        Exit Sub
+      End Try
+      SendCC()
+    End If
+  End Sub
+
   Private Sub SendCC()
     GenCC()
     ClientResponse = HashA()
-    If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated during initialization"))
-      Exit Sub
-    End If
-    wsLogin.Headers.Clear()
-    wsLogin.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+    Dim wsClientChallenge As WebClientEx = MakeSocket()
     Dim sPost As String = "s=verify&cc=" & PercentEncode(Convert.ToBase64String(ClientChallenge)) & "&cr=" & PercentEncode(Convert.ToBase64String(ClientResponse))
-    wsLogin.UploadStringAsync(New Uri(URLPath), "POST", sPost, "VERIFY")
+    Dim sRet As String = wsClientChallenge.UploadString(URLPath, "POST", sPost)
+    If ClosingTime Then Return
+    If CheckForErrors(sRet, wsClientChallenge.ResponseURI) Then Return
+    VerifyResponse(sRet)
   End Sub
+  Private Sub VerifyResponse(Response As String)
+    If Response = "BADKEY" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadProduct))
+    ElseIf Response = "NOUSER" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
+    ElseIf Response = "NODATA" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData))
+    Else
+      Try
+        ServerResponse = Convert.FromBase64String(Response)
+      Catch ex As Exception
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, Response))
+        Exit Sub
+      End Try
+      CalculatedServerResponse = HashB()
+      If IterativeEqualityCheck(ServerResponse, CalculatedServerResponse) Then
+        RaiseEvent OKKey(Me, New EventArgs)
+        If Not String.IsNullOrEmpty(sPassword) Then SendCR()
+      Else
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadServer))
+      End If
+    End If
+  End Sub
+
   Private Sub SendCR()
     Dim bPass(sPassword.Length - 1) As Byte
     Dim CSP As New RijndaelManaged
@@ -193,15 +199,152 @@ Public Class remoteRestrictionTracker
       End Using
     End Using
     CSP = Nothing
-    If wsLogin Is Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Remote Service Login terminated during verification"))
-      Exit Sub
-    End If
-    wsLogin.Headers.Clear()
-    wsLogin.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+    Dim wsClientResponse As WebClientEx = MakeSocket()
     Dim sPost As String = "s=login&pass=" & PercentEncode(Convert.ToBase64String(bPass))
-    wsLogin.UploadStringAsync(New Uri(URLPath), "POST", sPost, "PASS")
+    Dim sRet As String = wsClientResponse.UploadString(URLPath, "POST", sPost)
+    If ClosingTime Then Return
+    If CheckForErrors(sRet, wsClientResponse.ResponseURI) Then Return
+    PassResponse(sRet)
   End Sub
+  Private Sub PassResponse(Response As String)
+    Dim sRet As String = Nothing
+    Using OutStream As New IO.MemoryStream
+      Dim bRet() As Byte
+      Try
+        bRet = Convert.FromBase64String(Response)
+      Catch ex As Exception
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, Response))
+        Exit Sub
+      End Try
+      Dim outData() As Byte = DecompressData(bRet)
+      sRet = System.Text.Encoding.UTF8.GetString(outData)
+      If sRet.Contains(vbNullChar) Then sRet = sRet.Substring(0, sRet.IndexOf(vbNullChar))
+    End Using
+    If sRet = "NOUSER" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
+    ElseIf sRet = "NOPASS" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoPassword))
+    ElseIf sRet = "Bad Login" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadLogin))
+    ElseIf sRet = "Bad Password" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadPassword))
+    ElseIf sRet = "BADKEY" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadProduct))
+    ElseIf sRet = "" Then
+      RaiseEvent Success(Me, Nothing)
+    ElseIf sRet.Contains(vbLf) Then
+      Dim iProv As localRestrictionTracker.SatHostTypes
+      Dim sRows() As String = sRet.Split(vbLf)
+      Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
+      For Each row In sRows
+        If row.Contains("PROVIDER ") Then
+          iProv = StringToHostType(row.Substring(9))
+        ElseIf row.Contains(":") And row.Contains("|") Then
+          Dim sTime As String = Split(row, ":", 2)(0)
+          Dim dish As Boolean = False
+          If sTime.StartsWith("d") Then
+            dish = True
+            sTime = sTime.Substring(1)
+          End If
+          Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
+          Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
+          If sData.Length = 5 Then
+            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+            Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
+            Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
+            rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
+          ElseIf sData.Length = 4 Then
+            If dish Then
+              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+              rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
+            Else
+              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+              rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
+            End If
+          ElseIf sData.Length = 3 Then
+            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+            Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
+            Dim iTotal As Integer = StrToVal(sData(2), 1000)
+            rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
+          ElseIf sData.Length = 2 Then
+            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+            rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
+          End If
+        End If
+      Next
+      If rData.Count > 0 Then
+        RaiseEvent Success(Me, New SuccessEventArgs(iProv, rData.ToArray))
+      Else
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
+      End If
+    ElseIf sRet.Contains(":") And sRet.Contains("|") Then
+      Dim iProv As localRestrictionTracker.SatHostTypes
+      Dim sRows() As String = sRet.Split(vbLf)
+      Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
+      Dim sTime As String = Split(sRet, ":", 2)(0)
+      Dim dish As Boolean = False
+      If sTime.StartsWith("d") Then
+        dish = True
+        sTime = sTime.Substring(1)
+      End If
+      Dim sData() As String = Split(Split(sRet, ":", 2)(1), "|")
+      Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
+      If sData.Length = 5 Then
+        If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+        Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
+        Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
+        rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
+      ElseIf sData.Length = 4 Then
+        If dish Then
+          If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+          rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
+        Else
+          If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+          rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
+        End If
+      ElseIf sData.Length = 3 Then
+        If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+        Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
+        Dim iTotal As Integer = StrToVal(sData(2), 1000)
+        rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
+      ElseIf sData.Length = 2 Then
+        If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+        rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
+      End If
+      If rData.Count > 0 Then
+        RaiseEvent Success(Me, New SuccessEventArgs(iProv, rData.ToArray))
+      Else
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
+      End If
+    Else
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
+    End If
+    SendSocketErrors(sDataPath)
+  End Sub
+
+  Private Function MakeSocket() As WebClientEx
+    Dim wsNet As New WebClientEx(sDataPath)
+    wsNet.Timeout = c_Timeout
+    wsNet.Proxy = c_Proxy
+    wsNet.CookieJar = c_Jar
+    Return wsNet
+  End Function
+  Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
+    If String.IsNullOrEmpty(response) Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Empty Response"))
+      Return True
+    End If
+    If response.StartsWith("Error: ") Then
+      Dim sError As String = response.Substring(7)
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, sError))
+      Return True
+    End If
+    If Not responseURI.Host = "wb.realityripple.com" Then
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Connection redirected to """ & responseURI.OriginalString & """, check your Internet connection."))
+      Return True
+    End If
+    Return False
+  End Function
   Private Sub GenCC()
     ReDim ClientChallenge(63)
     Dim rng = RandomNumberGenerator.Create
@@ -243,183 +386,6 @@ Public Class remoteRestrictionTracker
       Return mSHA.ComputeHash(bHash)
     End Using
   End Function
-  Private Sub wsLogin_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles wsLogin.Failure
-    ResetTimeout()
-    RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, NetworkErrorToString(e.Error, sDataPath)))
-  End Sub
-  Private Sub wsLogin_UploadProgressChanged(sender As Object, e As System.Net.UploadProgressChangedEventArgs) Handles wsLogin.UploadProgressChanged
-    ResetTimeout(True)
-  End Sub
-  Private Sub wsLogin_UploadStringCompleted(sender As Object, e As System.Net.UploadStringCompletedEventArgs) Handles wsLogin.UploadStringCompleted
-    ResetTimeout()
-    If e.Error IsNot Nothing Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, NetworkErrorToString(e.Error, sDataPath)))
-      Return
-    End If
-    If Not wsLogin.ResponseURI.Host = "wb.realityripple.com" Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Redirected to """ & wsLogin.ResponseURI.OriginalString & """."))
-      Return
-    End If
-    If wsLogin Is Nothing Then Return
-    If e.Cancelled Then Return
-    Select Case e.UserState
-      Case "LOGIN"
-        Dim sRet As String = e.Result
-        If sRet = "NOUSER" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
-        Else
-          Try
-            ServerChallenge = Convert.FromBase64String(sRet)
-          Catch ex As Exception
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, sRet))
-            Exit Sub
-          End Try
-          SendCC()
-          ResetTimeout(True)
-        End If
-      Case "VERIFY"
-        Dim sRet As String = e.Result
-        If sRet = "BADKEY" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadProduct))
-        ElseIf sRet = "NOUSER" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
-        ElseIf sRet = "NODATA" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData))
-        Else
-          Try
-            ServerResponse = Convert.FromBase64String(sRet)
-          Catch ex As Exception
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, sRet))
-            Exit Sub
-          End Try
-          CalculatedServerResponse = HashB()
-          If IterativeEqualityCheck(ServerResponse, CalculatedServerResponse) Then
-            RaiseEvent OKKey(Me, New EventArgs)
-            If Not String.IsNullOrEmpty(sPassword) Then
-              SendCR()
-              ResetTimeout(True)
-            End If
-          Else
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadServer))
-          End If
-        End If
-      Case "PASS"
-        Dim sRet As String = e.Result
-        Dim bRETS() As Byte = System.Text.Encoding.GetEncoding(LATIN_1).GetBytes(sRet)
-        Using OutStream As New IO.MemoryStream
-          Dim bRet() As Byte
-          Try
-            bRet = Convert.FromBase64String(sRet)
-          Catch ex As Exception
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, sRet))
-            Exit Sub
-          End Try
-          Dim outData() As Byte = DecompressData(bRet)
-          sRet = System.Text.Encoding.UTF8.GetString(outData)
-          If sRet.Contains(vbNullChar) Then sRet = sRet.Substring(0, sRet.IndexOf(vbNullChar))
-        End Using
-        If sRet = "NOUSER" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoUsername))
-        ElseIf sRet = "NOPASS" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoPassword))
-        ElseIf sRet = "Bad Login" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadLogin))
-        ElseIf sRet = "Bad Password" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadPassword))
-        ElseIf sRet = "BADKEY" Then
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.BadProduct))
-        ElseIf sRet = "" Then
-          RaiseEvent Success(Me, Nothing)
-        ElseIf sRet.Contains(vbLf) Then
-          Dim iProv As localRestrictionTracker.SatHostTypes
-          Dim sRows() As String = sRet.Split(vbLf)
-          Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
-          For Each row In sRows
-            If row.Contains("PROVIDER ") Then
-              iProv = StringToHostType(row.Substring(9))
-            ElseIf row.Contains(":") And row.Contains("|") Then
-              Dim sTime As String = Split(row, ":", 2)(0)
-              Dim dish As Boolean = False
-              If sTime.StartsWith("d") Then
-                dish = True
-                sTime = sTime.Substring(1)
-              End If
-              Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
-              Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-              If sData.Length = 5 Then
-                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-                Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
-                Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
-                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
-              ElseIf sData.Length = 4 Then
-                If dish Then
-                  If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-                  rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
-                Else
-                  If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-                  rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
-                End If
-              ElseIf sData.Length = 3 Then
-                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-                Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
-                Dim iTotal As Integer = StrToVal(sData(2), 1000)
-                rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
-              ElseIf sData.Length = 2 Then
-                If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-                rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
-              End If
-            End If
-          Next
-          If rData.Count > 0 Then
-            RaiseEvent Success(Me, New SuccessEventArgs(iProv, rData.ToArray))
-          Else
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
-          End If
-        ElseIf sRet.Contains(":") And sRet.Contains("|") Then
-          Dim iProv As localRestrictionTracker.SatHostTypes
-          Dim sRows() As String = sRet.Split(vbLf)
-          Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
-          Dim sTime As String = Split(sRet, ":", 2)(0)
-          Dim dish As Boolean = False
-          If sTime.StartsWith("d") Then
-            dish = True
-            sTime = sTime.Substring(1)
-          End If
-          Dim sData() As String = Split(Split(sRet, ":", 2)(1), "|")
-          Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-          If sData.Length = 5 Then
-            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-            Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
-            Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
-            rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
-          ElseIf sData.Length = 4 Then
-            If dish Then
-              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-              rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
-            Else
-              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-              rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
-            End If
-          ElseIf sData.Length = 3 Then
-            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-            Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
-            Dim iTotal As Integer = StrToVal(sData(2), 1000)
-            rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
-          ElseIf sData.Length = 2 Then
-            If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-            rData.Add(New SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
-          End If
-          If rData.Count > 0 Then
-            RaiseEvent Success(Me, New SuccessEventArgs(iProv, rData.ToArray))
-          Else
-            RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
-          End If
-        Else
-          RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
-        End If
-        SendSocketErrors(sDataPath)
-    End Select
-  End Sub
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
@@ -446,9 +412,10 @@ Public Class remoteRestrictionTracker
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
-        If wsLogin IsNot Nothing Then
-          wsLogin.Dispose()
-          wsLogin = Nothing
+        If tLogin IsNot Nothing Then
+          If tLogin.IsAlive Then
+            ClosingTime = True
+          End If
         End If
       End If
     End If

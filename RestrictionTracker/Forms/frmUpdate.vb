@@ -1,14 +1,9 @@
 ﻿Public Class frmUpdate
-  Private WithEvents sckVerInfo As WebClientEx
   Private Ret As Boolean
   Private Sub frmUpdate_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Ret = False
   End Sub
   Private Sub frmUpdate_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-    If sckVerInfo IsNot Nothing Then
-      sckVerInfo.Dispose()
-      sckVerInfo = Nothing
-    End If
     If Not Ret Then Me.DialogResult = Windows.Forms.DialogResult.No
   End Sub
   Public Sub NewUpdate(Version As String, BETA As Boolean, UACIcon As Boolean)
@@ -61,56 +56,29 @@
         cmdDownload.Focus()
         cmdChanges.Enabled = False
         txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
-        Dim getInfo As New MethodInvoker(AddressOf GetVerInfo)
-        getInfo.BeginInvoke(Nothing, Nothing)
+        Dim tInfo As New Threading.Thread(AddressOf GetVerInfo)
+        tInfo.Start()
       End If
     End If
   End Sub
   Private Sub GetVerInfo()
-    If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf GetVerInfo))
-      Return
-    End If
-    sckVerInfo = New WebClientEx()
-    Application.DoEvents()
+    Dim sRet As String = Nothing
+    Dim sckVerInfo As New WebClientEx
     If lblBETA.Visible Then
-      sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/infob"))
+      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/infob")
     Else
-      sckVerInfo.DownloadStringAsync(New Uri("http://update.realityripple.com/Satellite_Restriction_Tracker/info"))
+      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/info")
     End If
+    SetVerInfo(sRet)
   End Sub
-  Private Sub sckVerInfo_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles sckVerInfo.DownloadStringCompleted
+  Private Delegate Sub SetVerInfoCallback(Message As String)
+  Private Sub SetVerInfo(Message As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf sckVerInfo_DownloadStringCompleted), sender, e)
+      Me.Invoke(New SetVerInfoCallback(AddressOf SetVerInfo), Message)
       Return
     End If
     pctThrobber.Visible = False
-    If e.Cancelled Then
-      txtInfo.Text = "Info Request Cancelled"
-    ElseIf e.Error IsNot Nothing Then
-      txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
-    Else
-      txtInfo.Text = e.Result
-    End If
-    If sckVerInfo IsNot Nothing Then
-      sckVerInfo.Dispose()
-      sckVerInfo = Nothing
-    End If
-    cmdChanges.Enabled = True
-    cmdChanges.Focus()
-  End Sub
-  Private Delegate Sub FailureHandler(sender As Object, e As WebClientEx.ErrorEventArgs)
-  Private Sub sckVerInfo_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles sckVerInfo.Failure
-    If Me.InvokeRequired Then
-      Me.Invoke(New FailureHandler(AddressOf sckVerInfo_Failure), sender, e)
-      Return
-    End If
-    pctThrobber.Visible = False
-    txtInfo.Text = "Info Request Error" & vbNewLine & e.Error.Message
-    If sckVerInfo IsNot Nothing Then
-      sckVerInfo.Dispose()
-      sckVerInfo = Nothing
-    End If
+    txtInfo.Text = Message
     cmdChanges.Enabled = True
     cmdChanges.Focus()
   End Sub

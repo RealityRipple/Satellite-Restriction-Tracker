@@ -178,11 +178,11 @@
     Inherits EventArgs
     Private m_state As ConnectionStates
     Private m_substate As ConnectionSubStates
-    Private m_subval As Decimal
-    Public Sub New(status As ConnectionStates, Optional substate As ConnectionSubStates = ConnectionSubStates.None, Optional percent As Decimal = 0)
+    Private m_stage As Integer
+    Public Sub New(status As ConnectionStates, Optional substate As ConnectionSubStates = ConnectionSubStates.None, Optional stage As Integer = 0)
       m_state = status
       m_substate = substate
-      m_subval = percent
+      m_stage = stage
     End Sub
     Public ReadOnly Property Status As ConnectionStates
       Get
@@ -194,58 +194,61 @@
         Return m_substate
       End Get
     End Property
-    Public ReadOnly Property SubPercentage As Decimal
+    Public ReadOnly Property Stage As Integer
       Get
-        Return m_subval
+        Return m_stage
       End Get
     End Property
   End Class
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
 #End Region
-  Private WithEvents wsData As WebClientEx
-  Private WithEvents acType As DetermineType
-  Private tmrReadTimeout As Threading.Timer
+  Private acType As DetermineType
   Private mySettings As AppSettings
   Private Const MBPerGB As Integer = 1000
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
-  Private sAccount, sPassword, sProvider As String
+  Private sAccount, sUsername, sPassword, sProvider As String
   Private sAttemptedURL As String
   Private AttemptedTag As ConnectionStates
   Private AttemptedSub As ConnectionSubStates
   Private AttemptedStage As Integer
-  Private bCancelled, bErrored As Boolean
   Private imSlowed As Boolean
   Private imFree As Boolean
   Private FullCheck As Boolean = True
-  Private myUID, myPass As String
   Private ClosingTime As Boolean
+  Private tConnect As Threading.Thread
+  Private c_Timeout As Integer
+  Private c_Proxy As Net.IWebProxy
+  Private c_Jar As Net.CookieContainer
   Private sDataPath As String
 #Region "Initialization Functions"
   Public Sub New(ConfigPath As String)
+    ClosingTime = False
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
     Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
     Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
-    bCancelled = False
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       sPassword = StoredPassword.DecryptApp(mySettings.PassCrypt)
     End If
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
+      sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))
       sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
     Else
+      sUsername = String.Empty
       sAccount = String.Empty
       sProvider = String.Empty
     End If
-    System.Windows.Forms.Application.DoEvents()
-    Connect()
+    c_Timeout = mySettings.Timeout
+    c_Proxy = mySettings.Proxy
+    tConnect = New Threading.Thread(AddressOf Connect)
+    tConnect.Start()
   End Sub
   Private Sub Connect()
-    ResetTimeout()
     If mySettings.AccountType = SatHostTypes.Other Then
       If mySettings.Account.Contains("@") Then
-        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy)
+        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy, AddressOf acType_TypeDetermined)
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
       End If
@@ -253,520 +256,87 @@
       GetUsage()
     End If
   End Sub
-  Private Sub acType_TypeDetermined(UserState As Object, e As DetermineType.TypeDeterminedEventArgs) Handles acType.TypeDetermined
-    Select Case e.HostGroup
-      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue
+  Private Sub acType_TypeDetermined(HostGroup As DetermineType.SatHostGroup)
+    Select Case HostGroup
+      Case DetermineType.SatHostGroup.WildBlue
         mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
         GetUsage()
-      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet
+      Case DetermineType.SatHostGroup.DishNet
         mySettings.AccountType = SatHostTypes.DishNet_EXEDE
         GetUsage()
-      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal
+      Case DetermineType.SatHostGroup.RuralPortal
         mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
         GetUsage()
-      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede
+      Case DetermineType.SatHostGroup.Exede
         mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         GetUsage()
-      Case DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other
-        ResetTimeout()
+      Case DetermineType.SatHostGroup.Other
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
     End Select
   End Sub
 #End Region
 #Region "Login Functions"
-  Private ReadTimeoutCount As Integer
-  Private Sub tmrReadTimeout_Tick()
-    ReadTimeoutCount += 1
-    Dim TimeOutTime As Integer = mySettings.Timeout
-    If ReadTimeoutCount >= TimeOutTime Then
-      If tmrReadTimeout IsNot Nothing Then
-        tmrReadTimeout.Dispose()
-        tmrReadTimeout = Nothing
-      End If
-      ReadTimeoutCount = 0
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
-    End If
-  End Sub
-  Private Sub ResetTimeout(Optional enable As Boolean = False)
-    If tmrReadTimeout IsNot Nothing Then
-      tmrReadTimeout.Dispose()
-      tmrReadTimeout = Nothing
-    End If
-    ReadTimeoutCount = 0
-    If enable Then tmrReadTimeout = New Threading.Timer(New Threading.TimerCallback(AddressOf tmrReadTimeout_Tick), New Object, 1000, 1000)
-  End Sub
   Private Sub GetUsage()
-    If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Or Not sAccount.Contains("@") Then
+    If String.IsNullOrEmpty(sUsername) Or String.IsNullOrEmpty(sPassword) Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountDetails))
     Else
       RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Initialize))
-      Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-      ResetTimeout(True)
-      PrepareLogin(False)
-      Login(sUser, sPassword)
+      Login()
     End If
   End Sub
-  Private Function KeyCheck(TestKey As String) As Boolean
-    If String.IsNullOrEmpty(TestKey) Then Return False
-    If TestKey.Contains("-") Then
-      Dim sKeys() As String = Split(TestKey, "-")
-      If sKeys.Length = 5 Then
-        If Trim(sKeys(0)).Length = 6 And Trim(sKeys(1)).Length = 4 And Trim(sKeys(2)).Length = 4 Or Trim(sKeys(3)).Length = 4 Or Trim(sKeys(4)).Length = 6 Then
-          Return True
-        End If
-      End If
-    End If
-    Return False
-  End Function
-  Private Sub PrepareLogin(preserveCookies As Boolean)
-    iHist = 0
-    Dim cJar As New Net.CookieContainer
-    If wsData IsNot Nothing Then
-      If preserveCookies Then cJar = wsData.CookieJar
-      If wsData.IsBusy Then wsData.CancelAsync()
-      wsData.Dispose()
-      wsData = Nothing
-    End If
-    wsData = New WebClientEx
-    If mySettings IsNot Nothing Then
-      wsData.Timeout = mySettings.Timeout
-      wsData.Proxy = mySettings.Proxy
-    End If
-    wsData.CookieJar = cJar
-    System.Windows.Forms.Application.DoEvents()
-  End Sub
-  Private Sub Login(sUID As String, sPass As String)
+  Private Sub Login()
+    c_Jar = New Net.CookieContainer
     Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY : LoginWB(sUID, sPass)
-      Case SatHostTypes.WildBlue_EXEDE : LoginExede(sUID, sPass)
-      Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP(sUID, sPass)
-      Case SatHostTypes.DishNet_EXEDE : LoginDN(sUID, sPass)
+      Case SatHostTypes.WildBlue_LEGACY : LoginWB()
+      Case SatHostTypes.WildBlue_EXEDE : LoginExede()
+      Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP()
+      Case SatHostTypes.DishNet_EXEDE : LoginDN()
     End Select
   End Sub
-  Private Sub LoginWB(sUID As String, sPass As String)
+  Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
-    wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-    wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-    Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
-    Dim uriURL As Uri = Nothing
-    Try
-      uriURL = New Uri(uriString)
-    Catch ex As Exception
-      uriURL = Nothing
-    End Try
-    If uriURL Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
-    Else
-      Try
-        Dim sSend As String = "uid=" & PercentEncode(sUID) & "&userPassword=" & PercentEncode(sPass)
-        wsData.UploadStringAsync(uriURL, "POST", sSend, aState)
-      Catch ex As Exception
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
-      End Try
-    End If
+    Dim wsLogin As WebClientEx = MakeSocket()
+    Dim sSend As String = "uid=" & PercentEncode(sUsername) & "&userPassword=" & PercentEncode(sPassword)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
+    Dim sRet As String = wsLogin.UploadString(uriString, "POST", sSend)
+    If ClosingTime Then Return
+    WB_Login_Response(sRet, wsLogin.ResponseURI)
   End Sub
-  Private Sub LoginExede(sUID As String, sPass As String)
+  Private Sub LoginExede()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
     Dim uriString As String = "https://my.exede.net/login"
-    Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
-    myUID = sUID
-    myPass = sPass
-    Dim uriURL As Uri = Nothing
-    Try
-      uriURL = New Uri(uriString)
-    Catch ex As Exception
-      uriURL = Nothing
-    End Try
-    If uriURL Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
-    Else
-      wsData.ManualRedirect = True
-      Try
-        wsData.DownloadStringAsync(uriURL, aState)
-      Catch ex As Exception
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
-      End Try
-    End If
+    Dim wsLoginPrepare As WebClientEx = MakeSocket()
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
+    Dim sRet As String = wsLoginPrepare.DownloadString(uriString)
+    If ClosingTime Then Return
+    EX_Login_Prepare_Response(sRet, wsLoginPrepare.ResponseURI, 0)
   End Sub
-  Private Sub LoginRP(sUID As String, sPass As String)
+  Private Sub LoginRP()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, "login")
-    wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-    wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-    Dim sSend As String = "warningTrip=false&userName=" & PercentEncode(sUID) & "&passwd=" & PercentEncode(sPass)
-    Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
-    Dim uriURL As Uri = Nothing
-    Try
-      uriURL = New Uri(uriString)
-    Catch ex As Exception
-      uriURL = Nothing
-    End Try
-    If uriURL Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
-    Else
-      Try
-        wsData.UploadStringAsync(uriURL, "POST", sSend, aState)
-      Catch ex As Exception
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
-      End Try
-    End If
+    Dim wsLogin As WebClientEx = MakeSocket()
+    Dim sSend As String = "warningTrip=false&userName=" & PercentEncode(sUsername) & "&passwd=" & PercentEncode(sPassword)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
+    Dim sRet As String = wsLogin.UploadString(uriString, "POST", sSend)
+    If ClosingTime Then Return
+    RP_Login_Response(sRet, wsLogin.ResponseURI, False)
   End Sub
-  Private Sub LoginDN(sUID As String, sPass As String)
+  Private Sub LoginDN()
+    iHist = 0
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
     Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
-    Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
-    myUID = sUID
-    myPass = sPass
-    Dim uriURL As Uri = Nothing
-    Try
-      uriURL = New Uri(uriString)
-    Catch ex As Exception
-      uriURL = Nothing
-    End Try
-    If uriURL Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unable to create URI from """ & uriString & """!"))
-    Else
-      Try
-        wsData.DownloadStringAsync(uriURL, aState)
-      Catch ex As Exception
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Login Send Failure: " & NetworkErrorToString(ex, sDataPath)))
-      End Try
-    End If
-  End Sub
-  Private Sub wsData_Failure(sender As Object, e As WebClientEx.ErrorEventArgs) Handles wsData.Failure
-    ResetTimeout()
-    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Error: " & NetworkErrorToString(e.Error, sDataPath)))
-    If wsData IsNot Nothing Then
-      wsData.Dispose()
-      wsData = Nothing
-    End If
+    Dim wsLogin As WebClientEx = MakeSocket()
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
+    Dim sRet As String = wsLogin.DownloadString(uriString)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_Response(sRet, wsLogin.ResponseURI)
   End Sub
 #End Region
 #Region "Parsing Functions"
-  Private iHist As Integer = 0
-  Private Sub wsData_DownloadProgressChanged(sender As Object, e As System.Net.DownloadProgressChangedEventArgs) Handles wsData.DownloadProgressChanged
-    ResetTimeout(True)
-  End Sub
-  Private Sub wsData_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsData.DownloadStringCompleted
-    If bCancelled Then
-      bCancelled = False
-      Exit Sub
-    End If
-    imSlowed = False
-    imFree = False
-    Dim sErrMsg As String = String.Empty
-    Dim sFailText As String = String.Empty
-    Dim bReset As Boolean = False
-    If e.Error IsNot Nothing Then
-      If e.Error.InnerException Is Nothing Then
-        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-      Else
-        If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
-          sErrMsg = Nothing
-        Else
-          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-        End If
-      End If
-    ElseIf e.Cancelled Then
-      sErrMsg = "Login Error: Request Cancelled"
-    Else
-      If wsData Is Nothing Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-        Return
-      End If
-      Dim sHost As String
-      Try
-        sHost = wsData.ResponseURI.Host.ToLower
-      Catch ex As Exception
-        sHost = Nothing
-      End Try
-      Dim sPath As String
-      Try
-        sPath = wsData.ResponseURI.LocalPath.ToLower
-      Catch ex As Exception
-        sPath = Nothing
-      End Try
-      Dim sQuery As String
-      Try
-        sQuery = wsData.ResponseURI.Query.ToLower
-      Catch ex As Exception
-        sQuery = Nothing
-      End Try
-      Dim sRet As String = e.Result
-      If String.IsNullOrEmpty(sPath) Then
-        sErrMsg = "Login Failed: No Response URI!"
-        bReset = True
-      ElseIf String.IsNullOrEmpty(sRet) Then
-        For Each Key In wsData.ResponseHeaders.AllKeys
-          If Key.ToLower = "location" Then
-            Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
-            wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-            ResetTimeout(True)
-            wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
-            Exit Sub
-          End If
-        Next
-        sErrMsg = "Login Error: Empty Content!"
-        bReset = True
-      Else
-        HandleResponse(e.UserState(0), e.UserState(1), e.UserState(2), mySettings.AccountType, wsData.ResponseURI.AbsoluteUri, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-      End If
-    End If
-    If Not String.IsNullOrEmpty(Trim(sErrMsg)) Then
-      ResetTimeout()
-      If bReset Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, sErrMsg, sFailText))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sErrMsg, sFailText))
-      End If
-    End If
-  End Sub
-  Private Sub wsData_UploadStringCompleted(sender As Object, e As System.Net.UploadStringCompletedEventArgs) Handles wsData.UploadStringCompleted
-    If bCancelled Then
-      bCancelled = False
-      Exit Sub
-    End If
-    Dim sErrMsg As String = String.Empty
-    Dim sFailText As String = String.Empty
-    Dim bReset As Boolean = False
-    If e.Error IsNot Nothing Then
-      If e.Error.InnerException Is Nothing Then
-        sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-      Else
-        If e.Error.InnerException.Message = "Object reference not set to an instance of an object." Then
-          sErrMsg = Nothing
-        Else
-          sErrMsg = "Login Error: " & NetworkErrorToString(e.Error, sDataPath) & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-        End If
-      End If
-    ElseIf e.Cancelled Then
-      sErrMsg = "Login Error: Request Cancelled"
-    Else
-      If wsData Is Nothing Then
-        ResetTimeout()
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-        Return
-      End If
-      Dim sHost As String
-      Try
-        sHost = wsData.ResponseURI.Host.ToLower
-      Catch ex As Exception
-        sHost = Nothing
-      End Try
-      Dim sPath As String
-      Try
-        sPath = wsData.ResponseURI.LocalPath.ToLower
-      Catch ex As Exception
-        sPath = Nothing
-      End Try
-      Dim sQuery As String
-      Try
-        sQuery = wsData.ResponseURI.Query.ToLower
-      Catch ex As Exception
-        sQuery = Nothing
-      End Try
-      Dim sRet As String = e.Result
-      If String.IsNullOrEmpty(sPath) Then
-        sErrMsg = "Login Failed: No Response URI!"
-        bReset = True
-      ElseIf String.IsNullOrEmpty(sRet) Then
-        For Each Key In wsData.ResponseHeaders.AllKeys
-          If Key.ToLower = "location" Then
-            Dim sNewPath As String = wsData.ResponseHeaders.Item(Key)
-            wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-            ResetTimeout(True)
-            wsData.DownloadStringAsync(New Uri(sNewPath), e.UserState)
-            Exit Sub
-          End If
-        Next
-        sErrMsg = "Login Error: Empty Content!"
-        bReset = True
-      Else
-        HandleResponse(e.UserState(0), e.UserState(1), e.UserState(2), mySettings.AccountType, wsData.ResponseURI.AbsoluteUri, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-      End If
-    End If
-    If Not String.IsNullOrEmpty(Trim(sErrMsg)) Then
-      ResetTimeout()
-      If bReset Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, sErrMsg, sFailText))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sErrMsg, sFailText))
-      End If
-    End If
-  End Sub
-  Private Sub HandleResponse(LoginState As ConnectionStates, LoginSubState As ConnectionSubStates, LoginStage As Integer, AccountType As SatHostTypes, sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
-    iHist += 1
-    ResetTimeout(True)
-    Dim CloseSocket As Boolean = False
-    Select Case AccountType
-      Case SatHostTypes.WildBlue_LEGACY
-        Select Case LoginState
-          Case ConnectionStates.Login
-            WB_Login_Authenticate(sRet, sErrMsg, sFailText, bReset)
-          Case ConnectionStates.TableDownload
-            WB_Download_Table(sHost, sRet, sErrMsg, sFailText, bReset)
-            CloseSocket = True
-          Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-            bReset = True
-        End Select
-      Case SatHostTypes.WildBlue_EXEDE
-        Select Case LoginState
-          Case ConnectionStates.Login
-            Select Case LoginSubState
-              Case ConnectionSubStates.ReadLogin
-                EX_Login_ReadLogin(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.Authenticate, ConnectionSubStates.AuthenticateRetry
-                EX_Login_Authenticate(sURI, sHost, sPath, sRet, sErrMsg, sFailText, bReset)
-            End Select
-          Case ConnectionStates.TableDownload
-            Select Case LoginSubState
-              Case ConnectionSubStates.LoadHome
-                EX_Download_Homepage(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.LoadAJAX
-                If LoginStage = 1 Then
-                  EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "2")
-                Else
-                  EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "3")
-                End If
-              Case ConnectionSubStates.LoadTable
-                EX_Download_Table(sHost, sPath, sRet, sErrMsg, sFailText, bReset)
-                CloseSocket = True
-              Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-                bReset = True
-            End Select
-          Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-            bReset = True
-        End Select
-      Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE
-        Select Case LoginState
-          Case ConnectionStates.Login
-            Select Case LoginSubState
-              Case ConnectionSubStates.Authenticate
-                RP_Login_Authenticate(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.AuthenticateRetry
-                RP_Login_AuthenticateRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-                bReset = True
-            End Select
-          Case ConnectionStates.TableDownload
-            RP_Download_Table(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-            CloseSocket = True
-          Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-            bReset = True
-        End Select
-      Case SatHostTypes.DishNet_EXEDE
-        Select Case LoginState
-          Case ConnectionStates.Login
-            Select Case LoginSubState
-              Case ConnectionSubStates.ReadLogin
-                DN_Login_ReadLogin(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.AuthPrepare
-                DN_Login_Prepare(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.Authenticate, ConnectionSubStates.AuthenticateRetry
-                DN_Login_Authenticate(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.Verify
-                DN_Login_Verify(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-                bReset = True
-            End Select
-          Case ConnectionStates.TableDownload
-            Select Case LoginSubState
-              Case ConnectionSubStates.LoadHome
-                DN_Download_Home(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.LoadTable
-                DN_Download_Table(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-              Case ConnectionSubStates.LoadTableRetry
-                DN_Download_TableRetry(sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-                CloseSocket = True
-              Case Else
-                sErrMsg = "Login Failed. Unknown Login SubState: " & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-                bReset = True
-            End Select
-          Case Else
-            sErrMsg = "Login Failed. Unknown Login State: " & LoginState.ToString & ">" & LoginSubState.ToString & " (" & AttemptedTag.ToString & " [" & AttemptedSub & "(" & AttemptedStage & ")])." & vbNewLine & "Attempted to load <" & sAttemptedURL & ">."
-            bReset = True
-        End Select
-      Case Else
-        sErrMsg = "Login Failed: Host Type not determined (" & AccountType.ToString & ")!"
-        bReset = True
-    End Select
-    If CloseSocket Then
-      If wsData IsNot Nothing Then
-        wsData.CancelAsync()
-        wsData.Dispose()
-        wsData = Nothing
-      End If
-    End If
-  End Sub
-  Private Sub LoadUsage(File As String)
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
-    PrepareLogin(True)
-    Select Case mySettings.AccountType
-      Case SatHostTypes.WildBlue_LEGACY
-        Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
-        Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-        wsData.DownloadStringAsync(New Uri(uriString), aState)
-      Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE
-        If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-        Dim uriString As String = String.Format(sRP, sProvider, File)
-        Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-        wsData.DownloadStringAsync(New Uri(uriString), aState)
-      Case Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, "Usage Failed: Host Type not determined (" & mySettings.AccountType.ToString & ")!"))
-    End Select
-  End Sub
   Private Sub ReadUsage(Table As String)
-    If wsData Is Nothing Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "The socket was closed or could not be accessed."))
-      Return
-    End If
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
@@ -774,47 +344,51 @@
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
       Case SatHostTypes.DishNet_EXEDE : DN_Read_Table(Table)
     End Select
-    If wsData IsNot Nothing Then wsData.CookieJar = New Net.CookieContainer
+    c_Jar = New Net.CookieContainer
     SendSocketErrors(sDataPath)
   End Sub
 #Region "WB"
-  Private Sub WB_Login_Authenticate(sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If sRet.Contains("usage.jsp") Then
-      PrepareLogin(True)
-      LoadUsage("usage")
-    ElseIf sRet.Contains("usage_bm.jsp") Then
-      PrepareLogin(True)
-      LoadUsage("usage_bm")
-    ElseIf sRet.Contains("<div class=""error"">") Then
-      Dim sMessage As String = sRet.Substring(sRet.IndexOf("<div class=""error"">"))
+  Private Sub WB_Login_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Response.Contains("usage.jsp") Then
+      WB_Usage("usage")
+    ElseIf Response.Contains("usage_bm.jsp") Then
+      WB_Usage("usage_bm")
+    ElseIf Response.Contains("<div class=""error"">") Then
+      Dim sMessage As String = Response.Substring(Response.IndexOf("<div class=""error"">"))
       If sMessage.Contains("<b>") Then
         sMessage = sMessage.Substring(sMessage.IndexOf("<b>") + 3)
         sMessage = sMessage.Substring(0, sMessage.IndexOf("<"))
-        sErrMsg = "Login Failed: " & sMessage
+        RaiseError("Login Failed: " & sMessage)
       ElseIf sMessage.Contains("my.exede.net") Then
-        sErrMsg = "Login Failed: You must create an account at the new Exede Portal."
-        bReset = True
+        RaiseError("Login Failed: You must create an account at the new Exede Portal.")
       Else
-        sErrMsg = "Login Failed: Could not understand error."
-        sFailText = "WB DIV Error = " & sErrMsg & vbNewLine & sRet
-        bReset = True
+        RaiseError("Login Failed: Could not understand error.", "WB Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
       End If
-    ElseIf sRet.Contains("https://my.exede.net/usage") Then
-      sErrMsg = "Login Redirect: Exede account detected."
+    ElseIf Response.Contains("https://my.exede.net/usage") Then
       mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
-      ResetTimeout()
+      RaiseError("Login Redirect: Exede account detected.")
       GetUsage()
     Else
-      sErrMsg = "Login Failed: Could not understand response."
-      sFailText = "WB Parse Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+      RaiseError("Login Failed: Could not understand response.", "WB Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
     End If
   End Sub
-  Private Sub WB_Download_Table(sHost As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "myaccount." & sProvider Then
-      sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sRet.Contains("Usage Meter") Then
-      Dim sFind As String = sRet.Substring(sRet.IndexOf("Usage Meter"))
+  Private Sub WB_Usage(File As String)
+    Dim wsUsage As WebClientEx = MakeSocket()
+    Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
+    Dim sRet As String = wsUsage.DownloadString(uriString)
+    If ClosingTime Then Return
+    WB_Usage_Response(sRet, wsUsage.ResponseURI)
+  End Sub
+  Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "myaccount." & sProvider Then
+      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Response.Contains("Usage Meter") Then
+      Dim sFind As String = Response.Substring(Response.IndexOf("Usage Meter"))
       If sFind.Contains("<strong>Slowed Speed</strong>") Then imSlowed = True
       If sFind.Contains("<table") Then
         sFind = sFind.Substring(sFind.IndexOf("<table"))
@@ -826,9 +400,7 @@
           sFind = sFind.Substring(0, sFind.IndexOf("</table>", iSearch))
           ReadUsage(sFind)
         Else
-          sErrMsg = "Usage Failed: Could not parse usage meter."
-          sFailText = "WildBlue Parse Error = " & sErrMsg & vbNewLine & sRet
-          bReset = True
+          RaiseError("Usage Failed: Could not parse usage meter.", "WB Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
         End If
       ElseIf sFind.Contains("FREEDOM") AndAlso sFind.Contains("Current Usage<strong>:") Then
         sFind = sFind.Substring(sFind.IndexOf("FREEDOM"))
@@ -836,32 +408,27 @@
           sFind = sFind.Substring(0, sFind.IndexOf("</td>"))
           ReadUsage(sFind)
         Else
-          sErrMsg = "Usage Failed: Could not parse usage meter."
-          sFailText = "Exede Freedom Parse Error = " & sErrMsg & vbNewLine & sRet
+          RaiseError("Usage Failed: Could not parse usage meter.", "WB Usage Response Error (Exede Freedom)", ResponseURI.OriginalString & vbNewLine & Response)
         End If
       ElseIf sFind.Contains("At this time, your usage is not being counted toward your data allowance.") Then
         imFree = True
-        sErrMsg = "Your usage is not being metered at this time!"
+        RaiseError("Your usage is not being metered at this time!")
       Else
-        sErrMsg = "Usage Failed: Could not find usage meter."
-        sFailText = "WildBlue Meter Error = " & sErrMsg & vbNewLine & sRet
-        bReset = True
+        RaiseError("Usage Failed: Could not find usage meter.", "WB Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       End If
-    ElseIf sRet.Contains("<div class=""error"">") Then
-      Dim sMessage As String = sRet.Substring(sRet.IndexOf("<div class=""error"">"))
+    ElseIf Response.Contains("<div class=""error"">") Then
+      Dim sMessage As String = Response.Substring(Response.IndexOf("<div class=""error"">"))
       If sMessage.Contains("<b>") Then
         sMessage = sMessage.Substring(sMessage.IndexOf("<b>") + 3)
         sMessage = sMessage.Substring(0, sMessage.IndexOf("<"))
-        sErrMsg = "Usage Failed: " & sMessage
+        RaiseError("Usage Failed: " & sMessage)
       Else
-        sErrMsg = "Usage Failed: Could not find usage meter."
-        sFailText = "WildBlue Error DIV = " & sErrMsg & vbNewLine & sRet
-        bReset = True
+        RaiseError("Usage Failed: Could not find usage meter.", "WB Usage Response Error (Error DIV but no BOLD text)", ResponseURI.OriginalString & vbNewLine & Response)
       End If
     Else
       Dim sErr As String = "Could not find usage meter."
-      If sRet.Contains("Oops") Then
-        sErr = sRet.Substring(sRet.IndexOf("Oops"))
+      If Response.Contains("Oops") Then
+        sErr = Response.Substring(Response.IndexOf("Oops"))
         If sErr.Contains("</h3>") Then
           sErr = sErr.Substring(0, sErr.IndexOf("</h3>"))
           If sErr = "Oops. We're having a problem displaying your usage information." Then sErr = "Data temporarily unavailable."
@@ -873,14 +440,12 @@
           If sErr.Contains("->") Then
             sErr = sErr.Substring(0, sErr.IndexOf("<!-")) & sErr.Substring(sErr.IndexOf("->") + 2)
           Else
-            sFailText = "WildBlue OOPS Response Error = " & sErr & vbNewLine & sRet
           End If
         End If
+        RaiseError("Usage Failed: " & sErr, "WB Usage Response Error (Oops)", ResponseURI.OriginalString & vbNewLine & Response)
       Else
-        sFailText = "WildBlue Response Error = " & sErr & vbNewLine & sRet
-        bReset = True
+        RaiseError("Usage Failed: " & sErr, "WB Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       End If
-      sErrMsg = "Usage Failed: " & sErr
     End If
   End Sub
   Private Sub WB_Read_Table(Table As String)
@@ -907,261 +472,275 @@
           End If
         End If
       Next
-      ResetTimeout()
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       Else
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
+    Else
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
     End If
   End Sub
 #End Region
 #Region "EX"
-  Private Sub EX_Login_ReadLogin(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "mysso.exede.net" Then
-      sErrMsg = "Prepare Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sRet.ToLower.Contains("unable to process request") Then
-      sErrMsg = "Login Failed: The server may be down."
-    ElseIf sPath = "/federation/ssoredirect/metaalias/idp" Then
-      If sRet.Contains("<form") And sRet.Contains("name=""Login""") Then
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sURI As String = sRet.Substring(sRet.IndexOf("name=""Login"""))
+  Private Sub EX_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "mysso.exede.net" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" Then
+      RaiseError("Login Failed: Could not understand response.", "EX Login Prepare Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    If Response.ToLower.Contains("unable to process request") Then
+      RaiseError("Prepare Failed: The server may be down.")
+      Return
+    End If
+    If Not Response.Contains("<form") Or Not Response.Contains("name=""Login""") Then
+      RaiseError("Prepare Failed: Login form not found.", "EX Login Prepare Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    Dim sURI As String = Response.Substring(Response.IndexOf("name=""Login"""))
+    sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
+    sURI = sURI.Substring(0, sURI.IndexOf(""""))
+    If sURI.StartsWith("/") Then sURI = "https://" & ResponseURI.Host & sURI
+    Dim sGOTO As String = Nothing
+    If Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
+      sGOTO = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""goto"" value="""))
+      sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
+      If sGOTO.Contains(""" />") Then
+        sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+      ElseIf sGOTO.Contains("""") Then
+        sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
+      End If
+    End If
+    If String.IsNullOrEmpty(sGOTO) Then
+      RaiseError("Prepare Failed: GOTO value not found.", "EX Login Prepare Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    Dim sSQPS As String = Nothing
+    If Response.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
+      sSQPS = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
+      sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
+      If sSQPS.Contains(""" />") Then
+        sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+      ElseIf sSQPS.Contains("""") Then
+        sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
+      End If
+    End If
+    If String.IsNullOrEmpty(sSQPS) Then
+      RaiseError("Prepare Failed: SunQueryParamsString value not found.", "Exede Login Prepare Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    EX_Login(sURI, sGOTO, sSQPS, TryCount)
+  End Sub
+  Private Sub EX_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
+    Dim wsLogin As WebClientEx = MakeSocket()
+    Dim sSend As String = "realm=" & PercentEncode("/") &
+                         "&IDToken1=" & PercentEncode(sUsername) &
+                         "&IDToken2=" & PercentEncode(sPassword) &
+                         "&IDButton=Sign+in" &
+                         "&goto=" & PercentEncode(sGOTO) &
+                         "&SunQueryParamsString=" & PercentEncode(sSQPS) &
+                         "&encoded=true" &
+                         "&gx_charset=UTF-8"
+    If TryCount = 0 Then
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
+    Else
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
+    End If
+    wsLogin.ErrorBypass = True
+    Dim sRet As String = wsLogin.UploadString(sURI, "POST", sSend)
+    If ClosingTime Then Return
+    EX_Login_Response(sRet, wsLogin.ResponseURI, TryCount)
+  End Sub
+  Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "mysso.exede.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" Then
+      If Response.Contains("window.location.href") Then
+        TryCount += 1
+        If TryCount > 9 Then
+          RaiseError("Login Failed: Server redirected too many times.")
+          Return
+        End If
+        Dim wsLogin As WebClientEx = MakeSocket()
+        wsLogin.ErrorBypass = False
+        Dim sRedirURI As String = Nothing
+        sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
+        sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
+        sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+        If sRedirURI = "/" Then sRedirURI = wsLogin.ResponseURI.AbsoluteUri.Substring(0, wsLogin.ResponseURI.AbsoluteUri.IndexOf("/", wsLogin.ResponseURI.AbsoluteUri.IndexOf("//") + 2))
+        BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sRedirURI)
+        Dim sRet As String = wsLogin.DownloadString(sRedirURI)
+        If ClosingTime Then Return
+        EX_Login_Response(sRet, wsLogin.ResponseURI, TryCount)
+      ElseIf Response.Contains("maintenance") Then
+        RaiseError("Login Failed: Server Down for Maintenance.")
+      ElseIf Response.Contains("https://DOMAIN.my.salesforce.com") Then
+        RaiseError("Login Failed: Server Down for Maintenance.")
+      Else
+        RaiseError("Login Failed: Could not understand response.", "EX Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      End If
+      Return
+    End If
+    If Response.Contains("Access rights validated") Then
+      Dim sURI As String = Nothing
+      If Response.Contains("<form method=""post"" action=""") Then
+        sURI = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-        sURI = sURI.Substring(0, sURI.IndexOf(""""))
-        If sURI.StartsWith("/") Then sURI = "https://" & sHost & sURI
-        Dim sGOTO As String = Nothing
-        If sRet.Contains("<input type=""hidden"" name=""goto"" value=""") Then
-          sGOTO = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""goto"" value="""))
-          sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
-          If sGOTO.Contains(""" />") Then
-            sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
-          ElseIf sGOTO.Contains("""") Then
-            sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
-          End If
-        End If
-        If String.IsNullOrEmpty(sGOTO) Then
-          sErrMsg = "Prepare Failed: GOTO value not found."
-          sFailText = sRet
-          Exit Sub
-        End If
-        Dim sSQPS As String = Nothing
-        If sRet.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
-          sSQPS = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
-          sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
-          If sSQPS.Contains(""" />") Then
-            sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
-          ElseIf sSQPS.Contains("""") Then
-            sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
-          End If
-        End If
-        If String.IsNullOrEmpty(sSQPS) Then
-          sErrMsg = "Prepare Failed: SunQueryParamsString value not found."
-          sFailText = sRet
-          Exit Sub
-        End If
-        Dim sSend As String = "realm=" & PercentEncode("/") &
-                             "&IDToken1=" & PercentEncode(myUID) &
-                             "&IDToken2=" & PercentEncode(myPass) &
-                             "&IDButton=Sign+in" &
-                             "&goto=" & PercentEncode(sGOTO) &
-                             "&SunQueryParamsString=" & PercentEncode(sSQPS) &
-                             "&encoded=true" &
-                             "&gx_charset=UTF-8"
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
-        wsData.ErrorBypass = True
-        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
-        myUID = Nothing
-        myPass = Nothing
-      Else
-        sErrMsg = "Prepare Failed: Login form not found."
-        sFailText = "Exede Prepare Page Error = " & sErrMsg & vbNewLine & sRet
+        sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+        sURI = HexDecode(sURI)
       End If
+      If String.IsNullOrEmpty(sURI) Then sURI = ResponseURI.AbsoluteUri
+      Dim sSAMLResponse As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
+        sSAMLResponse = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
+        sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
+        sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+      End If
+      If String.IsNullOrEmpty(sSAMLResponse) Then
+        RaiseError("Login Failed: SAML Response value not found.", "EX Login Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+        Return
+      End If
+      Dim sRelay As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
+        sRelay = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
+        sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
+        sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+      End If
+      If String.IsNullOrEmpty(sRelay) Then
+        RaiseError("Login Failed: Relay State value not found.", "EX Login Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+        Return
+      End If
+      EX_Authenticate(sURI, sSAMLResponse, sRelay)
+    ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
+      RaiseError("Login Failed: Please check your account information and try again.")
+    ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
+      TryCount += 1
+      If TryCount > 9 Then
+        RaiseError("Login Failed: Server redirected too many times.")
+        Return
+      End If
+      EX_Login_Prepare_Response(Response, ResponseURI, TryCount)
+    ElseIf Response.Contains("login-error-alert") Then
+      If Response.ToLower.Contains("your username and/or password are incorrect.") Then
+        RaiseError("Login Failed: Incorrect Password")
+      ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
+        RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
+      ElseIf Response.ToLower.Contains("your session has timed out.") Then
+        RaiseError("Login Failed: Session timed out. Please try again.")
+      Else
+        RaiseError("Unknown Login Error.", "EX Login Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      End If
+    ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
+      RaiseError("Login Failed: Server encountered an unexpected error.")
     Else
-      sErrMsg = "Prepare Failed: Could not understand response."
-      sFailText = "Exede Prepare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+      RaiseError("Could not log in.", "EX Login Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
   End Sub
-  Private Sub EX_Login_Authenticate(sURL As String, sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "mysso.exede.net" And Not sHost = "my.exede.net" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath = "/federation/ui/login" Or sPath = "/federation/ssoredirect/metaalias/idp" Then
-      If sRet.Contains("Access rights validated") Then
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sURI As String = Nothing
-        If sRet.Contains("<form method=""post"" action=""") Then
-          sURI = sRet.Substring(sRet.IndexOf("<form method=""post"" action="""))
-          sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-          sURI = sURI.Substring(0, sURI.IndexOf(""">"))
-          sURI = HexDecode(sURI)
-        End If
-        If String.IsNullOrEmpty(sURI) Then sURI = sURL
-        Dim sSAMLResponse As String = Nothing
-        If sRet.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
-          sSAMLResponse = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
-          sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
-          sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
-        End If
-        If String.IsNullOrEmpty(sSAMLResponse) Then
-          sErrMsg = "Login Failed: SAML Response value not found."
-          sFailText = sRet
-          Exit Sub
-        End If
-        Dim sRelay As String = Nothing
-        If sRet.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
-          sRelay = sRet.Substring(sRet.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
-          sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-          sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
-        End If
-        If String.IsNullOrEmpty(sRelay) Then
-          sErrMsg = "Login Failed: Relay State value not found."
-          sFailText = sRet
-          Exit Sub
-        End If
-        Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(sSAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(sRelay))
-        Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
-        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
-      ElseIf sRet.Contains("login-error-alert") Then
-        If sRet.ToLower.Contains("your username and/or password are incorrect.") Then
-          sErrMsg = "Login Failed: Incorrect Password"
-        ElseIf sRet.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
-          sErrMsg = "Login Failed: Exede Account Locked. Check your username and password."
-        ElseIf sRet.ToLower.Contains("your session has timed out.") Then
-          sErrMsg = "Login Failed: Session timed out. Please try again."
-        Else
-          sErrMsg = "Unknown Login Error."
-          sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-        End If
-      ElseIf sRet.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-        sErrMsg = "Login Failed: Please check your account information and try again."
-      ElseIf sRet.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
-        sErrMsg = "Login Failed: Server encountered an unexpected error."
-      Else
-        sErrMsg = "Could not log in."
-        sFailText = "Exede Login Page Error = " & sErrMsg & vbNewLine & sRet
-      End If
+  Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
+    Dim wsAuthenticate As WebClientEx = MakeSocket()
+    Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(SAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(RelayState))
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
+    Dim sRet As String = wsAuthenticate.UploadString(sURI, "POST", sSend)
+    If ClosingTime Then Return
+    EX_Authenticate_Response(sRet, wsAuthenticate.ResponseURI)
+  End Sub
+  Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+      RaiseError("Authentication Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower.Contains("/identity/saml/samlerror") Or ResponseURI.AbsolutePath.ToLower.Contains("/ssoerror") Then
+      RaiseError("Authentication Failed: The server may be down.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower = "/secur/frontdoor.jsp" Then
+      EX_Download_Homepage("https://" & ResponseURI.Host & "/dashboard")
+      Return
+    End If
+    If Response.Contains("maintenance") Then
+      RaiseError("Authentication Failed: Server Down for Maintenance.")
     Else
-      If sRet.Contains("window.location.href") Then
-        wsData.ErrorBypass = False
-        Dim sURI As String = Nothing
-        sURI = sRet.Substring(sRet.IndexOf("window.location.href"))
-        sURI = sURI.Substring(sURI.IndexOf("'") + 1)
-        sURI = sURI.Substring(0, sURI.IndexOf("'"))
-        If sURI = "/" Then
-          sURI = sURL.Substring(0, sURL.IndexOf("/", sURL.IndexOf("//") + 2))
-        End If
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURI)
-        wsData.DownloadStringAsync(New Uri(sURI), aState)
-      ElseIf sRet.Contains("maintenance") Then
-        sErrMsg = "Login Failed: Server Down for Maintenance."
-      ElseIf sRet.Contains("https://DOMAIN.my.salesforce.com") Then
-        sErrMsg = "Login Failed: Server Down for Maintenance."
-      Else
-        sErrMsg = "Login Failed: Could not understand response."
-        sFailText = "Exede Login Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-        bReset = True
-      End If
+      RaiseError("Authentication Failed: Could not understand response.", "EX Authenticate Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
     End If
   End Sub
-  Private Sub EX_Download_Homepage(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
-      sErrMsg = "Authentication Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath = "/secur/frontdoor.jsp" Then
-      Dim sURI As String = "https://" & sHost & "/dashboard"
-      Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
-      wsData.DownloadStringAsync(New Uri(sURI), aState)
-    ElseIf sPath.ToLower.Contains("/identity/saml/samlerror") Or sPath.ToLower.Contains("/ssoerror") Then
-      sErrMsg = "Authentication Failed: The server may be down."
-    ElseIf sRet.Contains("maintenance") Then
-      sErrMsg = "Authentication Failed: Server Down for Maintenance."
+  Private Sub EX_Download_Homepage(sURI As String)
+    Dim wsHomepage As WebClientEx = MakeSocket()
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
+    Dim sRet As String = wsHomepage.DownloadString(sURI)
+    If ClosingTime Then Return
+    EX_Ajax_Response(sRet, wsHomepage.ResponseURI, "2")
+  End Sub
+  Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+      RaiseError("Dashboard Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" Then
+      RaiseError("Dashboard Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    If Response.Contains("amount-used") Then
+      Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"">"))
+      sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
+      ReadUsage(sTable)
+    ElseIf Response.Contains("<span id=""ajax-view-state""") Then
+      Dim AjaxViewState As String = Response.Substring(Response.IndexOf("<span id=""ajax-view-state"""))
+      AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
+      Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
+      sViewState = sViewState.Substring(sViewState.IndexOf("value=""") + 7)
+      sViewState = sViewState.Substring(0, sViewState.IndexOf(""" />"))
+      Dim sVSVersion As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateVersion"""))
+      sVSVersion = sVSVersion.Substring(sVSVersion.IndexOf("value=""") + 7)
+      sVSVersion = sVSVersion.Substring(0, sVSVersion.IndexOf(""" />"))
+      Dim sVSMAC As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateMAC"""))
+      sVSMAC = sVSMAC.Substring(sVSMAC.IndexOf("value=""") + 7)
+      sVSMAC = sVSMAC.Substring(0, sVSMAC.IndexOf(""" />"))
+      Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
+      sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
+      sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
+      EX_Download_Ajax("https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard", AjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
+    ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my.exede.net/atlasPlanInvalid") Then
+      RaiseError("Dashboard Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
+    ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
+      RaiseError("Dashboard Load Failed: Too many requests. Check for usage data less often.")
+    ElseIf Response.Contains("maintenance") Then
+      RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
+    ElseIf Response.Contains("window.location.href") Then
+      RaiseError("Dashboard Load Failed: Sent back to login page. Please try again.")
     Else
-      sErrMsg = "Authentication Failed: Could not understand response."
-      sFailText = "Exede Authentication Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+      RaiseError("Dashboard Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
   End Sub
-  Private Sub EX_Download_Ajax(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean, AjaxID As String)
-    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
-      sErrMsg = "Dashboard Load Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath = "/dashboard" Then
-      If sRet.Contains("<span id=""ajax-view-state""") Then
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim AjaxViewState As String = sRet.Substring(sRet.IndexOf("<span id=""ajax-view-state"""))
-        AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
-        Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
-        sViewState = sViewState.Substring(sViewState.IndexOf("value=""") + 7)
-        sViewState = sViewState.Substring(0, sViewState.IndexOf(""" />"))
-        Dim sVSVersion As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateVersion"""))
-        sVSVersion = sVSVersion.Substring(sVSVersion.IndexOf("value=""") + 7)
-        sVSVersion = sVSVersion.Substring(0, sVSVersion.IndexOf(""" />"))
-        Dim sVSMAC As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateMAC"""))
-        sVSMAC = sVSMAC.Substring(sVSMAC.IndexOf("value=""") + 7)
-        sVSMAC = sVSMAC.Substring(0, sVSMAC.IndexOf(""" />"))
-        Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
-        sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
-        sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
-        Dim sSend As String = "AJAXREQUEST=_viewRoot" &
-               "&j_id0%3AidForm=j_id0%3AidForm" &
-               "&com.salesforce.visualforce.ViewState=" & PercentEncode(sViewState) &
-               "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
-               "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
-               "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
-               "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
-        Dim sURI As String = "https://" & sHost & "/dashboard?refURL=https%3A%2F%2F" & sHost & "%2Fdashboard"
-        Dim aState As Object = Nothing
-        If AjaxID = "2" Then
-          aState = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 2, sURI)
-        Else
-          aState = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
-        End If
-        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
-      ElseIf sRet.Contains("https://myexede.force.com/atlasPlanInvalid") Or sRet.Contains("https://my.exede.net/atlasPlanInvalid") Then
-        sErrMsg = "Dashboard Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists."
-      ElseIf sRet.Contains("Concurrent requests limit exceeded.") Then
-        sErrMsg = "Dashboard Load Failed: Too many requests. Check for usage data less often."
-      ElseIf sRet.Contains("maintenance") Then
-        sErrMsg = "Dashboard Load Failed: Server Down for Maintenance."
-      ElseIf sRet.Contains("window.location.href") Then
-        sErrMsg = "Dashboard Load Failed: Sent back to login page. Please try again."
-      Else
-        sErrMsg = "Dashboard Load Failed: Could not find AJAX ViewState variables."
-        sFailText = "Exede Dashboard Page Error = " & sErrMsg & vbNewLine & sRet
-      End If
+  Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
+    Dim wsAJAX As WebClientEx = MakeSocket()
+    If AjaxID = "2" Then
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 2, sURI)
     Else
-      sErrMsg = "Dashboard Load Failed: Could not understand response."
-      sFailText = "Exede Dashboard Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
     End If
-  End Sub
-  Private Sub EX_Download_Table(sHost As String, sPath As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "myexede.force.com" And Not sHost = "my.exede.net" Then
-      sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath = "/dashboard" Then
-      If sRet.Contains("amount-used") Then
-        Dim sTable As String = sRet.Substring(sRet.LastIndexOf("<div class=""amount-used"">"))
-        sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
-        ReadUsage(sTable)
-      ElseIf sRet.Contains("<span id=""ajax-view-state""") Then
-        EX_Download_Ajax(sHost, sPath, sRet, sErrMsg, sFailText, bReset, "3")
-      ElseIf sRet.ToLower.Contains("we are down for maintenance.") Then
-        sErrMsg = "Usage Failed: Server down for maintenance."
-      Else
-        sErrMsg = "ViewState Load Failed: Could not find usage data."
-        sFailText = "Exede AJAX Page Error = " & sErrMsg & vbNewLine & sRet
-      End If
-    Else
-      sErrMsg = "ViewState Load Failed: Could not understand response."
-      sFailText = "Exede AJAX Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
-    End If
+    Dim sSend As String = "AJAXREQUEST=_viewRoot" &
+             "&j_id0%3AidForm=j_id0%3AidForm" &
+             "&com.salesforce.visualforce.ViewState=" & PercentEncode(sViewState) &
+             "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
+             "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
+             "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
+             "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
+    Dim sRet As String = wsAJAX.UploadString(sURI, "POST", sSend)
+    If ClosingTime Then Return
+    EX_Ajax_Response(sRet, wsAJAX.ResponseURI, "3")
   End Sub
   Private Sub EX_Read_Table(Table As String)
     If Not Table.Contains("amount-used") Then
-      ResetTimeout()
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed", Table))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
     Else
       Dim Used As String = Table.Substring(Table.IndexOf("amount-used"))
       Used = Used.Substring(Used.IndexOf(""">") + 2)
@@ -1173,7 +752,6 @@
       End If
       Dim lUsed As Long = StrToVal(Used, MBPerGB)
       Dim lTotal As Long = StrToVal(Total, MBPerGB)
-      ResetTimeout()
       If lUsed = 0 And lTotal = 0 Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
       Else
@@ -1187,122 +765,99 @@
   End Sub
 #End Region
 #Region "RP"
-  Private Sub RP_Login_Authenticate(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = sProvider & ".ruralportal.net" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.StartsWith("/us/home.do") Then
-      PrepareLogin(True)
-      LoadUsage("sitemanage")
-    ElseIf sPath.StartsWith("/us/login.do") Then
-      If String.IsNullOrEmpty(sQuery) Then
-        If String.IsNullOrEmpty(sRet) Then
-          sErrMsg = "Login Error: Sent back to login page with empty content."
-          bReset = True
-        ElseIf sRet.ToLower.Contains("confirmchange(msg);") Then
-          ResetTimeout()
-          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Login Issue: Your password needs to be changed."))
-          If Not String.IsNullOrEmpty(sProvider) Then
-            If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-            Dim uriString As String = String.Format(sRP, sProvider, "login")
-            PrepareLogin(True)
-            wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-            wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-            Dim sSend As String = "warningTrip=true&userName=" & sAccount & "&passwd=" & PercentEncode(sPassword)
-            Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, uriString)
-            ResetTimeout(True)
-            Try
-              wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, aState)
-            Catch ex As Exception
-              ResetTimeout()
-              sErrMsg = "Login Failed: Error Bypassing Password Change - " & ex.Message
-              sFailText = "RuralPortal Login Error = " & sErrMsg & vbNewLine & sRet
-            End Try
-          Else
-            sErrMsg = "Login Error: Provider missing. Also, your password is bad. You'll need to change it."
-          End If
-        Else
-          sErrMsg = "Login Failed: Sent back to login page."
-          bReset = True
-        End If
-      ElseIf sQuery.Contains("pass=false") Then
-        sErrMsg = "Login Failed: Incorrect password."
-      Else
-        sErrMsg = "Login Failed (RP): " & sQuery & "."
-        bReset = True
+  Private Sub RP_Login_Retry(sURI As String)
+    Dim wsAuthenticate As WebClientEx = MakeSocket()
+    Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
+    Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & PercentEncode(sPassword)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURI)
+    Dim sRet As String = wsAuthenticate.UploadString(sURI, "POST", sSend)
+    If ClosingTime Then Return
+    RP_Login_Response(sRet, wsAuthenticate.ResponseURI, True)
+  End Sub
+  Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower.StartsWith("/us/home.do") Then
+      RP_Usage("sitemanage")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower.StartsWith("/us/login.do") Then
+      RaiseError("Login Failed: Could not understand response.", "RP Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    If Not String.IsNullOrEmpty(ResponseURI.Query) Then
+      If ResponseURI.Query.ToLower.Contains("pass=false") Then
+        RaiseError("Login Failed: Incorrect password.")
+        Return
       End If
+    End If
+    If Not Response.ToLower.Contains("confirmchange(msg);") Then
+      RaiseError("Login Failed: Sent back to login page.", , , True)
+      Return
+    End If
+    If String.IsNullOrEmpty(sProvider) Then
+      RaiseError("Login Error: Provider missing. Also, your password is bad. You'll need to change it.")
+      Return
+    End If
+    If Retry Then
+      RaiseError("Login Issue: Your password is bad.")
+      If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
+      Dim uriString As String = String.Format(sRP, sProvider, "login")
+      Try
+        Process.Start(uriString)
+      Catch ex As Exception
+      End Try
     Else
-      sErrMsg = "Unknown Login Result [" & sPath & "?" & sQuery & "]"
-      bReset = True
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Login Issue: Your password needs to be changed."))
+      If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
+      Dim uriString As String = String.Format(sRP, sProvider, "login")
+      RP_Login_Retry(uriString)
     End If
   End Sub
-  Private Sub RP_Login_AuthenticateRetry(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = sProvider & ".ruralportal.net" Then
-      sErrMsg = "Login Retry Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.StartsWith("/us/home.do") Then
-      PrepareLogin(True)
-      LoadUsage("sitemanage")
-    ElseIf sPath.StartsWith("/us/login.do") Then
-      If String.IsNullOrEmpty(sQuery) Then
-        If String.IsNullOrEmpty(sRet) Then
-          sErrMsg = "Login Retry Error: Sent back to login page with empty content."
-          bReset = True
-        ElseIf sRet.ToLower.Contains("confirmchange(msg);") Then
-          sErrMsg = "Login Issue: Your password is bad."
-          If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-          Dim uriString As String = String.Format(sRP, sProvider, "login")
-          Try
-            Process.Start(uriString)
-          Catch ex As Exception
-
-          End Try
-        Else
-          sErrMsg = "Login Retry Failed: Sent back to login page."
-          sFailText = "Login Retry Error = " & sErrMsg & vbNewLine & sRet
-          bReset = True
-        End If
-      ElseIf sQuery.Contains("pass=false") Then
-        sErrMsg = "Login Retry Failed: Incorrect password."
-      Else
-        sErrMsg = "Login Retry Failed: " & sQuery & "."
-        bReset = True
-      End If
-    Else
-      sErrMsg = "Unknown Login Retry Result [" & sPath & "?" & sQuery & "]"
-      bReset = True
-    End If
+  Private Sub RP_Usage(File As String)
+    If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
+    Dim uriString As String = String.Format(sRP, sProvider, File)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
+    Dim wsUsage As WebClientEx = MakeSocket()
+    Dim sRet As String = wsUsage.DownloadString(uriString)
+    If ClosingTime Then Return
+    RP_Usage_Response(sRet, wsUsage.ResponseURI)
   End Sub
-  Private Sub RP_Download_Table(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = sProvider & ".ruralportal.net" Then
-      sErrMsg = "Usage Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sRet.Contains("Current Usage") Then
-      If sRet.Contains("Usage data is not available.") Then
-        sErrMsg = "Data temporarily unavailable."
-      ElseIf sRet.Contains("<!-- usage bar -->") Then
-        Dim sFind As String = sRet.Substring(sRet.IndexOf("<!-- usage bar -->"))
-        If sFind.Contains("<table") Then
-          sFind = sFind.Substring(sFind.IndexOf("<table"))
-          If sFind.Contains("</table>") And sFind.Contains("<!-- Buy more -->") Then
-            sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- Buy more -->")))
-            ReadUsage(sFind)
-          ElseIf sFind.Contains("</table>") And sFind.Contains("<!-- End up/down stream -->") Then
-            sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- End up/down stream -->")))
-            ReadUsage(sFind)
-          Else
-            sErrMsg = "Usage Failed: Could not parse usage meter table."
-            sFailText = "RuralPortal Parse Error = " & sErrMsg & vbNewLine & sRet
-          End If
-        Else
-          sErrMsg = "Usage Failed: Could not find usage meter table."
-          sFailText = "RuralPortal Meter Error = " & sErrMsg & vbNewLine & sRet
-        End If
-      Else
-        sErrMsg = "Usage Failed: Could not find usage meter."
-        sFailText = "RuralPortal Parse Error = " & sErrMsg & vbNewLine & sRet
-      End If
+  Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
+      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not Response.Contains("Current Usage") Then
+      RaiseError("Usage Failed: Failed to log in.", "RP Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    If Response.Contains("Usage data is not available.") Then
+      RaiseError("Usage Failed: Data temporarily unavailable.")
+      Return
+    End If
+    If Not Response.Contains("<!-- usage bar -->") Then
+      RaiseError("Usage Failed: Could not find usage meter.", "RP Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    Dim sFind As String = Response.Substring(Response.IndexOf("<!-- usage bar -->"))
+    If Not sFind.Contains("<table") Then
+      RaiseError("Usage Failed: Could not find usage meter table.", "RP Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    sFind = sFind.Substring(sFind.IndexOf("<table"))
+    If sFind.Contains("</table>") And sFind.Contains("<!-- Buy more -->") Then
+      sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- Buy more -->")))
+      ReadUsage(sFind)
+    ElseIf sFind.Contains("</table>") And sFind.Contains("<!-- End up/down stream -->") Then
+      sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- End up/down stream -->")))
+      ReadUsage(sFind)
     Else
-      sErrMsg = "Usage Failed: Failed to log in."
-      sFailText = "RuralPortal Usage Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+      RaiseError("Usage Failed: Could not parse usage meter table.", "RP Usage Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
   End Sub
   Private Sub RP_Read_Table(Table As String)
@@ -1329,7 +884,6 @@
           End If
         End If
       Next
-      ResetTimeout()
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       Else
@@ -1356,259 +910,267 @@
           End If
         End If
       Next
-      ResetTimeout()
       If String.IsNullOrEmpty(sDownT) Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       Else
         RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now))
       End If
+    Else
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
     End If
   End Sub
 #End Region
 #Region "DN"
-  Private Sub DN_Login_ReadLogin(sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "identity1.dishnetwork.com" Then
-      sErrMsg = "Prepare Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/firstbookend.php") Then
-      If sQuery.StartsWith("?") Then
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim id As String = "0"
-        If sRet.Contains("name=""id"" value=""") Then
-          id = sRet.Substring(sRet.IndexOf("name=""id"" value=""") + 17)
-          id = id.Substring(0, id.IndexOf(""""))
-        End If
-        sURI &= "&id=" & id
-        sURI &= "&coeff=0"
-        sURI &= "&history=" & iHist
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
-        wsData.DownloadStringAsync(New Uri(sURI), aState)
-      Else
-        sErrMsg = "Prepare Failed: AuthState is missing!"
-        bReset = True
-      End If
-    Else
-      sErrMsg = "Prepare Failed: Could not understand response."
-      sFailText = "DishNet Prerpare Error = " & sErrMsg & vbNewLine & sPath & vbNewLine & sRet
-      bReset = True
+  Private iHist As Integer = 0
+  Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+      RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
     End If
-  End Sub
-  Private Sub DN_Login_Prepare(sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "identity1.dishnetwork.com" Then
-      sErrMsg = "FirstBookend Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/login.php") Then
-      If sQuery.StartsWith("?") Then
-        Dim AuthState As String = sQuery.Substring(sQuery.IndexOf("=") + 1)
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sSend As String = "username=" & PercentEncode(myUID) &
-                              "&password=" & PercentEncode(myPass) &
-                              "&login_type=username,password" &
-                              "&source=" &
-                              "&source_button="
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
-        wsData.UploadStringAsync(New Uri(sURI), "POST", sSend, aState)
-        myUID = Nothing
-        myPass = Nothing
-      Else
-        sErrMsg = "FirstBookend Failed: AuthState is missing!"
-        bReset = True
-      End If
-    ElseIf sPath.Contains("/firstbookend.php") Then
-      DN_Login_ReadLogin(sURI, sHost, sPath, sQuery, sRet, sErrMsg, sFailText, bReset)
-    Else
-      sErrMsg = "FirstBookend Failed: Could not understand response."
-      sFailText = "DishNet FirstBookend Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/firstbookend.php") Then
+      RaiseError("Login Prepare Failed: Could not understand response.", "DN Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
     End If
+    If Not ResponseURI.Query.StartsWith("?") Then
+      RaiseError("Login Prepare Failed: AuthState is missing!")
+      Return
+    End If
+    Dim id As String = "0"
+    If Response.Contains("name=""id"" value=""") Then
+      id = Response.Substring(Response.IndexOf("name=""id"" value=""") + 17)
+      id = id.Substring(0, id.IndexOf(""""))
+    End If
+    Dim sURI As String = ResponseURI.OriginalString
+    sURI &= "&id=" & id
+    sURI &= "&coeff=0"
+    sURI &= "&history=" & iHist
+    DN_Login_FirstBook(sURI)
   End Sub
-  Private Sub DN_Login_Authenticate(sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "identity1.dishnetwork.com" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/lastbookend.php") Then
-      If sQuery.StartsWith("?") Then
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim id As String = "0"
-        If sRet.Contains("name=""id"" value=""") Then
-          id = sRet.Substring(sRet.IndexOf("name=""id"" value=""") + 17)
-          id = id.Substring(0, id.IndexOf(""""))
-        End If
-        sURI &= "&id=" & id
-        sURI &= "&coeff=1"
-        sURI &= "&history=" & iHist
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
-        wsData.DownloadStringAsync(New Uri(sURI), aState)
-      Else
-        sErrMsg = "Login Failed: AuthState is missing!"
-        bReset = True
+  Private Sub DN_Login_FirstBook(sURI As String)
+    Dim wsAuth As WebClientEx = MakeSocket()
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
+    Dim sRet As String = wsAuth.DownloadString(sURI)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_FirstBook_Response(sRet, wsAuth.ResponseURI)
+  End Sub
+  Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
+    'CheckForErrors(Response)
+    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower.Contains("/firstbookend.php") Then
+      DN_Login_Response(Response, ResponseURI)
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.php") Then
+      RaiseError("Login Failed: Could not understand response.", "DN Login FirstBookend Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    If Not ResponseURI.Query.StartsWith("?") Then
+      RaiseError("Login Failed: AuthState is missing!")
+      Return
+    End If
+    DN_Login_Authenticate(ResponseURI.OriginalString)
+  End Sub
+  Private Sub DN_Login_Authenticate(sURI As String)
+    Dim wsAuth As WebClientEx = MakeSocket()
+    Dim sSend As String = "username=" & PercentEncode(sUsername) &
+                          "&password=" & PercentEncode(sPassword) &
+                          "&login_type=username,password" &
+                          "&source=" &
+                          "&source_button="
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
+    Dim sRet As String = wsAuth.UploadString(sURI, "POST", sSend)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_Authenticate_Response(sRet, wsAuth.ResponseURI)
+  End Sub
+  Private Sub DN_Login_Authenticate_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower.Contains("/lastbookend.php") Then
+      If Not ResponseURI.Query.StartsWith("?") Then
+        RaiseError("Login Failed: AuthState is missing!")
+        Return
       End If
-    ElseIf sPath.Contains("finish.php") Then
-      If sRet.Contains("location.href") Then
+      Dim id As String = "0"
+      If Response.Contains("name=""id"" value=""") Then
+        id = Response.Substring(Response.IndexOf("name=""id"" value=""") + 17)
+        id = id.Substring(0, id.IndexOf(""""))
+      End If
+      Dim sURI As String = ResponseURI.OriginalString
+      sURI &= "&id=" & id
+      sURI &= "&coeff=1"
+      sURI &= "&history=" & iHist
+      DN_Login_LastBook(sURI)
+    ElseIf ResponseURI.AbsolutePath.ToLower.Contains("finish.php") Then
+      If Response.Contains("location.href") Then
         Dim sURL As String = Nothing
-        sURL = sRet.Substring(sRet.IndexOf("location.href"))
+        sURL = Response.Substring(Response.IndexOf("location.href"))
         sURL = sURL.Substring(sURL.IndexOf("""") + 1)
         sURL = sURL.Substring(0, sURL.IndexOf(""""))
         If sURL = "/" Then
-          sURL = sURI.Substring(0, sURI.IndexOf("/", sURI.IndexOf("//") + 2))
+          sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
         End If
-        Dim aState As Object = BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
-        wsData.DownloadStringAsync(New Uri(sURL), aState)
-      ElseIf sRet.Contains("Exception") Then
-        If sRet.Contains("Unhandled Exception") Then
-          sErrMsg = "Login Failed: Unhandled Exception!"
-        ElseIf sRet.Contains("<h2>") Then
-          sErrMsg = sRet.Substring(sRet.IndexOf("<h2>") + 4)
+        Dim wsAuth As WebClientEx = MakeSocket()
+        BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
+        Dim sRet As String = wsAuth.DownloadString(sURL)
+        If ClosingTime Then Return
+        iHist += 1
+        DN_Login_Authenticate_Response(sRet, wsAuth.ResponseURI)
+        Return
+      ElseIf Response.Contains("Exception") Then
+        If Response.Contains("Unhandled Exception") Then
+          RaiseError("Login Failed: Unhandled Exception!")
+        ElseIf Response.Contains("<h2>") Then
+          Dim sErrMsg As String = Response.Substring(Response.IndexOf("<h2>") + 4)
           sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("</h2>"))
           If sErrMsg.Length > 64 Then sErrMsg = sErrMsg.Substring(0, 64) & "..."
-          sErrMsg = "Login Failed: " & sErrMsg
+          RaiseError("Login Failed: " & sErrMsg)
         Else
-          sErrMsg = "Login Failed: Unknown Exception!"
+          RaiseError("Login Failed: Unknown Exception!")
         End If
       Else
-        sErrMsg = "Login Failed: Server issue."
-        sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
+        RaiseError("Login Failed: Server issue.", "DN Login Authenticate Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       End If
-    ElseIf sRet.ToLower.Contains("you've submitted your request too soon. please wait and try again.") Then
-      sErrMsg = "Login Failed: Too many requests. Check for usage data less often."
-    ElseIf sRet.ToLower.Contains("captcha") Then
-      sErrMsg = "Login Failed: Server requires a captcha to be entered to validate your account. Please log in through your web browser, then try again."
+    ElseIf Response.ToLower.Contains("you've submitted your request too soon. please wait and try again.") Then
+      RaiseError("Login Failed: Too many requests. Check for usage data less often.")
+    ElseIf Response.ToLower.Contains("captcha") Then
+      RaiseError("Login Failed: Server requires a captcha to be entered to validate your account. Please log in through your web browser, then try again.")
     Else
-      sErrMsg = "Login Failed: Could not understand response."
-      sFailText = "DishNet Login Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+      RaiseError("Login Failed: Could not understand response.", "DN Login Authenticate Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
     End If
   End Sub
-  Private Sub DN_Login_Verify(sURI As String, sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "identity1.dishnetwork.com" Then
-      sErrMsg = "LastBookend Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/lastbookend.php") Then
-      If sRet.Contains("SAMLResponse"" value=""") Then
-        Dim SAMLResponse As String
-        SAMLResponse = sRet.Substring(sRet.IndexOf("SAMLResponse"" value=""") + 21)
+  Private Sub DN_Login_LastBook(sURI As String)
+    Dim wsAuth As WebClientEx = MakeSocket()
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
+    Dim sRet As String = wsAuth.DownloadString(sURI)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_LastBook_Response(sRet, wsAuth.ResponseURI)
+  End Sub
+  Private Sub DN_Login_LastBook_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response) Then Return
+    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/lastbookend.php") Then
+      RaiseError("Login Failed: Could not understand response.", "DN Login LastBookend Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    If Response.Contains("SAMLResponse"" value=""") Then
+      Dim SAMLResponse As String
+      SAMLResponse = Response.Substring(Response.IndexOf("SAMLResponse"" value=""") + 21)
+      If SAMLResponse.Contains(""" />") Then
         SAMLResponse = SAMLResponse.Substring(0, SAMLResponse.IndexOf(""" />"))
-        Dim uriString As String = "https://my.dish.com/customercare/saml/post"
-        PrepareLogin(True)
-        wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-        wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-        Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
-        Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
-        wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, aState)
-      ElseIf sRet.Contains("The system is currently unavailable. Please try again later.") Then
-        sErrMsg = "System currently unavailable."
-      ElseIf sRet.Contains("<div class=""custom_message_text"">") Then
-        sErrMsg = sRet.Substring(sRet.IndexOf("<div class=""custom_message_text"">") + 33)
-        sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("<"))
-        sErrMsg = sErrMsg.Trim
+        DN_Login_Verify(SAMLResponse)
       Else
-        sErrMsg = "No SAML Response"
-        sFailText = "DishNet LastBookend Error = " & sErrMsg & vbNewLine & sRet
+        RaiseError("Login Failed: Incomplete SAML Response Data.", "DN Login LastBookend Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       End If
+    ElseIf Response.Contains("The system is currently unavailable. Please try again later.") Then
+      RaiseError("System currently unavailable.")
+    ElseIf Response.Contains("<div class=""custom_message_text"">") Then
+      Dim sErrMsg As String = Response.Substring(Response.IndexOf("<div class=""custom_message_text"">") + 33)
+      sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("<"))
+      RaiseError(sErrMsg.Trim)
     Else
-      sErrMsg = "LastBookend Failed: Could not understand response."
-      sFailText = "DishNet LastBookend Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+      RaiseError("Login Failed: No SAML Response", "DN Login LastBookend Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
   End Sub
-  Private Sub DN_Download_Home(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "my.dish.com" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/processsynacoreresponse.do") Then
-      Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
-      PrepareLogin(True)
-      wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-      wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-      Dim sSend As String = "check="
-      Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-      wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, aState)
+  Private Sub DN_Login_Verify(SAMLResponse As String)
+    Dim wsVerify As WebClientEx = MakeSocket()
+    Dim uriString As String = "https://my.dish.com/customercare/saml/post"
+    Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
+    Dim sRet As String = wsVerify.UploadString(uriString, "POST", sSend)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_Verify_Response(sRet, wsVerify.ResponseURI)
+  End Sub
+  Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
+    'CheckForErrors(Response)
+    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/processsynacoreresponse.do") Then
+      RaiseError("Login Failed: Could not understand response.", "DishNet Login Verify Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    DN_Download_Home()
+  End Sub
+  Private Sub DN_Download_Home()
+    Dim wsHome As WebClientEx = MakeSocket()
+    Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
+    Dim sSend As String = "check="
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
+    Dim sRet As String = wsHome.UploadString(uriString, "POST", sSend)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Download_Home_Response(sRet, wsHome.ResponseURI)
+  End Sub
+  Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
+    'CheckForErrors(Response)
+    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
+      DN_Download_Table_Response(Response, ResponseURI)
     Else
-      sErrMsg = "Unknown Authentication Result [" & sPath & "?" & sQuery & "]"
-      bReset = True
+      DN_Download_Table()
     End If
   End Sub
-  Private Sub DN_Download_Table(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "my.dish.com" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("/javascript/broadband.js""></script>") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("/javascript/broadband.js""></script>"))
-        If sUsageDiv.Contains("<script type=""text/javascript"">") Then
-          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
-          If sUsageDiv.Contains("</script>") Then
-            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
-            If sUsageDiv.ToLower.Contains("var anytime") Then
-              ReadUsage(sUsageDiv)
-            Else
-              sErrMsg = "Login Failed: Could not detect usage data."
-              sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-              bReset = True
-            End If
-          Else
-            sErrMsg = "Login Failed: Could not parse usage data."
-            sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-            bReset = True
-          End If
-        Else
-          sErrMsg = "Login Failed: Could not find usage data."
-          sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-          bReset = True
-        End If
-      Else
-        sErrMsg = "Usage Failed: Could not find usage meter."
-        sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-        bReset = True
-      End If
-    Else
-      Dim uriString As String = "https://my.dish.com/customercare/broadband/prepBroadBand.do"
-      PrepareLogin(True)
-      wsData.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
-      wsData.Encoding = System.Text.Encoding.GetEncoding("windows-1252")
-      Dim sSend As String = "srt=second_try"
-      Dim aState As Object = BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
-      wsData.UploadStringAsync(New Uri(uriString), "POST", sSend, aState)
-    End If
+  Private Sub DN_Download_Table()
+    Dim wsTable As WebClientEx = MakeSocket()
+    Dim uriString As String = "https://my.dish.com/customercare/broadband/prepBroadBand.do"
+    Dim sSend As String = "srt=second_try"
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
+    Dim sRet As String = wsTable.UploadString(uriString, "POST", sSend)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Download_Table_Response(sRet, wsTable.ResponseURI)
   End Sub
-  Private Sub DN_Download_TableRetry(sHost As String, sPath As String, sQuery As String, sRet As String, ByRef sErrMsg As String, ByRef sFailText As String, ByRef bReset As Boolean)
-    If Not sHost = "my.dish.com" Then
-      sErrMsg = "Login Failed: Domain redirected, check your Internet connection. [" & sHost & "]"
-    ElseIf sPath.Contains("/prepbroadband.do") Then
-      If sRet.Contains("/javascript/broadband.js""></script>") Then
-        Dim sUsageDiv As String = sRet.Substring(sRet.IndexOf("/javascript/broadband.js""></script>"))
-        If sUsageDiv.Contains("<script type=""text/javascript"">") Then
-          sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
-          If sUsageDiv.Contains("</script>") Then
-            sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
-            If sUsageDiv.Contains("var anyTime=") Then
-              ReadUsage(sUsageDiv)
-            Else
-              sErrMsg = "Login Failed: Could not detect usage data."
-              sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-              bReset = True
-            End If
-          Else
-            sErrMsg = "Login Failed: Could not parse usage data."
-            sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-            bReset = True
-          End If
-        Else
-          sErrMsg = "Login Failed: Could not find usage data."
-          sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-          bReset = True
-        End If
-      Else
-        sErrMsg = "Usage Failed: Could not find usage meter."
-        sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-        bReset = True
-      End If
-    Else
-      sErrMsg = "Usage Failed: Could not load usage meter page. Redirected to " & wsData.ResponseURI.ToString()
-      sFailText = "DishNet Usage Error = " & sErrMsg & vbNewLine & sRet
-      bReset = True
+  Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
+    CheckForErrors(Response)
+    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
     End If
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
+      RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    If Not Response.Contains("/javascript/broadband.js""></script>") Then
+      RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    Dim sUsageDiv As String = Response.Substring(Response.IndexOf("/javascript/broadband.js""></script>"))
+    If Not sUsageDiv.Contains("<script type=""text/javascript"">") Then
+      RaiseError("Login Failed: Could not find usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
+    If Not sUsageDiv.Contains("</script>") Then
+      RaiseError("Login Failed: Could not parse usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
+    If Not sUsageDiv.ToLower.Contains("var anytime") Then
+      RaiseError("Login Failed: Could not detect usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    ReadUsage(sUsageDiv)
   End Sub
   Private Sub DN_Read_Table(Table As String)
     If Table.Contains("alertError") Then
-      ResetTimeout()
       If Table.Contains("This information is currently unavailable.") Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
       Else
@@ -1718,14 +1280,47 @@
 #End Region
 #End Region
 #Region "Useful Functions"
-  Private Function BeginAttempt(state As ConnectionStates, substate As ConnectionSubStates, stage As Integer, URL As String) As Object
+  Private Function MakeSocket() As WebClientEx
+    Dim wsNet As New WebClientEx(sDataPath)
+    wsNet.Timeout = c_Timeout
+    wsNet.Proxy = c_Proxy
+    wsNet.CookieJar = c_Jar
+    wsNet.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    Return wsNet
+  End Function
+  Private Function CheckForErrors(response As String) As Boolean
+    If String.IsNullOrEmpty(response) Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
+      Return True
+    End If
+    If response.StartsWith("Error: ") Then
+      Dim sError As String = response.Substring(7)
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sError))
+      Return True
+    End If
+    Return False
+  End Function
+  Private Sub RaiseError(ErrorMessage As String, Optional FailureLocation As String = Nothing, Optional FailureData As String = Nothing, Optional ResetAccountType As Boolean = False)
+    If Not String.IsNullOrEmpty(Trim(ErrorMessage)) Then
+      Dim FailureText As String = Nothing
+      If Not String.IsNullOrEmpty(Trim(FailureLocation)) Then
+        FailureText = FailureLocation & ": " & ErrorMessage
+        If Not String.IsNullOrEmpty(FailureData) Then FailureText &= vbNewLine & FailureData
+      End If
+      If ResetAccountType Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, ErrorMessage, FailureText))
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage, FailureText))
+      End If
+    End If
+  End Sub
+  Private Sub BeginAttempt(state As ConnectionStates, substate As ConnectionSubStates, stage As Integer, URL As String)
     sAttemptedURL = URL
     AttemptedTag = state
     AttemptedSub = substate
     AttemptedStage = stage
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(state, substate, stage))
-    Return {state, substate, stage}
-  End Function
+  End Sub
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
@@ -1759,10 +1354,10 @@
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
-        ResetTimeout()
-        If wsData IsNot Nothing Then
-          wsData.Dispose()
-          wsData = Nothing
+        If tConnect IsNot Nothing Then
+          If tConnect.IsAlive Then
+            ClosingTime = True
+          End If
         End If
       End If
     End If

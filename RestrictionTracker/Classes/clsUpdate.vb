@@ -21,8 +21,8 @@
     End Enum
     Public Result As ResultType
     Public Version As String
-    Friend Sub New(rtResult As ResultType, sVersion As String, ex As Exception, bCancelled As Boolean, state As Object)
-      MyBase.New(ex, bCancelled, state)
+    Friend Sub New(rtResult As ResultType, sVersion As String, ex As Exception, bCancelled As Boolean)
+      MyBase.New(ex, bCancelled, Nothing)
       Version = sVersion
       Result = rtResult
     End Sub
@@ -35,8 +35,8 @@
   Class DownloadEventArgs
     Inherits System.ComponentModel.AsyncCompletedEventArgs
     Public Version As String
-    Friend Sub New(sVersion As String, [error] As Exception, [cancelled] As Boolean, [userState] As Object)
-      MyBase.New([error], [cancelled], [userState])
+    Friend Sub New(sVersion As String, [error] As Exception, [cancelled] As Boolean)
+      MyBase.New([error], [cancelled], Nothing)
       Version = sVersion
     End Sub
     Friend Sub New(sVersion As String, e As System.ComponentModel.AsyncCompletedEventArgs)
@@ -50,7 +50,7 @@
   Public Event DownloadingUpdate(sender As Object, e As EventArgs)
   Public Event UpdateProgressChanged(sender As Object, e As ProgressEventArgs)
   Public Event DownloadResult(sender As Object, e As DownloadEventArgs)
-  Private WithEvents wsVer As WebClientEx
+  Private WithEvents wsVer As WebClientCore
   Private DownloadURL As String
   Private VerNumber As String
 #Region "IDisposable Support"
@@ -76,13 +76,13 @@
 #End Region
   Public Sub CheckVersion()
     Dim myS As New AppSettings
-    wsVer = New WebClientEx()
+    wsVer = New WebClientCore()
     wsVer.Proxy = myS.Proxy
     wsVer.Timeout = myS.Timeout
     myS = Nothing
     wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
     RaiseEvent CheckingVersion(Me, New EventArgs)
-    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginCheck), Nothing, 250, System.Threading.Timeout.Infinite)
+    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginCheck), Nothing, 300, System.Threading.Timeout.Infinite)
   End Sub
   Private Sub BeginCheck(state As Object)
     wsVer.DownloadStringAsync(New Uri(VersionURL), "INFO")
@@ -90,17 +90,14 @@
   Public Shared Function QuickCheckVersion() As CheckEventArgs.ResultType
     Dim sVerStr As String
     Dim mySettings As New AppSettings
-    Using wsCheck As New WebClientEx()
-      wsCheck.Proxy = mySettings.Proxy
-      wsCheck.Timeout = mySettings.Timeout
-      wsCheck.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
-      Try
-        sVerStr = wsCheck.DownloadString(New Uri(VersionURL))
-      Catch ex As Exception
-        mySettings = Nothing
-        Return CheckEventArgs.ResultType.NoUpdate
-      End Try
-    End Using
+    Dim wsCheck As New WebClientEx
+    wsCheck.Proxy = mySettings.Proxy
+    wsCheck.Timeout = mySettings.Timeout
+    sVerStr = wsCheck.DownloadString(VersionURL)
+    If sVerStr.StartsWith("Error: ") Then
+      mySettings = Nothing
+      Return CheckEventArgs.ResultType.NoUpdate
+    End If
     Dim sSplit As String = Nothing
     If sVerStr.Contains(vbNewLine) Then
       sSplit = vbNewLine
@@ -140,7 +137,7 @@
       wsVer.DownloadFileAsync(New Uri(DownloadURL), toLocation, "FILE")
       RaiseEvent DownloadingUpdate(Me, New EventArgs)
     Else
-      RaiseEvent DownloadResult(Me, New DownloadEventArgs(Nothing, New Exception("Version Check was not run."), True, Nothing))
+      RaiseEvent DownloadResult(Me, New DownloadEventArgs(Nothing, New Exception("Version Check was not run."), True))
     End If
   End Sub
   Private Sub wsVer_DownloadProgressChanged(sender As Object, e As System.Net.DownloadProgressChangedEventArgs) Handles wsVer.DownloadProgressChanged
@@ -191,12 +188,12 @@
             End If
             mySettings = Nothing
           Else
-            RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Reading Error", New Exception("Empty Version String")), e.Cancelled, e.UserState))
+            RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Reading Error", New Exception("Empty Version String")), e.Cancelled))
             Exit Sub
           End If
         End If
       Catch ex As Exception
-        RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Parsing Error", ex), e.Cancelled, e.UserState))
+        RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Parsing Error", ex), e.Cancelled))
         Exit Sub
       End Try
     End If
@@ -204,5 +201,8 @@
   End Sub
   Private Sub wsVer_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsVer.DownloadFileCompleted
     RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, e))
+  End Sub
+  Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientCore.ErrorEventArgs) Handles wsVer.Failure
+    RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
   End Sub
 End Class

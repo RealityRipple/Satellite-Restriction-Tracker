@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Module modFunctions
   Public Const LATIN_1 As Integer = 28591
+  Public Const WINDOWS_1252 As Integer = 1252
   Public Function PercentEncode(inString As String) As String
     Dim sRet As String = String.Empty
     If String.IsNullOrEmpty(inString) Then Return inString
@@ -60,14 +61,14 @@ Module modFunctions
         ElseIf ex.Message.Contains("A connection that was expected to be kept alive was closed by the server") Then
           Return "Connection to server closed. Please try again."
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection to server closed - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
           Return "The server did not like the request. Please try again."
         ElseIf ex.Message.Contains("401") Then
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "The server did not like the login. Please check your provider."
         ElseIf ex.Message.Contains("403") Then
           Return "The server did not like the login. Please check your provider."
@@ -88,7 +89,7 @@ Module modFunctions
         ElseIf ex.Message.Contains("505") Then
           Return "Server 505 (Version Not Supported). The server may not be supported or may be down. Check your account settings and try again."
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           If ex.Message.Contains(")") Then
             Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(")") + 1).Trim
           Else
@@ -105,7 +106,7 @@ Module modFunctions
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return "Connection aborted."
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection aborted - " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
         End If
       ElseIf ex.Message.Contains("Exception of type 'System.OutOfMemoryException' was thrown") Then
@@ -119,17 +120,17 @@ Module modFunctions
           If ex.Message.Contains("Network is unreachable") Then
             Return "The network is unreachable. Check your Internet connection."
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.Message
           End If
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error - " & ex.Message
         End If
       ElseIf ex.Message.StartsWith("Cannot be negative.") And ex.Message.Contains("Parameter name: length") Then
         Return "Negative Length exception. Check your local network."
       Else
-        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+        If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
       End If
     Else
@@ -159,7 +160,7 @@ Module modFunctions
         ElseIf ex.InnerException.Message.Contains("An invalid argument was supplied") Then
           Return "Unable to connect. An invalid argument was supplied. This may mean the provider you entered is invalid or that you have a network or firewall issue. If you figure it out, tell me."
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Can't connect to the server - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("An exception occurred during a WebClient request") Then
@@ -200,7 +201,7 @@ Module modFunctions
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The token supplied to the function is invalid") Then
               Return "Decryption failure. Invalid token."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
             End If
           Else
@@ -211,7 +212,7 @@ Module modFunctions
             If ex.InnerException.InnerException.Message.StartsWith("Connection reset by peer") Then
               Return "The server closed the connection. Please try again."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "The server closed the connection - " & ex.InnerException.InnerException.Message
             End If
           Else
@@ -228,7 +229,7 @@ Module modFunctions
             Return "The server closed the connection. Please try again."
           End If
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("Error getting response stream") Then
@@ -241,22 +242,22 @@ Module modFunctions
         ElseIf ex.Message.Contains("SendFailure") Then
           If ex.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
             If ex.InnerException.InnerException Is Nothing Then
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Error in response - " & ex.InnerException.Message
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
               Return "The server closed the connection. Please try again."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
               Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Error in response - " & ex.InnerException.Message
             End If
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Error in response - " & ex.InnerException.Message
           End If
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during response - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
@@ -275,14 +276,14 @@ Module modFunctions
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
               Return "Connection to the server timed out. Please try again."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Connection to server failed to read - " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
               Return "The server is too busy to respond. Please try again later."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Connection to server failed to write - " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
@@ -292,7 +293,7 @@ Module modFunctions
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
             Return "The server closed the connection. Please try again."
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
@@ -308,14 +309,14 @@ Module modFunctions
             ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
               Return "Connection aborted."
             ElseIf ex.InnerException.Message.Contains("The decryption operation failed, see inner exception") Then
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Decryption failure - " & ex.InnerException.InnerException.Message
             ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
               Return "The server closed the connection. Please try again."
             ElseIf ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host.") Then
               Return "The server closed the connection. Please try again."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Read failure - " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
@@ -325,32 +326,32 @@ Module modFunctions
               If ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
                 Return "Decryption failure. Data could not be decrypted."
               Else
-                reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+                If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
                 Return "Decryption failure - " & ex.InnerException.InnerException.Message
               End If
             Else
               Return "Decryption failure, but no details are available."
             End If
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Receive failure - " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("Could not establish trust relationship for the SSL/TLS secure channel.") Then
           If ex.InnerException.Message.StartsWith("The remote certificate is invalid according to the validation procedure") Then
             Return "Server certificate is invalid. Please change your Network Security Protocol settings and try again."
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Server security could not be established - " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("Unable to connect to the remote server") Then
           If ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
             Return "Too many connections open. Check your network activity or restart your computer."
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Can't connect to the server - " & ex.InnerException.Message
           End If
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection to server closed - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("Error:") Then
@@ -370,7 +371,7 @@ Module modFunctions
           ElseIf ex.InnerException.Message.Contains("System call failed") Then
             Return "System call failed. Please check your installation."
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("SendFailure") Then
@@ -382,15 +383,15 @@ Module modFunctions
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
               Return "Decryption failure. Please change your Network Security Protocol settings and try again."
             Else
-              reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Send Header Error - " & ex.InnerException.Message
             End If
           Else
-            reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+            If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Send Error - " & ex.InnerException.Message
           End If
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error - " & ex.Message
         End If
       ElseIf ex.Message.StartsWith("An error occurred performing a WebClient request") Then
@@ -399,11 +400,11 @@ Module modFunctions
         ElseIf ex.InnerException.Message.StartsWith("The object was used after being disposed") Then
           Return "Connection aborted."
         Else
-          reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+          If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.Message
         End If
       Else
-        reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+        If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message & " - " & ex.InnerException.Message
       End If
     End If
@@ -447,14 +448,12 @@ Module modFunctions
             ie = Nothing
           End If
           Try
-            Using sckUpload As New WebClientEx()
-              Dim params As New Collections.Specialized.NameValueCollection
-              params.Add("e", e)
-              If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)
-              Dim bRet() As Byte = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
-              Dim sRet As String = System.Text.Encoding.GetEncoding(LATIN_1).GetString(bRet)
-              If sRet = "e exists" Or sRet = "e added" Then reports.RemoveAt(I)
-            End Using
+            Dim sckUpload As New WebClientEx(DataPath)
+            Dim params As New Collections.Specialized.NameValueCollection
+            params.Add("e", e)
+            If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)
+            Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
+            If sRet = "e exists" Or sRet = "e added" Then reports.RemoveAt(I)
           Catch
             Exit For
           End Try

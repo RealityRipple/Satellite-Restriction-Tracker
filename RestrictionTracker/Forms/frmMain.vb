@@ -12,8 +12,6 @@ Public Class frmMain
   Private WithEvents taskNotifier As TaskbarNotifier
   Private WithEvents remoteData As remoteRestrictionTracker
   Private WithEvents localData As localRestrictionTracker
-  Private WithEvents wsHostList As WebClientEx
-  Private WithEvents wsFavicon As clsFavicon
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
@@ -48,21 +46,21 @@ Public Class frmMain
   Private lastBalloon As Long
 #Region "Server Type Determination"
   Private Class DetermineTypeOffline
-    Public Event TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs)
-    Public Sub New(Provider As String, Sender As Object)
-      Application.DoEvents()
-      Dim testCallback As New ParamaterizedInvoker(AddressOf BeginTest)
-      testCallback.BeginInvoke({Provider, Sender}, Nothing, Nothing)
+    Public Delegate Sub TypeDeterminedOfflineCallback(HostType As SatHostTypes)
+    Private c_callback As TypeDeterminedOfflineCallback
+    Public Sub New(Provider As String, callback As TypeDeterminedOfflineCallback)
+      c_callback = callback
+      Dim beginInvoker As New BeginTestInvoker(AddressOf BeginTest)
+      beginInvoker.BeginInvoke(Provider, Nothing, Nothing)
     End Sub
-    Private Sub BeginTest(state As Object)
-      Dim Provider As String = state(0)
-      Dim Sender As Object = state(1)
+    Private Delegate Sub BeginTestInvoker(Provider As String)
+    Private Sub BeginTest(Provider As String)
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
-        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.DishNet_EXEDE))
+        c_callback.Invoke(SatHostTypes.DishNet_EXEDE)
       ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
-        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
+        c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
       Else
-        OfflineCheck(state)
+        OfflineCheck()
       End If
     End Sub
     Private Sub OfflineStats(ByRef rpP As Single, ByRef exP As Single, ByRef wbP As Single)
@@ -104,55 +102,47 @@ Public Class frmMain
         wbP = WBGuess / TotalCount
       End If
     End Sub
-    Private Sub OfflineCheck(Sender As Object)
+    Private Sub OfflineCheck()
       Dim rpP, exP, wbP As Single
       OfflineStats(rpP, exP, wbP)
       If rpP = 0 And exP = 0 And wbP = 0 Then
-        RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Other))
+        c_callback.Invoke(SatHostTypes.Other)
       Else
         If rpP > exP And rpP > wbP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.RuralPortal_EXEDE))
+          c_callback.Invoke(SatHostTypes.RuralPortal_EXEDE)
         ElseIf exP > rpP And exP > wbP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
+          c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
         ElseIf wbP > rpP And wbP > exP Then
-          RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_LEGACY))
+          c_callback.Invoke(SatHostTypes.WildBlue_LEGACY)
         Else
           If rpP > wbP And exP > wbP And rpP = exP Then
-            RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.WildBlue_EXEDE))
+            c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
           Else
-            RaiseEvent TypeDetermined(Sender, New TypeDeterminedEventArgs(SatHostTypes.Other))
+            c_callback.Invoke(SatHostTypes.Other)
             Stop
           End If
         End If
       End If
     End Sub
   End Class
-  Private Class TypeDeterminedEventArgs
-    Inherits EventArgs
-    Public HostType As SatHostTypes
-    Public Sub New(Type As SatHostTypes)
-      HostType = Type
-    End Sub
-  End Class
-  Private WithEvents TypeDetermination As DetermineType
   Private WithEvents TypeDeterminationOffline As DetermineTypeOffline
-  Private Sub TypeDetermination_TypeDetermined(Sender As Object, e As DetermineType.TypeDeterminedEventArgs) Handles TypeDetermination.TypeDetermined
+  Private Sub TypeDetermination_TypeDetermined(HostGroup As DetermineType.SatHostGroup)
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf TypeDetermination_TypeDetermined), Sender, e)
+      Me.Invoke(New DetermineType.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
-    If e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Other Then
+    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    If HostGroup = DetermineType.SatHostGroup.Other Then
       tmrIcon.Enabled = False
-      TypeDeterminationOffline = New DetermineTypeOffline(sProvider, Sender)
+      Dim TypeDeterminationOffline As New DetermineTypeOffline(sProvider, AddressOf TypeDeterminationOffline_TypeDetermined)
     Else
-      If e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.DishNet Then
+      If HostGroup = DetermineType.SatHostGroup.DishNet Then
         mySettings.AccountType = SatHostTypes.DishNet_EXEDE
-      ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.WildBlue Then
+      ElseIf HostGroup = DetermineType.SatHostGroup.WildBlue Then
         mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
-      ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.RuralPortal Then
+      ElseIf HostGroup = DetermineType.SatHostGroup.RuralPortal Then
         mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
-      ElseIf e.HostGroup = DetermineType.TypeDeterminedEventArgs.SatHostGroup.Exede Then
+      ElseIf HostGroup = DetermineType.SatHostGroup.Exede Then
         mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
       End If
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
@@ -165,18 +155,18 @@ Public Class frmMain
       localData = New localRestrictionTracker(AppData)
     End If
   End Sub
-  Private Sub TypeDeterminationOffline_TypeDetermined(Sender As Object, e As TypeDeterminedEventArgs) Handles TypeDeterminationOffline.TypeDetermined
+  Private Sub TypeDeterminationOffline_TypeDetermined(HostType As SatHostTypes)
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf TypeDeterminationOffline_TypeDetermined), Sender, e)
+      Me.Invoke(New DetermineTypeOffline.TypeDeterminedOfflineCallback(AddressOf TypeDeterminationOffline_TypeDetermined), HostType)
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
-    If e.HostType = SatHostTypes.Other Then
+    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    If HostType = SatHostTypes.Other Then
       tmrIcon.Enabled = False
       DisplayUsage(False, True)
       SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
     Else
-      mySettings.AccountType = e.HostType
+      mySettings.AccountType = HostType
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       mySettings.Save()
       SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
@@ -476,6 +466,14 @@ Public Class frmMain
     End If
     ClosingTime = True
     tmrUpdate.Stop()
+    If localData IsNot Nothing Then
+      localData.Dispose()
+      localData = Nothing
+    End If
+    If remoteData IsNot Nothing Then
+      remoteData.Dispose()
+      remoteData = Nothing
+    End If
     StopSong()
     mySettings.Save()
     LOG_Terminate(False)
@@ -600,7 +598,7 @@ Public Class frmMain
         End Using
       Else
         pctNetTest.Image = My.Resources.throbber
-        wsFavicon = New clsFavicon(mySettings.NetTestURL)
+        Dim wsFavicon As New clsFavicon(mySettings.NetTestURL, AddressOf wsFavicon_DownloadIconCompleted, mySettings.NetTestURL)
       End If
       Dim sNetTestTitle As String = mySettings.NetTestURL
       If sNetTestTitle.Contains("://") Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf("://") + 3)
@@ -667,7 +665,7 @@ Public Class frmMain
         SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
       Else
         SetStatusText("Analyzing Account", "Determining your account type...", False)
-        TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+        Dim TypeDetermination As New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy, AddressOf TypeDetermination_TypeDetermined)
       End If
     Else
       tmrIcon.Enabled = False
@@ -775,7 +773,8 @@ Public Class frmMain
           localData.Dispose()
           localData = Nothing
         End If
-        SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+        Application.DoEvents()
+        SetStatusText(LOG_GetLast.ToString("g"), "Restarting Connection...", False)
         DisplayUsage(False, False)
         NextGrabTick = TickCount() + 5000
       End If
@@ -857,14 +856,19 @@ Public Class frmMain
           Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page...", False)
           Case ConnectionSubStates.AuthPrepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing Authentication...", False)
           Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
-          Case ConnectionSubStates.AuthenticateRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating...", False)
+          Case ConnectionSubStates.AuthenticateRetry
+            If e.Stage < 1 Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating...", False)
+            Else
+              SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating (Attempt " & e.Stage & ")...", False)
+            End If
           Case ConnectionSubStates.Verify : SetStatusText(LOG_GetLast.ToString("g"), "Verifying Authentication...", False)
           Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
           Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
-          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & FormatPercent(e.SubPercentage, 0, TriState.False, TriState.False, TriState.False) & ")...", False)
+          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of 2)...", False)
           Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
           Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
           Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
@@ -918,7 +922,7 @@ Public Class frmMain
           SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
         Else
           SetStatusText("Analyzing Account", "Determining your account type...", False)
-          TypeDetermination = New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy)
+          Dim TypeDetermination As New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy, AddressOf TypeDetermination_TypeDetermined)
         End If
     End Select
     If localData IsNot Nothing Then
@@ -1035,15 +1039,9 @@ Public Class frmMain
     End If
     If didHostListSave Then Exit Sub
     Try
-      If wsHostList IsNot Nothing Then
-        If wsHostList.IsBusy Then wsHostList.CancelAsync()
-        wsHostList.Dispose()
-        wsHostList = Nothing
-      End If
-      wsHostList = New WebClientEx
-      Application.DoEvents()
       Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
-      wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & myProvider), "UPDATE")
+      Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & myProvider)
+      sckHostList.BeginGetResponse(Nothing, Nothing)
       didHostListSave = True
     Catch ex As Exception
       didHostListSave = False
@@ -1933,7 +1931,7 @@ Public Class frmMain
   Private Sub CheckForUpdates()
     If Not frmAbout.Visible Then
       SetStatusText(LOG_GetLast.ToString("g"), "Checking for Software Update...", False)
-      NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
+      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
       If updateChecker IsNot Nothing Then
         updateChecker.Dispose()
         updateChecker = Nothing
@@ -2323,18 +2321,18 @@ Public Class frmMain
       MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not start!", "Service Controller failed to start.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End Try
   End Sub
-  Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted
+  Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
-      Me.Invoke(New clsFavicon.DownloadIconCompletedEventHandler(AddressOf wsFavicon_DownloadIconCompleted), sender, e)
+      Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
       Return
     End If
     Try
       pctNetTest.Visible = True
-      If e.Error IsNot Nothing Then
+      If [Error] IsNot Nothing Then
         pctNetTest.Image = My.Resources.ico_err
       Else
-        e.Icon16.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
-        pctNetTest.Image = e.Icon16
+        icon16.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
+        pctNetTest.Image = icon16
       End If
     Catch ex As Exception
       pctNetTest.Image = My.Resources.ico_err

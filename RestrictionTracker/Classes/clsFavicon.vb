@@ -1,25 +1,17 @@
 ﻿Public Class clsFavicon
   Implements IDisposable
-  Private WithEvents wsNetTest As WebClientEx
-  Public Class DownloadIconCompletedEventArgs
-    Inherits EventArgs
-    Public [Error] As Exception
-    Public Icon32 As Image
-    Public Icon16 As Image
-    Public Sub New(icon16 As Image, icon32 As Image, Optional err As Exception = Nothing)
-      Me.Icon16 = icon16
-      Me.Icon32 = icon32
-      Me.Error = err
-    End Sub
-  End Class
-  Public Event DownloadIconCompleted(sender As Object, e As DownloadIconCompletedEventArgs)
-  Public Sub New(URL As String)
+  Private WithEvents wsFile As WebClientCore
+  Public Delegate Sub DownloadIconCompletedCallback(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
+  Private c_callback As DownloadIconCompletedCallback
+  Public Sub New(URL As String, callback As DownloadIconCompletedCallback, token As Object)
     If String.IsNullOrEmpty(URL) Then Return
+    c_callback = callback
     Dim connectThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf BeginConnection))
-    connectThread.Start(URL)
+    connectThread.Start({URL, token})
   End Sub
-  Private Sub BeginConnection(o As Object)
-    Dim URL As String = o
+  Private Sub BeginConnection(obj As Object)
+    Dim URL As String = obj(0)
+    Dim token As Object = obj(1)
     If Not URL.Contains("://") Then URL = "http://" & URL
     Dim URI As Uri
     Try
@@ -27,57 +19,106 @@
     Catch ex As Exception
       Return
     End Try
-    ConnectToURL(URI, URL)
+    ConnectToURL(URI, token)
   End Sub
-  Private Sub ConnectToURL(URL As Uri, Optional token As Object = Nothing)
-    If URL.Host = "192.168.100.1" Then
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.modem16, My.Resources.modem32))
+  Private Sub ConnectToURL(URI As Uri, token As Object)
+    If URI.Host = "192.168.100.1" Then
+      c_callback.Invoke(My.Resources.modem16, My.Resources.modem32, token, Nothing)
       Return
     End If
     Try
-      Dim urlRes = Net.Dns.GetHostAddresses(URL.Host)
+      Dim urlRes() As Net.IPAddress = Net.Dns.GetHostAddresses(URI.Host)
       For Each addr In urlRes
         If addr.ToString = "192.168.100.1" Then
-          RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.modem16, My.Resources.modem32))
+          c_callback.Invoke(My.Resources.modem16, My.Resources.modem32, token, Nothing)
           Return
         End If
       Next
     Catch ex As Exception
     End Try
     Try
-      wsNetTest = New WebClientEx
-      wsNetTest.ErrorBypass = True
-      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadString), New Object() {URL, token}, 250, System.Threading.Timeout.Infinite)
+      Dim wsString As New WebClientEx
+      wsString.ErrorBypass = True
+      Dim sRet As String = wsString.DownloadString(URI.OriginalString)
+      If sRet.StartsWith("Error: ") Then
+        Try
+          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, False)
+        Catch ex As Exception
+        End Try
+        Return
+      End If
+      Try
+        Dim sHTML As String = sRet
+        If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
+        If sHTML.ToLower.Contains("rel=""icon""") Then
+          If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
+            sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
+            If sHTML.Contains(">") Then
+              sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
+              If sHTML.ToLower.Contains("href") Then
+                sHTML = sHTML.Substring(sHTML.IndexOf("href"))
+                If sHTML.Contains("""") Then
+                  sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
+                  If sHTML.Contains("""") Then
+                    Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
+                    If URL.Contains("://") Then
+
+                    ElseIf URL.Contains("//") Then
+                      Dim oldURL As String = URI.OriginalString
+                      If oldURL.Contains("://") Then oldURL = oldURL.Substring(0, oldURL.IndexOf("://") + 1)
+                      URL = oldURL & URL
+                    Else
+                      Dim oldURL As String = URI.OriginalString
+                      If Not oldURL.EndsWith("/") And oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
+                      If URL.StartsWith("/") Then
+                        If oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
+                        URL = oldURL & URL
+                      ElseIf oldURL.EndsWith("/") Then
+                        URL = oldURL & URL
+                      Else
+                        URL = oldURL & "/" & URL
+                      End If
+                    End If
+                    Try
+                      ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
+                    Catch ex As Exception
+
+                    End Try
+                    Return
+                  End If
+                End If
+              End If
+            End If
+          End If
+        End If
+      Catch ex As Exception
+      End Try
+      Try
+        ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
+      Catch ex As Exception
+      End Try
     Catch ex As Exception
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
+      c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URI.OriginalString & """!"))
     End Try
   End Sub
-  Private Sub DownloadString(state As Object)
-    Dim URL As Uri = state(0)
-    Dim token As Object = state(1)
+  Private Sub ConnectToFile(URL As Uri, Filename As String, token As Object, trySimpler As Boolean)
     Try
-      wsNetTest.DownloadStringAsync(URL, token)
+      wsFile = New WebClientCore
+      wsFile.ErrorBypass = True
+      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadFile), New Object() {URL, Filename, token, trySimpler}, 250, System.Threading.Timeout.Infinite)
     Catch ex As Exception
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
-    End Try
-  End Sub
-  Private Sub ConnectToFile(URL As Uri, Filename As String, Optional token As Object = Nothing)
-    Try
-      wsNetTest = New WebClientEx
-      wsNetTest.ErrorBypass = True
-      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadFile), New Object() {URL, Filename, token}, 250, System.Threading.Timeout.Infinite)
-    Catch ex As Exception
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
+      c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!"))
     End Try
   End Sub
   Private Sub DownloadFile(state As Object)
-    Dim URL As Uri = state(0)
+    Dim URI As Uri = state(0)
     Dim Filename As String = state(1)
     Dim token As Object = state(2)
+    Dim trySimpler As Boolean = state(3)
     Try
-      wsNetTest.DownloadFileAsync(URL, Filename, token)
+      wsFile.DownloadFileAsync(URI, Filename, {token, URI, trySimpler})
     Catch ex As Exception
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(My.Resources.ico_err, My.Resources.advanced_nettest_error, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!")))
+      c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URI.OriginalString & """!"))
     End Try
   End Sub
   Private Function GenerateCloneImage(fromImage As Image, width As Integer, height As Integer) As Image
@@ -96,14 +137,16 @@
       Return newImage.Clone
     End Using
   End Function
-  Private Sub wsNetTest_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsNetTest.DownloadFileCompleted
+  Private Sub wsFile_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsFile.DownloadFileCompleted
+    Dim Token As Object = e.UserState(0)
+    Dim URI As Uri = e.UserState(1)
+    Dim trySimpler As Boolean = e.UserState(2)
     If e.Error IsNot Nothing Then
-      If e.UserState Is Nothing Then
-        RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(Nothing, Nothing, New Exception("Failed to get an icon.")))
+      If Not trySimpler Then
+        c_callback.Invoke(Nothing, Nothing, Token, New Exception("Failed to get an icon."))
       Else
         Try
-          Dim pathURL As New Uri(e.UserState)
-          ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
+          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), Token, False)
         Catch ex As Exception
         End Try
       End If
@@ -145,14 +188,13 @@
     End Try
     If IO.File.Exists(imgFile) Then IO.File.Delete(imgFile)
     If didOK Then
-      RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(pctPNG16.Clone, pctPNG32.Clone))
+      c_callback.Invoke(pctPNG16.Clone, pctPNG32.Clone, Token, Nothing)
     Else
-      If e.UserState Is Nothing Then
-        RaiseEvent DownloadIconCompleted(Me, New DownloadIconCompletedEventArgs(Nothing, Nothing, New Exception("Failed to read the icon.")))
+      If Not trySimpler Then
+        c_callback.Invoke(Nothing, Nothing, Token, New Exception("Failed to read the icon."))
       Else
         Try
-          Dim pathURL As New Uri(e.UserState)
-          ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), imgFile)
+          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), imgFile, Token, False)
         Catch ex As Exception
           Return
         End Try
@@ -167,78 +209,15 @@
       pctPNG32 = Nothing
     End If
   End Sub
-  Private Sub wsNetTest_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsNetTest.DownloadStringCompleted
-    If e.Error IsNot Nothing Then
-      Try
-        Dim defPathURL As New Uri(e.UserState)
-        ConnectToFile(New Uri(defPathURL.Scheme & "://" & defPathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
-      Catch ex As Exception
-      End Try
-      Return
-    ElseIf e.Cancelled Then
-      Return
-    End If
-    Try
-      Dim sHTML As String = e.Result
-      If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
-      If sHTML.ToLower.Contains("rel=""icon""") Then
-        If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
-          sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
-          If sHTML.Contains(">") Then
-            sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
-            If sHTML.ToLower.Contains("href") Then
-              sHTML = sHTML.Substring(sHTML.IndexOf("href"))
-              If sHTML.Contains("""") Then
-                sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
-                If sHTML.Contains("""") Then
-                  Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
-                  If URL.Contains("://") Then
-
-                  ElseIf URL.Contains("//") Then
-                    Dim oldURL As String = e.UserState
-                    If oldURL.Contains("://") Then oldURL = oldURL.Substring(0, oldURL.IndexOf("://") + 1)
-                    URL = oldURL & URL
-                  Else
-                    Dim oldURL As String = e.UserState
-                    If Not oldURL.EndsWith("/") And oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
-                    If URL.StartsWith("/") Then
-                      If oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
-                      URL = oldURL & URL
-                    ElseIf oldURL.EndsWith("/") Then
-                      URL = oldURL & URL
-                    Else
-                      URL = oldURL & "/" & URL
-                    End If
-                  End If
-                  Try
-                    ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), URL)
-                  Catch ex As Exception
-
-                  End Try
-                  Return
-                End If
-              End If
-            End If
-          End If
-        End If
-      End If
-    Catch ex As Exception
-    End Try
-    Try
-      Dim pathURL As New Uri(e.UserState)
-      ConnectToFile(New Uri(pathURL.Scheme & "://" & pathURL.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"))
-    Catch ex As Exception
-    End Try
-  End Sub
 #Region "IDisposable Support"
   Private disposedValue As Boolean
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
-        If wsNetTest IsNot Nothing Then
-          If wsNetTest.IsBusy Then wsNetTest.CancelAsync()
-          wsNetTest.Dispose()
-          wsNetTest = Nothing
+        If wsFile IsNot Nothing Then
+          If wsFile.IsBusy Then wsFile.CancelAsync()
+          wsFile.Dispose()
+          wsFile = Nothing
         End If
       End If
     End If

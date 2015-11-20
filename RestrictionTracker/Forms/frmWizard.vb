@@ -19,7 +19,6 @@ Public Class frmWizard
   Private Const WM_NCLBUTTONDOWN As Integer = &HA1
   Private Const WM_GETSYSMENU As Integer = &H313
   Private Const HTCAPTION As Integer = 2
-  Private WithEvents wsHostList As WebClientEx
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
@@ -209,8 +208,8 @@ Public Class frmWizard
           DrawStatus(True, "Loading Host List...")
           cmbAccountHost.Text = ""
           cmbAccountHost.Enabled = False
-          Dim populateInvoker As New MethodInvoker(AddressOf PopulateHostList)
-          populateInvoker.BeginInvoke(Nothing, Nothing)
+          Dim tPopulate As New Threading.Thread(AddressOf PopulateHostList)
+          tPopulate.Start()
         End If
       Case 2
         pctLeftBox.Image = My.Resources.wizService
@@ -418,72 +417,33 @@ Public Class frmWizard
     End If
   End Sub
   Private Sub PopulateHostList()
+    Try
+      Dim sRet As String
+      Dim wsHostList As New WebClientEx
+      sRet = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
+      SetHostListData(sRet)
+    Catch ex As Exception
+      SetHostListData(Nothing)
+    End Try
+  End Sub
+  Private Delegate Sub SetHostListDataCallback(sHosts As String)
+  Private Sub SetHostListData(sHosts As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
+      Me.Invoke(New SetHostListDataCallback(AddressOf SetHostListData), sHosts)
       Return
     End If
-    If wsHostList IsNot Nothing Then
-      If wsHostList.IsBusy Then wsHostList.CancelAsync()
-      wsHostList.Dispose()
-      wsHostList = Nothing
-    End If
-    wsHostList = New WebClientEx
-    Application.DoEvents()
-    wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"))
-  End Sub
-  Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
     DrawStatus(False)
-    If e.Error IsNot Nothing Then
-      cmbAccountHost.Items.Clear()
-      cmbAccountHost.Items.Add("wildblue.net")
-      cmbAccountHost.Items.Add("exede.net")
-      cmbAccountHost.Items.Add("dishmail.net")
-      cmbAccountHost.Items.Add("dish.net")
-    ElseIf e.Cancelled Then
-      cmbAccountHost.Items.Clear()
-      cmbAccountHost.Items.Add("wildblue.net")
-      cmbAccountHost.Items.Add("exede.net")
-      cmbAccountHost.Items.Add("dishmail.net")
-      cmbAccountHost.Items.Add("dish.net")
-    ElseIf String.IsNullOrEmpty(e.Result) Then
-      cmbAccountHost.Items.Clear()
-      cmbAccountHost.Items.Add("wildblue.net")
-      cmbAccountHost.Items.Add("exede.net")
-      cmbAccountHost.Items.Add("dishmail.net")
-      cmbAccountHost.Items.Add("dish.net")
-    Else
-      cmbAccountHost.Text = ""
-      cmbAccountHost.Enabled = True
-      Try
-        If e.Result.Contains(vbLf) Then
-          Dim HostList() As String = Split(e.Result, vbLf)
-          cmbAccountHost.Items.Clear()
-          cmbAccountHost.Items.AddRange(HostList)
-        Else
-          cmbAccountHost.Items.Clear()
-          cmbAccountHost.Items.Add("wildblue.net")
-          cmbAccountHost.Items.Add("exede.net")
-          cmbAccountHost.Items.Add("dishmail.net")
-          cmbAccountHost.Items.Add("dish.net")
-        End If
-      Catch ex As Exception
-        cmbAccountHost.Items.Clear()
-        cmbAccountHost.Items.Add("wildblue.net")
-        cmbAccountHost.Items.Add("exede.net")
-        cmbAccountHost.Items.Add("dishmail.net")
-        cmbAccountHost.Items.Add("dish.net")
-      End Try
-    End If
-  End Sub
-  Private Sub wsHostList_Failure(sender As Object, e As RestrictionLibrary.WebClientEx.ErrorEventArgs) Handles wsHostList.Failure
-    DrawStatus(False)
+    cmbAccountHost.Items.Clear()
     cmbAccountHost.Text = ""
     cmbAccountHost.Enabled = True
-    cmbAccountHost.Items.Clear()
-    Dim hostData() As String = Split(My.Resources.HostList, vbNewLine)
-    For I As Integer = 0 To hostData.Length - 1
-      cmbAccountHost.Items.Add(hostData(I))
-    Next
+    If String.IsNullOrEmpty(sHosts) OrElse Not sHosts.Contains(vbLf) Then
+      Dim hostData() As String = Split(My.Resources.HostList, vbNewLine)
+      For I As Integer = 0 To hostData.Length - 1
+        cmbAccountHost.Items.Add(hostData(I))
+      Next
+    Else
+      cmbAccountHost.Items.AddRange(Split(sHosts, vbLf))
+    End If
   End Sub
   Private sAccount As String
   Private Sub KeyCheck()
@@ -596,7 +556,11 @@ Public Class frmWizard
     AccountType = acct
     DrawStatus(False)
     tbsWizardPages.SelectedIndex += 1
-    wsHostList.DownloadDataAsync(New Uri("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text))
+    Try
+      Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text)
+      sckHostList.BeginGetResponse(Nothing, Nothing)
+    Catch ex As Exception
+    End Try
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
     LocalComplete(SatHostTypes.DishNet_EXEDE)
@@ -636,14 +600,19 @@ Public Class frmWizard
           Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
           Case ConnectionSubStates.AuthPrepare : DrawStatus(True, "Preparing Authentication...")
           Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating...")
-          Case ConnectionSubStates.AuthenticateRetry : DrawStatus(True, "Re-Authenticating...")
+          Case ConnectionSubStates.AuthenticateRetry
+            If e.Stage < 1 Then
+              DrawStatus(True, "Re-Authenticating...")
+            Else
+              DrawStatus(True, "Re-Authenticating (Attempt " & e.Stage & ")...")
+            End If
           Case ConnectionSubStates.Verify : DrawStatus(True, "Verifying Authentication...")
           Case Else : DrawStatus(True, "Logging In...")
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
           Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page...")
-          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & FormatPercent(e.SubPercentage, 0, TriState.False, TriState.False, TriState.False) & ")...")
+          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of 2)...")
           Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
           Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
           Case Else : DrawStatus(True, "Downloading Usage Table...")

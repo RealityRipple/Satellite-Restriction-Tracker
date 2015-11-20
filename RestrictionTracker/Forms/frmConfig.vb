@@ -1,7 +1,5 @@
 ﻿Public Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
-  Private WithEvents wsHostList As WebClientEx
-  Private WithEvents wsFavicon As clsFavicon
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
@@ -168,7 +166,6 @@
         Case Else
           optNetTestCustom.Checked = True
           txtNetTestCustom.Text = mySettings.NetTestURL
-          wsFavicon = New clsFavicon(txtNetTestCustom.Text)
       End Select
     End If
     Select Case mySettings.UpdateType
@@ -190,10 +187,10 @@
     Dim aD As String = AppDataPath
     If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
     Dim hD As String = mySettings.HistoryDir
-    If String.IsNullOrEmpty(hD) Then hD = AppDataPath
+    If String.IsNullOrEmpty(hD) Then hD = AppDataAllPath
     If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
     If chkService.Checked Then
-      optHistoryProgramData.Checked = False
+      optHistoryProgramData.Checked = True
       DisableHistory = True
     ElseIf String.Compare(aD, Application.StartupPath & "\Config\", True) = 0 Then
       optHistoryProgramData.Checked = False
@@ -228,8 +225,6 @@
     fswController.NotifyFilter = IO.NotifyFilters.Attributes Or IO.NotifyFilters.CreationTime Or IO.NotifyFilters.DirectoryName Or IO.NotifyFilters.FileName Or IO.NotifyFilters.LastAccess Or IO.NotifyFilters.LastWrite Or IO.NotifyFilters.Security Or IO.NotifyFilters.Size
     fswController.EnableRaisingEvents = True
     bLoaded = True
-    wsHostList = New WebClientEx
-    Application.DoEvents()
     Dim populateInvoker As New MethodInvoker(AddressOf PopulateHostList)
     populateInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
@@ -469,13 +464,23 @@
     ElseIf Not String.IsNullOrEmpty(txtHistoryDir.Tag) Then
       txtHistoryDir.Text = txtHistoryDir.Tag
       txtHistoryDir.Tag = Nothing
+      Dim hD As String = mySettings.HistoryDir
+      If String.IsNullOrEmpty(hD) Then hD = AppDataPath
+      If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
+      If String.Compare(hD, AppDataAllPath, True) = 0 Then
+        optHistoryProgramData.Checked = True
+      ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
+        optHistoryAppData.Checked = True
+      Else
+        optHistoryCustom.Checked = True
+      End If
     End If
     optHistoryAppData.Enabled = Not chkService.Checked
     optHistoryProgramData.Enabled = Not chkService.Checked
     optHistoryCustom.Enabled = Not chkService.Checked
     If chkService.Checked Then optHistoryProgramData.Checked = True
-    txtHistoryDir.Enabled = Not chkService.Checked
-    cmdHistoryDir.Enabled = Not chkService.Checked
+    txtHistoryDir.Enabled = (Not chkService.Checked) And (optHistoryCustom.Checked)
+    cmdHistoryDir.Enabled = (Not chkService.Checked) And (optHistoryCustom.Checked)
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub chkOverAlert_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkOverAlert.CheckedChanged
@@ -613,10 +618,6 @@
   End Sub
   Private Sub optNetTestNone_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestNone.CheckedChanged
     If optNetTestNone.Checked Then
-      If wsFavicon IsNot Nothing Then
-        wsFavicon.Dispose()
-        wsFavicon = Nothing
-      End If
       txtNetTestCustom.Text = ""
       txtNetTestCustom.Enabled = False
       SetNetTestImage(My.Resources.advanced_nettest_none)
@@ -625,36 +626,26 @@
   End Sub
   Private Sub optNetTestTestMyNet_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestTestMyNet.CheckedChanged
     If optNetTestTestMyNet.Checked Then
-      If wsFavicon IsNot Nothing Then
-        wsFavicon.Dispose()
-        wsFavicon = Nothing
-      End If
       txtNetTestCustom.Text = "http://testmy.net"
       txtNetTestCustom.Enabled = False
-      SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-      wsFavicon = New clsFavicon("http://testmy.net")
+      Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
+      SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
+      Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
       cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
   Private Sub optNetTestSpeedTest_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestSpeedTest.CheckedChanged
     If optNetTestSpeedTest.Checked Then
-      If wsFavicon IsNot Nothing Then
-        wsFavicon.Dispose()
-        wsFavicon = Nothing
-      End If
       txtNetTestCustom.Text = "http://speedtest.net"
       txtNetTestCustom.Enabled = False
-      SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-      wsFavicon = New clsFavicon("http://speedtest.net")
+      Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
+      SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
+      Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
       cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
   Private Sub optNetTestCustom_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optNetTestCustom.CheckedChanged
     If optNetTestCustom.Checked Then
-      If wsFavicon IsNot Nothing Then
-        wsFavicon.Dispose()
-        wsFavicon = Nothing
-      End If
       txtNetTestCustom.Text = ""
       txtNetTestCustom.Enabled = True
       SetNetTestImage(My.Resources.advanced_nettest_edit)
@@ -666,8 +657,9 @@
       If pctAdvancedNetTestIcon.Tag Is Nothing Then
         tmrIcoWait.Stop()
         If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
-          SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-          wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+          Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
+          SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
+          Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
         End If
       End If
     End If
@@ -706,35 +698,23 @@
       Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
       Return
     End If
-    wsHostList.DownloadStringAsync(New Uri("http://wb.realityripple.com/hosts/"), "GRAB")
-  End Sub
-  Private Sub wsHostList_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsHostList.DownloadStringCompleted
-    If e.UserState = "GRAB" Then
-      If Me.InvokeRequired Then
-        Try
-          Me.Invoke(New Net.DownloadStringCompletedEventHandler(AddressOf wsHostList_DownloadStringCompleted), sender, e)
-        Catch ex As Exception
-
-        End Try
-        Return
+    Dim wsHostList As New WebClientEx
+    Dim sHostList As String = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
+    If sHostList.StartsWith("Error: ") Then Return
+    Try
+      If sHostList.Contains(vbLf) Then
+        Dim HostList() As String = Split(sHostList, vbLf)
+        bLoaded = False
+        cmbProvider.Items.Clear()
+        cmbProvider.Items.AddRange(HostList)
+        If mySettings.Account.Contains("@") Then
+          Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
+          cmbProvider.Text = sProvider
+        End If
+        bLoaded = True
       End If
-      If e.Error Is Nothing AndAlso Not e.Cancelled AndAlso Not String.IsNullOrEmpty(e.Result) Then
-        Try
-          If e.Result.Contains(vbLf) Then
-            Dim HostList() As String = Split(e.Result, vbLf)
-            bLoaded = False
-            cmbProvider.Items.Clear()
-            cmbProvider.Items.AddRange(HostList)
-            If mySettings.Account.Contains("@") Then
-              Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
-              cmbProvider.Text = sProvider
-            End If
-            bLoaded = True
-          End If
-        Catch ex As Exception
-        End Try
-      End If
-    End If
+    Catch ex As Exception
+    End Try
   End Sub
   Private Sub UseDefaultHostList()
     cmbProvider.Items.Clear()
@@ -745,32 +725,54 @@
   End Sub
 #End Region
 #Region "Net Test"
-  Private Sub wsFavicon_DownloadIconCompleted(sender As Object, e As clsFavicon.DownloadIconCompletedEventArgs) Handles wsFavicon.DownloadIconCompleted
+  Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
-      Me.Invoke(New clsFavicon.DownloadIconCompletedEventHandler(AddressOf wsFavicon_DownloadIconCompleted), sender, e)
+      Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
       Return
     End If
-    If e.Error IsNot Nothing Then
-      SetNetTestImage(pctAdvancedNetTestIcon.ErrorImage)
+    If [Error] IsNot Nothing Then
+      SetNetTestImage(pctAdvancedNetTestIcon.ErrorImage, True, token)
     Else
-      SetNetTestImage(e.Icon32, e.Icon16)
+      SetNetTestImage(icon32, True, token, icon16)
     End If
   End Sub
-  Private Sub SetNetTestImage(Image As Image, Optional tag As Object = Nothing)
+  Private Sub SetNetTestImage(Image As Image)
+    waitingForEndOf = 0
+    pctAdvancedNetTestIcon.Image = Image
+    pctAdvancedNetTestIcon.Tag = Nothing
+  End Sub
+  Private waitingForEndOf As Object
+  Private Sub SetNetTestImage(Image As Image, [End] As Boolean, Token As Object, Optional tag As Object = Nothing)
+    If [End] And Not Token = waitingForEndOf Then Return
     pctAdvancedNetTestIcon.Image = Image
     pctAdvancedNetTestIcon.Tag = tag
+    If [End] Then
+      waitingForEndOf = 0
+    Else
+      waitingForEndOf = Token
+    End If
   End Sub
   Private Sub tmrIcoWait_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcoWait.Tick
     tmrIcoWait.Stop()
     If optNetTestCustom.Checked Then
       If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
-        SetNetTestImage(pctAdvancedNetTestIcon.InitialImage)
-        wsFavicon = New clsFavicon(txtNetTestCustom.Text)
+        Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
+        SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
+        Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
       Else
         SetNetTestImage(My.Resources.advanced_nettest_edit)
       End If
     End If
   End Sub
+  Private Function MakeAToken(fromString As String) As Integer
+    Dim iToken As UInteger = fromString.Length * Int(Rnd() * 32) + Int(Rnd() * &HFFFFFFUI)
+    iToken = iToken Mod &HFFFFFFUI
+    For I As Integer = 0 To fromString.Length - 1
+      iToken *= AscW(fromString(I))
+      iToken = iToken Mod &HFFFFFFUI
+    Next
+    Return CInt(iToken)
+  End Function
 #End Region
 #End Region
   Private Sub lblPurchaseKey_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblPurchaseKey.LinkClicked
