@@ -54,7 +54,7 @@ Class AppSettings
                   ElseIf xName.CompareTo("PassCrypt") = 0 Then
                     m_PassCrypt = xValue
                   ElseIf xName.CompareTo("Timeout") = 0 Then
-                    If Not Integer.TryParse(xValue, m_Timeout) Then m_Timeout = 60
+                    If Not Integer.TryParse(xValue, m_Timeout) Then m_Timeout = 120
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
                   ElseIf xName.CompareTo("Protocol") = 0 Then
@@ -93,7 +93,7 @@ Class AppSettings
     m_LastSyncTime = New Date(2000, 1, 1)
     m_HistoryDir = Nothing
     m_PassCrypt = Nothing
-    m_Timeout = 60
+    m_Timeout = 120
     m_ProxySetting = "None"
     m_Protocol = Net.SecurityProtocolType.Tls
   End Sub

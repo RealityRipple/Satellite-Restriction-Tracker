@@ -32,7 +32,7 @@ Class SvcSettings
     m_AccountType = SatHostTypes.Other
     m_PassCrypt = Nothing
     m_Interval = 15
-    m_Timeout = 60
+    m_Timeout = 120
     m_ProxySetting = "None"
   End Sub
   Public Property Account As String
@@ -461,12 +461,12 @@ Class AppSettings
       End If
       Dim xTimeout As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Timeout")
       If xTimeout Is Nothing Then
-        m_Timeout = 60
+        m_Timeout = 120
       Else
         Try
           m_Timeout = xTimeout.Element("value").Value
         Catch ex As Exception
-          m_Timeout = 60
+          m_Timeout = 120
         End Try
       End If
       Dim xOveruse As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overuse")
@@ -1000,7 +1000,7 @@ Class AppSettings
     m_RemoteKey = Nothing
     m_PassCrypt = Nothing
     m_TopMost = False
-    m_Timeout = 60
+    m_Timeout = 120
     m_Overuse = 0
     m_Overtime = 60
     m_AlertStyle = "Default"
