@@ -415,13 +415,11 @@ Module modFunctions
       ElseIf ADDOK Then
         If Not OneAlert Then
           MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
-          'MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           OneAlert = True
         End If
       Else
         If Not OneAlert Then
           MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
-          'MessageBox.Show("Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
           OneAlert = True
         End If
       End If
@@ -731,7 +729,10 @@ Module modFunctions
     oProc.StartInfo.UseShellExecute = False
     oProc.Start()
   End Sub
-  Public Sub SaveToFTP(sData As String)
+  Public Delegate Sub FailResponseInvoker(sRet As Boolean)
+  Public Sub SaveToFTP(oData As Object)
+    Dim sData As String = oData(0)
+    Dim callback As FailResponseInvoker = oData(1)
     Try
       Dim sFailFile As String = "SRT-ReadFail-" & Now.ToString("G") & "-v" & Application.ProductVersion & ".txt"
       sFailFile = Replace(sFailFile, "/", "-")
@@ -745,9 +746,9 @@ Module modFunctions
         ftpStream.Write(bHTTP, 0, bHTTP.Length)
         ftpStream.Close()
       End Using
-      frmMain.FailResponse(True)
+      callback.Invoke(True)
     Catch ex As Exception
-      frmMain.FailResponse(False)
+      callback.Invoke(False)
     End Try
   End Sub
   Public Function PercentEncode(inString As String) As String

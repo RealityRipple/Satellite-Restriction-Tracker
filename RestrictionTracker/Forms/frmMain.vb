@@ -1864,9 +1864,10 @@ Public Class frmMain
     sFailTray = Nothing
   End Sub
   Private Sub taskNotifier_ContentClick(sender As Object, e As System.EventArgs) Handles taskNotifier.ContentClick
+    taskNotifier.Hide()
     If Not String.IsNullOrEmpty(sFailTray) Then
       Dim tFTP As New ParamaterizedInvoker(AddressOf SaveToFTP)
-      tFTP.BeginInvoke(sFailTray, Nothing, Nothing)
+      tFTP.BeginInvoke({sFailTray, New FailResponseInvoker(AddressOf FailResponse)}, Nothing, Nothing)
     End If
     sFailTray = Nothing
   End Sub

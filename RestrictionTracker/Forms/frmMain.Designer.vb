@@ -306,7 +306,7 @@ Partial Class frmMain
     '
     Me.lblRRS.AutoSize = True
     Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblRRS.Location = New System.Drawing.Point(214, 76)
     Me.lblRRS.Name = "lblRRS"
