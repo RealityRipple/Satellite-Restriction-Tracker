@@ -221,6 +221,7 @@
   Private c_Proxy As Net.IWebProxy
   Private c_Jar As Net.CookieContainer
   Private sDataPath As String
+  Private wsSocket As WebClientEx
 #Region "Initialization Functions"
   Public Sub New(ConfigPath As String)
     ClosingTime = False
@@ -296,43 +297,43 @@
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
-    Dim wsLogin As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sSend As String = "uid=" & PercentEncode(sUsername) & "&userPassword=" & PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
-    Dim sRet As String = wsLogin.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
-    WB_Login_Response(sRet, wsLogin.ResponseURI)
+    WB_Login_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub LoginExede()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my.exede.net/login"
-    Dim wsLoginPrepare As WebClientEx = MakeSocket()
+    MakeSocket()
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
-    Dim sRet As String = wsLoginPrepare.DownloadString(uriString)
+    Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
-    EX_Login_Prepare_Response(sRet, wsLoginPrepare.ResponseURI, 0)
+    EX_Login_Prepare_Response(sRet, wsSocket.ResponseURI, 0)
   End Sub
   Private Sub LoginRP()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, "login")
-    Dim wsLogin As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sSend As String = "warningTrip=false&userName=" & PercentEncode(sUsername) & "&passwd=" & PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
-    Dim sRet As String = wsLogin.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
-    RP_Login_Response(sRet, wsLogin.ResponseURI, False)
+    RP_Login_Response(sRet, wsSocket.ResponseURI, False)
   End Sub
   Private Sub LoginDN()
     iHist = 0
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
-    Dim wsLogin As WebClientEx = MakeSocket()
+    MakeSocket()
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
-    Dim sRet As String = wsLogin.DownloadString(uriString)
+    Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_Response(sRet, wsLogin.ResponseURI)
+    DN_Login_Response(sRet, wsSocket.ResponseURI)
   End Sub
 #End Region
 #Region "Parsing Functions"
@@ -374,12 +375,12 @@
     End If
   End Sub
   Private Sub WB_Usage(File As String)
-    Dim wsUsage As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-    Dim sRet As String = wsUsage.DownloadString(uriString)
+    Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
-    WB_Usage_Response(sRet, wsUsage.ResponseURI)
+    WB_Usage_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response) Then Return
@@ -536,7 +537,7 @@
     EX_Login(sURI, sGOTO, sSQPS, TryCount)
   End Sub
   Private Sub EX_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
-    Dim wsLogin As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sSend As String = "realm=" & PercentEncode("/") &
                          "&IDToken1=" & PercentEncode(sUsername) &
                          "&IDToken2=" & PercentEncode(sPassword) &
@@ -550,10 +551,10 @@
     Else
       BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
     End If
-    wsLogin.ErrorBypass = True
-    Dim sRet As String = wsLogin.UploadString(sURI, "POST", sSend)
+    wsSocket.ErrorBypass = True
+    Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
-    EX_Login_Response(sRet, wsLogin.ResponseURI, TryCount)
+    EX_Login_Response(sRet, wsSocket.ResponseURI, TryCount)
   End Sub
   Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response) Then Return
@@ -568,17 +569,21 @@
           RaiseError("Login Failed: Server redirected too many times.")
           Return
         End If
-        Dim wsLogin As WebClientEx = MakeSocket()
-        wsLogin.ErrorBypass = False
+        MakeSocket()
+        wsSocket.ErrorBypass = False
         Dim sRedirURI As String = Nothing
         sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
         sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
         sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-        If sRedirURI = "/" Then sRedirURI = wsLogin.ResponseURI.AbsoluteUri.Substring(0, wsLogin.ResponseURI.AbsoluteUri.IndexOf("/", wsLogin.ResponseURI.AbsoluteUri.IndexOf("//") + 2))
+        If sRedirURI = "/" Then
+          sRedirURI = wsSocket.ResponseURI.AbsoluteUri.Substring(0, wsSocket.ResponseURI.AbsoluteUri.IndexOf("/", wsSocket.ResponseURI.AbsoluteUri.IndexOf("//") + 2))
+        ElseIf sRedirURI.StartsWith("/") Then
+          sRedirURI = "https://" & ResponseURI.Host & sRedirURI
+        End If
         BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sRedirURI)
-        Dim sRet As String = wsLogin.DownloadString(sRedirURI)
+        Dim sRet As String = wsSocket.DownloadString(sRedirURI)
         If ClosingTime Then Return
-        EX_Login_Response(sRet, wsLogin.ResponseURI, TryCount)
+        EX_Login_Response(sRet, wsSocket.ResponseURI, TryCount)
       ElseIf Response.Contains("maintenance") Then
         RaiseError("Login Failed: Server Down for Maintenance.")
       ElseIf Response.Contains("https://DOMAIN.my.salesforce.com") Then
@@ -644,12 +649,12 @@
     End If
   End Sub
   Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
-    Dim wsAuthenticate As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(SAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(RelayState))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
-    Dim sRet As String = wsAuthenticate.UploadString(sURI, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
-    EX_Authenticate_Response(sRet, wsAuthenticate.ResponseURI)
+    EX_Authenticate_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response) Then Return
@@ -662,7 +667,20 @@
       Return
     End If
     If ResponseURI.AbsolutePath.ToLower = "/secur/frontdoor.jsp" Then
-      EX_Download_Homepage("https://" & ResponseURI.Host & "/dashboard")
+      Dim sURL As String = Nothing
+      If Response.Contains("location.href") Then
+        sURL = Response.Substring(Response.IndexOf("location.href"))
+        sURL = sURL.Substring(sURL.IndexOf("""") + 1)
+        sURL = sURL.Substring(0, sURL.IndexOf(""""))
+        If sURL = "/" Then
+          sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
+        ElseIf sURL.StartsWith("/") Then
+          sURL = "https://" & ResponseURI.Host & sURL
+        End If
+      Else
+        sURL = "https://" & ResponseURI.Host & "/dashboard"
+      End If
+      EX_Download_Homepage(sURL)
       Return
     End If
     If Response.Contains("maintenance") Then
@@ -672,11 +690,11 @@
     End If
   End Sub
   Private Sub EX_Download_Homepage(sURI As String)
-    Dim wsHomepage As WebClientEx = MakeSocket()
+    MakeSocket()
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
-    Dim sRet As String = wsHomepage.DownloadString(sURI)
+    Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
-    EX_Ajax_Response(sRet, wsHomepage.ResponseURI, "2")
+    EX_Ajax_Response(sRet, wsSocket.ResponseURI, "2")
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
     If CheckForErrors(Response) Then Return
@@ -685,7 +703,20 @@
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" Then
-      RaiseError("Dashboard Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      If Response.Contains("location.href") Then
+        Dim sURL As String = Nothing
+        sURL = Response.Substring(Response.IndexOf("location.href"))
+        sURL = sURL.Substring(sURL.IndexOf("'") + 1)
+        sURL = sURL.Substring(0, sURL.IndexOf("'"))
+        If sURL = "/" Then
+          sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
+        ElseIf sURL.StartsWith("/") Then
+          sURL = "https://" & ResponseURI.Host & sURL
+        End If
+        EX_Download_Homepage(sURL)
+      Else
+        RaiseError("Dashboard Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      End If
       Return
     End If
     If Response.Contains("amount-used") Then
@@ -721,11 +752,11 @@
     End If
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
-    Dim wsAJAX As WebClientEx = MakeSocket()
-    If AjaxID = "2" Then
-      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 2, sURI)
-    Else
+    MakeSocket()
+    If AjaxID = "9" Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
+    Else
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, Val(AjaxID), sURI)
     End If
     Dim sSend As String = "AJAXREQUEST=_viewRoot" &
              "&j_id0%3AidForm=j_id0%3AidForm" &
@@ -734,9 +765,9 @@
              "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
              "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
              "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
-    Dim sRet As String = wsAJAX.UploadString(sURI, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
-    EX_Ajax_Response(sRet, wsAJAX.ResponseURI, "3")
+    EX_Ajax_Response(sRet, wsSocket.ResponseURI, Trim(Str(Val(AjaxID) + 1)))
   End Sub
   Private Sub EX_Read_Table(Table As String)
     If Not Table.Contains("amount-used") Then
@@ -766,13 +797,13 @@
 #End Region
 #Region "RP"
   Private Sub RP_Login_Retry(sURI As String)
-    Dim wsAuthenticate As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
     Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURI)
-    Dim sRet As String = wsAuthenticate.UploadString(sURI, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
-    RP_Login_Response(sRet, wsAuthenticate.ResponseURI, True)
+    RP_Login_Response(sRet, wsSocket.ResponseURI, True)
   End Sub
   Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
     If CheckForErrors(Response) Then Return
@@ -821,10 +852,10 @@
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, File)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-    Dim wsUsage As WebClientEx = MakeSocket()
-    Dim sRet As String = wsUsage.DownloadString(uriString)
+    MakeSocket()
+    Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
-    RP_Usage_Response(sRet, wsUsage.ResponseURI)
+    RP_Usage_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response) Then Return
@@ -948,12 +979,12 @@
     DN_Login_FirstBook(sURI)
   End Sub
   Private Sub DN_Login_FirstBook(sURI As String)
-    Dim wsAuth As WebClientEx = MakeSocket()
+    MakeSocket()
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
-    Dim sRet As String = wsAuth.DownloadString(sURI)
+    Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_FirstBook_Response(sRet, wsAuth.ResponseURI)
+    DN_Login_FirstBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
     'CheckForErrors(Response)
@@ -976,17 +1007,17 @@
     DN_Login_Authenticate(ResponseURI.OriginalString)
   End Sub
   Private Sub DN_Login_Authenticate(sURI As String)
-    Dim wsAuth As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sSend As String = "username=" & PercentEncode(sUsername) &
                           "&password=" & PercentEncode(sPassword) &
                           "&login_type=username,password" &
                           "&source=" &
                           "&source_button="
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
-    Dim sRet As String = wsAuth.UploadString(sURI, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_Authenticate_Response(sRet, wsAuth.ResponseURI)
+    DN_Login_Authenticate_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response) Then Return
@@ -1018,12 +1049,12 @@
         If sURL = "/" Then
           sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
         End If
-        Dim wsAuth As WebClientEx = MakeSocket()
+        MakeSocket()
         BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
-        Dim sRet As String = wsAuth.DownloadString(sURL)
+        Dim sRet As String = wsSocket.DownloadString(sURL)
         If ClosingTime Then Return
         iHist += 1
-        DN_Login_Authenticate_Response(sRet, wsAuth.ResponseURI)
+        DN_Login_Authenticate_Response(sRet, wsSocket.ResponseURI)
         Return
       ElseIf Response.Contains("Exception") Then
         If Response.Contains("Unhandled Exception") Then
@@ -1048,12 +1079,12 @@
     End If
   End Sub
   Private Sub DN_Login_LastBook(sURI As String)
-    Dim wsAuth As WebClientEx = MakeSocket()
+    MakeSocket()
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
-    Dim sRet As String = wsAuth.DownloadString(sURI)
+    Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_LastBook_Response(sRet, wsAuth.ResponseURI)
+    DN_Login_LastBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_LastBook_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response) Then Return
@@ -1085,14 +1116,14 @@
     End If
   End Sub
   Private Sub DN_Login_Verify(SAMLResponse As String)
-    Dim wsVerify As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
-    Dim sRet As String = wsVerify.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_Verify_Response(sRet, wsVerify.ResponseURI)
+    DN_Login_Verify_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
     'CheckForErrors(Response)
@@ -1107,14 +1138,14 @@
     DN_Download_Home()
   End Sub
   Private Sub DN_Download_Home()
-    Dim wsHome As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-    Dim sRet As String = wsHome.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
     iHist += 1
-    DN_Download_Home_Response(sRet, wsHome.ResponseURI)
+    DN_Download_Home_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
     'CheckForErrors(Response)
@@ -1124,24 +1155,34 @@
     End If
     If ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
       DN_Download_Table_Response(Response, ResponseURI)
+    ElseIf Response.Contains("alertError") Then
+      If Response.Contains("System is currently unavailable") Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Response))
+      End If
     Else
       DN_Download_Table()
     End If
   End Sub
   Private Sub DN_Download_Table()
-    Dim wsTable As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim uriString As String = "https://my.dish.com/customercare/broadband/prepBroadBand.do"
     Dim sSend As String = "srt=second_try"
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
-    Dim sRet As String = wsTable.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
     iHist += 1
-    DN_Download_Table_Response(sRet, wsTable.ResponseURI)
+    DN_Download_Table_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
     CheckForErrors(Response)
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Response.Contains("The requested URL was rejected.") Then
+      RaiseError("Usage Failed: The server rejected the request.")
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
@@ -1154,17 +1195,17 @@
     End If
     Dim sUsageDiv As String = Response.Substring(Response.IndexOf("/javascript/broadband.js""></script>"))
     If Not sUsageDiv.Contains("<script type=""text/javascript"">") Then
-      RaiseError("Login Failed: Could not find usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      RaiseError("Usage Failed: Could not find usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
     sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
     If Not sUsageDiv.Contains("</script>") Then
-      RaiseError("Login Failed: Could not parse usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
     sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
     If Not sUsageDiv.ToLower.Contains("var anytime") Then
-      RaiseError("Login Failed: Could not detect usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
     ReadUsage(sUsageDiv)
@@ -1280,14 +1321,17 @@
 #End Region
 #End Region
 #Region "Useful Functions"
-  Private Function MakeSocket() As WebClientEx
-    Dim wsNet As New WebClientEx(sDataPath)
-    wsNet.Timeout = c_Timeout
-    wsNet.Proxy = c_Proxy
-    wsNet.CookieJar = c_Jar
-    wsNet.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
-    Return wsNet
-  End Function
+  Private Sub MakeSocket()
+    If wsSocket IsNot Nothing Then
+      If wsSocket.isBusy Then wsSocket.Cancel()
+      wsSocket = Nothing
+    End If
+    wsSocket = New WebClientEx(sDataPath)
+    wsSocket.Timeout = c_Timeout
+    wsSocket.Proxy = c_Proxy
+    wsSocket.CookieJar = c_Jar
+    wsSocket.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+  End Sub
   Private Function CheckForErrors(response As String) As Boolean
     If String.IsNullOrEmpty(response) Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
@@ -1354,10 +1398,10 @@
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
-        If tConnect IsNot Nothing Then
-          If tConnect.IsAlive Then
-            ClosingTime = True
-          End If
+        ClosingTime = True
+        If wsSocket IsNot Nothing AndAlso wsSocket.IsBusy Then
+          wsSocket.Cancel()
+          wsSocket = Nothing
         End If
       End If
     End If
