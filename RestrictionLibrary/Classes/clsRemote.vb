@@ -100,6 +100,7 @@ Public Class remoteRestrictionTracker
   Private c_Proxy As Net.IWebProxy
   Private c_Jar As Net.CookieContainer
   Private sDataPath As String
+  Private wsSocket As WebClientEx
   Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As Net.IWebProxy, Timeout As Integer, UpdateFrom As Date, ConfigPath As String)
     ClosingTime = False
     If Username.Contains("@") Then
@@ -121,11 +122,11 @@ Public Class remoteRestrictionTracker
   End Sub
   Private Sub Login()
     c_Jar = New Net.CookieContainer
-    Dim wsLogin As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sPost As String = "s=init&user=" & sUsername & "@" & sServer & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
-    Dim sRet As String = wsLogin.UploadString(URLPath, "POST", sPost)
+    Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
     If ClosingTime Then Return
-    If CheckForErrors(sRet, wsLogin.ResponseURI) Then Return
+    If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
     LoginResponse(sRet)
   End Sub
   Private Sub LoginResponse(response As String)
@@ -145,11 +146,11 @@ Public Class remoteRestrictionTracker
   Private Sub SendCC()
     GenCC()
     ClientResponse = HashA()
-    Dim wsClientChallenge As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sPost As String = "s=verify&cc=" & PercentEncode(Convert.ToBase64String(ClientChallenge)) & "&cr=" & PercentEncode(Convert.ToBase64String(ClientResponse))
-    Dim sRet As String = wsClientChallenge.UploadString(URLPath, "POST", sPost)
+    Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
     If ClosingTime Then Return
-    If CheckForErrors(sRet, wsClientChallenge.ResponseURI) Then Return
+    If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
     VerifyResponse(sRet)
   End Sub
   Private Sub VerifyResponse(Response As String)
@@ -199,11 +200,11 @@ Public Class remoteRestrictionTracker
       End Using
     End Using
     CSP = Nothing
-    Dim wsClientResponse As WebClientEx = MakeSocket()
+    MakeSocket()
     Dim sPost As String = "s=login&pass=" & PercentEncode(Convert.ToBase64String(bPass))
-    Dim sRet As String = wsClientResponse.UploadString(URLPath, "POST", sPost)
+    Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
     If ClosingTime Then Return
-    If CheckForErrors(sRet, wsClientResponse.ResponseURI) Then Return
+    If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
     PassResponse(sRet)
   End Sub
   Private Sub PassResponse(Response As String)
@@ -322,13 +323,16 @@ Public Class remoteRestrictionTracker
     SendSocketErrors(sDataPath)
   End Sub
 
-  Private Function MakeSocket() As WebClientEx
-    Dim wsNet As New WebClientEx(sDataPath)
-    wsNet.Timeout = c_Timeout
-    wsNet.Proxy = c_Proxy
-    wsNet.CookieJar = c_Jar
-    Return wsNet
-  End Function
+  Private Sub MakeSocket()
+    If wsSocket IsNot Nothing Then
+      If wsSocket.IsBusy Then wsSocket.Cancel()
+      wsSocket = Nothing
+    End If
+    wsSocket = New WebClientEx(sDataPath)
+    wsSocket.Timeout = c_Timeout
+    wsSocket.Proxy = c_Proxy
+    wsSocket.CookieJar = c_Jar
+  End Sub
   Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
     If String.IsNullOrEmpty(response) Then
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Empty Response"))
@@ -412,10 +416,10 @@ Public Class remoteRestrictionTracker
   Protected Overridable Sub Dispose(disposing As Boolean)
     If Not Me.disposedValue Then
       If disposing Then
-        If tLogin IsNot Nothing Then
-          If tLogin.IsAlive Then
-            ClosingTime = True
-          End If
+        ClosingTime = True
+        If wsSocket IsNot Nothing AndAlso wsSocket.IsBusy Then
+          wsSocket.Cancel()
+          wsSocket = Nothing
         End If
       End If
     End If
