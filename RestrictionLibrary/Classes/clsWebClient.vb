@@ -5,7 +5,7 @@
     c_CookieJar = New Net.CookieContainer
     c_Timeout = 120
     c_RWTimeout = 300
-    c_HTVer = Net.HttpVersion.Version10
+    c_HTVer = Net.HttpVersion.Version11
     c_ErrorBypass = False
     c_ManualRedirect = False
     System.Net.ServicePointManager.Expect100Continue = False
@@ -242,6 +242,13 @@ Public Class WebClientEx
       c_SendHeaders = value
     End Set
   End Property
+  Private c_Busy As Boolean
+  Public ReadOnly Property IsBusy As Boolean
+    Get
+      Return c_Busy
+    End Get
+  End Property
+  Private ClosingTime As Boolean
   Private sDataPath As String
   Public Sub New(DataPath As String)
     c_Timeout = 3 * 60
@@ -250,6 +257,8 @@ Public Class WebClientEx
     c_Jar = New Net.CookieContainer
     c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     sDataPath = DataPath
+    c_Busy = False
+    ClosingTime = False
   End Sub
   Public Sub New()
     c_Timeout = 3 * 60
@@ -258,8 +267,13 @@ Public Class WebClientEx
     c_Jar = New Net.CookieContainer
     c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     sDataPath = Nothing
+    c_Busy = False
+    ClosingTime = False
   End Sub
   Public Delegate Sub WebClientCallback(asyncState As Object, response As String)
+  Public Sub Cancel()
+    If IsBusy Then ClosingTime = True
+  End Sub
 #Region "Download"
   Private c_DownloadResults As New Specialized.NameValueCollection
   Private DownloadResultSync As New Object
@@ -329,13 +343,30 @@ Public Class WebClientEx
     Dim RunName As String = "DOWNLOADSTRING_" & address & "_" & Int(Rnd() * &HFFFF)
     DownloadResults.Add(RunName, Nothing)
     Dim tDownload As New Threading.Thread(AddressOf AsyncDownloadString)
+    c_Busy = True
     tDownload.Start({RunName, address, 0})
+    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(DownloadResults(RunName))
       Windows.Forms.Application.DoEvents()
+      Threading.Thread.Sleep(1)
       Threading.Thread.Sleep(0)
+      If ClosingTime Then
+        Try
+          tDownload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection aborted."
+      ElseIf TickCount() > WaitTime Then
+        Try
+          tDownload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection timed out."
+      End If
     Loop
     Dim sRet As String = DownloadResults(RunName)
     DownloadResults.Remove(RunName)
+    c_Busy = False
     Return sRet
   End Function
 #End Region
@@ -484,13 +515,30 @@ Public Class WebClientEx
     Dim RunName As String = "UPLOADSTRING_" & address & "_" & Int(Rnd() * &HFFFF)
     UploadResults.Add(RunName, Nothing)
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadString)
+    c_Busy = True
     tUpload.Start({RunName, address, method, data, 0})
+    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(UploadResults(RunName))
       Windows.Forms.Application.DoEvents()
+      Threading.Thread.Sleep(1)
       Threading.Thread.Sleep(0)
+      If ClosingTime Then
+        Try
+          tUpload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection aborted."
+      ElseIf TickCount() > WaitTime Then
+        Try
+          tUpload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection timed out."
+      End If
     Loop
     Dim sRet As String = UploadResults(RunName)
     UploadResults.Remove(RunName)
+    c_Busy = False
     Return sRet
   End Function
 #End Region
@@ -643,13 +691,30 @@ Public Class WebClientEx
     Dim RunName As String = "UPLOADVAUES_" & address & "_" & Int(Rnd() * &HFFFF)
     UploadResults.Add(RunName, Nothing)
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadValues)
+    c_Busy = True
     tUpload.Start({RunName, address, method, data, 0})
+    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(UploadResults(RunName))
       Windows.Forms.Application.DoEvents()
+      Threading.Thread.Sleep(1)
       Threading.Thread.Sleep(0)
+      If ClosingTime Then
+        Try
+          tUpload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection aborted."
+      ElseIf TickCount() > WaitTime Then
+        Try
+          tUpload.Abort()
+        Catch ex As Exception
+        End Try
+        Return "Connection timed out."
+      End If
     Loop
     Dim sRet As String = UploadResults(RunName)
     UploadResults.Remove(RunName)
+    c_Busy = False
     Return sRet
   End Function
 #End Region
