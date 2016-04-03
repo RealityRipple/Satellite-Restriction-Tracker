@@ -129,6 +129,8 @@ Module modFunctions
         End If
       ElseIf ex.Message.StartsWith("Cannot be negative.") And ex.Message.Contains("Parameter name: length") Then
         Return "Negative Length exception. Check your local network."
+      ElseIf ex.Message.StartsWith("Thread was being aborted") Then
+        Return "Connection aborted."
       Else
         If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
         Return ex.Message
