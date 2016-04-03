@@ -612,7 +612,7 @@ Public Class frmWizard
       Case ConnectionStates.TableDownload
         Select Case e.SubState
           Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page...")
-          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of 2)...")
+          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of 8)...")
           Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
           Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
           Case Else : DrawStatus(True, "Downloading Usage Table...")

@@ -125,7 +125,6 @@ Public Class frmMain
       End If
     End Sub
   End Class
-  Private WithEvents TypeDeterminationOffline As DetermineTypeOffline
   Private Sub TypeDetermination_TypeDetermined(HostGroup As DetermineType.SatHostGroup)
     If Me.InvokeRequired Then
       Me.Invoke(New DetermineType.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
@@ -868,7 +867,7 @@ Public Class frmMain
       Case ConnectionStates.TableDownload
         Select Case e.SubState
           Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
-          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of 2)...", False)
+          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of 8)...", False)
           Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
           Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
           Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
