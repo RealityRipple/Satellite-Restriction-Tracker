@@ -355,17 +355,22 @@ Public Class WebClientEx
           tDownload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection aborted."
       ElseIf TickCount() > WaitTime Then
         Try
           tDownload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection timed out."
       End If
     Loop
     Dim sRet As String = DownloadResults(RunName)
     DownloadResults.Remove(RunName)
+    If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
     c_Busy = False
     Return sRet
   End Function
@@ -527,17 +532,22 @@ Public Class WebClientEx
           tUpload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection aborted."
       ElseIf TickCount() > WaitTime Then
         Try
           tUpload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection timed out."
       End If
     Loop
     Dim sRet As String = UploadResults(RunName)
     UploadResults.Remove(RunName)
+    If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
     c_Busy = False
     Return sRet
   End Function
@@ -703,17 +713,22 @@ Public Class WebClientEx
           tUpload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection aborted."
       ElseIf TickCount() > WaitTime Then
         Try
           tUpload.Abort()
         Catch ex As Exception
         End Try
+        If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
+        c_Busy = False
         Return "Connection timed out."
       End If
     Loop
     Dim sRet As String = UploadResults(RunName)
     UploadResults.Remove(RunName)
+    If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
     c_Busy = False
     Return sRet
   End Function
