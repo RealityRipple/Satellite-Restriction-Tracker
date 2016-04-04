@@ -350,7 +350,7 @@
   End Sub
 #Region "WB"
   Private Sub WB_Login_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Response.Contains("usage.jsp") Then
       WB_Usage("usage")
     ElseIf Response.Contains("usage_bm.jsp") Then
@@ -383,7 +383,7 @@
     WB_Usage_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myaccount." & sProvider Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -485,7 +485,7 @@
 #End Region
 #Region "EX"
   Private Sub EX_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso.exede.net" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -557,7 +557,7 @@
     EX_Login_Response(sRet, wsSocket.ResponseURI, TryCount)
   End Sub
   Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso.exede.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -657,7 +657,7 @@
     EX_Authenticate_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
       RaiseError("Authentication Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -697,7 +697,7 @@
     EX_Ajax_Response(sRet, wsSocket.ResponseURI, "2")
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
       RaiseError("Dashboard Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -806,7 +806,7 @@
     RP_Login_Response(sRet, wsSocket.ResponseURI, True)
   End Sub
   Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -858,7 +858,7 @@
     RP_Usage_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -954,7 +954,7 @@
 #Region "DN"
   Private iHist As Integer = 0
   Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -987,7 +987,11 @@
     DN_Login_FirstBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response)
+    'CheckForErrors(Response, ResponseURI)
+    If ResponseURI Is Nothing Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
+      Return
+    End If
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1020,7 +1024,7 @@
     DN_Login_Authenticate_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Authenticate_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1087,7 +1091,7 @@
     DN_Login_LastBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_LastBook_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response) Then Return
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1126,7 +1130,11 @@
     DN_Login_Verify_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response)
+    'CheckForErrors(Response, ResponseURI)
+    If ResponseURI Is Nothing Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
+      Return
+    End If
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1148,7 +1156,11 @@
     DN_Download_Home_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response)
+    'CheckForErrors(Response, ResponseURI)
+    If ResponseURI Is Nothing Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
+      Return
+    End If
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1176,7 +1188,7 @@
     DN_Download_Table_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
-    CheckForErrors(Response)
+    CheckForErrors(Response, ResponseURI)
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1332,7 +1344,7 @@
     wsSocket.CookieJar = c_Jar
     wsSocket.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
   End Sub
-  Private Function CheckForErrors(response As String) As Boolean
+  Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
     If String.IsNullOrEmpty(response) Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
       Return True
@@ -1340,6 +1352,10 @@
     If response.StartsWith("Error: ") Then
       Dim sError As String = response.Substring(7)
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sError))
+      Return True
+    End If
+    If responseURI Is Nothing Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
       Return True
     End If
     Return False
