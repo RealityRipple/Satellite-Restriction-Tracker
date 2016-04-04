@@ -1188,7 +1188,7 @@
     DN_Download_Table_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
-    CheckForErrors(Response, ResponseURI)
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
