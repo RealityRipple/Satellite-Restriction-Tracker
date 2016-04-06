@@ -6,8 +6,8 @@
     c_Timeout = 120
     c_RWTimeout = 300
     c_HTVer = Net.HttpVersion.Version11
-    c_ErrorBypass = False
-    c_ManualRedirect = False
+    c_ErrorBypass = True
+    c_ManualRedirect = True
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   Public Class ErrorEventArgs
@@ -308,9 +308,16 @@ Public Class WebClientEx
             wsDownload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
+        Dim uriAddr As Uri
+        Try
+          uriAddr = New Uri(address)
+        Catch ex As Exception
+          DownloadResults(RunName) = "Error: " & address & " is not a valid URI."
+          Return
+        End Try
         Dim sRet As String = Nothing
         Try
-          sRet = wsDownload.DownloadString(address)
+          sRet = wsDownload.DownloadString(uriAddr)
           c_ResponseURI = wsDownload.ResponseURI
         Catch ex As Exception
           Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
@@ -471,8 +478,15 @@ Public Class WebClientEx
         Dim sRet As String = Nothing
         If method.ToLower = "post" And Not String.IsNullOrEmpty(data) Then
           wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+          Dim uriAddr As Uri
           Try
-            sRet = wsUpload.UploadString(address, method, data)
+            uriAddr = New Uri(address)
+          Catch ex As Exception
+            UploadResults(RunName) = "Error: " & address & " is not a valid URI."
+            Return
+          End Try
+          Try
+            sRet = wsUpload.UploadString(uriAddr, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
@@ -485,8 +499,15 @@ Public Class WebClientEx
             Return
           End Try
         Else
+          Dim uriAddr As Uri
           Try
-            sRet = wsUpload.DownloadString(address)
+            uriAddr = New Uri(address)
+          Catch ex As Exception
+            UploadResults(RunName) = "Error: " & address & " is not a valid URI."
+            Return
+          End Try
+          Try
+            sRet = wsUpload.DownloadString(uriAddr)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
@@ -650,9 +671,16 @@ Public Class WebClientEx
         End If
         Dim sRet As String = Nothing
         If method.ToLower = "post" And (data IsNot Nothing AndAlso data.Count > 0) Then
+          Dim uriAddr As Uri
+          Try
+            uriAddr = New Uri(address)
+          Catch ex As Exception
+            UploadResults(RunName) = "Error: " & address & " is not a valid URI."
+            Return
+          End Try
           Dim bRet() As Byte = Nothing
           Try
-            bRet = wsUpload.UploadValues(address, method, data)
+            bRet = wsUpload.UploadValues(uriAddr, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
@@ -666,8 +694,15 @@ Public Class WebClientEx
           End Try
           sRet = wsUpload.Encoding.GetString(bRet)
         Else
+          Dim uriAddr As Uri
           Try
-            sRet = wsUpload.DownloadString(address)
+            uriAddr = New Uri(address)
+          Catch ex As Exception
+            UploadResults(RunName) = "Error: " & address & " is not a valid URI."
+            Return
+          End Try
+          Try
+            sRet = wsUpload.DownloadString(uriAddr)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
