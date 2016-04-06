@@ -24,6 +24,7 @@
     Verify
     LoadHome
     LoadAJAX
+    LoadAJAXRetry
     LoadTable
     LoadTableRetry
   End Enum
@@ -695,7 +696,7 @@
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
     Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
-    EX_Ajax_Response(sRet, wsSocket.ResponseURI, "2")
+    EX_Ajax_Response(sRet, wsSocket.ResponseURI, "2a")
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
     If CheckForErrors(Response, ResponseURI) Then Return
@@ -754,10 +755,16 @@
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket()
-    If AjaxID = "9" Then
+    If AjaxID(0) = "9" Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
+    ElseIf AjaxID(1) = "a" Then
+      If AjaxID(0) = "6" Then
+        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 4, sURI)
+      Else
+        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, Val(AjaxID(0)), sURI)
+      End If
     Else
-      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, Val(AjaxID), sURI)
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, Val(AjaxID(0)), sURI)
     End If
     Dim sSend As String = "AJAXREQUEST=_viewRoot" &
              "&j_id0%3AidForm=j_id0%3AidForm" &
@@ -765,10 +772,22 @@
              "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
              "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
              "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
-             "&j_id0%3AidForm%3Aj_id" & AjaxID & "=j_id0%3AidForm%3Aj_id" & AjaxID
+             "&j_id0%3AidForm%3Aj_id" & AjaxID(0) & "=j_id0%3AidForm%3Aj_id" & AjaxID(0)
     Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
-    EX_Ajax_Response(sRet, wsSocket.ResponseURI, Trim(Str(Val(AjaxID) + 1)))
+    Dim newAjaxID As Integer = Val(AjaxID(0))
+    Dim newAjaxType As String = AjaxID(1)
+    If AjaxID(1) = "a" Then
+      Select Case Val(AjaxID)
+        Case 2 : newAjaxID = 3
+        Case 3 : newAjaxID = 6
+        Case 6 : newAjaxID = 9
+        Case Else : newAjaxID = 1 : newAjaxType = "b"
+      End Select
+    Else
+      newAjaxID += 1
+    End If
+    EX_Ajax_Response(sRet, wsSocket.ResponseURI, Trim(Str(newAjaxID)) & newAjaxType)
   End Sub
   Private Sub EX_Read_Table(Table As String)
     If Not Table.Contains("amount-used") Then
@@ -988,7 +1007,6 @@
     DN_Login_FirstBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response, ResponseURI)
     If ResponseURI Is Nothing Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
       Return
@@ -1131,7 +1149,6 @@
     DN_Login_Verify_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response, ResponseURI)
     If ResponseURI Is Nothing Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
       Return
@@ -1157,7 +1174,6 @@
     DN_Download_Home_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
-    'CheckForErrors(Response, ResponseURI)
     If ResponseURI Is Nothing Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
       Return
