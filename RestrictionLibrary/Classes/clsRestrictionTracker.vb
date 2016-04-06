@@ -551,7 +551,6 @@
     Else
       BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
     End If
-    wsSocket.ErrorBypass = True
     Dim sRet As String = wsSocket.UploadString(sURI, "POST", sSend)
     If ClosingTime Then Return
     EX_Login_Response(sRet, wsSocket.ResponseURI, TryCount)
@@ -570,7 +569,6 @@
           Return
         End If
         MakeSocket()
-        wsSocket.ErrorBypass = False
         Dim sRedirURI As String = Nothing
         sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
         sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
@@ -677,6 +675,9 @@
         ElseIf sURL.StartsWith("/") Then
           sURL = "https://" & ResponseURI.Host & sURL
         End If
+      ElseIf Response.Contains("We are down for maintenance.") Then
+        RaiseError("Authentication Failed. If you get this error, please let me know immediately!")
+        Return
       Else
         sURL = "https://" & ResponseURI.Host & "/dashboard"
       End If
@@ -746,7 +747,7 @@
     ElseIf Response.Contains("maintenance") Then
       RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
     ElseIf Response.Contains("window.location.href") Then
-      RaiseError("Dashboard Load Failed: Sent back to login page. Please try again.")
+      RaiseError("Dashboard Load Failed: Sent back to login page.")
     Else
       RaiseError("Dashboard Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
@@ -1334,15 +1335,17 @@
 #End Region
 #Region "Useful Functions"
   Private Sub MakeSocket()
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     If wsSocket IsNot Nothing Then
-      If wsSocket.isBusy Then wsSocket.Cancel()
+      oldEncoding = wsSocket.Encoding
+      If wsSocket.IsBusy Then wsSocket.Cancel()
       wsSocket = Nothing
     End If
     wsSocket = New WebClientEx(sDataPath)
     wsSocket.Timeout = c_Timeout
     wsSocket.Proxy = c_Proxy
     wsSocket.CookieJar = c_Jar
-    wsSocket.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    wsSocket.Encoding = oldEncoding
   End Sub
   Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
     If String.IsNullOrEmpty(response) Then

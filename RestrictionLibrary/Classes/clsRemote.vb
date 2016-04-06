@@ -324,7 +324,9 @@ Public Class remoteRestrictionTracker
   End Sub
 
   Private Sub MakeSocket()
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     If wsSocket IsNot Nothing Then
+      oldEncoding = wsSocket.Encoding
       If wsSocket.IsBusy Then wsSocket.Cancel()
       wsSocket = Nothing
     End If
@@ -332,6 +334,7 @@ Public Class remoteRestrictionTracker
     wsSocket.Timeout = c_Timeout
     wsSocket.Proxy = c_Proxy
     wsSocket.CookieJar = c_Jar
+    wsSocket.Encoding = oldEncoding
   End Sub
   Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
     If String.IsNullOrEmpty(response) Then
