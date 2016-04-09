@@ -330,6 +330,7 @@
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
     MakeSocket()
+    wsSocket.ManualRedirect = False
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
@@ -1000,6 +1001,7 @@
   End Sub
   Private Sub DN_Login_FirstBook(sURI As String)
     MakeSocket()
+    wsSocket.ManualRedirect = False
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
     Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
@@ -1031,6 +1033,7 @@
   End Sub
   Private Sub DN_Login_Authenticate(sURI As String)
     MakeSocket()
+    wsSocket.ManualRedirect = False
     Dim sSend As String = "username=" & PercentEncode(sUsername) &
                           "&password=" & PercentEncode(sPassword) &
                           "&login_type=username,password" &
@@ -1073,6 +1076,7 @@
           sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
         End If
         MakeSocket()
+        wsSocket.ManualRedirect = False
         BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
         Dim sRet As String = wsSocket.DownloadString(sURL)
         If ClosingTime Then Return
@@ -1103,6 +1107,7 @@
   End Sub
   Private Sub DN_Login_LastBook(sURI As String)
     MakeSocket()
+    wsSocket.ManualRedirect = False
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
     Dim sRet As String = wsSocket.DownloadString(sURI)
     If ClosingTime Then Return
@@ -1140,6 +1145,7 @@
   End Sub
   Private Sub DN_Login_Verify(SAMLResponse As String)
     MakeSocket()
+    wsSocket.ManualRedirect = False
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
@@ -1165,6 +1171,7 @@
   End Sub
   Private Sub DN_Download_Home()
     MakeSocket()
+    wsSocket.ManualRedirect = False
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
@@ -1196,6 +1203,7 @@
   End Sub
   Private Sub DN_Download_Table()
     MakeSocket()
+    wsSocket.ManualRedirect = False
     Dim uriString As String = "https://my.dish.com/customercare/broadband/prepBroadBand.do"
     Dim sSend As String = "srt=second_try"
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
