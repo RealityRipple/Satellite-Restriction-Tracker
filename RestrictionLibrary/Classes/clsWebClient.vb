@@ -233,6 +233,15 @@ Public Class WebClientEx
       c_ErrorBypass = value
     End Set
   End Property
+  Private c_ManualRedirect As Boolean
+  Public Property ManualRedirect As Boolean
+    Get
+      Return c_ManualRedirect
+    End Get
+    Set(value As Boolean)
+      c_ManualRedirect = value
+    End Set
+  End Property
   Private c_SendHeaders As Net.WebHeaderCollection
   Public Property SendHeaders As Net.WebHeaderCollection
     Get
@@ -258,6 +267,8 @@ Public Class WebClientEx
     c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     sDataPath = DataPath
     c_Busy = False
+    c_ErrorBypass = True
+    c_ManualRedirect = True
     ClosingTime = False
   End Sub
   Public Sub New()
@@ -268,6 +279,8 @@ Public Class WebClientEx
     c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
     sDataPath = Nothing
     c_Busy = False
+    c_ErrorBypass = True
+    c_ManualRedirect = True
     ClosingTime = False
   End Sub
   Public Delegate Sub WebClientCallback(asyncState As Object, response As String)
@@ -303,6 +316,7 @@ Public Class WebClientEx
         wsDownload.CookieJar = c_Jar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
+        wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
@@ -396,6 +410,7 @@ Public Class WebClientEx
         wsDownload.CookieJar = c_Jar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
+        wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
@@ -470,6 +485,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
@@ -589,6 +605,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
@@ -664,6 +681,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
@@ -784,6 +802,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
