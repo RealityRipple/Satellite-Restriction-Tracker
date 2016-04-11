@@ -44,6 +44,15 @@ Public Class frmMain
   Private wb_down, wb_up, wb_dlim, wb_ulim As Long
   Private r_used, r_lim As Long
   Private lastBalloon As Long
+  Private c_PauseActivity As String
+  Public Property PauseActivity As String
+    Get
+      Return c_PauseActivity
+    End Get
+    Set(value As String)
+      c_PauseActivity = value
+    End Set
+  End Property
 #Region "Server Type Determination"
   Private Class DetermineTypeOffline
     Public Delegate Sub TypeDeterminedOfflineCallback(HostType As SatHostTypes)
@@ -715,6 +724,7 @@ Public Class frmMain
             If Math.Abs(DateDiff(DateInterval.Minute, LOG_GetLast, Now)) >= 10 Then
               If Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then
                 NextGrabTick = Long.MaxValue
+                PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
                 SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
                 Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
@@ -773,7 +783,7 @@ Public Class frmMain
           localData = Nothing
         End If
         Application.DoEvents()
-        SetStatusText(LOG_GetLast.ToString("g"), "Restarting Connection...", False)
+        SetStatusText(LOG_GetLast.ToString("g"), "Restarting Connection in 5 Seconds...", False)
         DisplayUsage(False, False)
         NextGrabTick = TickCount() + 5000
       End If
@@ -1609,6 +1619,7 @@ Public Class frmMain
     End If
     mySettings.Save()
     NextGrabTick = Long.MaxValue
+    PauseActivity = "Configuration Open"
     Dim dRet As DialogResult
     Using dlgConfig As New frmConfig
       dRet = dlgConfig.ShowDialog(Me)
@@ -2258,7 +2269,7 @@ Public Class frmMain
     Dim lNext As Long = NextGrabTick
     Dim lNow As Long = TickCount()
     If lNext = Long.MaxValue Then
-      ttUI.SetToolTip(lblStatus, "Update Temporarily Paused")
+      ttUI.SetToolTip(lblStatus, "Update Temporarily Paused - " & PauseActivity)
     ElseIf lNext = Long.MinValue Then
       ttUI.SetToolTip(lblStatus, "Next Update is Being Calculated")
     Else
