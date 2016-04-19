@@ -1009,10 +1009,7 @@
     DN_Login_FirstBook_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
-    If ResponseURI Is Nothing Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
-      Return
-    End If
+    If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1155,10 +1152,7 @@
     DN_Login_Verify_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
-    If ResponseURI Is Nothing Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
-      Return
-    End If
+    If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1181,10 +1175,7 @@
     DN_Download_Home_Response(sRet, wsSocket.ResponseURI)
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
-    If ResponseURI Is Nothing Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
-      Return
-    End If
+    If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
@@ -1371,14 +1362,20 @@
     wsSocket.CookieJar = c_Jar
     wsSocket.Encoding = oldEncoding
   End Sub
-  Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
-    If String.IsNullOrEmpty(response) Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
-      Return True
+  Private Function CheckForErrors(response As String, responseURI As Uri, Optional IgnoreResponseData As Boolean = False) As Boolean
+    If IgnoreResponseData Then
+      If String.IsNullOrEmpty(response) Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
+        Return True
+      End If
+      If response.StartsWith("Error: ") Then
+        Dim sError As String = response.Substring(7)
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sError))
+        Return True
+      End If
     End If
-    If response.StartsWith("Error: ") Then
-      Dim sError As String = response.Substring(7)
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sError))
+    If response = "Connection timed out." Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
       Return True
     End If
     If responseURI Is Nothing Then
