@@ -856,7 +856,7 @@ Public Class frmMain
       Me.Invoke(New EventHandler(AddressOf localData_ConnectionStatus), sender, e)
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Timeout * 1000)
+    NextGrabTick = TickCount() + ((mySettings.Timeout + 15) * 1000)
     Select Case e.Status
       Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection...", False)
       Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In...", False)
@@ -894,7 +894,6 @@ Public Class frmMain
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.LoginIssue
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
-        Exit Sub
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
         SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
         DisplayUsage(False, False)
