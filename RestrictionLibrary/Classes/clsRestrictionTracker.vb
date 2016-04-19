@@ -750,6 +750,8 @@
       RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
     ElseIf Response.Contains("window.location.href") Then
       RaiseError("Dashboard Load Failed: Sent back to login page.")
+    ElseIf Response.Contains("An internal server error occurred") Then
+      RaiseError("Dashboard Load Failed: Server Down for Maintenance (Internal Error).")
     Else
       RaiseError("Dashboard Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
