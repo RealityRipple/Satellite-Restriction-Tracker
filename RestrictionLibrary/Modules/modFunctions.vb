@@ -192,6 +192,8 @@ Module modFunctions
           Return "Error writing to logging service error log."
         ElseIf ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
           Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("Thread was being aborted") Then
+          Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("There were not enough free threads in the ThreadPool to complete the operation") Then
           Return "Too many threads running. Check your network activity or restart your computer."
         ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
@@ -208,6 +210,17 @@ Module modFunctions
             End If
           Else
             Return "Decryption failure, but no details are available."
+          End If
+        ElseIf ex.InnerException.Message.StartsWith("The read operation failed, see inner exception") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("Thread was being aborted") Then
+              Return "Connection aborted."
+            Else
+              If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
+              Return "Read failure - " & ex.InnerException.InnerException.Message
+            End If
+          Else
+            Return "Read failure, but no details are available."
           End If
         ElseIf ex.InnerException.Message.StartsWith("EndRead failure") Then
           If ex.InnerException.InnerException IsNot Nothing Then
