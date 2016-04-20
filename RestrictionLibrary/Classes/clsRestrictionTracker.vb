@@ -717,6 +717,8 @@
           sURL = "https://" & ResponseURI.Host & sURL
         End If
         EX_Download_Homepage(sURL)
+      ElseIf Response.Contains("maintenance") Then
+        RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
       Else
         RaiseError("Dashboard Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
       End If
