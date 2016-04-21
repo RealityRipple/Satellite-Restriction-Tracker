@@ -702,7 +702,7 @@
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
-      RaiseError("Dashboard Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("AJAX Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" Then
@@ -718,9 +718,9 @@
         End If
         EX_Download_Homepage(sURL)
       ElseIf Response.Contains("maintenance") Then
-        RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
+        RaiseError("AJAX Load Failed: Server Down for Maintenance.")
       Else
-        RaiseError("Dashboard Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+        RaiseError("AJAX Load Failed: Could not understand response.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
       End If
       Return
     End If
@@ -745,17 +745,17 @@
       sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
       EX_Download_Ajax("https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard", AjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
     ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my.exede.net/atlasPlanInvalid") Then
-      RaiseError("Dashboard Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
+      RaiseError("AJAX Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
     ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
-      RaiseError("Dashboard Load Failed: Too many requests. Check for usage data less often.")
+      RaiseError("AJAX Load Failed: Too many requests. Check for usage data less often.")
     ElseIf Response.Contains("maintenance") Then
-      RaiseError("Dashboard Load Failed: Server Down for Maintenance.")
+      RaiseError("AJAX Load Failed: Server Down for Maintenance.")
     ElseIf Response.Contains("window.location.href") Then
-      RaiseError("Dashboard Load Failed: Sent back to login page.")
-    ElseIf Response.Contains("An internal server error occurred") Then
-      RaiseError("Dashboard Load Failed: Server Down for Maintenance (Internal Error).")
+      RaiseError("AJAX Load Failed: Sent back to login page.")
+    ElseIf Response.Contains("An internal server error occurred") Or Response.Contains("Something went wrong.") Then
+      RaiseError("AJAX Load Failed: Server Error - Exede may be having trouble.")
     Else
-      RaiseError("Dashboard Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response Error", ResponseURI.OriginalString & vbNewLine & Response)
     End If
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
