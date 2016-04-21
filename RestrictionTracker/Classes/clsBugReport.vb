@@ -31,12 +31,16 @@
     Urgent = 50
     Immediate = 60
   End Enum
+  Private Shared cJar As Net.CookieContainer
   Private Shared Function GetToken(Project_ID As Integer) As String
     Dim pD1 As New Collections.Specialized.NameValueCollection
     pD1.Add("ref", "bug_report_page.php")
     pD1.Add("project_id", Project_ID.ToString.Trim)
     pD1.Add("make_default", Nothing)
     Dim httpToken As New WebClientEx
+    cJar = New Net.CookieContainer
+    httpToken.CookieJar = cJar
+    httpToken.SendHeaders = New Net.WebHeaderCollection
     httpToken.SendHeaders.Add(Net.HttpRequestHeader.Referer, "http://bugs.realityripple.com/login_select_proj_page.php?bug_report_page.php")
     Dim sTok As String = httpToken.UploadValues("http://bugs.realityripple.com/set_project.php", "POST", pD1)
     If sTok.StartsWith("Error: ") Then Return Nothing
@@ -68,6 +72,7 @@
     pData.Add("report_stay", Nothing)
     Dim sRet As String
     Dim httpReport As New WebClientEx
+    httpReport.CookieJar = cJar
     sRet = httpReport.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
     If sRet.StartsWith("Error: ") Then Return "Failed to Send Report - " & sRet.Substring(7)
     If sRet.Contains("Operation successful.") Then
@@ -79,31 +84,11 @@
     End If
   End Function
   Friend Shared Function ReportIssue(e As Exception) As String
-    Dim sTok As String = GetToken(1)
+    Dim sTok As String = GetToken(2)
     If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
     Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
-    Dim sSum As String = e.Message
+    Dim sSum As String = "[v" & Application.ProductVersion & "] " & e.Message
     If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."
-    Dim sDesc As String = e.Message
-    If Not String.IsNullOrEmpty(e.StackTrace) Then
-      sDesc &= vbNewLine & e.StackTrace
-    Else
-      If Not String.IsNullOrEmpty(e.Source) Then
-        sDesc &= vbNewLine & " @ " & e.Source
-        If e.TargetSite IsNot Nothing Then sDesc &= "." & e.TargetSite.Name
-      Else
-        If e.TargetSite IsNot Nothing Then sDesc &= vbNewLine & " @ " & e.TargetSite.Name
-      End If
-    End If
-    sDesc &= vbNewLine & "Version " & Application.ProductVersion
-    Dim sSteps As String = Nothing
-    Dim sInfo As String = Nothing
-    If e.InnerException IsNot Nothing Then
-      sInfo = e.InnerException.Message
-      If e.InnerException.TargetSite IsNot Nothing Then sInfo &= vbNewLine & "Trace - " & e.InnerException.TargetSite.Name
-      If Not String.IsNullOrEmpty(e.InnerException.Source) Then sInfo &= " > " & e.InnerException.Source
-      If Not String.IsNullOrEmpty(e.InnerException.StackTrace) Then sInfo &= vbNewLine & e.InnerException.StackTrace
-    End If
-    Return ReportBug(sTok, 2, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sSum, sDesc, sSteps, sInfo, True)
+    Return ReportBug(sTok, 2, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sSum, e.ToString, String.Empty, String.Empty, True)
   End Function
 End Class
