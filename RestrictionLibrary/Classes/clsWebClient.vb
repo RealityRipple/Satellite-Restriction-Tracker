@@ -318,7 +318,7 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key As String In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -412,7 +412,7 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key As String In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -683,7 +683,7 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key As String In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
