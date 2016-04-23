@@ -136,7 +136,7 @@
       Dim sTitle As String = lstStyles.SelectedItem
       If index = 0 Then
         Beep()
-      ElseIf MsgDlg(Me, "Do you want to remove the """ & sTitle & """ style?", "Are you sure?", "Remove Alert Window Style?", MessageBoxButtons.YesNo, TaskDialogIcon.Personalize, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
+      ElseIf MsgDlg(Me, "Do you want to remove the """ & sTitle & """ style?", "Are you sure?", "Remove Alert Window Style?", MessageBoxButtons.YesNo, _TaskDialogIcon.Personalize, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
         'ElseIf MessageBox.Show("Do you want to remove the """ & sTitle & """ Alert Window Style?", My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
         If IO.File.Exists(AppDataPath & sTitle & ".tar.gz") Then
           lstStyles.SelectedIndex = 0
@@ -151,7 +151,7 @@
           IO.File.Delete(AppDataPath & sTitle & ".tar")
           lstStyles.Items.RemoveAt(index)
         Else
-          MsgDlg(Me, "The """ & sTitle & """ Alert Window style could not be found. The file may already be removed.", "Unable to find Alert Window style.", "Style not Found", MessageBoxButtons.OK, TaskDialogIcon.Preferences, MessageBoxIcon.Warning)
+          MsgDlg(Me, "The """ & sTitle & """ Alert Window style could not be found. The file may already be removed.", "Unable to find Alert Window style.", "Style not Found", MessageBoxButtons.OK, _TaskDialogIcon.Preferences, MessageBoxIcon.Warning)
           'MessageBox.Show("No file by that name was found! Alert Window Style may already be removed.", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
           lstStyles.SelectedIndex = 0
           lstStyles.Items.RemoveAt(index)

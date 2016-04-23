@@ -260,7 +260,7 @@
           Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
       ElseIf cmdSave.Enabled Then
-        Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your configuration?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+        Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your configuration?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, _TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
         If saveRet = Windows.Forms.DialogResult.Yes Then
           cmdSave.PerformClick()
           If bAccount Then
@@ -913,19 +913,19 @@
       If My.Computer.FileSystem.DirectoryExists(AppDataAllPath) Then
         Process.Start(AppDataAllPath)
       Else
-        MsgDlg(Me, "The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        MsgDlg(Me, "The directory """ & AppDataAllPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, _TaskDialogIcon.Recent, MessageBoxIcon.Error)
       End If
     ElseIf optHistoryAppData.Checked Then
       If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
         Process.Start(AppDataPath)
       Else
-        MsgDlg(Me, "The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        MsgDlg(Me, "The directory """ & AppDataPath & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, _TaskDialogIcon.Recent, MessageBoxIcon.Error)
       End If
     Else
       If My.Computer.FileSystem.DirectoryExists(txtHistoryDir.Text) Then
         Process.Start(txtHistoryDir.Text)
       Else
-        MsgDlg(Me, "The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, TaskDialogIcon.Recent, MessageBoxIcon.Error)
+        MsgDlg(Me, "The directory """ & txtHistoryDir.Text & """ does not exist." & vbNewLine & "Please save the configuration first.", "Unable to find History directory.", "Missing Directory", MessageBoxButtons.OK, _TaskDialogIcon.Recent, MessageBoxIcon.Error)
       End If
     End If
   End Sub
@@ -968,10 +968,10 @@
           file.CopyTo(sPath & "Config\" & file.Name, True)
         Next
       End If
-      MsgDlg(Me, My.Application.Info.ProductName & " has been ported to """ & sPath & """!", "Portable application created.", "Files Copied", MessageBoxButtons.OK, TaskDialogIcon.RemovableDrive, MessageBoxIcon.Information)
+      MsgDlg(Me, My.Application.Info.ProductName & " has been ported to """ & sPath & """!", "Portable application created.", "Files Copied", MessageBoxButtons.OK, _TaskDialogIcon.RemovableDrive, MessageBoxIcon.Information)
     Catch ex As Exception
       txtPortableDir.Focus()
-      MsgDlg(Me, "There was an error trying to create a portable install in """ & sPath & """!", "Portable application creation error.", "Drive Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLockedRemovable, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Me, "There was an error trying to create a portable install in """ & sPath & """!", "Portable application creation error.", "Drive Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLockedRemovable, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       Exit Sub
     End Try
   End Sub
@@ -999,17 +999,17 @@
   End Sub
   Private Sub cmdSave_Click(sender As System.Object, e As System.EventArgs) Handles cmdSave.Click
     If String.IsNullOrEmpty(txtAccount.Text) Then
-      MsgDlg(Me, "You must enter your ViaSat account Username before saving the Configuration.", "Please enter your Username.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Information)
+      MsgDlg(Me, "You must enter your ViaSat account Username before saving the Configuration.", "Please enter your Username.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Information)
       txtAccount.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
-      MsgDlg(Me, "You must enter your ViaSat account Password before saving the Configuration.", "Please enter your Password.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.Padlock, MessageBoxIcon.Information)
+      MsgDlg(Me, "You must enter your ViaSat account Password before saving the Configuration.", "Please enter your Password.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
       txtPassword.Focus()
       Exit Sub
     End If
     If String.IsNullOrEmpty(cmbProvider.Text) Then
-      MsgDlg(Me, "Please enter your ViaSat Provider domain or select one from the list before saving the Configuration.", "Please select your Provider.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.Internet, MessageBoxIcon.Information)
+      MsgDlg(Me, "Please enter your ViaSat Provider domain or select one from the list before saving the Configuration.", "Please select your Provider.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Internet, MessageBoxIcon.Information)
       cmbProvider.Focus()
       Exit Sub
     End If
@@ -1032,7 +1032,7 @@
             sC = "Tab"
             sHD = Replace(sHD, c, "[Tab]")
         End Select
-        MsgDlg(Me, "The directory you have entered contains invalid characters. You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , "Directory: """ & sHD & """" & vbNewLine & "Invalid Character: " & sC & " (0x" & PadHex(AscW(c)) & ")", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Directory Details", "Hide Directory Details")
+        MsgDlg(Me, "The directory you have entered contains invalid characters. You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , "Directory: """ & sHD & """" & vbNewLine & "Invalid Character: " & sC & " (0x" & PadHex(AscW(c)) & ")", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Directory Details", "Hide Directory Details")
         txtHistoryDir.Focus()
         Exit Sub
       End If
@@ -1118,7 +1118,7 @@
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
       Case 2
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
+          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -1133,7 +1133,7 @@
         End If
       Case 3
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
-          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
+          MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
           txtProxyAddress.Focus()
           Exit Sub
         End If
@@ -1198,7 +1198,7 @@
         Try
           My.Computer.FileSystem.CreateDirectory(txtHistoryDir.Text)
         Catch ex As Exception
-          MsgDlg(Me, "The directory you selected could not be created! You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+          MsgDlg(Me, "The directory you selected could not be created! You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
           optHistoryCustom.Checked = True
           txtHistoryDir.Enabled = True
           txtHistoryDir.Focus()
@@ -1241,7 +1241,7 @@
             Next
           Next
           If sOverWrites.Count > 0 Then
-            If MsgDlg(Me, "Do you want to overwrite the files that already exist in the new Data Directory?", "Files exist in the new directory.", "Overwrite Files?", MessageBoxButtons.YesNo, TaskDialogIcon.FolderFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, "The following files will be overwritten:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files") = Windows.Forms.DialogResult.Yes Then
+            If MsgDlg(Me, "Do you want to overwrite the files that already exist in the new Data Directory?", "Files exist in the new directory.", "Overwrite Files?", MessageBoxButtons.YesNo, _TaskDialogIcon.FolderFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2, "The following files will be overwritten:" & vbNewLine & Join(sOverWrites.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files") = Windows.Forms.DialogResult.Yes Then
               Dim sFails As New Collections.Generic.List(Of String)
               Dim sNoMove As New Collections.Generic.List(Of String)
               For Each sFile In sOldFiles
@@ -1269,10 +1269,10 @@
                 If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
               If sFails.Count > 0 Then
-                MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
               End If
               If sNoMove.Count > 0 Then
-                MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+                MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
               End If
             Else
               Dim sFails As New Collections.Generic.List(Of String)
@@ -1302,8 +1302,8 @@
                 End Try
                 If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
               Next
-              If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
-              If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+              If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+              If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
             End If
           Else
             Dim sFails As New Collections.Generic.List(Of String)
@@ -1332,8 +1332,8 @@
               End Try
               If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
             Next
-            If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
-            If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+            If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+            If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
           End If
         Else
           Dim sFails As New Collections.Generic.List(Of String)
@@ -1362,8 +1362,8 @@
             End Try
             If txtHistoryDir.Text = AppDataAllPath Then If Not GrantFullControlToEveryone(sNewFile) Then sFails.Add(sNewFile)
           Next
-          If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
-          If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+          If sFails.Count > 0 Then MsgDlg(Me, "The permissions on some failed to set. Please run " & My.Application.Info.ProductName & " as Administrator to enable full permission control.", "Failed to set permissions.", "Permission Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldUAC, MessageBoxIcon.Error, , "The following files did not receive full permissions:" & vbNewLine & Join(sFails.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
+          If sNoMove.Count > 0 Then MsgDlg(Me, "Some files could not be moved to the new Data Directory.", "Failed to move files.", "File Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLocked, MessageBoxIcon.Error, , "The following files could not be moved:" & vbNewLine & Join(sNoMove.ToArray, vbNewLine), _TaskDialogExpandedDetailsLocation.ExpandContent, "View Files", "Hide Files")
         End If
       End If
       mySettings.HistoryDir = txtHistoryDir.Text

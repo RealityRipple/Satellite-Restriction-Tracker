@@ -11,9 +11,9 @@
       Dim appRet As TriState = CopyDirectory(AppDataWB, AppDataSRT)
       Select Case appRet
         Case TriState.True
-          If MsgDlg(Nothing, My.Application.Info.ProductName & " has copied all old Application data." & vbNewLine & "Would you like to delete the old directory?", "The data was copied successfully.", "Application Data Copied", MessageBoxButtons.YesNo, TaskDialogIcon.TrashFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then My.Computer.FileSystem.DeleteDirectory(AppDataWB, FileIO.DeleteDirectoryOption.DeleteAllContents)
+          If MsgDlg(Nothing, My.Application.Info.ProductName & " has copied all old Application data." & vbNewLine & "Would you like to delete the old directory?", "The data was copied successfully.", "Application Data Copied", MessageBoxButtons.YesNo, _TaskDialogIcon.TrashFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then My.Computer.FileSystem.DeleteDirectory(AppDataWB, FileIO.DeleteDirectoryOption.DeleteAllContents)
         Case TriState.False
-          If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to copy the old Application data." & vbNewLine & "You may copy the data over manually.", "There was a failure copying the data.", "Application Data Copy Failed", MessageBoxButtons.OKCancel, TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
+          If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to copy the old Application data." & vbNewLine & "You may copy the data over manually.", "There was a failure copying the data.", "Application Data Copy Failed", MessageBoxButtons.OKCancel, _TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
             Try
               Process.Start("explorer", "/select,""" & AppDataWB & """")
             Catch ex As Exception
@@ -38,9 +38,9 @@
           Dim histRet As TriState = CopyDirectory(oldHistoryDir, cSettings.HistoryDir)
           Select Case histRet
             Case TriState.True
-              If MsgDlg(Nothing, My.Application.Info.ProductName & " has copied all History data." & vbNewLine & "Would you like to delete the old directory?", "The data was copied successfully.", "History Data Copied", MessageBoxButtons.YesNo, TaskDialogIcon.TrashFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then My.Computer.FileSystem.DeleteDirectory(oldHistoryDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
+              If MsgDlg(Nothing, My.Application.Info.ProductName & " has copied all History data." & vbNewLine & "Would you like to delete the old directory?", "The data was copied successfully.", "History Data Copied", MessageBoxButtons.YesNo, _TaskDialogIcon.TrashFull, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then My.Computer.FileSystem.DeleteDirectory(oldHistoryDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
             Case TriState.False
-              If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to copy the old History data." & vbNewLine & "You may copy the data over manually.", "There was a failure copying the data..", "History Data Copy Failed", MessageBoxButtons.OKCancel, TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
+              If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to copy the old History data." & vbNewLine & "You may copy the data over manually.", "There was a failure copying the data..", "History Data Copy Failed", MessageBoxButtons.OKCancel, _TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1) = DialogResult.OK Then
                 Try
                   Process.Start("explorer", "/select,""" & oldHistoryDir & """")
                 Catch ex As Exception
@@ -95,18 +95,18 @@
       End If
       Dim OldDir As String = My.Computer.FileSystem.SpecialDirectories.ProgramFiles & "\" & Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
       If My.Computer.FileSystem.DirectoryExists(OldDir) Then
-        If MsgDlg(Nothing, "Would you like to remove the defunct WildBlue Bandwidth Monitor from your computer?" & vbNewLine & "Your settings will be saved for use in the new Satellite Restriction Tracker.", "WildBlue Bandwith Monitor has been rebranded.", "Uninstall WildBlue Bandwidth Monitor?", MessageBoxButtons.YesNo, TaskDialogIcon.DefaultPrograms, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
+        If MsgDlg(Nothing, "Would you like to remove the defunct WildBlue Bandwidth Monitor from your computer?" & vbNewLine & "Your settings will be saved for use in the new Satellite Restriction Tracker.", "WildBlue Bandwith Monitor has been rebranded.", "Uninstall WildBlue Bandwidth Monitor?", MessageBoxButtons.YesNo, _TaskDialogIcon.DefaultPrograms, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
           If My.Computer.FileSystem.FileExists(OldDir & "\unins000.exe") Then
             Try
               ShellEx(OldDir & "\unins000.exe", "/silent")
             Catch ex As Exception
-              MsgDlg(Nothing, "Unable to run WildBlue Bandwidth Monitor uninstaller. Please uninstall the program manually through Start or the <a href=""control appwiz.cpl"">Control Panel</a>.", "The Uninstaller failed to run.", "Uninstall Failed", MessageBoxButtons.OK, TaskDialogIcon.ControlPanel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+              MsgDlg(Nothing, "Unable to run WildBlue Bandwidth Monitor uninstaller. Please uninstall the program manually through Start or the <a href=""control appwiz.cpl"">Control Panel</a>.", "The Uninstaller failed to run.", "Uninstall Failed", MessageBoxButtons.OK, _TaskDialogIcon.ControlPanel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
             End Try
           Else
             Try
               My.Computer.FileSystem.DeleteDirectory(OldDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
             Catch ex As Exception
-              If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to delete the old WildBlue Bandwidth Monitor directory." & vbNewLine & "You may delete the folder manually.", "Directory could not be deleted.", "Uninstall Failed", MessageBoxButtons.OKCancel, TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details") = DialogResult.OK Then
+              If MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to delete the old WildBlue Bandwidth Monitor directory." & vbNewLine & "You may delete the folder manually.", "Directory could not be deleted.", "Uninstall Failed", MessageBoxButtons.OKCancel, _TaskDialogIcon.FolderFull, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details") = DialogResult.OK Then
                 Try
                   Process.Start("explorer", "/select,""" & OldDir & """")
                 Catch ex2 As Exception
@@ -137,7 +137,7 @@
     Private Sub MyApplication_UnhandledException(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
       Try
         If e.Exception.Message.Contains("Could not load file or assembly") Then
-          MsgDlg(Nothing, "A critical file is missing. Please ensure " & My.Application.Info.ProductName & " has been fully extracted or installed.", "This program is missing a required file.", "Could not load File or Assembly.", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, e.Exception.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+          MsgDlg(Nothing, "A critical file is missing. Please ensure " & My.Application.Info.ProductName & " has been fully extracted or installed.", "This program is missing a required file.", "Could not load File or Assembly.", MessageBoxButtons.OK, _TaskDialogIcon.DLL, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, e.Exception.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
           e.ExitApplication = True
         Else
           Dim frmError As New Form With
@@ -295,7 +295,7 @@
               e.ExitApplication = False
               Dim sRet As String = MantisReporter.ReportIssue(e.Exception)
               If sRet = "OK" Then
-                MsgDlg(Nothing, "Thank you for reporting the error." & vbNewLine & vbNewLine & "<a href=""http://bugs.realityripple.com/set_project.php?project_id=2"">View Details about the Error</a>", "The error has been reported.", "Error Report Sent!", MessageBoxButtons.OK, TaskDialogIcon.MoveToNetwork, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, , , , , True)
+                MsgDlg(Nothing, "Thank you for reporting the error." & vbNewLine & vbNewLine & "<a href=""http://bugs.realityripple.com/set_project.php?project_id=2"">View Details about the Error</a>", "The error has been reported.", "Error Report Sent!", MessageBoxButtons.OK, _TaskDialogIcon.MoveToNetwork, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, , , , , True)
               Else
                 Dim sErrRep As String = "http://bugs.realityripple.com/set_project.php?project_id=2&make_default=no&ref=bug_report_page.php"
                 sErrRep &= "?platform=" & IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
@@ -317,7 +317,7 @@
                 End If
                 sDesc &= vbNewLine & "Version " & Windows.Forms.Application.ProductVersion.Trim
                 sErrRep &= "%2526description=" & DoubleEncode(sDesc)
-                MsgDlg(Nothing, sRet & vbNewLine & vbNewLine & "<a href=""" & sErrRep & """>Report the Error Manually</a>", "The error could not be reported.", "Error Report Failed!", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , , , , , True)
+                MsgDlg(Nothing, sRet & vbNewLine & vbNewLine & "<a href=""" & sErrRep & """>Report the Error Manually</a>", "The error could not be reported.", "Error Report Failed!", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , , , , , True)
               End If
             Case DialogResult.Ignore : e.ExitApplication = False
             Case DialogResult.Abort : e.ExitApplication = True
@@ -325,7 +325,7 @@
           End Select
         End If
       Catch ex As Exception
-        MsgDlg(Nothing, "There was an error while handling another error.", "Error in Error Report system.", "Error Report Error", MessageBoxButtons.OK, TaskDialogIcon.Error, MessageBoxIcon.Error, , "Error: " & ex.Message & vbNewLine & vbNewLine & "Original Error: " & e.Exception.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        MsgDlg(Nothing, "There was an error while handling another error.", "Error in Error Report system.", "Error Report Error", MessageBoxButtons.OK, _TaskDialogIcon.Error, MessageBoxIcon.Error, , "Error: " & ex.Message & vbNewLine & vbNewLine & "Original Error: " & e.Exception.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     End Sub
     Private Function DoubleEncode(inString As String) As String

@@ -21,10 +21,10 @@ Class SvcSettings
       Try
         xConfig.Save(AppDataAll & "\user.config")
       Catch ex As Exception
-        MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & AppDataAll & "\user.config"" may be in use.", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & AppDataAll & "\user.config"" may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End If
   End Sub
   Public Sub New()
@@ -1144,10 +1144,10 @@ Class AppSettings
       Try
         xConfig.Save(ConfigFile)
       Catch ex As Exception
-        MsgDlg(Nothing, "There was an error saving the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+        MsgDlg(Nothing, "There was an error saving the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & ConfigFile & """ may be in use.", Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & ConfigFile & """ may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End If
   End Sub
   Private Function ColorToStr(c As Color) As String

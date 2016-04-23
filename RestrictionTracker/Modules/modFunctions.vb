@@ -414,12 +414,12 @@ Module modFunctions
 
       ElseIf ADDOK Then
         If Not OneAlert Then
-          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
+          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, _TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
           OneAlert = True
         End If
       Else
         If Not OneAlert Then
-          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
+          MsgDlg(Nothing, "Failed to set permissions for the directory """ & sTmp & """ and its parent." & vbNewLine & vbNewLine & "Please run " & My.Application.Info.ProductName & " as Administrator to correct this problem.", "Unable to set folder permissions", "Permissions Error", MessageBoxButtons.OK, _TaskDialogIcon.UserFolder, MessageBoxIcon.Error)
           OneAlert = True
         End If
       End If
@@ -1667,7 +1667,7 @@ Module modFunctions
   End Function
 #End Region
 #Region "Task Dialogs"
-  Public Enum TaskDialogIcon
+  Public Enum _TaskDialogIcon
     None = 0
     Space = &H1
     File = &H2
@@ -1888,7 +1888,19 @@ Module modFunctions
     Error2 = &HFFFE
     Warning2 = &HFFFF
   End Enum
-  Public Function MsgDlg(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As TaskDialogIcon = TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As TaskDialogExpandedDetailsLocation = TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
+  Public Enum _TaskDialogExpandedDetailsLocation
+    Hide
+    ExpandContent
+    ExpandFooter
+  End Enum
+  Public Function MsgDlg(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
+    Try
+      Return MsgDlgInternal(owner, Text, Title, Caption, Buttons, Icon, OldIcon, DefaultButton, Details, DetailsMode, ShowDetails, HideDetails, OldHelpLink)
+    Catch ex As Exception
+      Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+    End Try
+  End Function
+  Private Function MsgDlgInternal(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
     If TaskDialog.IsPlatformSupported Then
       Using dlgMessage As New TaskDialog
         dlgMessage.Cancelable = True
@@ -2089,21 +2101,19 @@ Module modFunctions
         If Text.EndsWith(vbNewLine & vbNewLine) Then Text = Text.Substring(0, Text.Length - 4)
       End If
       Content = Title & vbNewLine & vbNewLine & Text
-      End If
-      If Not String.IsNullOrEmpty(Details) Then
-        If String.IsNullOrEmpty(Content) Then
-          Content = Details
-        Else
-          Content &= vbNewLine & vbNewLine & Details
-        End If
-      End If
-      'Dim msgIcon As MessageBoxIcon = MessageBoxIcon.None
-      'msgIcon = Icon
-      If String.IsNullOrEmpty(Link) And String.IsNullOrEmpty(LinkText) Then
-        Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton)
+    End If
+    If Not String.IsNullOrEmpty(Details) Then
+      If String.IsNullOrEmpty(Content) Then
+        Content = Details
       Else
-        Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton, Nothing, Link, HelpNavigator.Index)
+        Content &= vbNewLine & vbNewLine & Details
       End If
+    End If
+    If String.IsNullOrEmpty(Link) And String.IsNullOrEmpty(LinkText) Then
+      Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton)
+    Else
+      Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton, Nothing, Link, HelpNavigator.Index)
+    End If
   End Function
   Private Function LinkSplitPath(Path As String, Optional Separator As String = "\") As String
     If Path.EndsWith(Separator) Then Path = Path.Substring(0, Path.Length - Separator.Length)

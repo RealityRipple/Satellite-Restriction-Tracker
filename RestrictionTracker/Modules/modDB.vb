@@ -106,8 +106,7 @@
       If InUseChecker(sFile, IO.FileAccess.Write) Then
         usageDB.Save(sFile, withDisplay)
       Else
-        MsgDlg(Nothing, "Your history file could not be saved because another program is using it!", "History could not be saved.", "File in Use", MessageBoxButtons.OK, TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-        'MessageBox.Show("Your history file could not be saved because another program is using it!", My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1)
+        MsgDlg(Nothing, "Your history file could not be saved because another program is using it!", "History could not be saved.", "File in Use", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
       End If
       isSaving = False
     End If

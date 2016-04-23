@@ -122,7 +122,7 @@ Public Class frmWizard
           If Not pnlKey.Tag = 1 Then
             tbsWizardPages.SelectedIndex = 2
             optRemote.Focus()
-            MsgDlg(Me, "Please verify your Remote Usage Service Product Key before continuing.", "Your Product Key has not been validated.", "Verify your Product Key", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
+            MsgDlg(Me, "Please verify your Remote Usage Service Product Key before continuing.", "Your Product Key has not been validated.", "Verify your Product Key", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Error)
             Me.DialogResult = Windows.Forms.DialogResult.None
           End If
         ElseIf optLocal.Checked Then
@@ -457,14 +457,14 @@ Public Class frmWizard
       tbsWizardPages.SelectedIndex = 1
       txtAccountUsername.Focus()
       DrawStatus(False)
-      MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+      MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Exit Sub
     End If
     If String.IsNullOrEmpty(cmbAccountHost.Text) Then
       tbsWizardPages.SelectedIndex = 1
       cmbAccountHost.Focus()
       DrawStatus(False)
-      MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
+      MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
       Exit Sub
     End If
     If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
@@ -505,10 +505,10 @@ Public Class frmWizard
     End If
     Select Case e.Type
       Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
-        MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Warning)
+        MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Warning)
       Case Else
         optNone.Checked = True
-        MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, TaskDialogIcon.Key, MessageBoxIcon.Error)
+        MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Error)
     End Select
     DrawStatus(False)
     pnlKey.Tag = 0
@@ -573,10 +573,10 @@ Public Class frmWizard
     If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
     AccountType = SatHostTypes.Other
     Select Case e.Type
-      Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+      Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+      Case ConnectionFailureEventArgs.FailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1
     End Select
     If localTest IsNot Nothing Then

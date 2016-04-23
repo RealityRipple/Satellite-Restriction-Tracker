@@ -758,7 +758,7 @@ Public Class frmMain
         End If
       End If
       cmdConfig.Focus()
-      MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Warning)
+      MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Warning)
     Else
       If cmdRefresh.Enabled Then
         cmdRefresh.Enabled = False
@@ -925,7 +925,7 @@ Public Class frmMain
           End If
         End If
         cmdConfig.Focus()
-        MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+        MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
         If mySettings.AccountTypeForced Then
           SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
@@ -1593,7 +1593,7 @@ Public Class frmMain
         End If
       End If
       cmdConfig.Focus()
-      MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, TaskDialogIcon.User, MessageBoxIcon.Error)
+      MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
     End If
   End Sub
   Private Sub cmdHistory_Click(sender As System.Object, e As System.EventArgs) Handles cmdHistory.Click
@@ -2129,7 +2129,7 @@ Public Class frmMain
           ShellEx(sEXEPath, UpdateParam)
           Application.Exit()
         Catch ex As Exception
-          MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, TaskDialogIcon.ShieldWarning, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+          MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Error, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
           SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
           NextGrabTick = Long.MinValue
         End Try
@@ -2324,12 +2324,12 @@ Public Class frmMain
           ControllerProps.WindowStyle = ProcessWindowStyle.Hidden
           Process.Start(ControllerProps)
         Else
-          MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not be found!" & vbNewLine & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & " with the ""Windows Service"" component selected.", "Service Controller not found.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error)
+          MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not be found!" & vbNewLine & vbNewLine & "Please reinstall " & My.Application.Info.ProductName & " with the ""Windows Service"" component selected.", "Service Controller not found.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Error)
           mySettings.Service = False
         End If
       End If
     Catch ex As Exception
-      MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not start!", "Service Controller failed to start.", "Logger Service Error", MessageBoxButtons.OK, TaskDialogIcon.Batch, MessageBoxIcon.Error, , ex.Message, Microsoft.WindowsAPICodePack.Dialogs.TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Me, "The Satellite Restriction Logger Service Controller could not start!", "Service Controller failed to start.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Error, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End Try
   End Sub
   Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
