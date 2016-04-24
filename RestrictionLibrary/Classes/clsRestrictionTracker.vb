@@ -1367,8 +1367,8 @@
     wsSocket.Encoding = oldEncoding
   End Sub
   Private Function CheckForErrors(response As String, responseURI As Uri, Optional IgnoreResponseData As Boolean = False) As Boolean
-    If IgnoreResponseData Then
-      If String.IsNullOrEmpty(response) Then
+    If Not IgnoreResponseData Then
+      If String.IsNullOrEmpty(response) OrElse response = "Error: Empty Response" Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
         Return True
       End If
