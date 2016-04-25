@@ -109,6 +109,8 @@ Module modFunctions
           If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Connection aborted - " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
         End If
+      ElseIf ex.Message = "Aborted." Then
+        Return "Connection aborted."
       ElseIf ex.Message.Contains("Exception of type 'System.OutOfMemoryException' was thrown") Then
         Return "Out of Memory exception. Check your local network."
       ElseIf ex.Message.Contains("The server committed a protocol violation") Then
@@ -429,20 +431,10 @@ Module modFunctions
     Dim ReportList As String = DataPath & "\sckerrs.log"
     If IO.File.Exists(ReportList) Then
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
-        My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, True)
-        If ex.InnerException IsNot Nothing Then
-          My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
-          If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
-        End If
-        My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
+        My.Computer.FileSystem.WriteAllText(ReportList, ex.ToString & vbNewLine & vbNewLine, True)
       End If
     Else
-      My.Computer.FileSystem.WriteAllText(ReportList, ex.Message & vbNewLine, False)
-      If ex.InnerException IsNot Nothing Then
-        My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.Message & vbNewLine, True)
-        If ex.InnerException.InnerException IsNot Nothing Then My.Computer.FileSystem.WriteAllText(ReportList, ex.InnerException.InnerException.Message & vbNewLine, True)
-      End If
-      My.Computer.FileSystem.WriteAllText(ReportList, vbNewLine, True)
+      My.Computer.FileSystem.WriteAllText(ReportList, ex.ToString & vbNewLine & vbNewLine, False)
     End If
     SendSocketErrors(DataPath)
   End Sub
@@ -451,22 +443,13 @@ Module modFunctions
     If IO.File.Exists(ReportList) Then
       Dim reports As New Collections.Generic.List(Of String)(Split(My.Computer.FileSystem.ReadAllText(ReportList), vbNewLine & vbNewLine))
       For I As Integer = reports.Count - 1 To 0 Step -1
-        Dim ReportBunch As String = reports(I)
-        If Not String.IsNullOrEmpty(ReportBunch) Then
-          Dim e, ie As String
-          If ReportBunch.Contains(vbNewLine) Then
-            e = Split(ReportBunch, vbNewLine, 2)(0)
-            ie = Split(ReportBunch, vbNewLine, 2)(1)
-            If ie.Contains(vbNewLine) Then ie = ie.Replace(vbNewLine, " - ")
-          Else
-            e = ReportBunch
-            ie = Nothing
-          End If
+        Dim err As String = reports(I)
+        If Not String.IsNullOrEmpty(err) Then
+          Dim e As String = err.Replace(vbNewLine, " - ")
           Try
             Dim sckUpload As New WebClientEx(DataPath)
             Dim params As New Collections.Specialized.NameValueCollection
             params.Add("e", e)
-            If Not String.IsNullOrEmpty(ie) Then params.Add("ie", ie)
             Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
             If sRet = "e exists" Or sRet = "e added" Then reports.RemoveAt(I)
           Catch
