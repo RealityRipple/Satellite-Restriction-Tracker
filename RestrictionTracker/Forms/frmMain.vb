@@ -2215,15 +2215,17 @@ Public Class frmMain
     End If
   End Sub
 #Region "Failure Reports"
-  Public Sub FailResponse(sRet As Boolean)
+  Public Sub FailResponse(sRet As String)
     If Me.InvokeRequired Then
       Me.Invoke(New ParamaterizedInvoker(AddressOf FailResponse), sRet)
       Return
     End If
     MakeNotifier(taskNotifier, False)
     If taskNotifier IsNot Nothing Then
-      If sRet Then
+      If sRet = "added" Then
         taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & My.Application.Info.ProductName & "!", 200, 15 * 1000, 100)
+      ElseIf sRet = "exists" Then
+        taskNotifier.Show("Error Already Reported", "This error has already been reported. It should be fixed in the next release." & vbNewLine & "Thank you anyway!", 200, 15 * 1000, 100)
       Else
         taskNotifier.Show("Error Reporting Error", My.Application.Info.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 1000, 100)
       End If

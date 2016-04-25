@@ -729,26 +729,26 @@ Module modFunctions
     oProc.StartInfo.UseShellExecute = False
     oProc.Start()
   End Sub
-  Public Delegate Sub FailResponseInvoker(sRet As Boolean)
+  Public Delegate Sub FailResponseInvoker(sRet As String)
   Public Sub SaveToFTP(oData As Object)
     Dim sData As String = oData(0)
     Dim callback As FailResponseInvoker = oData(1)
     Try
-      Dim sFailFile As String = "SRT-ReadFail-" & Now.ToString("G") & "-v" & Application.ProductVersion & ".txt"
-      sFailFile = Replace(sFailFile, "/", "-")
-      sFailFile = Replace(sFailFile, ":", "-")
-      Dim ftpSave As Net.FtpWebRequest = Net.FtpWebRequest.Create("ftp://realityripple.com/" & sFailFile)
-      ftpSave.Proxy = Nothing
-      ftpSave.Credentials = FTPCredentials 'Use [New Net.NetworkCredential("FTPUSER", "FTPPASS")] to upload failures to a FTP location.
-      ftpSave.Method = Net.WebRequestMethods.Ftp.UploadFile
-      Using ftpStream As IO.Stream = ftpSave.GetRequestStream
-        Dim bHTTP As Byte() = System.Text.Encoding.UTF8.GetBytes(sData)
-        ftpStream.Write(bHTTP, 0, bHTTP.Length)
-        ftpStream.Close()
-      End Using
-      callback.Invoke(True)
+      Dim bData As Byte() = System.Text.Encoding.UTF8.GetBytes(sData)
+      Dim sBase64Data As String = Convert.ToBase64String(bData, Base64FormattingOptions.None)
+      Dim sckUpload As New WebClientEx()
+      Dim params As New Collections.Specialized.NameValueCollection
+      params.Add("eFile", sBase64Data)
+      Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
+      If sRet = "e exists" Then
+        callback.Invoke("exists")
+      ElseIf sRet = "e added" Then
+        callback.Invoke("added")
+      Else
+        callback.Invoke("error")
+      End If
     Catch ex As Exception
-      callback.Invoke(False)
+      callback.Invoke("error")
     End Try
   End Sub
   Public Function PercentEncode(inString As String) As String
