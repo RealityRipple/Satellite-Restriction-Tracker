@@ -21,7 +21,7 @@
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Check for &Updates"
-    ttAbout.SetTooltip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
+    ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
   End Sub
   Private Sub frmAbout_FormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
     If tReset IsNot Nothing Then
@@ -37,7 +37,6 @@
         If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, UpdateParam)
       Catch ex As Exception
         MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-        'MessageBox.Show("There was an error starting the update. If you have User Account Control enabled, please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & vbNewLine & ex.Message, My.Application.Info.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1)
       End Try
     Else
       Try

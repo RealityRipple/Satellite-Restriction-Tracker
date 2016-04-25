@@ -27,15 +27,15 @@ Partial Class frmAbout
     Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAbout))
     Me.LogoPictureBox = New System.Windows.Forms.PictureBox()
     Me.pnlAbout = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblProduct = New RestrictionTracker.LinkLabel()
-    Me.lblVersion = New RestrictionTracker.LinkLabel()
-    Me.lblUpdate = New RestrictionTracker.LinkLabel()
-    Me.lblCompany = New RestrictionTracker.LinkLabel()
     Me.txtDescription = New System.Windows.Forms.TextBox()
     Me.cmdOK = New System.Windows.Forms.Button()
     Me.cmdDonate = New System.Windows.Forms.Button()
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.cmdUpdate = New System.Windows.Forms.Button()
+    Me.lblProduct = New RestrictionTracker.LinkLabel()
+    Me.lblVersion = New RestrictionTracker.LinkLabel()
+    Me.lblUpdate = New RestrictionTracker.LinkLabel()
+    Me.lblCompany = New RestrictionTracker.LinkLabel()
     Me.ttAbout = New RestrictionTracker.ToolTip(Me.components)
     CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAbout.SuspendLayout()
@@ -80,6 +80,64 @@ Partial Class frmAbout
     Me.pnlAbout.Size = New System.Drawing.Size(396, 250)
     Me.pnlAbout.TabIndex = 1
     '
+    'txtDescription
+    '
+    Me.pnlAbout.SetColumnSpan(Me.txtDescription, 2)
+    Me.txtDescription.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.txtDescription.Location = New System.Drawing.Point(136, 111)
+    Me.txtDescription.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
+    Me.txtDescription.Multiline = True
+    Me.txtDescription.Name = "txtDescription"
+    Me.txtDescription.ReadOnly = True
+    Me.txtDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both
+    Me.txtDescription.Size = New System.Drawing.Size(257, 103)
+    Me.txtDescription.TabIndex = 6
+    Me.txtDescription.TabStop = False
+    Me.txtDescription.Text = resources.GetString("txtDescription.Text")
+    '
+    'cmdOK
+    '
+    Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.cmdOK.AutoSize = True
+    Me.cmdOK.DialogResult = System.Windows.Forms.DialogResult.Cancel
+    Me.cmdOK.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.cmdOK.Location = New System.Drawing.Point(318, 222)
+    Me.cmdOK.Name = "cmdOK"
+    Me.cmdOK.Size = New System.Drawing.Size(75, 25)
+    Me.cmdOK.TabIndex = 0
+    Me.cmdOK.Text = "OK"
+    Me.ttAbout.SetToolTip(Me.cmdOK, "Close.")
+    '
+    'cmdDonate
+    '
+    Me.cmdDonate.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.cmdDonate.AutoSize = True
+    Me.cmdDonate.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.cmdDonate.Location = New System.Drawing.Point(167, 221)
+    Me.cmdDonate.Name = "cmdDonate"
+    Me.cmdDonate.Size = New System.Drawing.Size(110, 25)
+    Me.cmdDonate.TabIndex = 1
+    Me.cmdDonate.Text = "Make a &Donation"
+    Me.ttAbout.SetToolTip(Me.cmdDonate, "Donate to RealityRipple Software to keep Satellite Restriction Tracker alive.")
+    Me.cmdDonate.UseVisualStyleBackColor = True
+    '
+    'tmrSpeed
+    '
+    Me.tmrSpeed.Interval = 1000
+    '
+    'cmdUpdate
+    '
+    Me.cmdUpdate.AutoSize = True
+    Me.cmdUpdate.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.cmdUpdate.Location = New System.Drawing.Point(0, 0)
+    Me.cmdUpdate.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
+    Me.cmdUpdate.Name = "cmdUpdate"
+    Me.cmdUpdate.Padding = New System.Windows.Forms.Padding(6, 0, 3, 0)
+    Me.cmdUpdate.Size = New System.Drawing.Size(120, 25)
+    Me.cmdUpdate.TabIndex = 2
+    Me.cmdUpdate.Text = "Check for Updates"
+    Me.cmdUpdate.UseVisualStyleBackColor = True
+    '
     'lblProduct
     '
     Me.lblProduct.Anchor = System.Windows.Forms.AnchorStyles.Left
@@ -96,7 +154,7 @@ Partial Class frmAbout
     Me.lblProduct.TabStop = True
     Me.lblProduct.Text = "Product Name"
     Me.lblProduct.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetTooltip(Me.lblProduct, "Visit the Satellite Restriction Tracker webpage.")
+    Me.ttAbout.SetToolTip(Me.lblProduct, "Visit the Satellite Restriction Tracker webpage.")
     '
     'lblVersion
     '
@@ -114,7 +172,7 @@ Partial Class frmAbout
     Me.lblVersion.TabStop = True
     Me.lblVersion.Text = "Version"
     Me.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetTooltip(Me.lblVersion, "View the Satellite Restriction Tracker version history.")
+    Me.ttAbout.SetToolTip(Me.lblVersion, "View the Satellite Restriction Tracker version history.")
     '
     'lblUpdate
     '
@@ -151,65 +209,7 @@ Partial Class frmAbout
     Me.lblCompany.TabStop = True
     Me.lblCompany.Text = "Company Name"
     Me.lblCompany.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetTooltip(Me.lblCompany, "Visit RealityRipple Software.")
-    '
-    'txtDescription
-    '
-    Me.pnlAbout.SetColumnSpan(Me.txtDescription, 2)
-    Me.txtDescription.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.txtDescription.Location = New System.Drawing.Point(136, 111)
-    Me.txtDescription.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
-    Me.txtDescription.Multiline = True
-    Me.txtDescription.Name = "txtDescription"
-    Me.txtDescription.ReadOnly = True
-    Me.txtDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both
-    Me.txtDescription.Size = New System.Drawing.Size(257, 103)
-    Me.txtDescription.TabIndex = 6
-    Me.txtDescription.TabStop = False
-    Me.txtDescription.Text = resources.GetString("txtDescription.Text")
-    '
-    'cmdOK
-    '
-    Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cmdOK.AutoSize = True
-    Me.cmdOK.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.cmdOK.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdOK.Location = New System.Drawing.Point(318, 222)
-    Me.cmdOK.Name = "cmdOK"
-    Me.cmdOK.Size = New System.Drawing.Size(75, 25)
-    Me.cmdOK.TabIndex = 0
-    Me.cmdOK.Text = "OK"
-    Me.ttAbout.SetTooltip(Me.cmdOK, "Close.")
-    '
-    'cmdDonate
-    '
-    Me.cmdDonate.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.cmdDonate.AutoSize = True
-    Me.cmdDonate.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdDonate.Location = New System.Drawing.Point(167, 221)
-    Me.cmdDonate.Name = "cmdDonate"
-    Me.cmdDonate.Size = New System.Drawing.Size(110, 25)
-    Me.cmdDonate.TabIndex = 1
-    Me.cmdDonate.Text = "Make a &Donation"
-    Me.ttAbout.SetTooltip(Me.cmdDonate, "Donate to RealityRipple Software to keep Satellite Restriction Tracker alive.")
-    Me.cmdDonate.UseVisualStyleBackColor = True
-    '
-    'tmrSpeed
-    '
-    Me.tmrSpeed.Interval = 1000
-    '
-    'cmdUpdate
-    '
-    Me.cmdUpdate.AutoSize = True
-    Me.cmdUpdate.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmdUpdate.Location = New System.Drawing.Point(0, 0)
-    Me.cmdUpdate.Margin = New System.Windows.Forms.Padding(3, 0, 3, 0)
-    Me.cmdUpdate.Name = "cmdUpdate"
-    Me.cmdUpdate.Padding = New System.Windows.Forms.Padding(6, 0, 3, 0)
-    Me.cmdUpdate.Size = New System.Drawing.Size(120, 25)
-    Me.cmdUpdate.TabIndex = 2
-    Me.cmdUpdate.Text = "Check for Updates"
-    Me.cmdUpdate.UseVisualStyleBackColor = True
+    Me.ttAbout.SetToolTip(Me.lblCompany, "Visit RealityRipple Software.")
     '
     'frmAbout
     '
@@ -226,8 +226,6 @@ Partial Class frmAbout
     Me.MinimizeBox = False
     Me.Name = "frmAbout"
     Me.Padding = New System.Windows.Forms.Padding(9)
-    Me.ShowIcon = False
-    Me.ShowInTaskbar = False
     Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
     Me.Text = "frmAbout"
     CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
