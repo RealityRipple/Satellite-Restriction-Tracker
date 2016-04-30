@@ -202,7 +202,6 @@
       txtPortableDir.Enabled = False
       cmdPortableDir.Enabled = False
       cmdMakePortable.Enabled = False
-      tbsConfig.TabPages.Remove(tabAdvanced)
     ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
       optHistoryProgramData.Checked = True
     ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
