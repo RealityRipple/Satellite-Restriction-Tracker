@@ -51,6 +51,17 @@ Public Class DataBase
       End If
       Return sRet
     End Function
+    Public Shared ReadOnly Property Empty() As DataRow
+      Get
+        Return New DataRow(Date.FromBinary(0), 0, 0, 0, 0)
+      End Get
+    End Property
+    Public Shared Function IsEmpty(dRow As DataRow) As Boolean
+      Return (dRow.DATETIME.ToBinary = 0 And dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0)
+    End Function
+    Public Function IsEmpty() As Boolean
+      Return (DATETIME.ToBinary = 0 And DOWNLOAD = 0 And UPLOAD = 0 And DOWNLIM = 0 And UPLIM = 0)
+    End Function
   End Structure
   Private data() As DataRow
   Public Sub New()
