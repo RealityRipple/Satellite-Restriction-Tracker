@@ -17,14 +17,14 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
-    If InUseChecker(AppDataAll & "\user.config", IO.FileAccess.Write) Then
+    If InUseChecker(CommonAppDataDirectory & "\user.config", IO.FileAccess.Write) Then
       Try
-        xConfig.Save(AppDataAll & "\user.config")
+        xConfig.Save(CommonAppDataDirectory & "\user.config")
       Catch ex As Exception
         MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & AppDataAll & "\user.config"" may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & CommonAppDataDirectory & "\user.config"" may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End If
   End Sub
   Public Sub New()
@@ -202,12 +202,12 @@ Class AppSettings
   End Enum
   Private ReadOnly Property ConfigFile As String
     Get
-      Return AppData & "user.config"
+      Return LocalAppDataDirectory & "user.config"
     End Get
   End Property
   Private ReadOnly Property ConfigFileBackup As String
     Get
-      Return AppData & "backup.config"
+      Return LocalAppDataDirectory & "backup.config"
     End Get
   End Property
   Public Sub New()

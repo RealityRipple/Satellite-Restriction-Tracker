@@ -189,18 +189,18 @@ Module modFunctions
     End Function
   End Class
   Public Function LoadAlertStyle(Path As String) As NotifierStyle
-    If My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tgz") Then
-      Path = AppDataPath & Path & ".tgz"
-    ElseIf My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tar.gz") Then
-      Path = AppDataPath & Path & ".tar.gz"
-    ElseIf My.Computer.FileSystem.FileExists(AppDataPath & Path & ".tar") Then
-      Path = AppDataPath & Path & ".tar"
+    If My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tgz") Then
+      Path = LocalAppDataDirectory & Path & ".tgz"
+    ElseIf My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tar.gz") Then
+      Path = LocalAppDataDirectory & Path & ".tar.gz"
+    ElseIf My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tar") Then
+      Path = LocalAppDataDirectory & Path & ".tar"
     Else
       Return New NotifierStyle
     End If
     Try
-      Dim TempAlertDir As String = AppData & "notifier\"
-      Dim TempAlertTAR As String = AppData & "notifier.tar"
+      Dim TempAlertDir As String = LocalAppDataDirectory & "notifier\"
+      Dim TempAlertTAR As String = LocalAppDataDirectory & "notifier.tar"
       If Path.EndsWith(".tar") Then
         ExtractTar(Path, TempAlertDir)
       Else
@@ -352,8 +352,8 @@ Module modFunctions
   End Sub
   Public Sub PlaySong()
     If Song Is Nothing Then
-      My.Computer.FileSystem.WriteAllBytes(AppData & "Song.mid", My.Resources.Song, False)
-      Song = New MCIPlayer(AppData & "Song.mid")
+      My.Computer.FileSystem.WriteAllBytes(LocalAppDataDirectory & "Song.mid", My.Resources.Song, False)
+      Song = New MCIPlayer(LocalAppDataDirectory & "Song.mid")
       Song.Play()
     End If
   End Sub
@@ -365,9 +365,9 @@ Module modFunctions
       Song.Dispose()
       Song = Nothing
     End If
-    If My.Computer.FileSystem.FileExists(AppDataPath & "Song.mid") Then
+    If My.Computer.FileSystem.FileExists(LocalAppDataDirectory & "Song.mid") Then
       Try
-        My.Computer.FileSystem.DeleteFile(AppData & "Song.mid")
+        My.Computer.FileSystem.DeleteFile(LocalAppDataDirectory & "Song.mid")
       Catch ex As Exception
       End Try
     End If
@@ -377,27 +377,12 @@ Module modFunctions
       Return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
     End Get
   End Property
-  Public ReadOnly Property AppData As String
-    Get
-      Static sTmp As String
-      If Application.StartupPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
-        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
-        If Not My.Computer.FileSystem.DirectoryExists(AppDataPath) Then My.Computer.FileSystem.CreateDirectory(AppDataPath)
-        If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataPath
-      Else
-        If String.IsNullOrEmpty(sTmp) Then
-          sTmp = Application.StartupPath & "\Config\"
-        End If
-      End If
-      Return sTmp
-    End Get
-  End Property
   Public ReadOnly Property AppDataAllPath As String
     Get
       Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
     End Get
   End Property
-  Public ReadOnly Property AppDataAll As String
+  Public ReadOnly Property CommonAppDataDirectory As String
     Get
       Static sTmp As String
       Static OneAlert As Boolean
@@ -426,9 +411,24 @@ Module modFunctions
       Return sTmp
     End Get
   End Property
+  Public ReadOnly Property LocalAppDataDirectory As String
+    Get
+      Static sTmp As String
+      If Application.StartupPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
+        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
+        If Not My.Computer.FileSystem.DirectoryExists(AppDataPath) Then My.Computer.FileSystem.CreateDirectory(AppDataPath)
+        If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataPath
+      Else
+        If String.IsNullOrEmpty(sTmp) Then
+          sTmp = Application.StartupPath & "\Config\"
+        End If
+      End If
+      Return sTmp
+    End Get
+  End Property
   Public ReadOnly Property UpdateParam As String
     Get
-      If AppDataPath = Application.StartupPath & "\Config\" Then
+      If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
         Return "/silent /dir=""" & Application.StartupPath & """ /type=portable"
       Else
         Return "/silent"
@@ -442,12 +442,12 @@ Module modFunctions
         If String.IsNullOrEmpty(mySettings.HistoryDir) Then
           If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
             If Array.Exists(My.Computer.FileSystem.GetFiles(AppDataPath).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
-              mySettings.HistoryDir = IIf(Create, AppData, AppDataPath)
+              mySettings.HistoryDir = IIf(Create, LocalAppDataDirectory, AppDataPath)
             Else
-              mySettings.HistoryDir = IIf(Create, AppDataAll, AppDataAllPath)
+              mySettings.HistoryDir = IIf(Create, CommonAppDataDirectory, AppDataAllPath)
             End If
           Else
-            mySettings.HistoryDir = IIf(Create, AppDataAll, AppDataAllPath)
+            mySettings.HistoryDir = IIf(Create, CommonAppDataDirectory, AppDataAllPath)
           End If
         End If
       Else
@@ -457,7 +457,7 @@ Module modFunctions
         Try
           If Not My.Computer.FileSystem.DirectoryExists(mySettings.HistoryDir) Then My.Computer.FileSystem.CreateDirectory(mySettings.HistoryDir)
         Catch ex As Exception
-          Return AppDataAll
+          Return CommonAppDataDirectory
         End Try
       End If
       Return mySettings.HistoryDir
@@ -894,6 +894,11 @@ Module modFunctions
   Private dGraph, uGraph As Rectangle
   Private oldDate, newDate As Date
   Private dData(), uData() As DataBase.DataRow
+  Private Enum Direction
+    No
+    Down
+    Up
+  End Enum
   Public Function GetGraphRect(DownGraph As Boolean, ByRef firstX As Date, ByRef lastX As Date) As Rectangle
     firstX = oldDate
     lastX = newDate
@@ -905,6 +910,7 @@ Module modFunctions
   End Function
   Friend Function GetGraphData(fromDate As Date, DownGraph As Boolean) As DataBase.DataRow
     If DownGraph Then
+      If dData Is Nothing Then Return DataBase.DataRow.Empty
       Dim closestRow As DataBase.DataRow
       Dim closestVal As Integer = Integer.MaxValue
       For Each item In dData
@@ -915,6 +921,7 @@ Module modFunctions
       Next
       Return closestRow
     Else
+      If uData Is Nothing Then Return DataBase.DataRow.Empty
       Dim closestRow As DataBase.DataRow
       Dim closestVal As Integer = Integer.MaxValue
       For Each item In uData
@@ -927,16 +934,20 @@ Module modFunctions
     End If
   End Function
   Public Function DrawRGraph(Data() As DataBase.DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, 0, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+    Return DrawGraph(Data, Direction.No, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
   Public Function DrawLineGraph(Data() As DataBase.DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, IIf(Down, 1, 255), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+    Return DrawGraph(Data, IIf(Down, Direction.Down, Direction.Up), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
-  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, Down As Byte, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    If Data Is Nothing OrElse Data.Length = 0 Then Return New Bitmap(1, 1)
+  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, GraphDir As Direction, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+    If Data Is Nothing OrElse Data.Length = 0 Then
+      dData = Nothing
+      uData = Nothing
+      Return New Bitmap(1, 1)
+    End If
     Dim yMax As Long = 0
     Dim lMax As Long = 0
-    If Down = 0 Then
+    If GraphDir = Direction.No Then
       Dim yVMax As Long = 0
       For I As Integer = 0 To Data.Length - 1
         If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
@@ -956,7 +967,7 @@ Module modFunctions
       Next
       yMax = IIf(yDMax > yUMax, yDMax, yUMax)
       If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-      lMax = IIf(Down = 1, yDMax, yUMax)
+      lMax = IIf(GraphDir = Direction.Down, yDMax, yUMax)
     End If
     If Not lMax Mod 1000 = 0 Then lMax = (lMax \ 1000) * 1000 + 1000
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
@@ -968,7 +979,7 @@ Module modFunctions
     g.Clear(ColorBG)
     Dim yTop As Integer = lXHeight / 2
     Dim yHeight As Integer = ImgSize.Height - (lXHeight * 1.5)
-    If Down = 255 Then
+    If GraphDir = Direction.Up Then
       uGraph = New Rectangle(lYWidth, yTop, (ImgSize.Width - 4) - lYWidth, yHeight)
       uData = Data
     Else
@@ -1115,10 +1126,10 @@ Module modFunctions
       g.DrawString(sLastDisp, tFont, New SolidBrush(ColorText), lastI - iLastDispWidth + 3, ImgSize.Height - lXHeight + 5)
     End If
     Dim MaxY As Integer = 0
-    If Down = 0 Then
+    If GraphDir = Direction.No Then
       MaxY = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
     Else
-      MaxY = yTop + yHeight - (IIf(Down = 1, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
+      MaxY = yTop + yHeight - (IIf(GraphDir = Direction.Down, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
     End If
     Dim lMaxPoints(lMaxTime) As Point
     Dim lPoints(lMaxTime + 3) As Point
@@ -1131,7 +1142,7 @@ Module modFunctions
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jLim As Long = 0
-          If Down = 255 Then
+          If GraphDir = Direction.Up Then
             jLim = Data(J).UPLIM
           Else
             jLim = Data(J).DOWNLIM
@@ -1168,7 +1179,7 @@ Module modFunctions
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jVal As Long = 0
-          If Down = 255 Then
+          If GraphDir = Direction.Up Then
             jVal = Data(J).UPLOAD
           Else
             jVal = Data(J).DOWNLOAD
@@ -1221,6 +1232,10 @@ Module modFunctions
     g.Dispose()
     Return iPic
   End Function
+  Public Sub ClearGraphData()
+    dData = Nothing
+    uData = Nothing
+  End Sub
 #End Region
 #Region "Progress"
   Public Function DisplayProgress(ImgSize As Size, Current As Long, Total As Long, Accuracy As Integer, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color) As Image

@@ -12,7 +12,7 @@
     lstStyles.Items.Clear()
     Dim iFirst As Integer = lstStyles.Items.Add("Default")
     If AlertStyle.ToLower = "default" Then lstStyles.SelectedIndex = iFirst
-    For Each sFile As String In IO.Directory.GetFiles(AppData)
+    For Each sFile As String In IO.Directory.GetFiles(LocalAppDataDirectory)
       Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(sFile)
       Dim sExt As String = IO.Path.GetExtension(sFile).ToLower
       Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
@@ -54,7 +54,7 @@
           sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
         Loop
         If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
-          IO.File.Copy(StylePath, AppData & sTitle & sExt, True)
+          IO.File.Copy(StylePath, LocalAppDataDirectory & sTitle & sExt, True)
           Dim iItem As Integer = -1
           If lstStyles.Items.Contains(sTitle) Then
             iItem = lstStyles.FindStringExact(sTitle)
@@ -74,7 +74,7 @@
             sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
           Loop
           If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
-            IO.File.Copy(StylePath, AppData & sTitle & sExt, True)
+            IO.File.Copy(StylePath, LocalAppDataDirectory & sTitle & sExt, True)
             If Not lstStyles.Items.Contains(sTitle) Then lstStyles.Items.Add(sTitle)
           End If
         Next
@@ -138,17 +138,17 @@
         Beep()
       ElseIf MsgDlg(Me, "Do you want to remove the """ & sTitle & """ style?", "Are you sure?", "Remove Alert Window Style?", MessageBoxButtons.YesNo, _TaskDialogIcon.Personalize, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
         'ElseIf MessageBox.Show("Do you want to remove the """ & sTitle & """ Alert Window Style?", My.Application.Info.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) = Windows.Forms.DialogResult.Yes Then
-        If IO.File.Exists(AppDataPath & sTitle & ".tar.gz") Then
+        If IO.File.Exists(LocalAppDataDirectory & sTitle & ".tar.gz") Then
           lstStyles.SelectedIndex = 0
-          IO.File.Delete(AppDataPath & sTitle & ".tar.gz")
+          IO.File.Delete(LocalAppDataDirectory & sTitle & ".tar.gz")
           lstStyles.Items.RemoveAt(index)
-        ElseIf IO.File.Exists(AppDataPath & sTitle & ".tgz") Then
+        ElseIf IO.File.Exists(LocalAppDataDirectory & sTitle & ".tgz") Then
           lstStyles.SelectedIndex = 0
-          IO.File.Delete(AppDataPath & sTitle & ".tgz")
+          IO.File.Delete(LocalAppDataDirectory & sTitle & ".tgz")
           lstStyles.Items.RemoveAt(index)
-        ElseIf IO.File.Exists(AppDataPath & sTitle & ".tar") Then
+        ElseIf IO.File.Exists(LocalAppDataDirectory & sTitle & ".tar") Then
           lstStyles.SelectedIndex = 0
-          IO.File.Delete(AppDataPath & sTitle & ".tar")
+          IO.File.Delete(LocalAppDataDirectory & sTitle & ".tar")
           lstStyles.Items.RemoveAt(index)
         Else
           MsgDlg(Me, "The """ & sTitle & """ Alert Window style could not be found. The file may already be removed.", "Unable to find Alert Window style.", "Style not Found", MessageBoxButtons.OK, _TaskDialogIcon.Preferences, MessageBoxIcon.Warning)

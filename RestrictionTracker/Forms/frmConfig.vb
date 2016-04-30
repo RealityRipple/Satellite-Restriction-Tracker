@@ -11,7 +11,7 @@
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
-    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     RepadAllItems(Me)
     Dim sAccount As String = mySettings.Account
     Dim sUsername, sProvider As String
@@ -184,7 +184,7 @@
     End Select
     DoCheck()
     Dim DisableHistory As Boolean = False
-    Dim aD As String = AppDataPath
+    Dim aD As String = LocalAppDataDirectory
     If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
     Dim hD As String = mySettings.HistoryDir
     If String.IsNullOrEmpty(hD) Then hD = AppDataAllPath
@@ -239,7 +239,7 @@
     Else
       Exit Sub
     End If
-    remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), AppData)
+    remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then
@@ -1152,7 +1152,7 @@
     Else
       mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls
     End If
-    Dim sNetTestIco As String = IO.Path.Combine(AppDataPath, "netTest.png")
+    Dim sNetTestIco As String = IO.Path.Combine(LocalAppDataDirectory, "netTest.png")
     Try
       If IO.File.Exists(sNetTestIco) Then IO.File.Delete(sNetTestIco)
     Catch ex As Exception
@@ -1486,7 +1486,7 @@
   End Function
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
-      If AppDataPath = Application.StartupPath & "\Config\" Then
+      If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
         ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
         txtInterval.Minimum = 15
         chkService.Enabled = False

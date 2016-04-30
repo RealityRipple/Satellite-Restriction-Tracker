@@ -14,7 +14,7 @@ Public Class frmHistory
 #Region "Form Events"
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
-    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     useStyle = mySettings.AccountType
     ScreenDefaultColors(mySettings.Colors, useStyle)
     ResetDates()
@@ -74,7 +74,7 @@ Public Class frmHistory
     Dim SetAgo As UInt32 = 30
     If mySettings IsNot Nothing Then SetAgo = mySettings.Ago
     mySettings = New AppSettings
-    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     mySettings.Ago = SetAgo
     mySettings.Gr = IIf(optGraph.Checked, "aph", "id")
     mySettings.Save()
@@ -87,9 +87,9 @@ Public Class frmHistory
     End If
     Select Case useStyle
       Case SatHostTypes.DishNet_EXEDE
-        cmd30Days.Text = "This Period"
+        cmd30Days.Text = "T&his Period"
         ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-        cmd60Days.Text = "Last Period"
+        cmd60Days.Text = "&Last Period"
         ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
         dgvUsage.Columns.Clear()
         colDOWNLOAD.HeaderText = "Anytime"
@@ -98,9 +98,9 @@ Public Class frmHistory
         dgvUsage.Columns.Add(colDOWNLOAD)
         dgvUsage.Columns.Add(colUPLOAD)
       Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
-        cmd30Days.Text = "This Period"
+        cmd30Days.Text = "T&his Period"
         ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-        cmd60Days.Text = "Last Period"
+        cmd60Days.Text = "&Last Period"
         ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
         dgvUsage.Columns.Clear()
         colDOWNLOAD.HeaderText = "Used"
@@ -109,9 +109,9 @@ Public Class frmHistory
         dgvUsage.Columns.Add(colDOWNLOAD)
         dgvUsage.Columns.Add(colUPLOAD)
       Case Else
-        cmd30Days.Text = "30 Days"
+        cmd30Days.Text = "&30 Days"
         ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
-        cmd60Days.Text = "60 Days"
+        cmd60Days.Text = "&60 Days"
         ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last 60 days.")
         dgvUsage.Columns.Clear()
         colDOWNLOAD.HeaderText = "Download"
@@ -178,6 +178,9 @@ Public Class frmHistory
             pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
             pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            ClearGraphData()
+            graphSpaceD = Nothing
+            graphSpaceU = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
@@ -188,6 +191,9 @@ Public Class frmHistory
             pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
             pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            ClearGraphData()
+            graphSpaceD = Nothing
+            graphSpaceU = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
@@ -198,6 +204,9 @@ Public Class frmHistory
             pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
             pctDld.Image = BadDataNote(BadDataNotes.One, pctDld.Size)
+            ClearGraphData()
+            graphSpaceD = Nothing
+            graphSpaceU = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
@@ -253,11 +262,12 @@ Public Class frmHistory
     End If
   End Sub
   Private Sub pctDld_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctDld.MouseMove
-    If graphSpaceD = Nothing Then Exit Sub
+    If graphSpaceD = Nothing Then Return
     If graphSpaceD.Contains(e.Location) Then
       Dim dNow As Date = CalculateNow(graphSpaceD, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
-      Dim gShow = GetGraphData(dNow, True)
+      Dim gShow As DataBase.DataRow = GetGraphData(dNow, True)
+      If gShow.IsEmpty Then Return
       Dim showTime As String = gShow.sDATETIME
       Dim Show As String = showTime & " : " & gShow.sDOWNLOAD & " MB / " & gShow.sDOWNLIM & " MB"
       If lastShow = Show Then Exit Sub
@@ -268,11 +278,12 @@ Public Class frmHistory
     End If
   End Sub
   Private Sub pctUld_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctUld.MouseMove
-    If graphSpaceU = Nothing Then Exit Sub
+    If graphSpaceU = Nothing Then Return
     If graphSpaceU.Contains(e.Location) Then
       Dim dNow As Date = CalculateNow(graphSpaceU, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
-      Dim gShow = GetGraphData(dNow, False)
+      Dim gShow As DataBase.DataRow = GetGraphData(dNow, False)
+      If gShow.IsEmpty Then Return
       Dim Show As String = gShow.sDATETIME & " : " & gShow.sUPLOAD & " MB / " & gShow.sUPLIM & " MB"
       If lastShow = Show Then Exit Sub
       lastShow = Show
@@ -287,11 +298,19 @@ Public Class frmHistory
   End Function
 #End Region
 #Region "Buttons"
+  Private Function ShowDifference(valA As Long, valB As Long) As String
+    If valA = valB Then
+      Return "Equal"
+    ElseIf valA > valB Then
+      Return "Over by " & (valA - valB)
+    Else
+      Return "Under by " & (valB - valA)
+    End If
+  End Function
   Private Sub cmdQuery_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdQuery.Click
-    grpAge.Enabled = False
+    ToggleInterface(False)
     Dim dFrom As Date = Date.Parse(dtpFrom.Value.Date & " 00:00:00 AM")
     Dim dTo As Date = Date.Parse(dtpTo.Value.Date & " 11:59:59 PM")
-    Dim lItems() As DataBase.DataRow
     Dim bClose As Boolean = False
     If fDB Is Nothing Then fDB = New frmDBProgress
     If Not fDB.Visible Then
@@ -303,7 +322,7 @@ Public Class frmHistory
       dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        lItems = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
         pnlGraph.Tag = lItems
         DoResize(True)
       Else
@@ -315,10 +334,12 @@ Public Class frmHistory
       pnlGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        lItems = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
+        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
+
         dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
         ChangeStyle()
+        If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
         Select Case useStyle
           Case SatHostTypes.DishNet_EXEDE
             Dim myDLim As Long = 0
@@ -341,50 +362,20 @@ Public Class frmHistory
                 End If
               End If
             Next
-            If SameLim Then
-              For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
-              Next lItem
-            Else
-              For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
-              Next lItem
-            End If
+              If SameLim Then
+                For Each lItem As DataBase.DataRow In lItems
+                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
+                Next lItem
+              Else
+                For Each lItem As DataBase.DataRow In lItems
+                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
+                Next lItem
+              End If
           Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+
             For Each lItem As DataBase.DataRow In lItems
               dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)
             Next lItem
-          Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
-            Dim myDLim As Long = 0
-            Dim myULim As Long = 0
-            For Each lItem As DataBase.DataRow In lItems
-              If myDLim = 0 Then
-                myDLim = lItem.DOWNLIM
-              Else
-                If Not myDLim = lItem.DOWNLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-              If myULim = 0 Then
-                myULim = lItem.UPLIM
-              Else
-                If Not myULim = lItem.UPLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-            Next
-            If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
-            If SameLim Then
-              For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
-              Next lItem
-            Else
-              For Each lItem As DataBase.DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
-              Next lItem
-            End If
           Case Else
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
@@ -415,7 +406,6 @@ Public Class frmHistory
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
-
         End Select
       Else
         dgvUsage.Rows.Clear()
@@ -430,7 +420,7 @@ Public Class frmHistory
     End If
     mySettings.Ago = Math.Abs(DateDiff(DateInterval.Day, dtpFrom.Value.Date, dtpTo.Value.Date))
     If mySettings.Ago = 0 Then mySettings.Ago = 1
-    grpAge.Enabled = True
+    ToggleInterface(True)
   End Sub
   Private Sub cmdToday_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdToday.Click
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
@@ -737,19 +727,37 @@ Public Class frmHistory
       End If
     End If
   End Sub
+  Private Sub ToggleInterface(Enable As Boolean, Optional IncludeImport As Boolean = True)
+    lblFrom.Enabled = Enable
+    dtpFrom.Enabled = Enable
+    lblTo.Enabled = Enable
+    dtpTo.Enabled = Enable
+    cmdToday.Enabled = Enable
+    cmd30Days.Enabled = Enable
+    cmd60Days.Enabled = Enable
+    cmdAllTime.Enabled = Enable
+    optGraph.Enabled = Enable
+    optGrid.Enabled = Enable
+    cmdQuery.Enabled = Enable
+    If IncludeImport Then cmdImport.Enabled = Enable
+    cmdExport.Enabled = Enable
+    chkExportRange.Enabled = Enable
+  End Sub
   Private Sub ResetDates()
     Dim dMin, dMax As Date
     LOG_Get(0, dMin, 0, 0, 0, 0)
     Dim fDate As Date = New Date(2000, 1, 1)
     If DateDiff(DateInterval.Year, fDate, dMin) < 0 Then dMin = fDate
     If DateDiff(DateInterval.Second, dMin, Now) < 0 Then
+      pctErr.Visible = True
       pctErr.Image = New ErrorProvider().Icon.ToBitmap
-      ttHistory.SetTooltip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
+      ttHistory.SetToolTip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
     Else
       dMax = Now
-      pctErr.Image = Nothing
-      ttHistory.SetTooltip(pctErr, Nothing)
       If DateDiff(DateInterval.Second, dMin, dMax) > 0 Then
+        pctErr.Visible = False
+        pctErr.Image = Nothing
+        ttHistory.SetToolTip(pctErr, Nothing)
         dtpFrom.MinDate = fDate
         dtpTo.MinDate = fDate
         dtpFrom.MaxDate = dMax
@@ -757,40 +765,17 @@ Public Class frmHistory
         dtpFrom.MinDate = dMin
         dtpTo.MinDate = dMin
       Else
+        pctErr.Visible = True
         pctErr.Image = New ErrorProvider().Icon.ToBitmap
-        ttHistory.SetTooltip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
+        ttHistory.SetToolTip(pctErr, "The Log history is more recent than your system clock." & vbCr & "Please update your computer's time.")
       End If
     End If
     If dtpFrom.MinDate.Year < 2000 Then dtpFrom.MinDate = fDate
     If dtpTo.MinDate.Year < 2000 Then dtpTo.MinDate = fDate
     If dtpFrom.MinDate = fDate And dtpTo.MinDate = fDate Then
-      lblFrom.Enabled = False
-      dtpFrom.Enabled = False
-      lblTo.Enabled = False
-      dtpTo.Enabled = False
-      optGraph.Enabled = False
-      optGrid.Enabled = False
-      cmdQuery.Enabled = False
-      cmd30Days.Enabled = False
-      cmd60Days.Enabled = False
-      cmdAllTime.Enabled = False
-      grpAge.Enabled = False
-      cmdExport.Enabled = False
-      chkExportRange.Enabled = False
+      ToggleInterface(False, False)
     Else
-      lblFrom.Enabled = True
-      dtpFrom.Enabled = True
-      lblTo.Enabled = True
-      dtpTo.Enabled = True
-      optGraph.Enabled = True
-      optGrid.Enabled = True
-      cmdQuery.Enabled = True
-      cmd30Days.Enabled = True
-      cmd60Days.Enabled = True
-      cmdAllTime.Enabled = True
-      grpAge.Enabled = True
-      cmdExport.Enabled = True
-      chkExportRange.Enabled = True
+      ToggleInterface(True, False)
     End If
   End Sub
 #End Region

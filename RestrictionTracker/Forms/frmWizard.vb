@@ -478,7 +478,7 @@ Public Class frmWizard
     Else
       Exit Sub
     End If
-    remoteTest = New remoteRestrictionTracker(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), AppData)
+    remoteTest = New remoteRestrictionTracker(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
@@ -545,14 +545,14 @@ Public Class frmWizard
     newSettings.Save()
     newSettings = Nothing
 
-    localTest = New localRestrictionTracker(AppData)
+    localTest = New localRestrictionTracker(LocalAppDataDirectory)
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
       Me.Invoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
       Return
     End If
-    If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
+    If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
     AccountType = acct
     DrawStatus(False)
     tbsWizardPages.SelectedIndex += 1
@@ -570,7 +570,7 @@ Public Class frmWizard
       Me.Invoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
       Return
     End If
-    If IO.File.Exists(AppDataPath & "user.config") Then IO.File.Delete(AppDataPath & "user.config")
+    If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
     AccountType = SatHostTypes.Other
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)

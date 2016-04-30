@@ -31,7 +31,7 @@ Public Class frmMain
   Private sDisp_TT_M = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
-  Private sEXEPath As String = AppDataPath & "Setup.exe"
+  Private sEXEPath As String = LocalAppDataDirectory & "Setup.exe"
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
   Private imSlowed As Boolean
@@ -160,7 +160,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
-      localData = New localRestrictionTracker(AppData)
+      localData = New localRestrictionTracker(LocalAppDataDirectory)
     End If
   End Sub
   Private Sub TypeDeterminationOffline_TypeDetermined(HostType As SatHostTypes)
@@ -182,7 +182,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
-      localData = New localRestrictionTracker(AppData)
+      localData = New localRestrictionTracker(LocalAppDataDirectory)
     End If
   End Sub
 #End Region
@@ -297,7 +297,7 @@ Public Class frmMain
     NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, 0, String.Empty)
   End Sub
   Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
-    Select m.Msg
+    Select Case m.Msg
       Case NativeMethods.WM_SYSCOMMAND
         Select Case m.WParam.ToInt64
           Case TOPMOST_MENU_ID
@@ -320,7 +320,7 @@ Public Class frmMain
               NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
             End If
           Case NativeMethods.SC_MINIMIZE
-            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never and mySettings.TrayIconAnimation Then m.Result = New IntPtr(-1)
+            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never And mySettings.TrayIconAnimation Then m.Result = New IntPtr(-1)
         End Select
       Case NativeMethods.WM_WINDOWPOSCHANGING
         Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
@@ -567,7 +567,7 @@ Public Class frmMain
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
     Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
-    If AppDataPath = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
@@ -594,7 +594,7 @@ Public Class frmMain
     Else
       pctNetTest.Visible = True
       pctNetTest.Cursor = Cursors.Hand
-      Dim sNetTestIco As String = IO.Path.Combine(AppDataPath, "netTest.png")
+      Dim sNetTestIco As String = IO.Path.Combine(LocalAppDataDirectory, "netTest.png")
       If IO.File.Exists(sNetTestIco) Then
         Using imgNetDrawn As New Bitmap(16, 16)
           Using g As Graphics = Graphics.FromImage(imgNetDrawn)
@@ -771,7 +771,7 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
-          localData = New localRestrictionTracker(AppData)
+          localData = New localRestrictionTracker(LocalAppDataDirectory)
         End If
       Else
         If remoteData IsNot Nothing Then
@@ -809,7 +809,7 @@ Public Class frmMain
     Dim fromDate = mySettings.LastSyncTime
     If My.Computer.Keyboard.CtrlKeyDown Then fromDate = New Date(2000, 1, 1)
     If LOG_GetCount() = 0 Then fromDate = New Date(2000, 1, 1)
-    remoteData = New remoteRestrictionTracker(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, AppData)
+    remoteData = New remoteRestrictionTracker(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, LocalAppDataDirectory)
   End Sub
   Private Sub DisplayUsage(bStatusText As Boolean, bHardTime As Boolean)
     If Me.InvokeRequired Then
@@ -1659,7 +1659,7 @@ Public Class frmMain
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
           ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
-          If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+          If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
           frmHistory.DoResize(True)
         End If
       Case Windows.Forms.DialogResult.Abort
@@ -1768,7 +1768,7 @@ Public Class frmMain
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
         ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
-        If AppDataPath = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+        If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
         frmHistory.DoResize(True)
       End If
     End If
@@ -2344,7 +2344,7 @@ Public Class frmMain
       If [Error] IsNot Nothing Then
         pctNetTest.Image = My.Resources.ico_err
       Else
-        icon16.Save(IO.Path.Combine(AppDataPath, "netTest.png"))
+        icon16.Save(IO.Path.Combine(LocalAppDataDirectory, "netTest.png"))
         pctNetTest.Image = icon16
       End If
     Catch ex As Exception
