@@ -298,15 +298,6 @@ Public Class frmHistory
   End Function
 #End Region
 #Region "Buttons"
-  Private Function ShowDifference(valA As Long, valB As Long) As String
-    If valA = valB Then
-      Return "Equal"
-    ElseIf valA > valB Then
-      Return "Over by " & (valA - valB)
-    Else
-      Return "Under by " & (valB - valA)
-    End If
-  End Function
   Private Sub cmdQuery_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdQuery.Click
     ToggleInterface(False)
     Dim dFrom As Date = Date.Parse(dtpFrom.Value.Date & " 00:00:00 AM")
@@ -362,15 +353,15 @@ Public Class frmHistory
                 End If
               End If
             Next
-              If SameLim Then
-                For Each lItem As DataBase.DataRow In lItems
-                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
-                Next lItem
-              Else
-                For Each lItem As DataBase.DataRow In lItems
-                  dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
-                Next lItem
-              End If
+            If SameLim Then
+              For Each lItem As DataBase.DataRow In lItems
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
+              Next lItem
+            Else
+              For Each lItem As DataBase.DataRow In lItems
+                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
+              Next lItem
+            End If
           Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
 
             For Each lItem As DataBase.DataRow In lItems
