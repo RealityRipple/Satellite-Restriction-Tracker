@@ -416,6 +416,8 @@ Module modFunctions
           Return "Connection aborted."
         ElseIf ex.InnerException.Message.StartsWith("The object was used after being disposed") Then
           Return "Connection aborted."
+        ElseIf ex.InnerException.Message.StartsWith("Thread was being aborted") Then
+          Return "Connection aborted."
         Else
           If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error during request - " & ex.Message
