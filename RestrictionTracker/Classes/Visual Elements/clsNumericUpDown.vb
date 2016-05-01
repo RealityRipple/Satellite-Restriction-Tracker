@@ -10,7 +10,7 @@ Public Class NumericUpDownIncrementable
   ''' Indicates the amount to increment or decrement on each wheel scroll.
   ''' </summary>
   ''' <value>Increment value for wheel scrolling.</value>
-  ''' <remarks>This property only effects the Mouse Wheel event.</remarks>
+  ''' <remarks>This property only affects the Mouse Wheel event.</remarks>
   <System.ComponentModel.Description("Indicates the amount to increment or decrement on each wheel scroll."), System.ComponentModel.DefaultValue(3)>
   Public Property LargeIncrement As UInteger
     Get

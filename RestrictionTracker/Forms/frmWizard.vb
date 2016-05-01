@@ -254,6 +254,10 @@ Public Class frmWizard
   Private Sub frmWizard_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Me.Icon = My.Resources.t16_norm
     DrawTitle()
+    tbsWizardPages.ItemSize = New Size(Math.Floor(tbsWizardPages.Width / 5) - 11, cmdFAQ.Height - 2)
+    ttWizard.SetToolTip(txtAccountPass.Button, "Toggle display of the Password.")
+    txtOverSize.Margin = New Padding(3)
+    txtOverTime.Margin = New Padding(3)
   End Sub
   Private Sub cmbAccountHost_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbAccountHost.SelectedIndexChanged
     AccountType = SatHostTypes.Other
@@ -377,7 +381,9 @@ Public Class frmWizard
         Me.ShowIcon = False
       End If
       Dim TextFont As New Drawing.Font(Drawing.SystemFonts.CaptionFont.Name, 9)
-      clsGlass.DrawTextOnGlass(pctHeader.Handle, sTitle, TextFont, New Rectangle(0, -4, 600, 40), 12, 12)
+      Dim offset As Integer = (TextFont.Height - 8) / 2
+      If offset < 4 Then offset = 4
+      clsGlass.DrawTextOnGlass(pctHeader.Handle, sTitle, TextFont, New Rectangle(0, -offset, 600, 36 + offset), 16 - offset, 12)
       Using g As Graphics = Graphics.FromHwnd(pctIcon.Handle)
         g.DrawImageUnscaled(My.Resources.t16_norm.ToBitmap, New Rectangle(6, 8, 16, 16))
       End Using

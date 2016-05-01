@@ -45,11 +45,13 @@ Partial Class frmWizard
     Me.lblAccountHost = New System.Windows.Forms.Label()
     Me.txtAccountUsername = New System.Windows.Forms.TextBox()
     Me.lblAccountPassText = New System.Windows.Forms.Label()
-    Me.txtAccountPass = New System.Windows.Forms.TextBox()
+    Me.txtAccountPass = New RestrictionTracker.PasswordBox()
     Me.lblAccountPass = New System.Windows.Forms.Label()
     Me.lblAccountUsername = New System.Windows.Forms.Label()
     Me.cmbAccountHost = New System.Windows.Forms.ComboBox()
     Me.lblAccountTitle = New System.Windows.Forms.Label()
+    Me.lnAccountSpace1 = New RestrictionTracker.LineBreak()
+    Me.lnAccountSpace2 = New RestrictionTracker.LineBreak()
     Me.tabService = New System.Windows.Forms.TabPage()
     Me.pnlService = New System.Windows.Forms.TableLayoutPanel()
     Me.lblServiceTitle = New System.Windows.Forms.Label()
@@ -66,13 +68,16 @@ Partial Class frmWizard
     Me.optNone = New System.Windows.Forms.RadioButton()
     Me.lblLocal = New System.Windows.Forms.Label()
     Me.lblNone = New System.Windows.Forms.Label()
+    Me.txtSignUp = New RestrictionTracker.LinkLabel()
+    Me.lnServiceSpace2 = New RestrictionTracker.LineBreak()
+    Me.lnServiceSpace1 = New RestrictionTracker.LineBreak()
     Me.tabDisplay = New System.Windows.Forms.TabPage()
     Me.pnlDisplay = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlOverAlert = New System.Windows.Forms.TableLayoutPanel()
     Me.chkOverAlert = New System.Windows.Forms.CheckBox()
-    Me.txtOverSize = New NumericUpDownIncrementable()
+    Me.txtOverSize = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblOverSize = New System.Windows.Forms.Label()
-    Me.txtOverTime = New NumericUpDownIncrementable()
+    Me.txtOverTime = New RestrictionTracker.NumericUpDownIncrementable()
     Me.lblOverTime = New System.Windows.Forms.Label()
     Me.lblDisplayTitle = New System.Windows.Forms.Label()
     Me.lblDisplayAccuracy = New System.Windows.Forms.Label()
@@ -83,20 +88,15 @@ Partial Class frmWizard
     Me.optAccuracy3 = New System.Windows.Forms.RadioButton()
     Me.chkDisplayScale = New System.Windows.Forms.CheckBox()
     Me.lblDisplayOver = New System.Windows.Forms.Label()
+    Me.lnDisplaySpace1 = New RestrictionTracker.LineBreak()
+    Me.lnDisplaySpace2 = New RestrictionTracker.LineBreak()
     Me.tabFinished = New System.Windows.Forms.TabPage()
     Me.pnlFinished = New System.Windows.Forms.TableLayoutPanel()
     Me.lblFinishedTitle = New System.Windows.Forms.Label()
     Me.lblFinishedText = New System.Windows.Forms.Label()
     Me.pctHeader = New System.Windows.Forms.PictureBox()
-    Me.tmrDraw = New System.Windows.Forms.Timer(Me.components)
     Me.pctIcon = New System.Windows.Forms.PictureBox()
-    Me.lnAccountSpace1 = New RestrictionTracker.LineBreak()
-    Me.lnAccountSpace2 = New RestrictionTracker.LineBreak()
-    Me.txtSignUp = New RestrictionTracker.LinkLabel()
-    Me.lnServiceSpace2 = New RestrictionTracker.LineBreak()
-    Me.lnServiceSpace1 = New RestrictionTracker.LineBreak()
-    Me.lnDisplaySpace1 = New RestrictionTracker.LineBreak()
-    Me.lnDisplaySpace2 = New RestrictionTracker.LineBreak()
+    Me.tmrDraw = New System.Windows.Forms.Timer(Me.components)
     Me.ttWizard = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlWizard.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
@@ -367,7 +367,7 @@ Partial Class frmWizard
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccount.Size = New System.Drawing.Size(447, 311)
-    Me.pnlAccount.TabIndex = 1
+    Me.pnlAccount.TabIndex = 0
     '
     'lblAccountName
     '
@@ -379,7 +379,7 @@ Partial Class frmWizard
     Me.lblAccountName.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountName.Name = "lblAccountName"
     Me.lblAccountName.Size = New System.Drawing.Size(432, 48)
-    Me.lblAccountName.TabIndex = 3
+    Me.lblAccountName.TabIndex = 5
     Me.lblAccountName.Text = resources.GetString("lblAccountName.Text")
     '
     'lblAccountProvider
@@ -392,7 +392,7 @@ Partial Class frmWizard
     Me.lblAccountProvider.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountProvider.Name = "lblAccountProvider"
     Me.lblAccountProvider.Size = New System.Drawing.Size(434, 48)
-    Me.lblAccountProvider.TabIndex = 0
+    Me.lblAccountProvider.TabIndex = 1
     Me.lblAccountProvider.Text = resources.GetString("lblAccountProvider.Text")
     '
     'lblAccountHost
@@ -404,7 +404,7 @@ Partial Class frmWizard
     Me.lblAccountHost.Location = New System.Drawing.Point(3, 91)
     Me.lblAccountHost.Name = "lblAccountHost"
     Me.lblAccountHost.Size = New System.Drawing.Size(65, 17)
-    Me.lblAccountHost.TabIndex = 1
+    Me.lblAccountHost.TabIndex = 2
     Me.lblAccountHost.Text = "P&rovider:"
     Me.lblAccountHost.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
@@ -414,7 +414,7 @@ Partial Class frmWizard
     Me.txtAccountUsername.Location = New System.Drawing.Point(84, 181)
     Me.txtAccountUsername.Name = "txtAccountUsername"
     Me.txtAccountUsername.Size = New System.Drawing.Size(360, 20)
-    Me.txtAccountUsername.TabIndex = 5
+    Me.txtAccountUsername.TabIndex = 7
     Me.ttWizard.SetToolTip(Me.txtAccountUsername, "Enter your ViaSat provider Account Username.")
     '
     'lblAccountPassText
@@ -427,7 +427,7 @@ Partial Class frmWizard
     Me.lblAccountPassText.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountPassText.Name = "lblAccountPassText"
     Me.lblAccountPassText.Size = New System.Drawing.Size(440, 64)
-    Me.lblAccountPassText.TabIndex = 6
+    Me.lblAccountPassText.TabIndex = 9
     Me.lblAccountPassText.Text = resources.GetString("lblAccountPassText.Text")
     '
     'txtAccountPass
@@ -435,10 +435,10 @@ Partial Class frmWizard
     Me.txtAccountPass.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtAccountPass.Location = New System.Drawing.Point(84, 288)
     Me.txtAccountPass.Name = "txtAccountPass"
+    Me.txtAccountPass.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
     Me.txtAccountPass.Size = New System.Drawing.Size(360, 20)
-    Me.txtAccountPass.TabIndex = 8
+    Me.txtAccountPass.TabIndex = 11
     Me.ttWizard.SetToolTip(Me.txtAccountPass, "Enter your ViaSat provider Account Password.")
-    Me.txtAccountPass.UseSystemPasswordChar = True
     '
     'lblAccountPass
     '
@@ -449,7 +449,7 @@ Partial Class frmWizard
     Me.lblAccountPass.Location = New System.Drawing.Point(3, 289)
     Me.lblAccountPass.Name = "lblAccountPass"
     Me.lblAccountPass.Size = New System.Drawing.Size(69, 17)
-    Me.lblAccountPass.TabIndex = 7
+    Me.lblAccountPass.TabIndex = 10
     Me.lblAccountPass.Text = "Pass&word:"
     Me.lblAccountPass.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
@@ -462,7 +462,7 @@ Partial Class frmWizard
     Me.lblAccountUsername.Location = New System.Drawing.Point(3, 182)
     Me.lblAccountUsername.Name = "lblAccountUsername"
     Me.lblAccountUsername.Size = New System.Drawing.Size(75, 17)
-    Me.lblAccountUsername.TabIndex = 4
+    Me.lblAccountUsername.TabIndex = 6
     Me.lblAccountUsername.Text = "&Username:"
     Me.lblAccountUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
@@ -476,7 +476,7 @@ Partial Class frmWizard
     Me.cmbAccountHost.Location = New System.Drawing.Point(84, 89)
     Me.cmbAccountHost.Name = "cmbAccountHost"
     Me.cmbAccountHost.Size = New System.Drawing.Size(360, 21)
-    Me.cmbAccountHost.TabIndex = 2
+    Me.cmbAccountHost.TabIndex = 3
     Me.ttWizard.SetToolTip(Me.cmbAccountHost, "Choose your ViaSat provider website. If your provider is not listed, you can ente" & _
         "r the domain name of your meter page or ViaSat E-Mail Address.")
     '
@@ -490,9 +490,35 @@ Partial Class frmWizard
     Me.lblAccountTitle.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountTitle.Name = "lblAccountTitle"
     Me.lblAccountTitle.Size = New System.Drawing.Size(313, 26)
-    Me.lblAccountTitle.TabIndex = 9
+    Me.lblAccountTitle.TabIndex = 0
     Me.lblAccountTitle.Text = "Your ViaSat Account Settings"
     Me.lblAccountTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+    '
+    'lnAccountSpace1
+    '
+    Me.lnAccountSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnAccountSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnAccountSpace1.CausesValidation = False
+    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace1, 2)
+    Me.lnAccountSpace1.Location = New System.Drawing.Point(3, 116)
+    Me.lnAccountSpace1.Name = "lnAccountSpace1"
+    Me.lnAccountSpace1.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnAccountSpace1.Size = New System.Drawing.Size(441, 4)
+    Me.lnAccountSpace1.TabIndex = 4
+    Me.lnAccountSpace1.TabStop = False
+    '
+    'lnAccountSpace2
+    '
+    Me.lnAccountSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnAccountSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnAccountSpace2.CausesValidation = False
+    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace2, 2)
+    Me.lnAccountSpace2.Location = New System.Drawing.Point(3, 207)
+    Me.lnAccountSpace2.Name = "lnAccountSpace2"
+    Me.lnAccountSpace2.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnAccountSpace2.Size = New System.Drawing.Size(441, 4)
+    Me.lnAccountSpace2.TabIndex = 8
+    Me.lnAccountSpace2.TabStop = False
     '
     'tabService
     '
@@ -549,7 +575,7 @@ Partial Class frmWizard
     Me.lblServiceTitle.Margin = New System.Windows.Forms.Padding(3)
     Me.lblServiceTitle.Name = "lblServiceTitle"
     Me.lblServiceTitle.Size = New System.Drawing.Size(286, 26)
-    Me.lblServiceTitle.TabIndex = 13
+    Me.lblServiceTitle.TabIndex = 0
     Me.lblServiceTitle.Text = "Keep Track of Your Usage!"
     Me.lblServiceTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
@@ -563,7 +589,7 @@ Partial Class frmWizard
     Me.lblRemoteText.Margin = New System.Windows.Forms.Padding(3)
     Me.lblRemoteText.Name = "lblRemoteText"
     Me.lblRemoteText.Size = New System.Drawing.Size(435, 80)
-    Me.lblRemoteText.TabIndex = 2
+    Me.lblRemoteText.TabIndex = 1
     Me.lblRemoteText.Text = resources.GetString("lblRemoteText.Text")
     '
     'optRemote
@@ -575,7 +601,7 @@ Partial Class frmWizard
     Me.optRemote.Location = New System.Drawing.Point(3, 121)
     Me.optRemote.Name = "optRemote"
     Me.optRemote.Size = New System.Drawing.Size(129, 22)
-    Me.optRemote.TabIndex = 3
+    Me.optRemote.TabIndex = 2
     Me.optRemote.Text = "&Remote Service"
     Me.ttWizard.SetToolTip(Me.optRemote, "Use the Remote Usage Service to keep track of your usage 24/7, for only $15 per y" & _
         "ear!")
@@ -592,7 +618,6 @@ Partial Class frmWizard
     Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlKey.Controls.Add(Me.txtKey1, 0, 0)
     Me.pnlKey.Controls.Add(Me.txtKey2, 1, 0)
     Me.pnlKey.Controls.Add(Me.txtKey3, 2, 0)
@@ -602,9 +627,9 @@ Partial Class frmWizard
     Me.pnlKey.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlKey.Name = "pnlKey"
     Me.pnlKey.RowCount = 1
-    Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlKey.Size = New System.Drawing.Size(210, 24)
-    Me.pnlKey.TabIndex = 4
+    Me.pnlKey.TabIndex = 3
     '
     'txtKey1
     '
@@ -718,7 +743,7 @@ Partial Class frmWizard
     Me.optNone.Location = New System.Drawing.Point(3, 285)
     Me.optNone.Name = "optNone"
     Me.optNone.Size = New System.Drawing.Size(118, 22)
-    Me.optNone.TabIndex = 0
+    Me.optNone.TabIndex = 10
     Me.optNone.Text = "&No Thank You"
     Me.ttWizard.SetToolTip(Me.optNone, "Satellite Restriction Tracker will only gather usage data when the program is run" & _
         "ning.")
@@ -747,8 +772,49 @@ Partial Class frmWizard
     Me.lblNone.Location = New System.Drawing.Point(138, 288)
     Me.lblNone.Name = "lblNone"
     Me.lblNone.Size = New System.Drawing.Size(265, 16)
-    Me.lblNone.TabIndex = 1
+    Me.lblNone.TabIndex = 11
     Me.lblNone.Text = "Just gather data when the program is running"
+    '
+    'txtSignUp
+    '
+    Me.txtSignUp.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.txtSignUp.AutoSize = True
+    Me.txtSignUp.Cursor = System.Windows.Forms.Cursors.Hand
+    Me.txtSignUp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.txtSignUp.ForeColor = System.Drawing.Color.MediumBlue
+    Me.txtSignUp.Location = New System.Drawing.Point(355, 125)
+    Me.txtSignUp.Name = "txtSignUp"
+    Me.txtSignUp.Size = New System.Drawing.Size(81, 13)
+    Me.txtSignUp.TabIndex = 4
+    Me.txtSignUp.Text = "&Sign Up Today!"
+    Me.ttWizard.SetToolTip(Me.txtSignUp, "Sign up for the Remote Usage Service on the Satellite Restriction Tracker website" & _
+        ".")
+    '
+    'lnServiceSpace2
+    '
+    Me.lnServiceSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnServiceSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnServiceSpace2.CausesValidation = False
+    Me.pnlService.SetColumnSpan(Me.lnServiceSpace2, 3)
+    Me.lnServiceSpace2.Location = New System.Drawing.Point(3, 270)
+    Me.lnServiceSpace2.Name = "lnServiceSpace2"
+    Me.lnServiceSpace2.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnServiceSpace2.Size = New System.Drawing.Size(441, 4)
+    Me.lnServiceSpace2.TabIndex = 9
+    Me.lnServiceSpace2.TabStop = False
+    '
+    'lnServiceSpace1
+    '
+    Me.lnServiceSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnServiceSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnServiceSpace1.CausesValidation = False
+    Me.pnlService.SetColumnSpan(Me.lnServiceSpace1, 3)
+    Me.lnServiceSpace1.Location = New System.Drawing.Point(3, 153)
+    Me.lnServiceSpace1.Name = "lnServiceSpace1"
+    Me.lnServiceSpace1.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnServiceSpace1.Size = New System.Drawing.Size(441, 4)
+    Me.lnServiceSpace1.TabIndex = 5
+    Me.lnServiceSpace1.TabStop = False
     '
     'tabDisplay
     '
@@ -785,9 +851,8 @@ Partial Class frmWizard
     Me.pnlDisplay.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
     Me.pnlDisplay.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlDisplay.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlDisplay.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlDisplay.Size = New System.Drawing.Size(447, 311)
-    Me.pnlDisplay.TabIndex = 1
+    Me.pnlDisplay.TabIndex = 0
     '
     'pnlOverAlert
     '
@@ -796,9 +861,9 @@ Partial Class frmWizard
     Me.pnlOverAlert.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlOverAlert.ColumnCount = 5
     Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlOverAlert.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlOverAlert.Controls.Add(Me.chkOverAlert, 0, 0)
     Me.pnlOverAlert.Controls.Add(Me.txtOverSize, 1, 0)
@@ -809,14 +874,13 @@ Partial Class frmWizard
     Me.pnlOverAlert.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlOverAlert.Name = "pnlOverAlert"
     Me.pnlOverAlert.RowCount = 1
-    Me.pnlOverAlert.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlOverAlert.Size = New System.Drawing.Size(352, 28)
-    Me.pnlOverAlert.TabIndex = 20
+    Me.pnlOverAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlOverAlert.Size = New System.Drawing.Size(341, 28)
+    Me.pnlOverAlert.TabIndex = 7
     '
     'chkOverAlert
     '
     Me.chkOverAlert.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.chkOverAlert.AutoSize = True
     Me.chkOverAlert.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.chkOverAlert.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.chkOverAlert.Location = New System.Drawing.Point(3, 3)
@@ -826,13 +890,14 @@ Partial Class frmWizard
     Me.chkOverAlert.Text = "Usage &Alert:"
     Me.ttWizard.SetToolTip(Me.chkOverAlert, "Display an alert when your usage exceeds a certain amount in a specified duration" & _
         ". (Off by Default)")
-    Me.chkOverAlert.UseVisualStyleBackColor = True
+    Me.chkOverAlert.UseVisualStyleBackColor = False
     '
     'txtOverSize
     '
-    Me.txtOverSize.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtOverSize.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.txtOverSize.Enabled = False
     Me.txtOverSize.Increment = New Decimal(New Integer() {100, 0, 0, 0})
+    Me.txtOverSize.LargeIncrement = CType(3UI, UInteger)
     Me.txtOverSize.Location = New System.Drawing.Point(118, 4)
     Me.txtOverSize.Maximum = New Decimal(New Integer() {5000, 0, 0, 0})
     Me.txtOverSize.Minimum = New Decimal(New Integer() {25, 0, 0, 0})
@@ -846,22 +911,21 @@ Partial Class frmWizard
     'lblOverSize
     '
     Me.lblOverSize.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblOverSize.AutoSize = True
     Me.lblOverSize.Enabled = False
-    Me.lblOverSize.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.lblOverSize.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblOverSize.Location = New System.Drawing.Point(179, 5)
+    Me.lblOverSize.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lblOverSize.Location = New System.Drawing.Point(179, 6)
     Me.lblOverSize.Name = "lblOverSize"
-    Me.lblOverSize.Size = New System.Drawing.Size(45, 17)
+    Me.lblOverSize.Size = New System.Drawing.Size(41, 15)
     Me.lblOverSize.TabIndex = 2
     Me.lblOverSize.Text = "MB in"
     '
     'txtOverTime
     '
-    Me.txtOverTime.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtOverTime.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.txtOverTime.Enabled = False
     Me.txtOverTime.Increment = New Decimal(New Integer() {15, 0, 0, 0})
-    Me.txtOverTime.Location = New System.Drawing.Point(230, 4)
+    Me.txtOverTime.LargeIncrement = CType(3UI, UInteger)
+    Me.txtOverTime.Location = New System.Drawing.Point(226, 4)
     Me.txtOverTime.Maximum = New Decimal(New Integer() {360, 0, 0, 0})
     Me.txtOverTime.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
     Me.txtOverTime.Name = "txtOverTime"
@@ -874,13 +938,11 @@ Partial Class frmWizard
     'lblOverTime
     '
     Me.lblOverTime.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblOverTime.AutoSize = True
     Me.lblOverTime.Enabled = False
-    Me.lblOverTime.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.lblOverTime.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblOverTime.Location = New System.Drawing.Point(291, 5)
+    Me.lblOverTime.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lblOverTime.Location = New System.Drawing.Point(287, 6)
     Me.lblOverTime.Name = "lblOverTime"
-    Me.lblOverTime.Size = New System.Drawing.Size(58, 17)
+    Me.lblOverTime.Size = New System.Drawing.Size(51, 15)
     Me.lblOverTime.TabIndex = 4
     Me.lblOverTime.Text = "minutes"
     '
@@ -893,7 +955,7 @@ Partial Class frmWizard
     Me.lblDisplayTitle.Margin = New System.Windows.Forms.Padding(3)
     Me.lblDisplayTitle.Name = "lblDisplayTitle"
     Me.lblDisplayTitle.Size = New System.Drawing.Size(311, 26)
-    Me.lblDisplayTitle.TabIndex = 13
+    Me.lblDisplayTitle.TabIndex = 0
     Me.lblDisplayTitle.Text = "Set Optional Display Settings"
     Me.lblDisplayTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
@@ -906,8 +968,8 @@ Partial Class frmWizard
     Me.lblDisplayAccuracy.Margin = New System.Windows.Forms.Padding(3)
     Me.lblDisplayAccuracy.Name = "lblDisplayAccuracy"
     Me.lblDisplayAccuracy.Size = New System.Drawing.Size(420, 64)
-    Me.lblDisplayAccuracy.TabIndex = 2
-    Me.lblDisplayAccuracy.Text = "The following settings are all optional, and only effect the appearance of Satell" & _
+    Me.lblDisplayAccuracy.TabIndex = 1
+    Me.lblDisplayAccuracy.Text = "The following settings are all optional, and only affect the appearance of Satell" & _
     "ite Restriction Tracker." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Select how accurate you want usage data on the Main " & _
     "Window to be:"
     '
@@ -929,10 +991,9 @@ Partial Class frmWizard
     Me.pnlDisplayAccuracy.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlDisplayAccuracy.Name = "pnlDisplayAccuracy"
     Me.pnlDisplayAccuracy.RowCount = 1
-    Me.pnlDisplayAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDisplayAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31.0!))
+    Me.pnlDisplayAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlDisplayAccuracy.Size = New System.Drawing.Size(344, 31)
-    Me.pnlDisplayAccuracy.TabIndex = 14
+    Me.pnlDisplayAccuracy.TabIndex = 2
     '
     'optAccuracy0
     '
@@ -1007,7 +1068,7 @@ Partial Class frmWizard
     Me.chkDisplayScale.Margin = New System.Windows.Forms.Padding(3, 6, 3, 6)
     Me.chkDisplayScale.Name = "chkDisplayScale"
     Me.chkDisplayScale.Size = New System.Drawing.Size(441, 22)
-    Me.chkDisplayScale.TabIndex = 16
+    Me.chkDisplayScale.TabIndex = 4
     Me.chkDisplayScale.Text = "Set the size of the &Main Window's text to fit the size of the Main Window"
     Me.ttWizard.SetToolTip(Me.chkDisplayScale, "Scale text in the Main Window when the window is resized or maximized. (Off by De" & _
         "fault)")
@@ -1022,9 +1083,33 @@ Partial Class frmWizard
     Me.lblDisplayOver.Margin = New System.Windows.Forms.Padding(3)
     Me.lblDisplayOver.Name = "lblDisplayOver"
     Me.lblDisplayOver.Size = New System.Drawing.Size(441, 32)
-    Me.lblDisplayOver.TabIndex = 19
+    Me.lblDisplayOver.TabIndex = 6
     Me.lblDisplayOver.Text = "Satellite Restriction Tracker can notify you if your usage climbs too quickly to " & _
     "help prevent overuse. Choose a size and duration to set the alert limit:"
+    '
+    'lnDisplaySpace1
+    '
+    Me.lnDisplaySpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnDisplaySpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnDisplaySpace1.CausesValidation = False
+    Me.lnDisplaySpace1.Location = New System.Drawing.Point(3, 160)
+    Me.lnDisplaySpace1.Name = "lnDisplaySpace1"
+    Me.lnDisplaySpace1.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnDisplaySpace1.Size = New System.Drawing.Size(441, 4)
+    Me.lnDisplaySpace1.TabIndex = 3
+    Me.lnDisplaySpace1.TabStop = False
+    '
+    'lnDisplaySpace2
+    '
+    Me.lnDisplaySpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnDisplaySpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnDisplaySpace2.CausesValidation = False
+    Me.lnDisplaySpace2.Location = New System.Drawing.Point(3, 232)
+    Me.lnDisplaySpace2.Name = "lnDisplaySpace2"
+    Me.lnDisplaySpace2.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnDisplaySpace2.Size = New System.Drawing.Size(441, 4)
+    Me.lnDisplaySpace2.TabIndex = 5
+    Me.lnDisplaySpace2.TabStop = False
     '
     'tabFinished
     '
@@ -1087,11 +1172,6 @@ Partial Class frmWizard
     Me.pctHeader.TabIndex = 3
     Me.pctHeader.TabStop = False
     '
-    'tmrDraw
-    '
-    Me.tmrDraw.Enabled = True
-    Me.tmrDraw.Interval = 500
-    '
     'pctIcon
     '
     Me.pctIcon.BackColor = System.Drawing.SystemColors.Window
@@ -1104,96 +1184,10 @@ Partial Class frmWizard
     Me.pctIcon.TabIndex = 4
     Me.pctIcon.TabStop = False
     '
-    'lnAccountSpace1
+    'tmrDraw
     '
-    Me.lnAccountSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountSpace1.CausesValidation = False
-    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace1, 2)
-    Me.lnAccountSpace1.Location = New System.Drawing.Point(3, 116)
-    Me.lnAccountSpace1.Name = "lnAccountSpace1"
-    Me.lnAccountSpace1.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnAccountSpace1.Size = New System.Drawing.Size(441, 4)
-    Me.lnAccountSpace1.TabIndex = 10
-    Me.lnAccountSpace1.TabStop = False
-    '
-    'lnAccountSpace2
-    '
-    Me.lnAccountSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountSpace2.CausesValidation = False
-    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace2, 2)
-    Me.lnAccountSpace2.Location = New System.Drawing.Point(3, 207)
-    Me.lnAccountSpace2.Name = "lnAccountSpace2"
-    Me.lnAccountSpace2.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnAccountSpace2.Size = New System.Drawing.Size(441, 4)
-    Me.lnAccountSpace2.TabIndex = 11
-    Me.lnAccountSpace2.TabStop = False
-    '
-    'txtSignUp
-    '
-    Me.txtSignUp.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.txtSignUp.AutoSize = True
-    Me.txtSignUp.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.txtSignUp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.txtSignUp.ForeColor = System.Drawing.Color.MediumBlue
-    Me.txtSignUp.Location = New System.Drawing.Point(355, 125)
-    Me.txtSignUp.Name = "txtSignUp"
-    Me.txtSignUp.Size = New System.Drawing.Size(81, 13)
-    Me.txtSignUp.TabIndex = 14
-    Me.txtSignUp.Text = "&Sign Up Today!"
-    Me.ttWizard.SetToolTip(Me.txtSignUp, "Sign up for the Remote Usage Service on the Satellite Restriction Tracker website" & _
-        ".")
-    '
-    'lnServiceSpace2
-    '
-    Me.lnServiceSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnServiceSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnServiceSpace2.CausesValidation = False
-    Me.pnlService.SetColumnSpan(Me.lnServiceSpace2, 3)
-    Me.lnServiceSpace2.Location = New System.Drawing.Point(3, 270)
-    Me.lnServiceSpace2.Name = "lnServiceSpace2"
-    Me.lnServiceSpace2.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnServiceSpace2.Size = New System.Drawing.Size(441, 4)
-    Me.lnServiceSpace2.TabIndex = 15
-    Me.lnServiceSpace2.TabStop = False
-    '
-    'lnServiceSpace1
-    '
-    Me.lnServiceSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnServiceSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnServiceSpace1.CausesValidation = False
-    Me.pnlService.SetColumnSpan(Me.lnServiceSpace1, 3)
-    Me.lnServiceSpace1.Location = New System.Drawing.Point(3, 153)
-    Me.lnServiceSpace1.Name = "lnServiceSpace1"
-    Me.lnServiceSpace1.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnServiceSpace1.Size = New System.Drawing.Size(441, 4)
-    Me.lnServiceSpace1.TabIndex = 16
-    Me.lnServiceSpace1.TabStop = False
-    '
-    'lnDisplaySpace1
-    '
-    Me.lnDisplaySpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnDisplaySpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnDisplaySpace1.CausesValidation = False
-    Me.lnDisplaySpace1.Location = New System.Drawing.Point(3, 160)
-    Me.lnDisplaySpace1.Name = "lnDisplaySpace1"
-    Me.lnDisplaySpace1.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnDisplaySpace1.Size = New System.Drawing.Size(441, 4)
-    Me.lnDisplaySpace1.TabIndex = 21
-    Me.lnDisplaySpace1.TabStop = False
-    '
-    'lnDisplaySpace2
-    '
-    Me.lnDisplaySpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnDisplaySpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnDisplaySpace2.CausesValidation = False
-    Me.lnDisplaySpace2.Location = New System.Drawing.Point(3, 232)
-    Me.lnDisplaySpace2.Name = "lnDisplaySpace2"
-    Me.lnDisplaySpace2.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnDisplaySpace2.Size = New System.Drawing.Size(441, 4)
-    Me.lnDisplaySpace2.TabIndex = 22
-    Me.lnDisplaySpace2.TabStop = False
+    Me.tmrDraw.Enabled = True
+    Me.tmrDraw.Interval = 500
     '
     'frmWizard
     '
@@ -1234,7 +1228,6 @@ Partial Class frmWizard
     Me.pnlDisplay.ResumeLayout(False)
     Me.pnlDisplay.PerformLayout()
     Me.pnlOverAlert.ResumeLayout(False)
-    Me.pnlOverAlert.PerformLayout()
     CType(Me.txtOverSize, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.txtOverTime, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlDisplayAccuracy.ResumeLayout(False)
@@ -1266,7 +1259,7 @@ Partial Class frmWizard
   Friend WithEvents lblAccountHost As System.Windows.Forms.Label
   Friend WithEvents txtAccountUsername As System.Windows.Forms.TextBox
   Friend WithEvents lblAccountPassText As System.Windows.Forms.Label
-  Friend WithEvents txtAccountPass As System.Windows.Forms.TextBox
+  Friend WithEvents txtAccountPass As RestrictionTracker.PasswordBox
   Friend WithEvents lblAccountPass As System.Windows.Forms.Label
   Friend WithEvents tabService As System.Windows.Forms.TabPage
   Friend WithEvents pnlService As System.Windows.Forms.TableLayoutPanel
@@ -1308,9 +1301,9 @@ Partial Class frmWizard
   Friend WithEvents lblDisplayOver As System.Windows.Forms.Label
   Friend WithEvents pnlOverAlert As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents chkOverAlert As System.Windows.Forms.CheckBox
-  Friend WithEvents txtOverSize As NumericUpDownIncrementable
+  Friend WithEvents txtOverSize As RestrictionTracker.NumericUpDownIncrementable
   Friend WithEvents lblOverSize As System.Windows.Forms.Label
-  Friend WithEvents txtOverTime As NumericUpDownIncrementable
+  Friend WithEvents txtOverTime As RestrictionTracker.NumericUpDownIncrementable
   Friend WithEvents lblOverTime As System.Windows.Forms.Label
   Friend WithEvents lblAccountTitle As System.Windows.Forms.Label
   Friend WithEvents ttWizard As RestrictionTracker.ToolTip
