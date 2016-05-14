@@ -77,7 +77,12 @@
       c_ManualRedirect = value
     End Set
   End Property
+  Private c_Events As Boolean
   Public Event Failure(sender As Object, e As ErrorEventArgs)
+  Public Sub New(useEvents As Boolean)
+    MyBase.New()
+    c_Events = useEvents
+  End Sub
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
@@ -94,7 +99,11 @@
       Return request
     Catch ex As Net.WebException
       MyBase.CancelAsync()
-      RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      If c_Events Then
+        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      Else
+        Throw ex
+      End If
       Return Nothing
     End Try
   End Function
@@ -130,7 +139,11 @@
       End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
-      RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      If c_Events Then
+        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      Else
+        Throw ex
+      End If
       Return Nothing
     End Try
   End Function
@@ -166,7 +179,11 @@
       End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
-      RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      If c_Events Then
+        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+      Else
+        Throw ex
+      End If
       Return Nothing
     End Try
   End Function

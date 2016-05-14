@@ -76,7 +76,7 @@
 #End Region
   Public Sub CheckVersion()
     Dim myS As New AppSettings
-    wsVer = New WebClientCore()
+    wsVer = New WebClientCore(True)
     wsVer.Proxy = myS.Proxy
     wsVer.Timeout = myS.Timeout
     myS = Nothing
