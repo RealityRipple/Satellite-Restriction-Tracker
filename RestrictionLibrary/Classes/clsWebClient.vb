@@ -1,7 +1,19 @@
 ﻿Public Class WebClientCore
   Inherits Net.WebClient
+  Public Sub New(useEvents As Boolean)
+    MyBase.New()
+    c_Events = useEvents
+    c_CookieJar = New Net.CookieContainer
+    c_Timeout = 120
+    c_RWTimeout = 300
+    c_HTVer = Net.HttpVersion.Version11
+    c_ErrorBypass = True
+    c_ManualRedirect = True
+    System.Net.ServicePointManager.Expect100Continue = False
+  End Sub
   Sub New()
     MyBase.New()
+    c_Events = False
     c_CookieJar = New Net.CookieContainer
     c_Timeout = 120
     c_RWTimeout = 300
@@ -79,10 +91,6 @@
   End Property
   Private c_Events As Boolean
   Public Event Failure(sender As Object, e As ErrorEventArgs)
-  Public Sub New(useEvents As Boolean)
-    MyBase.New()
-    c_Events = useEvents
-  End Sub
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
