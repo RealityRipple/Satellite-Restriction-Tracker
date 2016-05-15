@@ -228,7 +228,15 @@
     ClosingTime = False
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
-    Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls Then
+      Try
+        Net.ServicePointManager.SecurityProtocol = &HFF0
+      Catch ex As Exception
+        Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+      End Try
+    Else
+      Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+    End If
     Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
@@ -1354,7 +1362,7 @@
 #End Region
 #Region "Useful Functions"
   Private Sub MakeSocket()
-    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
     If wsSocket IsNot Nothing Then
       oldEncoding = wsSocket.Encoding
       If wsSocket.IsBusy Then wsSocket.Cancel()

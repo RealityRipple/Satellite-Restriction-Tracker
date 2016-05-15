@@ -124,7 +124,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
         End Try
       ElseIf response.ContentType.ToLower.Contains("charset=") Then
         Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
@@ -133,7 +133,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
         End Try
       End If
       Return response
@@ -164,7 +164,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
         End Try
       ElseIf response.ContentType.ToLower.Contains("charset=") Then
         Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
@@ -173,7 +173,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
         End Try
       End If
       Return response
@@ -289,7 +289,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
-    c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    c_Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
     sDataPath = DataPath
     c_Busy = False
     c_ErrorBypass = True
@@ -301,7 +301,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
-    c_Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    c_Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
     sDataPath = Nothing
     c_Busy = False
     c_ErrorBypass = True

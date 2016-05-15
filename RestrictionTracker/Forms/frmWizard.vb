@@ -580,7 +580,19 @@ Public Class frmWizard
     AccountType = SatHostTypes.Other
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case ConnectionFailureEventArgs.FailureType.LoginFailure
+        If e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
+          Dim sMessage As String = e.Message.Substring(21)
+          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+            MsgDlg(Me, "Your Operating System is too old for this connection. I'm trying to find a way around this problem." & vbNewLine & "For more information, search for ""TLS 1.2 Windows XP"".", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+            MsgDlg(Me, "Your version of the .NET Framework is too old for this connection. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          Else
+            MsgDlg(Me, sMessage, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          End If
+        Else
+          MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+        End If
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1

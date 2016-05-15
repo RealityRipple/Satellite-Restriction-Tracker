@@ -324,7 +324,7 @@ Public Class remoteRestrictionTracker
   End Sub
 
   Private Sub MakeSocket()
-    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(WINDOWS_1252)
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
     If wsSocket IsNot Nothing Then
       oldEncoding = wsSocket.Encoding
       If wsSocket.IsBusy Then wsSocket.Cancel()

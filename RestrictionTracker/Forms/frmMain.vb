@@ -566,7 +566,15 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
-    Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls Then
+      Try
+        Net.ServicePointManager.SecurityProtocol = &HFF0
+      Catch ex As Exception
+        Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+      End Try
+    Else
+      Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+    End If
     If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
@@ -898,7 +906,18 @@ Public Class frmMain
         SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.LoginFailure
-        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        If e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
+          Dim sMessage As String = e.Message.Substring(21)
+          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Your Operating System is too old for this connection. I'm trying to find a way around this problem." & vbNewLine & "For more information, search for ""TLS 1.2 Windows XP"".", True)
+          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Your version of the .NET Framework is too old for this connection. Please update to .NET 4.5 or newer.", True)
+          Else
+            SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+          End If
+        Else
+          SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        End If
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, True)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure

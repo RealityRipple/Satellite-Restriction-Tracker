@@ -1,7 +1,6 @@
 ﻿Imports System.IO
 Module modFunctions
   Public Const LATIN_1 As Integer = 28591
-  Public Const WINDOWS_1252 As Integer = 1252
   Public Function PercentEncode(inString As String) As String
     Dim sRet As String = String.Empty
     If String.IsNullOrEmpty(inString) Then Return inString
@@ -102,7 +101,7 @@ Module modFunctions
         Return "Connection to the server timed out. Please try again."
       ElseIf ex.Message.StartsWith("The request was aborted:") Then
         If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
-          Return "Unable to create secure connection. Please change your Network Security Protocol settings and try again."
+          Return "POSSIBLE TLS ERROR - Unable to create secure connection. Please change your Network Security Protocol settings and try again."
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return "Connection aborted."
         Else
@@ -261,13 +260,15 @@ Module modFunctions
             If ex.InnerException.InnerException Is Nothing Then
               If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Error in response - " & ex.InnerException.Message
+            ElseIf ex.InnerException.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
+              Return "POSSIBLE TLS ERROR - The authentication or decryption has failed. Please change your Network Security Protocol settings and try again."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
               Return "The server closed the connection. Please try again."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
               Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
             Else
               If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
-              Return "Error in response - " & ex.InnerException.Message
+              Return "Connection server failed to negotiate - " & ex.InnerException.InnerException.Message
             End If
           Else
             If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
@@ -308,7 +309,7 @@ Module modFunctions
           ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
             Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
-            Return "The server closed the connection. Please try again."
+            Return "POSSIBLE TLS ERROR - The server closed the connection."
           Else
             If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
@@ -398,7 +399,7 @@ Module modFunctions
             ElseIf ex.InnerException.InnerException.Message.Contains("The socket has been shut down") Then
               Return "Connection to server closed. Please try again."
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
-              Return "Decryption failure. Please change your Network Security Protocol settings and try again."
+              Return "POSSIBLE TLS ERROR - Decryption failure. Please change your Network Security Protocol settings and try again."
             Else
               If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Send Header Error - " & ex.InnerException.Message
