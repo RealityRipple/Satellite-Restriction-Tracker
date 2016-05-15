@@ -760,7 +760,7 @@ Partial Class frmConfig
     Me.chkAccountTypeAuto.Location = New System.Drawing.Point(160, 49)
     Me.chkAccountTypeAuto.Name = "chkAccountTypeAuto"
     Me.chkAccountTypeAuto.Size = New System.Drawing.Size(170, 18)
-    Me.chkAccountTypeAuto.TabIndex = 6
+    Me.chkAccountTypeAuto.TabIndex = 4
     Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
     Me.ttConfig.SetToolTip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
         "onnection." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you'd like to choose a type manually, you can uncheck this box an" & _
@@ -813,7 +813,7 @@ Partial Class frmConfig
     Me.pnlKey.RowCount = 1
     Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlKey.Size = New System.Drawing.Size(230, 24)
-    Me.pnlKey.TabIndex = 1
+    Me.pnlKey.TabIndex = 2
     '
     'pctKeyState
     '
@@ -921,7 +921,7 @@ Partial Class frmConfig
     Me.lblKey.Location = New System.Drawing.Point(59, 37)
     Me.lblKey.Name = "lblKey"
     Me.lblKey.Size = New System.Drawing.Size(68, 13)
-    Me.lblKey.TabIndex = 0
+    Me.lblKey.TabIndex = 1
     Me.lblKey.Text = "Product &Key:"
     '
     'lblPurchaseKey
@@ -929,13 +929,13 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblPurchaseKey.AutoSize = True
     Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
+    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 59)
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
     Me.lblPurchaseKey.Name = "lblPurchaseKey"
     Me.lblPurchaseKey.Size = New System.Drawing.Size(235, 13)
-    Me.lblPurchaseKey.TabIndex = 2
+    Me.lblPurchaseKey.TabIndex = 3
     Me.lblPurchaseKey.TabStop = True
     Me.lblPurchaseKey.Text = "Purchase a Remote Usage Service Subscription"
     '
@@ -947,7 +947,7 @@ Partial Class frmConfig
     Me.lblAccountKeyDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountKeyDescription.Name = "lblAccountKeyDescription"
     Me.lblAccountKeyDescription.Size = New System.Drawing.Size(316, 26)
-    Me.lblAccountKeyDescription.TabIndex = 3
+    Me.lblAccountKeyDescription.TabIndex = 0
     Me.lblAccountKeyDescription.Text = "Let us track your usage for you! 24-hour meter information at your fingertips, pr" & _
     "ovided by RealityRipple Software."
     '
@@ -1012,7 +1012,7 @@ Partial Class frmConfig
     Me.pnlPrefInterfaceTitle.RowCount = 1
     Me.pnlPrefInterfaceTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefInterfaceTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlPrefInterfaceTitle.TabIndex = 9
+    Me.pnlPrefInterfaceTitle.TabIndex = 6
     '
     'lblPrefInterfaceTitle
     '
@@ -1057,7 +1057,7 @@ Partial Class frmConfig
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefColor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45.0!))
     Me.pnlPrefColor.Size = New System.Drawing.Size(379, 45)
-    Me.pnlPrefColor.TabIndex = 8
+    Me.pnlPrefColor.TabIndex = 9
     '
     'pctPrefColorIcon
     '
@@ -1125,7 +1125,7 @@ Partial Class frmConfig
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAlert.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAlert.Size = New System.Drawing.Size(364, 97)
-    Me.pnlPrefAlert.TabIndex = 7
+    Me.pnlPrefAlert.TabIndex = 5
     '
     'pctPrefAlertIcon
     '
@@ -1265,7 +1265,7 @@ Partial Class frmConfig
     Me.pnlPrefAccuracy.RowCount = 1
     Me.pnlPrefAccuracy.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefAccuracy.Size = New System.Drawing.Size(344, 52)
-    Me.pnlPrefAccuracy.TabIndex = 6
+    Me.pnlPrefAccuracy.TabIndex = 3
     '
     'pctPrefAccuracyIcon
     '
@@ -1309,7 +1309,7 @@ Partial Class frmConfig
     Me.lblInterval1.Location = New System.Drawing.Point(3, 6)
     Me.lblInterval1.Name = "lblInterval1"
     Me.lblInterval1.Size = New System.Drawing.Size(29, 13)
-    Me.lblInterval1.TabIndex = 1
+    Me.lblInterval1.TabIndex = 0
     Me.lblInterval1.Text = "W&ait"
     '
     'txtInterval
@@ -1320,7 +1320,7 @@ Partial Class frmConfig
     Me.txtInterval.Minimum = New Decimal(New Integer() {15, 0, 0, 0})
     Me.txtInterval.Name = "txtInterval"
     Me.txtInterval.Size = New System.Drawing.Size(50, 20)
-    Me.txtInterval.TabIndex = 2
+    Me.txtInterval.TabIndex = 1
     Me.txtInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetToolTip(Me.txtInterval, "Interval between meter checks in minutes.")
     Me.txtInterval.Value = New Decimal(New Integer() {15, 0, 0, 0})
@@ -1332,7 +1332,7 @@ Partial Class frmConfig
     Me.lblInterval2.Location = New System.Drawing.Point(106, 6)
     Me.lblInterval2.Name = "lblInterval2"
     Me.lblInterval2.Size = New System.Drawing.Size(179, 13)
-    Me.lblInterval2.TabIndex = 3
+    Me.lblInterval2.TabIndex = 2
     Me.lblInterval2.Text = "minutes between each usage check"
     '
     'lblAccuracy1
@@ -1342,7 +1342,7 @@ Partial Class frmConfig
     Me.lblAccuracy1.Location = New System.Drawing.Point(3, 32)
     Me.lblAccuracy1.Name = "lblAccuracy1"
     Me.lblAccuracy1.Size = New System.Drawing.Size(41, 13)
-    Me.lblAccuracy1.TabIndex = 4
+    Me.lblAccuracy1.TabIndex = 3
     Me.lblAccuracy1.Text = "&Display"
     '
     'txtAccuracy
@@ -1352,7 +1352,7 @@ Partial Class frmConfig
     Me.txtAccuracy.Maximum = New Decimal(New Integer() {3, 0, 0, 0})
     Me.txtAccuracy.Name = "txtAccuracy"
     Me.txtAccuracy.Size = New System.Drawing.Size(50, 20)
-    Me.txtAccuracy.TabIndex = 5
+    Me.txtAccuracy.TabIndex = 4
     Me.txtAccuracy.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetToolTip(Me.txtAccuracy, "Number of decimal places to display.")
     '
@@ -1363,7 +1363,7 @@ Partial Class frmConfig
     Me.lblAccuracy2.Location = New System.Drawing.Point(106, 32)
     Me.lblAccuracy2.Name = "lblAccuracy2"
     Me.lblAccuracy2.Size = New System.Drawing.Size(138, 13)
-    Me.lblAccuracy2.TabIndex = 6
+    Me.lblAccuracy2.TabIndex = 5
     Me.lblAccuracy2.Text = "digits after the decimal point"
     '
     'pnlPrefStartTitle
@@ -1383,7 +1383,7 @@ Partial Class frmConfig
     Me.pnlPrefStartTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefStartTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 13.0!))
     Me.pnlPrefStartTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlPrefStartTitle.TabIndex = 1
+    Me.pnlPrefStartTitle.TabIndex = 0
     '
     'lblPrefStartTitle
     '
@@ -1467,7 +1467,7 @@ Partial Class frmConfig
     Me.pnlPrefAlertTitle.RowCount = 1
     Me.pnlPrefAlertTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefAlertTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlPrefAlertTitle.TabIndex = 3
+    Me.pnlPrefAlertTitle.TabIndex = 4
     '
     'lblPrefAlertTitle
     '
@@ -1509,7 +1509,7 @@ Partial Class frmConfig
     Me.pnlPrefColorTitle.RowCount = 1
     Me.pnlPrefColorTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlPrefColorTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlPrefColorTitle.TabIndex = 4
+    Me.pnlPrefColorTitle.TabIndex = 8
     '
     'lblPrefColorTitle
     '
@@ -1549,7 +1549,7 @@ Partial Class frmConfig
     Me.pnlPrefStart.RowCount = 1
     Me.pnlPrefStart.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefStart.Size = New System.Drawing.Size(379, 98)
-    Me.pnlPrefStart.TabIndex = 5
+    Me.pnlPrefStart.TabIndex = 1
     '
     'pctPrefStartIcon
     '
@@ -1644,7 +1644,7 @@ Partial Class frmConfig
     Me.chkService.Location = New System.Drawing.Point(3, 53)
     Me.chkService.Name = "chkService"
     Me.chkService.Size = New System.Drawing.Size(317, 18)
-    Me.chkService.TabIndex = 7
+    Me.chkService.TabIndex = 4
     Me.chkService.Text = "Run &Logger Service when Satellite Restriction Tracker closes"
     Me.ttConfig.SetToolTip(Me.chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracke" & _
         "r is closed.")
@@ -1658,7 +1658,7 @@ Partial Class frmConfig
     Me.chkAutoHide.Location = New System.Drawing.Point(3, 77)
     Me.chkAutoHide.Name = "chkAutoHide"
     Me.chkAutoHide.Size = New System.Drawing.Size(255, 18)
-    Me.chkAutoHide.TabIndex = 8
+    Me.chkAutoHide.TabIndex = 5
     Me.chkAutoHide.Text = "&Minimize Satellite Restriction Tracker on startup"
     Me.ttConfig.SetToolTip(Me.chkAutoHide, "Automatically minimize the program when it starts.")
     Me.chkAutoHide.UseVisualStyleBackColor = False
@@ -1686,7 +1686,7 @@ Partial Class frmConfig
     Me.pnlPrefInterface.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefInterface.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlPrefInterface.Size = New System.Drawing.Size(379, 72)
-    Me.pnlPrefInterface.TabIndex = 5
+    Me.pnlPrefInterface.TabIndex = 7
     '
     'chkTrayIcon
     '
@@ -1696,7 +1696,7 @@ Partial Class frmConfig
     Me.chkTrayIcon.Location = New System.Drawing.Point(59, 27)
     Me.chkTrayIcon.Name = "chkTrayIcon"
     Me.chkTrayIcon.Size = New System.Drawing.Size(137, 18)
-    Me.chkTrayIcon.TabIndex = 7
+    Me.chkTrayIcon.TabIndex = 1
     Me.chkTrayIcon.Text = "Show system &tray icon"
     Me.ttConfig.SetToolTip(Me.chkTrayIcon, "Display an icon in the system Notification Area.")
     Me.chkTrayIcon.UseVisualStyleBackColor = False
@@ -1735,7 +1735,7 @@ Partial Class frmConfig
     Me.chkTrayMin.Location = New System.Drawing.Point(77, 51)
     Me.chkTrayMin.Name = "chkTrayMin"
     Me.chkTrayMin.Size = New System.Drawing.Size(130, 18)
-    Me.chkTrayMin.TabIndex = 8
+    Me.chkTrayMin.TabIndex = 2
     Me.chkTrayMin.Text = "O&nly when minimized"
     Me.ttConfig.SetToolTip(Me.chkTrayMin, "Display the tray icon only when Satellite Restriction Tracker is minimized.")
     Me.chkTrayMin.UseVisualStyleBackColor = False
@@ -1748,7 +1748,7 @@ Partial Class frmConfig
     Me.chkTrayAnim.Location = New System.Drawing.Point(216, 51)
     Me.chkTrayAnim.Name = "chkTrayAnim"
     Me.chkTrayAnim.Size = New System.Drawing.Size(169, 18)
-    Me.chkTrayAnim.TabIndex = 9
+    Me.chkTrayAnim.TabIndex = 4
     Me.chkTrayAnim.Text = "Show tra&y minimize animation"
     Me.ttConfig.SetToolTip(Me.chkTrayAnim, "See the Main Window go to the System Tray instead of the default minimize animati" & _
         "on.")
@@ -1762,7 +1762,7 @@ Partial Class frmConfig
     Me.chkTrayClose.Location = New System.Drawing.Point(216, 3)
     Me.chkTrayClose.Name = "chkTrayClose"
     Me.chkTrayClose.Size = New System.Drawing.Size(157, 18)
-    Me.chkTrayClose.TabIndex = 10
+    Me.chkTrayClose.TabIndex = 3
     Me.chkTrayClose.Text = "Minimize instead of closin&g"
     Me.ttConfig.SetToolTip(Me.chkTrayClose, "Instead of closing the program, pressing the X button will minimize the program.")
     Me.chkTrayClose.UseVisualStyleBackColor = True
@@ -1823,7 +1823,7 @@ Partial Class frmConfig
     Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkProtocol.Size = New System.Drawing.Size(350, 56)
-    Me.pnlNetworkProtocol.TabIndex = 16
+    Me.pnlNetworkProtocol.TabIndex = 6
     '
     'lblNetworkProtocolDescription
     '
@@ -1834,7 +1834,7 @@ Partial Class frmConfig
     Me.lblNetworkProtocolDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkProtocolDescription.Name = "lblNetworkProtocolDescription"
     Me.lblNetworkProtocolDescription.Size = New System.Drawing.Size(288, 26)
-    Me.lblNetworkProtocolDescription.TabIndex = 2
+    Me.lblNetworkProtocolDescription.TabIndex = 0
     Me.lblNetworkProtocolDescription.Text = "Some servers may prefer the older SSL protocol, others may" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "require modern TLS."
     '
     'pctNetworkProtocolIcon
@@ -1879,7 +1879,7 @@ Partial Class frmConfig
     Me.pnlNetworkProtocolTitle.RowCount = 1
     Me.pnlNetworkProtocolTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProtocolTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlNetworkProtocolTitle.TabIndex = 15
+    Me.pnlNetworkProtocolTitle.TabIndex = 5
     '
     'lblNetworkProtocolTitle
     '
@@ -1925,7 +1925,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkUpdate.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlNetworkUpdate.Size = New System.Drawing.Size(310, 78)
-    Me.pnlNetworkUpdate.TabIndex = 6
+    Me.pnlNetworkUpdate.TabIndex = 8
     '
     'pctNetworkUpdateIcon
     '
@@ -1965,7 +1965,7 @@ Partial Class frmConfig
     Me.lblUpdateInterval.Location = New System.Drawing.Point(3, 7)
     Me.lblUpdateInterval.Name = "lblUpdateInterval"
     Me.lblUpdateInterval.Size = New System.Drawing.Size(117, 13)
-    Me.lblUpdateInterval.TabIndex = 0
+    Me.lblUpdateInterval.TabIndex = 2
     Me.lblUpdateInterval.Text = "Perform a &check every:"
     '
     'cmbUpdateInterval
@@ -1977,7 +1977,7 @@ Partial Class frmConfig
     Me.cmbUpdateInterval.Location = New System.Drawing.Point(130, 3)
     Me.cmbUpdateInterval.Name = "cmbUpdateInterval"
     Me.cmbUpdateInterval.Size = New System.Drawing.Size(121, 21)
-    Me.cmbUpdateInterval.TabIndex = 1
+    Me.cmbUpdateInterval.TabIndex = 3
     Me.ttConfig.SetToolTip(Me.cmbUpdateInterval, "Select an interval between automatic update checks.")
     '
     'chkUpdateBETA
@@ -1988,7 +1988,7 @@ Partial Class frmConfig
     Me.chkUpdateBETA.Location = New System.Drawing.Point(59, 30)
     Me.chkUpdateBETA.Name = "chkUpdateBETA"
     Me.chkUpdateBETA.Size = New System.Drawing.Size(150, 18)
-    Me.chkUpdateBETA.TabIndex = 5
+    Me.chkUpdateBETA.TabIndex = 1
     Me.chkUpdateBETA.Text = "Check for BETA updates"
     Me.ttConfig.SetToolTip(Me.chkUpdateBETA, "Download potentially unstable updates to help test the next release of Satellite " & _
         "Restriction Tracker.")
@@ -2005,7 +2005,7 @@ Partial Class frmConfig
     Me.cmbUpdateAutomation.Location = New System.Drawing.Point(59, 3)
     Me.cmbUpdateAutomation.Name = "cmbUpdateAutomation"
     Me.cmbUpdateAutomation.Size = New System.Drawing.Size(248, 21)
-    Me.cmbUpdateAutomation.TabIndex = 6
+    Me.cmbUpdateAutomation.TabIndex = 0
     Me.ttConfig.SetToolTip(Me.cmbUpdateAutomation, "Choose how Satellite Restriction Tracker installs updates.")
     '
     'pnlNetworkProxy
@@ -2395,7 +2395,7 @@ Partial Class frmConfig
     Me.pnlNetworkUpdateTitle.RowCount = 1
     Me.pnlNetworkUpdateTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkUpdateTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlNetworkUpdateTitle.TabIndex = 5
+    Me.pnlNetworkUpdateTitle.TabIndex = 7
     '
     'lblNetworkUpdateTitle
     '
@@ -2477,7 +2477,7 @@ Partial Class frmConfig
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvancedPortable.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAdvancedPortable.Size = New System.Drawing.Size(375, 89)
-    Me.pnlAdvancedPortable.TabIndex = 13
+    Me.pnlAdvancedPortable.TabIndex = 5
     '
     'pnlPortableDir
     '
@@ -2592,7 +2592,7 @@ Partial Class frmConfig
     Me.pnlAdvancedPortableTitle.RowCount = 1
     Me.pnlAdvancedPortableTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedPortableTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlAdvancedPortableTitle.TabIndex = 12
+    Me.pnlAdvancedPortableTitle.TabIndex = 4
     '
     'lblAdvancedPortableTitle
     '
@@ -2632,7 +2632,7 @@ Partial Class frmConfig
     Me.pnlAdvancedData.RowCount = 1
     Me.pnlAdvancedData.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedData.Size = New System.Drawing.Size(375, 150)
-    Me.pnlAdvancedData.TabIndex = 11
+    Me.pnlAdvancedData.TabIndex = 1
     '
     'pctAdvancedDataIcon
     '
@@ -2805,7 +2805,7 @@ Partial Class frmConfig
     Me.pnlAdvancedDataTitle.RowCount = 1
     Me.pnlAdvancedDataTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedDataTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlAdvancedDataTitle.TabIndex = 10
+    Me.pnlAdvancedDataTitle.TabIndex = 0
     '
     'lblAdvancedDataTitle
     '
@@ -2847,7 +2847,7 @@ Partial Class frmConfig
     Me.pnlAdvancedNetTestTitle.RowCount = 1
     Me.pnlAdvancedNetTestTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedNetTestTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlAdvancedNetTestTitle.TabIndex = 10
+    Me.pnlAdvancedNetTestTitle.TabIndex = 2
     '
     'lblAdvancedNetTestTitle
     '
@@ -2887,7 +2887,7 @@ Partial Class frmConfig
     Me.pnlAdvancedNetTest.RowCount = 1
     Me.pnlAdvancedNetTest.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAdvancedNetTest.Size = New System.Drawing.Size(377, 143)
-    Me.pnlAdvancedNetTest.TabIndex = 11
+    Me.pnlAdvancedNetTest.TabIndex = 3
     '
     'pctAdvancedNetTestIcon
     '
