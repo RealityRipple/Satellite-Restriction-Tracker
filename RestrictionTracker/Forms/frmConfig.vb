@@ -239,6 +239,7 @@
       txtPortableDir.Enabled = False
       cmdPortableDir.Enabled = False
       cmdMakePortable.Enabled = False
+      ttConfig.SetToolTip(cmdMakePortable, "This application is already portable!")
     ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
       optHistoryProgramData.Checked = True
     ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
@@ -327,10 +328,12 @@
     pnlPrefAccuracy.MouseMove, pnlPrefAccuracyInput.MouseMove,
     pnlPrefAlert.MouseMove, pnlPrefColor.MouseMove,
     pnlNetwork.MouseMove,
-    pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkUpdate.MouseMove,
+    pnlNetworkTimeout.MouseMove, pnlNetworkProxy.MouseMove, pnlNetworkProtocol.MouseMove, pnlNetworkUpdate.MouseMove,
     pnlAdvanced.MouseMove,
     pnlAdvancedData.MouseMove, pnlAdvancedDataInput.MouseMove, pnlHistoryDir.MouseMove,
-    pnlButtons.MouseMove, pnlPrefInterface.MouseMove, pnlAdvancedNetTestInput.MouseMove, pnlAdvancedNetTest.MouseMove
+    pnlPrefInterface.MouseMove, pnlAdvancedNetTestInput.MouseMove, pnlAdvancedNetTest.MouseMove,
+    pnlAdvancedPortable.MouseMove,
+    pnlButtons.MouseMove
     Dim pnlParent As TableLayoutPanel = sender
     Dim ctl As Control = pnlParent.GetChildAtPoint(e.Location)
     If Not ctl Is Nothing Then
@@ -387,7 +390,7 @@
       remoteTest = Nothing
     End If
     lblPurchaseKey.Text = LINK_PURCHASE
-    ttConfig.SetTooltip(lblPurchaseKey, LINK_PURCHASE_TT)
+    ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
     If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
       cmdSave.Enabled = SettingsChanged()
     Else
@@ -482,11 +485,11 @@
       remoteTest = Nothing
     End If
     lblPurchaseKey.Text = LINK_PURCHASE
-    ttConfig.SetTooltip(lblPurchaseKey, LINK_PURCHASE_TT)
+    ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
     If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
       pctKeyState.Tag = 0
       pctKeyState.Image = Nothing
-      ttConfig.SetTooltip(pctKeyState, String.Empty)
+      ttConfig.SetToolTip(pctKeyState, String.Empty)
       cmdSave.Enabled = SettingsChanged()
       DoCheck()
     Else
@@ -711,21 +714,25 @@
   Private Sub txtPortableDir_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtPortableDir.TextChanged
     If String.IsNullOrEmpty(txtPortableDir.Text) Then
       cmdMakePortable.Enabled = False
+      ttConfig.SetToolTip(cmdMakePortable, "No directory selected!")
       pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
       Exit Sub
     End If
     Try
       If Not IO.Directory.Exists(txtPortableDir.Text) Then
         cmdMakePortable.Enabled = False
+        ttConfig.SetToolTip(cmdMakePortable, "Selected directory does not exist!")
         pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
         Exit Sub
       End If
     Catch ex As Exception
       cmdMakePortable.Enabled = False
+      ttConfig.SetToolTip(cmdMakePortable, "Error accessing selected directory!")
       pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
       Exit Sub
     End Try
     cmdMakePortable.Enabled = True
+    ttConfig.SetToolTip(cmdMakePortable, "Copy " & My.Application.Info.ProductName & " to the selected directory.")
     pctAdvancedPortableIcon.Image = My.Resources.advanced_portable
   End Sub
 #Region "Host List"
