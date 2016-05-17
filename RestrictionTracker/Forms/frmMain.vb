@@ -566,14 +566,35 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
-    If mySettings.SecurityProtocol = Net.SecurityProtocolType.Tls Then
+    Dim useProtocol As SecurityProtocolTypeEx = 0
+    For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+      If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then
+        Try
+          Net.ServicePointManager.SecurityProtocol = protocolTest
+          useProtocol = useProtocol Or protocolTest
+        Catch ex As Exception
+        End Try
+      End If
+    Next
+    If useProtocol = 0 Then
+      For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+        Try
+          Net.ServicePointManager.SecurityProtocol = protocolTest
+          useProtocol = useProtocol Or protocolTest
+        Catch ex As Exception
+        End Try
+      Next
       Try
-        Net.ServicePointManager.SecurityProtocol = &HFF0
+        Net.ServicePointManager.SecurityProtocol = useProtocol
+        mySettings.SecurityProtocol = useProtocol
+        mySettings.Save()
       Catch ex As Exception
-        Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
       End Try
     Else
-      Net.ServicePointManager.SecurityProtocol = mySettings.SecurityProtocol
+      Try
+        Net.ServicePointManager.SecurityProtocol = useProtocol
+      Catch ex As Exception
+      End Try
     End If
     If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)

@@ -58,7 +58,12 @@ Class AppSettings
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
                   ElseIf xName.CompareTo("Protocol") = 0 Then
-                    m_Protocol = IIf(xValue = "TLS", Net.SecurityProtocolType.Tls, Net.SecurityProtocolType.Ssl3)
+                    m_Protocol = 0
+                    If xValue.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
+                    If xValue.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
+                    If xValue.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
+                    If xValue.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
+                    If xValue.Contains("TLS") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
                   End If
                 Next
                 Loaded = True
@@ -95,7 +100,7 @@ Class AppSettings
     m_PassCrypt = Nothing
     m_Timeout = 120
     m_ProxySetting = "None"
-    m_Protocol = Net.SecurityProtocolType.Tls
+    m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
   End Sub
   Public Property Account As String
     Get

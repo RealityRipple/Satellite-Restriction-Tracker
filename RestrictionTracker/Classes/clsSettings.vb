@@ -580,12 +580,17 @@ Class AppSettings
       End If
       Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
       If xProtocol Is Nothing Then
-        m_Protocol = Net.SecurityProtocolType.Tls
+        m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
       Else
         Try
-          m_Protocol = IIf(xProtocol.Element("value").Value = "TLS", Net.SecurityProtocolType.Tls, Net.SecurityProtocolType.Ssl3)
+          m_Protocol = 0
+          If xProtocol.Element("value").Value.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
+          If xProtocol.Element("value").Value.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
+          If xProtocol.Element("value").Value.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
+          If xProtocol.Element("value").Value.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
+          If xProtocol.Element("value").Value.Contains("TLS") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         Catch ex As Exception
-          m_Protocol = Net.SecurityProtocolType.Tls
+          m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         End Try
       End If
       Dim xNetTest As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "NetTestURL")
@@ -1010,7 +1015,7 @@ Class AppSettings
     m_AutoHide = True
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
-    m_Protocol = Net.SecurityProtocolType.Tls
+    m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     m_NetTest = Nothing
     Colors = New AppColors
     ResetColors()
@@ -1066,6 +1071,13 @@ Class AppSettings
       Case TrayStyles.Never : sTrayIcon = "Never"
       Case TrayStyles.Minimized : sTrayIcon = "Minimized"
     End Select
+    Dim sProtocol As String = ""
+    For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+      If (m_Protocol And protocolTest) = protocolTest Then
+        sProtocol &= [Enum].GetName(GetType(SecurityProtocolTypeEx), protocolTest).ToUpper & ", "
+      End If
+    Next
+    If Not String.IsNullOrEmpty(sProtocol) AndAlso sProtocol.EndsWith(", ") Then sProtocol = sProtocol.Substring(0, sProtocol.Length - 2)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
@@ -1098,7 +1110,7 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
-                                                          New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", IIf(m_Protocol = Net.SecurityProtocolType.Tls, "TLS", "SSL"))),
+                                                          New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
                                                           New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),

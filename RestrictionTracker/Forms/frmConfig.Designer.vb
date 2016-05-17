@@ -130,7 +130,7 @@ Partial Class frmConfig
     Me.pnlNetworkProtocol = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolDescription = New System.Windows.Forms.Label()
     Me.pctNetworkProtocolIcon = New System.Windows.Forms.PictureBox()
-    Me.chkNetworkProtocolSSL = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolSSL3 = New System.Windows.Forms.CheckBox()
     Me.pnlNetworkProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolTitle = New System.Windows.Forms.Label()
     Me.lnNetworkProtocolTitle = New RestrictionTracker.LineBreak()
@@ -218,6 +218,9 @@ Partial Class frmConfig
     Me.fswController = New System.IO.FileSystemWatcher()
     Me.tmrIcoWait = New System.Windows.Forms.Timer(Me.components)
     Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
+    Me.chkNetworkProtocolTLS10 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -929,7 +932,7 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblPurchaseKey.AutoSize = True
     Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
     Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 59)
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
@@ -1811,18 +1814,24 @@ Partial Class frmConfig
     '
     Me.pnlNetworkProtocol.AutoSize = True
     Me.pnlNetworkProtocol.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlNetworkProtocol.ColumnCount = 2
+    Me.pnlNetworkProtocol.ColumnCount = 5
     Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+    Me.pnlNetworkProtocol.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
     Me.pnlNetworkProtocol.Controls.Add(Me.lblNetworkProtocolDescription, 1, 0)
     Me.pnlNetworkProtocol.Controls.Add(Me.pctNetworkProtocolIcon, 0, 0)
-    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolSSL, 1, 1)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolSSL3, 1, 1)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS10, 2, 1)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS11, 3, 1)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS12, 4, 1)
     Me.pnlNetworkProtocol.Location = New System.Drawing.Point(3, 312)
     Me.pnlNetworkProtocol.Name = "pnlNetworkProtocol"
     Me.pnlNetworkProtocol.RowCount = 2
     Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlNetworkProtocol.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetworkProtocol.Size = New System.Drawing.Size(350, 56)
+    Me.pnlNetworkProtocol.Size = New System.Drawing.Size(360, 56)
     Me.pnlNetworkProtocol.TabIndex = 6
     '
     'lblNetworkProtocolDescription
@@ -1830,10 +1839,11 @@ Partial Class frmConfig
     Me.lblNetworkProtocolDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblNetworkProtocolDescription.AutoSize = True
+    Me.pnlNetworkProtocol.SetColumnSpan(Me.lblNetworkProtocolDescription, 4)
     Me.lblNetworkProtocolDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblNetworkProtocolDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkProtocolDescription.Name = "lblNetworkProtocolDescription"
-    Me.lblNetworkProtocolDescription.Size = New System.Drawing.Size(288, 26)
+    Me.lblNetworkProtocolDescription.Size = New System.Drawing.Size(298, 26)
     Me.lblNetworkProtocolDescription.TabIndex = 0
     Me.lblNetworkProtocolDescription.Text = "Some servers may prefer the older SSL protocol, others may" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "require modern TLS."
     '
@@ -1850,18 +1860,18 @@ Partial Class frmConfig
     Me.pctNetworkProtocolIcon.TabIndex = 0
     Me.pctNetworkProtocolIcon.TabStop = False
     '
-    'chkNetworkProtocolSSL
+    'chkNetworkProtocolSSL3
     '
-    Me.chkNetworkProtocolSSL.AutoSize = True
-    Me.chkNetworkProtocolSSL.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolSSL.Location = New System.Drawing.Point(59, 35)
-    Me.chkNetworkProtocolSSL.Name = "chkNetworkProtocolSSL"
-    Me.chkNetworkProtocolSSL.Size = New System.Drawing.Size(130, 18)
-    Me.chkNetworkProtocolSSL.TabIndex = 1
-    Me.chkNetworkProtocolSSL.Text = "Use &Legacy SSL 3.0"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL, "Check this box to use the older SSL 3.0 instead of TLS 1.0 for secure connections" & _
-        ".")
-    Me.chkNetworkProtocolSSL.UseVisualStyleBackColor = False
+    Me.chkNetworkProtocolSSL3.AutoSize = True
+    Me.chkNetworkProtocolSSL3.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolSSL3.Location = New System.Drawing.Point(59, 35)
+    Me.chkNetworkProtocolSSL3.Name = "chkNetworkProtocolSSL3"
+    Me.chkNetworkProtocolSSL3.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolSSL3.TabIndex = 1
+    Me.chkNetworkProtocolSSL3.Text = "SS&L 3.0"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which may be vulnerabl" & _
+        "e to attacks.")
+    Me.chkNetworkProtocolSSL3.UseVisualStyleBackColor = False
     '
     'pnlNetworkProtocolTitle
     '
@@ -3087,6 +3097,45 @@ Partial Class frmConfig
     Me.ttConfig.Persistant = True
     Me.ttConfig.ReshowDelay = 100
     '
+    'chkNetworkProtocolTLS10
+    '
+    Me.chkNetworkProtocolTLS10.AutoSize = True
+    Me.chkNetworkProtocolTLS10.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(135, 35)
+    Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
+    Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS10.TabIndex = 2
+    Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
+        "e to attacks.")
+    Me.chkNetworkProtocolTLS10.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolTLS11
+    '
+    Me.chkNetworkProtocolTLS11.AutoSize = True
+    Me.chkNetworkProtocolTLS11.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(211, 35)
+    Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
+    Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS11.TabIndex = 2
+    Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer TLS 1.1 protocol, which requires Windows" & _
+        " 7 or newer.")
+    Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolTLS12
+    '
+    Me.chkNetworkProtocolTLS12.AutoSize = True
+    Me.chkNetworkProtocolTLS12.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS12.Location = New System.Drawing.Point(287, 35)
+    Me.chkNetworkProtocolTLS12.Name = "chkNetworkProtocolTLS12"
+    Me.chkNetworkProtocolTLS12.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS12.TabIndex = 2
+    Me.chkNetworkProtocolTLS12.Text = "TLS 1.2"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the newer TLS 1.2 protocol, which requires Windows" & _
+        " 7 or newer.")
+    Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
+    '
     'frmConfig
     '
     Me.AcceptButton = Me.cmdSave
@@ -3387,7 +3436,7 @@ Partial Class frmConfig
   Friend WithEvents cmdPortableDir As System.Windows.Forms.Button
   Friend WithEvents pnlNetworkProtocol As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pctNetworkProtocolIcon As System.Windows.Forms.PictureBox
-  Friend WithEvents chkNetworkProtocolSSL As System.Windows.Forms.CheckBox
+  Friend WithEvents chkNetworkProtocolSSL3 As System.Windows.Forms.CheckBox
   Friend WithEvents pnlNetworkProtocolTitle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblNetworkProtocolTitle As System.Windows.Forms.Label
   Friend WithEvents lnNetworkProtocolTitle As RestrictionTracker.LineBreak
@@ -3423,5 +3472,8 @@ Partial Class frmConfig
   Friend WithEvents chkAccountTypeAuto As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayAnim As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayClose As System.Windows.Forms.CheckBox
+  Friend WithEvents chkNetworkProtocolTLS10 As System.Windows.Forms.CheckBox
+  Friend WithEvents chkNetworkProtocolTLS11 As System.Windows.Forms.CheckBox
+  Friend WithEvents chkNetworkProtocolTLS12 As System.Windows.Forms.CheckBox
 
 End Class

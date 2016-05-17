@@ -890,3 +890,10 @@ Public Class WebClientEx
 #End Region
 #End Region
 End Class
+
+Public Enum SecurityProtocolTypeEx
+  Ssl3 = &H30
+  Tls10 = &HC0
+  Tls11 = &H300
+  Tls12 = &HC00
+End Enum
