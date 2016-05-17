@@ -131,6 +131,9 @@ Partial Class frmConfig
     Me.lblNetworkProtocolDescription = New System.Windows.Forms.Label()
     Me.pctNetworkProtocolIcon = New System.Windows.Forms.PictureBox()
     Me.chkNetworkProtocolSSL3 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS10 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
     Me.pnlNetworkProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolTitle = New System.Windows.Forms.Label()
     Me.lnNetworkProtocolTitle = New RestrictionTracker.LineBreak()
@@ -218,9 +221,6 @@ Partial Class frmConfig
     Me.fswController = New System.IO.FileSystemWatcher()
     Me.tmrIcoWait = New System.Windows.Forms.Timer(Me.components)
     Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
-    Me.chkNetworkProtocolTLS10 = New System.Windows.Forms.CheckBox()
-    Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
-    Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -1873,6 +1873,45 @@ Partial Class frmConfig
         "e to attacks.")
     Me.chkNetworkProtocolSSL3.UseVisualStyleBackColor = False
     '
+    'chkNetworkProtocolTLS10
+    '
+    Me.chkNetworkProtocolTLS10.AutoSize = True
+    Me.chkNetworkProtocolTLS10.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(135, 35)
+    Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
+    Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS10.TabIndex = 2
+    Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
+        "e to attacks.")
+    Me.chkNetworkProtocolTLS10.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolTLS11
+    '
+    Me.chkNetworkProtocolTLS11.AutoSize = True
+    Me.chkNetworkProtocolTLS11.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(211, 35)
+    Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
+    Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS11.TabIndex = 2
+    Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer TLS 1.1 protocol, which requires Windows" & _
+        " 7 or newer.")
+    Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolTLS12
+    '
+    Me.chkNetworkProtocolTLS12.AutoSize = True
+    Me.chkNetworkProtocolTLS12.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS12.Location = New System.Drawing.Point(287, 35)
+    Me.chkNetworkProtocolTLS12.Name = "chkNetworkProtocolTLS12"
+    Me.chkNetworkProtocolTLS12.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS12.TabIndex = 2
+    Me.chkNetworkProtocolTLS12.Text = "TLS 1.2"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the newer TLS 1.2 protocol, which requires Windows" & _
+        " 7 or newer.")
+    Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
+    '
     'pnlNetworkProtocolTitle
     '
     Me.pnlNetworkProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -2573,7 +2612,7 @@ Partial Class frmConfig
     Me.cmdMakePortable.Size = New System.Drawing.Size(175, 23)
     Me.cmdMakePortable.TabIndex = 3
     Me.cmdMakePortable.Text = "&Create Portable Application"
-    Me.ttConfig.SetToolTip(Me.cmdMakePortable, "Copy Satellite Restriction Tracker to the selected directory.")
+    Me.ttConfig.SetToolTip(Me.cmdMakePortable, "No directory selected!")
     Me.cmdMakePortable.UseVisualStyleBackColor = True
     '
     'lblPortableDir
@@ -3096,45 +3135,6 @@ Partial Class frmConfig
     Me.ttConfig.InitialDelay = 300
     Me.ttConfig.Persistant = True
     Me.ttConfig.ReshowDelay = 100
-    '
-    'chkNetworkProtocolTLS10
-    '
-    Me.chkNetworkProtocolTLS10.AutoSize = True
-    Me.chkNetworkProtocolTLS10.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(135, 35)
-    Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
-    Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS10.TabIndex = 2
-    Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
-        "e to attacks.")
-    Me.chkNetworkProtocolTLS10.UseVisualStyleBackColor = True
-    '
-    'chkNetworkProtocolTLS11
-    '
-    Me.chkNetworkProtocolTLS11.AutoSize = True
-    Me.chkNetworkProtocolTLS11.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(211, 35)
-    Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
-    Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS11.TabIndex = 2
-    Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer TLS 1.1 protocol, which requires Windows" & _
-        " 7 or newer.")
-    Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
-    '
-    'chkNetworkProtocolTLS12
-    '
-    Me.chkNetworkProtocolTLS12.AutoSize = True
-    Me.chkNetworkProtocolTLS12.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS12.Location = New System.Drawing.Point(287, 35)
-    Me.chkNetworkProtocolTLS12.Name = "chkNetworkProtocolTLS12"
-    Me.chkNetworkProtocolTLS12.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS12.TabIndex = 2
-    Me.chkNetworkProtocolTLS12.Text = "TLS 1.2"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the newer TLS 1.2 protocol, which requires Windows" & _
-        " 7 or newer.")
-    Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
     '
     'frmConfig
     '
