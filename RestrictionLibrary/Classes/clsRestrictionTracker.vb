@@ -589,7 +589,7 @@
     If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" Then
       If Response.Contains("window.location.href") Then
         TryCount += 1
-        If TryCount > 9 Then
+        If TryCount > 15 Then
           RaiseError("Login Failed: Server redirected too many times.")
           Return
         End If
@@ -650,7 +650,7 @@
       RaiseError("Login Failed: Please check your account information and try again.")
     ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
       TryCount += 1
-      If TryCount > 9 Then
+      If TryCount > 15 Then
         RaiseError("Login Failed: Server redirected too many times.")
         Return
       End If
@@ -783,7 +783,7 @@
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket()
-    If AjaxID(0) = "9" Then
+    If AjaxID(0) = "8" Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
     ElseIf AjaxID(1) = "a" Then
       If AjaxID(0) = "6" Then
@@ -809,7 +809,7 @@
       Select Case Val(AjaxID)
         Case 2 : newAjaxID = 3
         Case 3 : newAjaxID = 6
-        Case 6 : newAjaxID = 9
+        Case 6 : newAjaxID = 8
         Case Else : newAjaxID = 1 : newAjaxType = "b"
       End Select
     Else
