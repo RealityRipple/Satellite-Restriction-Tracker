@@ -114,7 +114,7 @@ Partial Class frmAbout
     Me.lblVersion.TabStop = True
     Me.lblVersion.Text = "Version"
     Me.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    Me.ttAbout.SetToolTip(Me.lblVersion, "View the Satellite Restriction Tracker version history.")
+    Me.ttAbout.SetToolTip(Me.lblVersion, "View the Satellite Restriction Tracker Release Notes webpage.")
     '
     'lblUpdate
     '
