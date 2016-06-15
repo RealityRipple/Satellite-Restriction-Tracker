@@ -228,7 +228,7 @@
     ClosingTime = False
     sDataPath = ConfigPath
     If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
-    Dim useProtocol As SecurityProtocolTypeEx = 0
+    Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
     For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
       If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then
         Try
@@ -238,7 +238,7 @@
         End Try
       End If
     Next
-    If useProtocol = 0 Then
+    If useProtocol = SecurityProtocolTypeEx.None Then
       For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
         Try
           Net.ServicePointManager.SecurityProtocol = protocolTest
@@ -251,7 +251,6 @@
       Net.ServicePointManager.SecurityProtocol = useProtocol
     Catch ex As Exception
     End Try
-
     Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then

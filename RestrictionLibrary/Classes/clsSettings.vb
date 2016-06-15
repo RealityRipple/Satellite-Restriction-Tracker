@@ -58,12 +58,12 @@ Class AppSettings
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
                   ElseIf xName.CompareTo("Protocol") = 0 Then
-                    m_Protocol = 0
+                    m_Protocol = SecurityProtocolTypeEx.None
                     If xValue.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
                     If xValue.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
                     If xValue.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
                     If xValue.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
-                    If xValue.Contains("TLS") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+                    If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
                   End If
                 Next
                 Loaded = True

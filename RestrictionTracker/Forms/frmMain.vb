@@ -566,7 +566,7 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
-    Dim useProtocol As SecurityProtocolTypeEx = 0
+    Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
     For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
       If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then
         Try
@@ -576,20 +576,24 @@ Public Class frmMain
         End Try
       End If
     Next
-    If useProtocol = 0 Then
-      For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+    If useProtocol = SecurityProtocolTypeEx.None Then
+      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
+        For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+          Try
+            Net.ServicePointManager.SecurityProtocol = protocolTest
+            useProtocol = useProtocol Or protocolTest
+          Catch ex As Exception
+          End Try
+        Next
         Try
-          Net.ServicePointManager.SecurityProtocol = protocolTest
-          useProtocol = useProtocol Or protocolTest
+          Net.ServicePointManager.SecurityProtocol = useProtocol
+          mySettings.SecurityProtocol = useProtocol
+          mySettings.Save()
         Catch ex As Exception
         End Try
-      Next
-      Try
-        Net.ServicePointManager.SecurityProtocol = useProtocol
-        mySettings.SecurityProtocol = useProtocol
-        mySettings.Save()
-      Catch ex As Exception
-      End Try
+      Else
+        Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.None
+      End If
     Else
       Try
         Net.ServicePointManager.SecurityProtocol = useProtocol

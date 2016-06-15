@@ -583,12 +583,12 @@ Class AppSettings
         m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
       Else
         Try
-          m_Protocol = 0
+          m_Protocol = SecurityProtocolTypeEx.None
           If xProtocol.Element("value").Value.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
           If xProtocol.Element("value").Value.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
           If xProtocol.Element("value").Value.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
           If xProtocol.Element("value").Value.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
-          If xProtocol.Element("value").Value.Contains("TLS") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         Catch ex As Exception
           m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         End Try

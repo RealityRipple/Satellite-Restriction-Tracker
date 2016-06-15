@@ -892,6 +892,7 @@ Public Class WebClientEx
 End Class
 
 Public Enum SecurityProtocolTypeEx
+  None = 0
   Ssl3 = &H30
   Tls10 = &HC0
   Tls11 = &H300

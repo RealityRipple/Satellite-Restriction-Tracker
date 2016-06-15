@@ -159,40 +159,49 @@
     Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
-      chkNetworkProtocolSSL3.Enabled = True
+      chkNetworkProtocolSSL3.Visible = True
       chkNetworkProtocolSSL3.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3
     Catch ex As Exception
-      chkNetworkProtocolSSL3.Enabled = False
+      chkNetworkProtocolSSL3.Visible = False
       chkNetworkProtocolSSL3.Checked = False
-      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "SSL 3.0 is not available on your Operating System or version of The .NET Framework.")
     End Try
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls10
-      chkNetworkProtocolTLS10.Enabled = True
+      chkNetworkProtocolTLS10.Visible = True
       chkNetworkProtocolTLS10.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10
     Catch ex As Exception
-      chkNetworkProtocolTLS10.Enabled = False
+      chkNetworkProtocolTLS10.Visible = False
       chkNetworkProtocolTLS10.Checked = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "TLS 1.0 is not available on your Operating System or version of The .NET Framework.")
     End Try
-    Try
-      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls11
-      chkNetworkProtocolTLS11.Enabled = True
-      chkNetworkProtocolTLS11.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11
-    Catch ex As Exception
-      chkNetworkProtocolTLS11.Enabled = False
+    If (Environment.OSVersion.Version.Major < 6) OrElse
+       (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
+      chkNetworkProtocolTLS11.Visible = False
       chkNetworkProtocolTLS11.Checked = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "TLS 1.1 is not available on your Operating System or version of The .NET Framework.")
-    End Try
-    Try
-      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls12
-      chkNetworkProtocolTLS12.Enabled = True
-      chkNetworkProtocolTLS12.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12
-    Catch ex As Exception
-      chkNetworkProtocolTLS12.Enabled = False
+      chkNetworkProtocolTLS12.Visible = False
       chkNetworkProtocolTLS12.Checked = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is not available on your Operating System or version of The .NET Framework.")
-    End Try
+    ElseIf Environment.Version.Revision < 17929 Then
+      chkNetworkProtocolTLS11.Visible = False
+      chkNetworkProtocolTLS11.Checked = False
+      chkNetworkProtocolTLS12.Visible = False
+      chkNetworkProtocolTLS12.Checked = False
+    Else
+      Try
+        Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls11
+        chkNetworkProtocolTLS11.Visible = True
+        chkNetworkProtocolTLS11.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11
+      Catch ex As Exception
+        chkNetworkProtocolTLS11.Visible = False
+        chkNetworkProtocolTLS11.Checked = False
+      End Try
+      Try
+        Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls12
+        chkNetworkProtocolTLS12.Visible = True
+        chkNetworkProtocolTLS12.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12
+      Catch ex As Exception
+        chkNetworkProtocolTLS12.Visible = False
+        chkNetworkProtocolTLS12.Checked = False
+      End Try
+    End If
     Net.ServicePointManager.SecurityProtocol = myProtocol
     If String.IsNullOrEmpty(mySettings.NetTestURL) Then
       optNetTestNone.Checked = True
@@ -374,7 +383,6 @@
                                                                              cmbUpdateInterval.KeyPress, cmbUpdateInterval.SelectedIndexChanged,
                                                                              txtHistoryDir.KeyPress, txtHistoryDir.TextChanged, chkScaleScreen.CheckedChanged,
                                                                              chkTrayMin.CheckedChanged, chkTrayAnim.CheckedChanged, chkTrayClose.CheckedChanged
-
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged, cmbProvider.KeyPress, cmbProvider.TextChanged, cmbProvider.SelectedIndexChanged
@@ -1056,7 +1064,7 @@
       cmbProvider.Focus()
       Exit Sub
     End If
-    If Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked) Then
+    If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked) Then
       MsgDlg(Me, "Please select at least one Security Protocol type to connect with before saving the Configuration.", "Please select your Security Protocol.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
       If chkNetworkProtocolTLS12.CanFocus Then
         chkNetworkProtocolTLS12.Focus()
@@ -1205,7 +1213,7 @@
           End If
         End If
     End Select
-    mySettings.SecurityProtocol = 0
+    mySettings.SecurityProtocol = SecurityProtocolTypeEx.None
     If chkNetworkProtocolSSL3.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Ssl3
     If chkNetworkProtocolTLS10.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls10
     If chkNetworkProtocolTLS11.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls11
