@@ -306,7 +306,7 @@ Partial Class frmMain
     '
     Me.lblRRS.AutoSize = True
     Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
     Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblRRS.Location = New System.Drawing.Point(214, 76)
     Me.lblRRS.Name = "lblRRS"
@@ -364,10 +364,10 @@ Partial Class frmMain
     Me.pctUld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctUld.ContextMenu = Me.mnuGraph
     Me.pctUld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctUld.Location = New System.Drawing.Point(75, 0)
+    Me.pctUld.Location = New System.Drawing.Point(57, 0)
     Me.pctUld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
     Me.pctUld.Name = "pctUld"
-    Me.pctUld.Size = New System.Drawing.Size(121, 81)
+    Me.pctUld.Size = New System.Drawing.Size(139, 81)
     Me.pctUld.TabIndex = 0
     Me.pctUld.TabStop = False
     Me.ttUI.SetToolTip(Me.pctUld, "Graph representing your upload usage.")
@@ -415,7 +415,7 @@ Partial Class frmMain
     Me.pnlUldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlUldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlUldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-    Me.pnlUldText.Size = New System.Drawing.Size(75, 84)
+    Me.pnlUldText.Size = New System.Drawing.Size(57, 84)
     Me.pnlUldText.TabIndex = 1
     '
     'pnlUldTextUsed
@@ -433,14 +433,14 @@ Partial Class frmMain
     Me.pnlUldTextUsed.Name = "pnlUldTextUsed"
     Me.pnlUldTextUsed.RowCount = 1
     Me.pnlUldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUldTextUsed.Size = New System.Drawing.Size(75, 28)
+    Me.pnlUldTextUsed.Size = New System.Drawing.Size(57, 28)
     Me.pnlUldTextUsed.TabIndex = 6
     '
     'lblUldUsed
     '
     Me.lblUldUsed.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblUldUsed.AutoSize = True
-    Me.lblUldUsed.Location = New System.Drawing.Point(56, 7)
+    Me.lblUldUsed.Location = New System.Drawing.Point(38, 7)
     Me.lblUldUsed.Margin = New System.Windows.Forms.Padding(0)
     Me.lblUldUsed.Name = "lblUldUsed"
     Me.lblUldUsed.Size = New System.Drawing.Size(19, 13)
@@ -473,14 +473,14 @@ Partial Class frmMain
     Me.pnlUldTextFree.Name = "pnlUldTextFree"
     Me.pnlUldTextFree.RowCount = 1
     Me.pnlUldTextFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUldTextFree.Size = New System.Drawing.Size(75, 28)
+    Me.pnlUldTextFree.Size = New System.Drawing.Size(57, 28)
     Me.pnlUldTextFree.TabIndex = 7
     '
     'lblUldFree
     '
     Me.lblUldFree.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblUldFree.AutoSize = True
-    Me.lblUldFree.Location = New System.Drawing.Point(56, 7)
+    Me.lblUldFree.Location = New System.Drawing.Point(38, 7)
     Me.lblUldFree.Margin = New System.Windows.Forms.Padding(0)
     Me.lblUldFree.Name = "lblUldFree"
     Me.lblUldFree.Size = New System.Drawing.Size(19, 13)
@@ -494,9 +494,9 @@ Partial Class frmMain
     Me.lblUFree.Location = New System.Drawing.Point(3, 7)
     Me.lblUFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
     Me.lblUFree.Name = "lblUFree"
-    Me.lblUFree.Size = New System.Drawing.Size(53, 13)
+    Me.lblUFree.Size = New System.Drawing.Size(31, 13)
     Me.lblUFree.TabIndex = 2
-    Me.lblUFree.Text = "Available:"
+    Me.lblUFree.Text = "Free:"
     '
     'pnlUldTextTotal
     '
@@ -514,14 +514,14 @@ Partial Class frmMain
     Me.pnlUldTextTotal.RowCount = 1
     Me.pnlUldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlUldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlUldTextTotal.Size = New System.Drawing.Size(75, 28)
+    Me.pnlUldTextTotal.Size = New System.Drawing.Size(57, 28)
     Me.pnlUldTextTotal.TabIndex = 8
     '
     'lblUldTotal
     '
     Me.lblUldTotal.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblUldTotal.AutoSize = True
-    Me.lblUldTotal.Location = New System.Drawing.Point(56, 7)
+    Me.lblUldTotal.Location = New System.Drawing.Point(38, 7)
     Me.lblUldTotal.Margin = New System.Windows.Forms.Padding(0)
     Me.lblUldTotal.Name = "lblUldTotal"
     Me.lblUldTotal.Size = New System.Drawing.Size(19, 13)
@@ -573,10 +573,10 @@ Partial Class frmMain
     Me.pctDld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctDld.ContextMenu = Me.mnuGraph
     Me.pctDld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctDld.Location = New System.Drawing.Point(75, 0)
+    Me.pctDld.Location = New System.Drawing.Point(57, 0)
     Me.pctDld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
     Me.pctDld.Name = "pctDld"
-    Me.pctDld.Size = New System.Drawing.Size(121, 81)
+    Me.pctDld.Size = New System.Drawing.Size(139, 81)
     Me.pctDld.TabIndex = 0
     Me.pctDld.TabStop = False
     Me.ttUI.SetToolTip(Me.pctDld, "Graph representing your download usage.")
@@ -599,7 +599,7 @@ Partial Class frmMain
     Me.pnlDldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlDldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
     Me.pnlDldText.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-    Me.pnlDldText.Size = New System.Drawing.Size(75, 84)
+    Me.pnlDldText.Size = New System.Drawing.Size(57, 84)
     Me.pnlDldText.TabIndex = 1
     '
     'pnlDldTextUsed
@@ -618,14 +618,14 @@ Partial Class frmMain
     Me.pnlDldTextUsed.RowCount = 1
     Me.pnlDldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlDldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlDldTextUsed.Size = New System.Drawing.Size(75, 28)
+    Me.pnlDldTextUsed.Size = New System.Drawing.Size(57, 28)
     Me.pnlDldTextUsed.TabIndex = 6
     '
     'lblDldUsed
     '
     Me.lblDldUsed.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblDldUsed.AutoSize = True
-    Me.lblDldUsed.Location = New System.Drawing.Point(56, 7)
+    Me.lblDldUsed.Location = New System.Drawing.Point(38, 7)
     Me.lblDldUsed.Margin = New System.Windows.Forms.Padding(0)
     Me.lblDldUsed.Name = "lblDldUsed"
     Me.lblDldUsed.Size = New System.Drawing.Size(19, 13)
@@ -658,14 +658,14 @@ Partial Class frmMain
     Me.pnlDldTextFree.Name = "pnlDldTextFree"
     Me.pnlDldTextFree.RowCount = 1
     Me.pnlDldTextFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDldTextFree.Size = New System.Drawing.Size(75, 28)
+    Me.pnlDldTextFree.Size = New System.Drawing.Size(57, 28)
     Me.pnlDldTextFree.TabIndex = 7
     '
     'lblDldFree
     '
     Me.lblDldFree.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblDldFree.AutoSize = True
-    Me.lblDldFree.Location = New System.Drawing.Point(56, 7)
+    Me.lblDldFree.Location = New System.Drawing.Point(38, 7)
     Me.lblDldFree.Margin = New System.Windows.Forms.Padding(0)
     Me.lblDldFree.Name = "lblDldFree"
     Me.lblDldFree.Size = New System.Drawing.Size(19, 13)
@@ -679,9 +679,9 @@ Partial Class frmMain
     Me.lblDFree.Location = New System.Drawing.Point(3, 7)
     Me.lblDFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
     Me.lblDFree.Name = "lblDFree"
-    Me.lblDFree.Size = New System.Drawing.Size(53, 13)
+    Me.lblDFree.Size = New System.Drawing.Size(31, 13)
     Me.lblDFree.TabIndex = 2
-    Me.lblDFree.Text = "Available:"
+    Me.lblDFree.Text = "Free:"
     '
     'pnlDldTextTotal
     '
@@ -698,14 +698,14 @@ Partial Class frmMain
     Me.pnlDldTextTotal.Name = "pnlDldTextTotal"
     Me.pnlDldTextTotal.RowCount = 1
     Me.pnlDldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDldTextTotal.Size = New System.Drawing.Size(75, 28)
+    Me.pnlDldTextTotal.Size = New System.Drawing.Size(57, 28)
     Me.pnlDldTextTotal.TabIndex = 8
     '
     'lblDldTotal
     '
     Me.lblDldTotal.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblDldTotal.AutoSize = True
-    Me.lblDldTotal.Location = New System.Drawing.Point(56, 7)
+    Me.lblDldTotal.Location = New System.Drawing.Point(38, 7)
     Me.lblDldTotal.Margin = New System.Windows.Forms.Padding(0)
     Me.lblDldTotal.Name = "lblDldTotal"
     Me.lblDldTotal.Size = New System.Drawing.Size(19, 13)
@@ -848,9 +848,9 @@ Partial Class frmMain
     Me.lblExedeRemain.AutoSize = True
     Me.lblExedeRemain.Location = New System.Drawing.Point(3, 4)
     Me.lblExedeRemain.Name = "lblExedeRemain"
-    Me.lblExedeRemain.Size = New System.Drawing.Size(53, 13)
+    Me.lblExedeRemain.Size = New System.Drawing.Size(31, 13)
     Me.lblExedeRemain.TabIndex = 15
-    Me.lblExedeRemain.Text = "Available:"
+    Me.lblExedeRemain.Text = "Free:"
     '
     'lblExedeRemainVal
     '
@@ -989,7 +989,7 @@ Partial Class frmMain
     Me.pnlRuralUsed.Name = "pnlRuralUsed"
     Me.pnlRuralUsed.RowCount = 1
     Me.pnlRuralUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralUsed.Size = New System.Drawing.Size(84, 36)
+    Me.pnlRuralUsed.Size = New System.Drawing.Size(66, 36)
     Me.pnlRuralUsed.TabIndex = 18
     '
     'lblRuralUsed
@@ -1006,7 +1006,7 @@ Partial Class frmMain
     '
     Me.lblRuralUsedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblRuralUsedVal.AutoSize = True
-    Me.lblRuralUsedVal.Location = New System.Drawing.Point(62, 11)
+    Me.lblRuralUsedVal.Location = New System.Drawing.Point(44, 11)
     Me.lblRuralUsedVal.Name = "lblRuralUsedVal"
     Me.lblRuralUsedVal.Size = New System.Drawing.Size(19, 13)
     Me.lblRuralUsedVal.TabIndex = 12
@@ -1027,7 +1027,7 @@ Partial Class frmMain
     Me.pnlRuralFree.Name = "pnlRuralFree"
     Me.pnlRuralFree.RowCount = 1
     Me.pnlRuralFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralFree.Size = New System.Drawing.Size(84, 36)
+    Me.pnlRuralFree.Size = New System.Drawing.Size(66, 36)
     Me.pnlRuralFree.TabIndex = 19
     '
     'lblRuralRemain
@@ -1036,15 +1036,15 @@ Partial Class frmMain
     Me.lblRuralRemain.AutoSize = True
     Me.lblRuralRemain.Location = New System.Drawing.Point(3, 11)
     Me.lblRuralRemain.Name = "lblRuralRemain"
-    Me.lblRuralRemain.Size = New System.Drawing.Size(53, 13)
+    Me.lblRuralRemain.Size = New System.Drawing.Size(31, 13)
     Me.lblRuralRemain.TabIndex = 15
-    Me.lblRuralRemain.Text = "Available:"
+    Me.lblRuralRemain.Text = "Free:"
     '
     'lblRuralRemainVal
     '
     Me.lblRuralRemainVal.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblRuralRemainVal.AutoSize = True
-    Me.lblRuralRemainVal.Location = New System.Drawing.Point(62, 11)
+    Me.lblRuralRemainVal.Location = New System.Drawing.Point(44, 11)
     Me.lblRuralRemainVal.Name = "lblRuralRemainVal"
     Me.lblRuralRemainVal.Size = New System.Drawing.Size(19, 13)
     Me.lblRuralRemainVal.TabIndex = 16
@@ -1065,7 +1065,7 @@ Partial Class frmMain
     Me.pnlRuralTotal.Name = "pnlRuralTotal"
     Me.pnlRuralTotal.RowCount = 1
     Me.pnlRuralTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralTotal.Size = New System.Drawing.Size(84, 37)
+    Me.pnlRuralTotal.Size = New System.Drawing.Size(66, 37)
     Me.pnlRuralTotal.TabIndex = 20
     '
     'lblRuralAllowed
@@ -1082,7 +1082,7 @@ Partial Class frmMain
     '
     Me.lblRuralAllowedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
     Me.lblRuralAllowedVal.AutoSize = True
-    Me.lblRuralAllowedVal.Location = New System.Drawing.Point(62, 12)
+    Me.lblRuralAllowedVal.Location = New System.Drawing.Point(44, 12)
     Me.lblRuralAllowedVal.Name = "lblRuralAllowedVal"
     Me.lblRuralAllowedVal.Size = New System.Drawing.Size(19, 13)
     Me.lblRuralAllowedVal.TabIndex = 14
@@ -1094,11 +1094,11 @@ Partial Class frmMain
     Me.pctRural.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
     Me.pctRural.ContextMenu = Me.mnuGraph
     Me.pctRural.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctRural.Location = New System.Drawing.Point(84, 0)
+    Me.pctRural.Location = New System.Drawing.Point(66, 0)
     Me.pctRural.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
     Me.pctRural.Name = "pctRural"
     Me.pnlRural.SetRowSpan(Me.pctRural, 3)
-    Me.pctRural.Size = New System.Drawing.Size(335, 109)
+    Me.pctRural.Size = New System.Drawing.Size(353, 109)
     Me.pctRural.TabIndex = 1
     Me.pctRural.TabStop = False
     Me.ttUI.SetToolTip(Me.pctRural, "Graph representing your usage.")
