@@ -350,14 +350,14 @@
   Private Sub LoginDN()
     iHist = 0
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://my.dish.com/customercare/saml/login?target=%2Fcustomercare%2Fusermanagement%2FprocessSynacoreResponse.do%3Foverlayuri%3D-broadband-prepBroadBand.do&message=&forceAuthn=true"
+    Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
     MakeSocket()
     wsSocket.ManualRedirect = False
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
     iHist += 1
-    DN_Login_Response(sRet, wsSocket.ResponseURI)
+    DN_Login_Prep_Response(sRet, wsSocket.ResponseURI)
   End Sub
 #End Region
 #Region "Parsing Functions"
@@ -498,12 +498,12 @@
         End If
       Next
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+        RaiseError("Usage Read Failed: Unable to parse data!", , , , Table)
       Else
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
     Else
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      RaiseError("Usage Read Failed: Unable to locate data table!", , , , Table)
     End If
   End Sub
 #End Region
@@ -818,7 +818,7 @@
   End Sub
   Private Sub EX_Read_Table(Table As String)
     If Not Table.Contains("amount-used") Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      RaiseError("Usage Read Failed: Unable to locate data table", , , , Table)
     Else
       Dim Used As String = Table.Substring(Table.IndexOf("amount-used"))
       Used = Used.Substring(Used.IndexOf(""">") + 2)
@@ -963,7 +963,7 @@
         End If
       Next
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+        RaiseError("Usage Read Failed: Unable to parse data!", , , , Table)
       Else
         RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
@@ -989,25 +989,42 @@
         End If
       Next
       If String.IsNullOrEmpty(sDownT) Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+        RaiseError("Usage Read Failed: Unable to parse data!", , , , Table)
       Else
         RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now))
       End If
     Else
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      RaiseError("Usage Read Failed: Unable to locate data table!", , , , Table)
     End If
   End Sub
 #End Region
 #Region "DN"
   Private iHist As Integer = 0
+  Private Sub DN_Login_Prep_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+      RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      Return
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/preplogon.do") Then
+      RaiseError("Login Prepare Failed: Could not understand response.", "DN Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
+      Return
+    End If
+    DN_Login("https://my.dish.com/customercare/saml/login?target=" & PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet") & "&message=&forceAuthn=true")
+  End Sub
+  Private Sub DN_Login(sURI As String)
+    MakeSocket()
+    wsSocket.ManualRedirect = False
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, sURI)
+    Dim sRet As String = wsSocket.DownloadString(sURI)
+    If ClosingTime Then Return
+    iHist += 1
+    DN_Login_Response(sRet, wsSocket.ResponseURI)
+  End Sub
   Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
       RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
-      Return
-    End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/firstbookend.php") Then
-      RaiseError("Login Prepare Failed: Could not understand response.", "DN Login Response Error", ResponseURI.OriginalString & vbNewLine & Response, True)
       Return
     End If
     If Not ResponseURI.Query.StartsWith("?") Then
@@ -1020,9 +1037,9 @@
       id = id.Substring(0, id.IndexOf(""""))
     End If
     Dim sURI As String = ResponseURI.OriginalString
-    sURI &= "&id=" & id
-    sURI &= "&coeff=0"
-    sURI &= "&history=" & iHist
+    If Not sURI.Contains("&id=") Then sURI &= "&id=" & id
+    If Not sURI.Contains("&coeff=") Then sURI &= "&coeff=0"
+    If Not sURI.Contains("&history=") Then sURI &= "&history=" & iHist
     DN_Login_FirstBook(sURI)
   End Sub
   Private Sub DN_Login_FirstBook(sURI As String)
@@ -1085,9 +1102,9 @@
         id = id.Substring(0, id.IndexOf(""""))
       End If
       Dim sURI As String = ResponseURI.OriginalString
-      sURI &= "&id=" & id
-      sURI &= "&coeff=1"
-      sURI &= "&history=" & iHist
+      If Not sURI.Contains("&id=") Then sURI &= "&id=" & id
+      If Not sURI.Contains("&coeff=") Then sURI &= "&coeff=1"
+      If Not sURI.Contains("&history=") Then sURI &= "&history=" & iHist
       DN_Login_LastBook(sURI)
     ElseIf ResponseURI.AbsolutePath.ToLower.Contains("finish.php") Then
       If Response.Contains("location.href") Then
@@ -1170,7 +1187,7 @@
     MakeSocket()
     wsSocket.ManualRedirect = False
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
-    Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse)
+    Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse) & "&RelayState=" & PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet")
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
     Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
     If ClosingTime Then Return
@@ -1206,25 +1223,24 @@
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
-      DN_Download_Table_Response(Response, ResponseURI)
-    ElseIf Response.Contains("alertError") Then
-      If Response.Contains("System is currently unavailable") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Response))
-      End If
-    Else
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") Then
+      RaiseError("Login Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+      Return
+    End If
+    If ResponseURI.Query = "?page=myaccountsummary_res" Then
       DN_Download_Table()
+    ElseIf ResponseURI.Query = "?pageurl=myinternet" Then
+      DN_Download_Table_Response(Response, ResponseURI)
+    Else
+      RaiseError("Home Read Failed.", , , , Response)
     End If
   End Sub
   Private Sub DN_Download_Table()
     MakeSocket()
     wsSocket.ManualRedirect = False
-    Dim uriString As String = "https://my.dish.com/customercare/broadband/prepBroadBand.do"
-    Dim sSend As String = "srt=second_try"
+    Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
-    Dim sRet As String = wsSocket.UploadString(uriString, "POST", sSend)
+    Dim sRet As String = wsSocket.DownloadString(uriString)
     If ClosingTime Then Return
     iHist += 1
     DN_Download_Table_Response(sRet, wsSocket.ResponseURI)
@@ -1239,137 +1255,268 @@
       RaiseError("Usage Failed: The server rejected the request.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/prepbroadband.do") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") Then
       RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
-    If Not Response.Contains("/javascript/broadband.js""></script>") Then
-      RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
-      Return
+    If ResponseURI.Query = "?page=myaccountsummary_res" Then
+      DN_Download_Table()
+    ElseIf ResponseURI.Query = "?pageurl=myinternet" Then
+      If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
+        RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+        Return
+      End If
+      Dim sUsageDiv As String = Response.Substring(Response.IndexOf("widgetLoadUrls[widgetListCount]"))
+      If Not sUsageDiv.Contains("</form>") Then
+        RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+        Return
+      End If
+      sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</form>"))
+      If Not sUsageDiv.ToLower.Contains("remaining capacity") Then
+        RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
+        Return
+      End If
+      ReadUsage(sUsageDiv)
+    Else
+      RaiseError("Usage Failed: Redirected to Unknown Page [" & ResponseURI.Query & "]", , , , Response)
     End If
-    Dim sUsageDiv As String = Response.Substring(Response.IndexOf("/javascript/broadband.js""></script>"))
-    If Not sUsageDiv.Contains("<script type=""text/javascript"">") Then
-      RaiseError("Usage Failed: Could not find usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
-      Return
-    End If
-    sUsageDiv = sUsageDiv.Substring(sUsageDiv.IndexOf("<script type=""text/javascript"">") + 32)
-    If Not sUsageDiv.Contains("</script>") Then
-      RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
-      Return
-    End If
-    sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</script>"))
-    If Not sUsageDiv.ToLower.Contains("var anytime") Then
-      RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
-      Return
-    End If
-    ReadUsage(sUsageDiv)
   End Sub
   Private Sub DN_Read_Table(Table As String)
-    If Table.Contains("alertError") Then
-      If Table.Contains("This information is currently unavailable.") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
-      End If
-    ElseIf Table.ToLower.Contains("var anytime") Then
-      Dim UsageList As New System.Collections.Specialized.StringDictionary
-      For Each Row As String In Split(Table, "var ")
-        If Row.Contains("='") Then
-          Dim kV() As String = Split(Row, "='")
-          Dim sK As String = kV(0)
-          CleanupResult(sK)
-          sK = sK.ToLower
-          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf("'"))
-          CleanupResult(sV)
-          sV = sV.ToLower
-          If Not String.IsNullOrEmpty(sV) Then
-            If UsageList.ContainsKey(sK) Then
-              If Not UsageList(sK) = sV Then UsageList(sK) = sV
-            Else
-              UsageList.Add(sK, sV)
+    Dim findCRLF As String = vbLf
+    If Table.Contains(vbNewLine) Then
+      findCRLF = vbNewLine
+    ElseIf Table.Contains(vbLf) Then
+      findCRLF = vbLf
+    ElseIf Table.Contains(vbCr) Then
+      findCRLF = vbCr
+    End If
+    Dim opV As String = Nothing
+    Dim opM As String = Nothing
+    Dim atV As String = Nothing
+    Dim atM As String = Nothing
+    Dim atxV As String = Nothing
+    Dim atxM As String = Nothing
+
+    Dim scriptSegment As String = Nothing
+    If Table.Contains("</script>") Then
+      scriptSegment = Table.Substring(0, Table.IndexOf("</script>"))
+    End If
+    If Not String.IsNullOrEmpty(scriptSegment) Then
+      Dim widgetData() As String = Split(scriptSegment, findCRLF & findCRLF & findCRLF)
+      Dim wMeterData As New Specialized.StringDictionary
+      For Each widget In widgetData
+        Dim widgetLines() As String = Split(widget, findCRLF)
+        Dim isMeter As Boolean = False
+        For Each wLine In widgetLines
+          If wLine.Contains("'/customercare/widgets/loadMeter.do'") Then
+            isMeter = True
+          End If
+        Next
+        If Not isMeter Then Continue For
+        Dim wID As String = Nothing
+        Dim wAttrs As String = Nothing
+        For Each wLine In widgetLines
+          If wLine.Contains("widgetUniqueIds[widgetListCount]") Then
+            wID = wLine
+            If wID.Contains(" = ") Then wID = wID.Substring(wID.IndexOf(" = ") + 3)
+            If wID.Contains("'") Then
+              wID = wID.Substring(wID.IndexOf("'") + 1)
+              If wID.Contains("'") Then wID = wID.Substring(0, wID.IndexOf("'"))
+            ElseIf wID.Contains("""") Then
+              wID = wID.Substring(wID.IndexOf("""") + 1)
+              If wID.Contains("""") Then wID = wID.Substring(0, wID.IndexOf(""""))
+            ElseIf wID.Contains(";") Then
+              wID = wID.Substring(0, wID.IndexOf(";"))
+            ElseIf wID.Contains(findCRLF) Then
+              wID = wID.Substring(0, wID.IndexOf(findCRLF))
             End If
           End If
-        ElseIf Row.Contains(" = '") Then
-          Dim kV() As String = Split(Row, " = '")
-          Dim sK As String = kV(0)
-          CleanupResult(sK)
-          sK = sK.ToLower
-          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf("'"))
-          CleanupResult(sV)
-          sV = sV.ToLower
-          If Not String.IsNullOrEmpty(sV) Then
-            If UsageList.ContainsKey(sK) Then
-              If Not UsageList(sK) = sV Then UsageList(sK) = sV
-            Else
-              UsageList.Add(sK, sV)
+          If wLine.Contains("widgetAttrsJsons[widgetListCount]") Then
+            wAttrs = wLine
+            If wAttrs.Contains(" = ") Then wAttrs = wAttrs.Substring(wAttrs.IndexOf(" = ") + 3)
+            If wAttrs.Contains("""") Then
+              wAttrs = wAttrs.Substring(wAttrs.IndexOf("""") + 1)
+              If wAttrs.Contains("""") Then wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(""""))
+            ElseIf wAttrs.Contains("'") Then
+              wAttrs = wAttrs.Substring(wAttrs.IndexOf("'") + 1)
+              If wAttrs.Contains("'") Then wAttrs = wAttrs.Substring(0, wAttrs.IndexOf("'"))
+            ElseIf wAttrs.Contains(";") Then
+              wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(";"))
+            ElseIf wAttrs.Contains(findCRLF) Then
+              wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(findCRLF))
             End If
           End If
-        ElseIf Row.Contains("=""") Then
-          Dim kV() As String = Split(Row, "=""")
-          Dim sK As String = kV(0)
-          CleanupResult(sK)
-          sK = sK.ToLower
-          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf(""""))
-          CleanupResult(sV)
-          sV = sV.ToLower
-          If Not String.IsNullOrEmpty(sV) Then
-            If UsageList.ContainsKey(sK) Then
-              If Not UsageList(sK) = sV Then UsageList(sK) = sV
-            Else
-              UsageList.Add(sK, sV)
-            End If
+          If Not String.IsNullOrEmpty(wID) And Not String.IsNullOrEmpty(wAttrs) Then
+            wMeterData.Add(wID, wAttrs)
+            Exit For
           End If
-        ElseIf Row.Contains(" = """) Then
-          Dim kV() As String = Split(Row, " ="" ")
-          Dim sK As String = kV(0)
-          CleanupResult(sK)
-          sK = sK.ToLower
-          Dim sV As String = kV(1).Substring(0, kV(1).IndexOf(""""))
-          CleanupResult(sV)
-          sV = sV.ToLower
-          If Not String.IsNullOrEmpty(sV) Then
-            If UsageList.ContainsKey(sK) Then
-              If Not UsageList(sK) = sV Then UsageList(sK) = sV
-            Else
-              UsageList.Add(sK, sV)
-            End If
-          End If
-        End If
+        Next
       Next
-      Dim lDown, lDownT, lUp, lUpT As Long
-      If UsageList.ContainsKey("anytime") Then
-        lDownT = StrToVal(UsageList("anytime"), MBPerGB)
-      End If
-      If UsageList.ContainsKey("anytimeresult") Then
-        Dim dMult As Double = StrToFloat(UsageList("anytimeresult"))
-        lDown = (lDownT - ((lDownT * dMult) / 100))
-      End If
-      If UsageList.ContainsKey("offpeak") Then
-        lUpT = StrToVal(UsageList("offpeak"), MBPerGB)
-      End If
-      If UsageList.ContainsKey("offpeakresult") Then
-        Dim dMult As Double = StrToFloat(UsageList("offpeakresult"))
-        lUp = (lUpT - ((lUpT * dMult) / 100))
-      End If
-      If lDownT = 0 And lUpT = 0 Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
-      ElseIf lDownT > 0 Then
-        If UsageList.ContainsKey("tokentotal") Then
-          Dim lExtraT As Long = StrToVal(UsageList("tokentotal"), MBPerGB)
-          Dim lExtra As Long = 0
-          If UsageList.ContainsKey("tokenresult") Then
-            Dim dMult As Double = StrToFloat(UsageList("tokenresult"))
-            lExtra = (lExtraT - ((lExtraT * dMult) / 100))
+      If wMeterData.ContainsKey("w_meter_0") Then
+        Dim sJSON As String = wMeterData("w_meter_0")
+        If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
+        If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
+        If sJSON.Contains(",") Then
+          Dim jsLines As New Specialized.StringDictionary
+          Dim sJSLines() As String = Split(sJSON, ",")
+          For Each sJSLine In sJSLines
+            If Not sJSLine.Contains(":") Then Continue For
+            If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
+            Dim sKeyVal() As String = Split(sJSLine, ":", 2)
+            jsLines.Add(sKeyVal(0), sKeyVal(1))
+          Next
+          If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
+            opV = jsLines("progressValueAttr")
+            opM = jsLines("maxValueAttr")
           End If
-          lDownT += lExtraT
-          lDown += lExtra
         End If
-        RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
-      Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
       End If
+      If wMeterData.ContainsKey("w_meter_1") Then
+        Dim sJSON As String = wMeterData("w_meter_1")
+        If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
+        If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
+        If sJSON.Contains(",") Then
+          Dim jsLines As New Specialized.StringDictionary
+          Dim sJSLines() As String = Split(sJSON, ",")
+          For Each sJSLine In sJSLines
+            If Not sJSLine.Contains(":") Then Continue For
+            If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
+            Dim sKeyVal() As String = Split(sJSLine, ":", 2)
+            jsLines.Add(sKeyVal(0), sKeyVal(1))
+          Next
+          If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
+            atV = jsLines("progressValueAttr")
+            atM = jsLines("maxValueAttr")
+          End If
+        End If
+      End If
+      If wMeterData.ContainsKey("w_meter_2") Then
+        Dim sJSON As String = wMeterData("w_meter_2")
+        If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
+        If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
+        If sJSON.Contains(",") Then
+          Dim jsLines As New Specialized.StringDictionary
+          Dim sJSLines() As String = Split(sJSON, ",")
+          For Each sJSLine In sJSLines
+            If Not sJSLine.Contains(":") Then Continue For
+            If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
+            Dim sKeyVal() As String = Split(sJSLine, ":", 2)
+            jsLines.Add(sKeyVal(0), sKeyVal(1))
+          Next
+          If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
+            atxV = jsLines("progressValueAttr")
+            atxM = jsLines("maxValueAttr")
+          End If
+        End If
+      End If
+    End If
+
+    Dim htmlSegment As String = Nothing
+    If Table.Contains("<div class=""row PrimSec bbActive"">") Then
+      htmlSegment = Table.Substring(Table.IndexOf("<div class=""row PrimSec bbActive"">"))
+      If htmlSegment.Contains("<div class=""row""><div class=""col-xs-12 col-lg-12 label"">&nbsp;</div></div>") Then
+        htmlSegment = htmlSegment.Substring(0, htmlSegment.IndexOf("<div class=""row""><div class=""col-xs-12 col-lg-12 label"">&nbsp;</div></div>"))
+      End If
+    End If
+    If Not String.IsNullOrEmpty(htmlSegment) Then
+      If htmlSegment.Contains("<h3 class=""secondaryHeader"">Monthly Capacity</h3>") Then
+        htmlSegment = htmlSegment.Substring(htmlSegment.IndexOf("<h3 class=""secondaryHeader"">Monthly Capacity</h3>"))
+      End If
+      If htmlSegment.Contains(" GB") Then
+        Dim htmlParts() As String = Split(htmlSegment, " GB")
+        If htmlParts.Length >= 6 Then
+          ReDim Preserve htmlParts(htmlParts.Length - 2)
+          For I As Integer = 0 To htmlParts.Length - 1
+            htmlParts(I) = htmlParts(I).Substring(htmlParts(I).LastIndexOf(">") + 1)
+            CleanupResult(htmlParts(I))
+          Next
+          If Not String.IsNullOrEmpty(htmlParts(0)) Then
+            If String.IsNullOrEmpty(opM) Then
+              opM = htmlParts(0)
+            Else
+              If Not opM = htmlParts(0) Then
+                Debug.Print("Inconsistency!")
+                Stop
+                opM = htmlParts(0)
+              End If
+            End If
+          End If
+          If Not String.IsNullOrEmpty(htmlParts(1)) Then
+            If String.IsNullOrEmpty(atM) Then
+              atM = htmlParts(1)
+            Else
+              If Not atM = htmlParts(1) Then
+                Debug.Print("Inconsistency!")
+                Stop
+                atM = htmlParts(1)
+              End If
+            End If
+          End If
+          If Not String.IsNullOrEmpty(htmlParts(2)) Then
+            If String.IsNullOrEmpty(opV) Then
+              opV = htmlParts(2)
+            Else
+              If Not opV = htmlParts(2) Then
+                Debug.Print("Inconsistency!")
+                Stop
+                opV = htmlParts(2)
+              End If
+            End If
+          End If
+          If Not String.IsNullOrEmpty(htmlParts(3)) Then
+            If String.IsNullOrEmpty(atV) Then
+              atV = htmlParts(3)
+            Else
+              If Not atV = htmlParts(3) Then
+                Debug.Print("Inconsistency!")
+                Stop
+                atV = htmlParts(3)
+              End If
+            End If
+          End If
+          If Not String.IsNullOrEmpty(htmlParts(4)) Then
+            If String.IsNullOrEmpty(atxM) Then
+              atxM = htmlParts(4)
+            Else
+              If Not atxM = htmlParts(4) Then
+                Debug.Print("Inconsistency!")
+                Stop
+                atxM = htmlParts(4)
+              End If
+            End If
+          End If
+        End If
+      End If
+    End If
+    Dim lDown, lDownT, lUp, lUpT As Long
+    If Not String.IsNullOrEmpty(atM) Then lDownT = StrToVal(atM, MBPerGB)
+    If Not String.IsNullOrEmpty(atV) Then
+      If lDownT > 0 Then
+        lDown = lDownT - StrToVal(atV, MBPerGB)
+      Else
+        lDown = StrToVal(atV, MBPerGB)
+      End If
+    End If
+    If Not String.IsNullOrEmpty(opM) Then lUpT = StrToVal(opM, MBPerGB)
+    If Not String.IsNullOrEmpty(opV) Then
+      If lUpT > 0 Then
+        lUp = lUpT - StrToVal(opV, MBPerGB)
+      Else
+        lUp = StrToVal(opV, MBPerGB)
+      End If
+    End If
+    If lDownT = 0 And lUpT = 0 Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
+    ElseIf lDownT > 0 Then
+      If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
+        If Not (StrToFloat(atxV) = 0.0 And StrToFloat(atxM) = 15.0) Then
+          lDown += StrToVal(atxV, MBPerGB)
+          lDownT += StrToVal(atxM, MBPerGB)
+        End If
+      End If
+      RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
     Else
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Usage Read Failed.", Table))
+      RaiseError("Usage Read Failed: Unable to locate data table!", , , , Table)
     End If
   End Sub
 #End Region
@@ -1391,12 +1538,12 @@
   Private Function CheckForErrors(response As String, responseURI As Uri, Optional IgnoreResponseData As Boolean = False) As Boolean
     If Not IgnoreResponseData Then
       If String.IsNullOrEmpty(response) OrElse response = "Error: Empty Response" Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response"))
+        RaiseError("Empty Response")
         Return True
       End If
       If response.StartsWith("Error: ") Then
         Dim sError As String = response.Substring(7)
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, sError))
+        RaiseError(sError)
         Return True
       End If
     End If
@@ -1405,17 +1552,18 @@
       Return True
     End If
     If responseURI Is Nothing Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Empty Response URL."))
+      RaiseError("Empty Response URL")
       Return True
     End If
     Return False
   End Function
-  Private Sub RaiseError(ErrorMessage As String, Optional FailureLocation As String = Nothing, Optional FailureData As String = Nothing, Optional ResetAccountType As Boolean = False)
+  Private Sub RaiseError(ErrorMessage As String, Optional FailureLocation As String = Nothing, Optional FailureData As String = Nothing, Optional ResetAccountType As Boolean = False, Optional FailureText As String = Nothing)
     If Not String.IsNullOrEmpty(Trim(ErrorMessage)) Then
-      Dim FailureText As String = Nothing
-      If Not String.IsNullOrEmpty(Trim(FailureLocation)) Then
-        FailureText = FailureLocation & ": " & ErrorMessage
-        If Not String.IsNullOrEmpty(FailureData) Then FailureText &= vbNewLine & FailureData
+      If String.IsNullOrEmpty(FailureText) Then
+        If Not String.IsNullOrEmpty(Trim(FailureLocation)) Then
+          FailureText = FailureLocation & ": " & ErrorMessage
+          If Not String.IsNullOrEmpty(FailureData) Then FailureText &= vbNewLine & FailureData
+        End If
       End If
       If ResetAccountType Then
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, ErrorMessage, FailureText))
