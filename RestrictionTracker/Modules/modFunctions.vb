@@ -429,9 +429,9 @@ Module modFunctions
   Public ReadOnly Property UpdateParam As String
     Get
       If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
-        Return "/silent /dir=""" & Application.StartupPath & """ /type=portable"
+        Return "/silent /noicons /dir=""" & Application.StartupPath & """ /type=portable"
       Else
-        Return "/silent"
+        Return "/silent /noicons"
       End If
     End Get
   End Property
