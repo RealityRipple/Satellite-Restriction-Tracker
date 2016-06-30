@@ -1223,13 +1223,13 @@
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And Not ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
       RaiseError("Login Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
     If ResponseURI.Query = "?page=myaccountsummary_res" Then
       DN_Download_Table()
-    ElseIf ResponseURI.Query = "?pageurl=myinternet" Then
+    ElseIf ResponseURI.Query = "?pageurl=myinternet" Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
       DN_Download_Table_Response(Response, ResponseURI)
     Else
       RaiseError("Home Read Failed.", , , , Response)
@@ -1255,13 +1255,13 @@
       RaiseError("Usage Failed: The server rejected the request.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And Not ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
       RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
       Return
     End If
     If ResponseURI.Query = "?page=myaccountsummary_res" Then
       DN_Download_Table()
-    ElseIf ResponseURI.Query = "?pageurl=myinternet" Then
+    ElseIf ResponseURI.Query = "?pageurl=myinternet" Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
       If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
         RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response Error", ResponseURI.OriginalString & vbNewLine & Response)
         Return
