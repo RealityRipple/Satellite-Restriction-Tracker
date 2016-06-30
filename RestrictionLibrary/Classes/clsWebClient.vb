@@ -369,13 +369,11 @@ Public Class WebClientEx
           Return
         End Try
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsDownload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsDownload.ResponseHeaders.Item(Key)
-              AsyncDownloadString({RunName, sNewPath, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsDownload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncDownloadString({RunName, sNewPath, 0})
+            Return
+          End If
           DownloadResults(RunName) = "Error: Empty Response"
         Else
           DownloadResults(RunName) = sRet
@@ -456,13 +454,11 @@ Public Class WebClientEx
           Return
         End Try
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsDownload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsDownload.ResponseHeaders.Item(Key)
-              AsyncDownloadStringWithCallback({callback, aState, sNewPath, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsDownload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncDownloadStringWithCallback({callback, aState, sNewPath, 0})
+            Return
+          End If
           callback(aState, "Error: Empty Response")
         Else
           callback(aState, sRet)
@@ -562,13 +558,11 @@ Public Class WebClientEx
           End Try
         End If
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsUpload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsUpload.ResponseHeaders.Item(Key)
-              AsyncUploadString({RunName, sNewPath, "GET", Nothing, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsUpload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncUploadString({RunName, sNewPath, "GET", Nothing, 0})
+            Return
+          End If
           UploadResults(RunName) = "Error: Empty Response"
         Else
           UploadResults(RunName) = sRet
@@ -668,13 +662,11 @@ Public Class WebClientEx
           End Try
         End If
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsUpload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsUpload.ResponseHeaders.Item(Key)
-              AsyncUploadStringWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsUpload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncUploadStringWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
+            Return
+          End If
           callback(aState, "Error: Empty Response")
         Else
           callback(aState, sRet)
@@ -759,13 +751,11 @@ Public Class WebClientEx
           End Try
         End If
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsUpload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsUpload.ResponseHeaders.Item(Key)
-              AsyncUploadValues({RunName, sNewPath, "GET", Nothing, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsUpload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncUploadValues({RunName, sNewPath, "GET", Nothing, 0})
+            Return
+          End If
           UploadResults(RunName) = "Error: Empty Response"
         Else
           UploadResults(RunName) = sRet
@@ -866,13 +856,11 @@ Public Class WebClientEx
           End Try
         End If
         If String.IsNullOrEmpty(sRet) Then
-          For Each Key In wsUpload.ResponseHeaders.AllKeys
-            If Key.ToLower = "location" Then
-              Dim sNewPath As String = wsUpload.ResponseHeaders.Item(Key)
-              AsyncUploadValuesWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
-              Return
-            End If
-          Next
+          Dim sNewPath As String = CheckHeaderRedirect(wsUpload.ResponseHeaders, IIf(c_ResponseURI Is Nothing, address, c_ResponseURI.OriginalString))
+          If Not String.IsNullOrEmpty(sNewPath) Then
+            AsyncUploadValuesWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
+            Return
+          End If
           callback(aState, "Error: Empty Response")
         Else
           callback(aState, sRet)
@@ -889,6 +877,20 @@ Public Class WebClientEx
 #End Region
 #End Region
 #End Region
+  Private Function CheckHeaderRedirect(HeaderData As Net.WebHeaderCollection, SourceAddr As String) As String
+    For Each Key In HeaderData.AllKeys
+      If Key.ToLower = "location" Then
+        Dim sNewPath As String = HeaderData.Item(Key)
+        If sNewPath.StartsWith("/") Then
+          sNewPath = SourceAddr.Substring(0, SourceAddr.IndexOf("/", SourceAddr.IndexOf("//") + 2)) & sNewPath
+        ElseIf Not sNewPath.Contains("//") Then
+          sNewPath = SourceAddr.Substring(0, SourceAddr.LastIndexOf("/") + 1) & sNewPath
+        End If
+        Return sNewPath
+      End If
+    Next
+    Return Nothing
+  End Function
 End Class
 
 Public Enum SecurityProtocolTypeEx
