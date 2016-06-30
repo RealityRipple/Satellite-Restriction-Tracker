@@ -1435,8 +1435,7 @@
               opM = htmlParts(0)
             Else
               If Not opM = htmlParts(0) Then
-                Debug.Print("Inconsistency!")
-                Stop
+                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Off-Peak Max). Gonna take a closer look...", Table))
                 opM = htmlParts(0)
               End If
             End If
@@ -1446,8 +1445,7 @@
               atM = htmlParts(1)
             Else
               If Not atM = htmlParts(1) Then
-                Debug.Print("Inconsistency!")
-                Stop
+                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Anytime Max). Gonna take a closer look...", Table))
                 atM = htmlParts(1)
               End If
             End If
@@ -1457,8 +1455,7 @@
               opV = htmlParts(2)
             Else
               If Not opV = htmlParts(2) Then
-                Debug.Print("Inconsistency!")
-                Stop
+                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Off-Peak Value). Gonna take a closer look...", Table))
                 opV = htmlParts(2)
               End If
             End If
@@ -1468,8 +1465,7 @@
               atV = htmlParts(3)
             Else
               If Not atV = htmlParts(3) Then
-                Debug.Print("Inconsistency!")
-                Stop
+                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Anytime Value). Gonna take a closer look...", Table))
                 atV = htmlParts(3)
               End If
             End If
@@ -1479,9 +1475,12 @@
               atxM = htmlParts(4)
             Else
               If Not atxM = htmlParts(4) Then
-                Debug.Print("Inconsistency!")
-                Stop
-                atxM = htmlParts(4)
+                If atxM = "15.0" And htmlParts(4) = "0.0" Then
+                  atxM = "0.0"
+                Else
+                  RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Added Max). Gonna take a closer look...", Table))
+                  atxM = htmlParts(4)
+                End If
               End If
             End If
           End If
@@ -1509,10 +1508,8 @@
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
     ElseIf lDownT > 0 Then
       If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
-        If Not (StrToFloat(atxV) = 0.0 And StrToFloat(atxM) = 15.0) Then
-          lDown += StrToVal(atxV, MBPerGB)
-          lDownT += StrToVal(atxM, MBPerGB)
-        End If
+        If Not StrToFloat(atxV) = 0.0 Then lDown += StrToVal(atxV, MBPerGB)
+        If Not StrToFloat(atxM) = 0.0 Then lDownT += StrToVal(atxV, MBPerGB)
       End If
       RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
     Else
