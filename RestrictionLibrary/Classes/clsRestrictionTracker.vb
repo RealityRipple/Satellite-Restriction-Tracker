@@ -1645,6 +1645,8 @@
       If sCookieData.EndsWith(vbLf) Then sCookieData = sCookieData.Substring(0, sCookieData.Length - 1)
       sPOST &= "&cookies=" & PercentEncode(ToBase64(sCookieData))
     End If
+    wsSocket.SendHeaders = New Net.WebHeaderCollection
+    wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)
     Dim sRet As String = wsSocket.UploadString(c_TLSProxyAddr, "POST", sPOST)
     If Not sRet.Contains(vbLf) Then
       ReturnURL = Nothing
@@ -1701,6 +1703,8 @@
       SendTLSProxy(SendURL, SendData, ReturnURL, ReturnData)
       Return
     End If
+    wsSocket.SendHeaders = New Net.WebHeaderCollection
+    wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)
     Dim sRet As String = wsSocket.UploadString(SendURL.OriginalString, "POST", SendData)
     ReturnData = sRet
     ReturnURL = wsSocket.ResponseURI

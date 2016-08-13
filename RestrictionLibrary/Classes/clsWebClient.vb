@@ -91,11 +91,16 @@
   End Property
   Private c_Events As Boolean
   Public Event Failure(sender As Object, e As ErrorEventArgs)
+  Public Shared ReadOnly Property UserAgent As String
+    Get
+      Return "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & Environment.Version.ToString & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
+    End Get
+  End Property
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
       If request.GetType Is GetType(Net.HttpWebRequest) Then
-        CType(request, Net.HttpWebRequest).UserAgent = "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & Environment.Version.ToString & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
+        CType(request, Net.HttpWebRequest).UserAgent = WebClientCore.UserAgent
         CType(request, Net.HttpWebRequest).ReadWriteTimeout = c_RWTimeout * 1000
         CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
         CType(request, Net.HttpWebRequest).CookieContainer = c_CookieJar
@@ -343,7 +348,7 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As String In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -435,7 +440,7 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As String In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsDownload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -508,7 +513,7 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -626,7 +631,7 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -700,7 +705,7 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As String In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
@@ -819,7 +824,7 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key As Net.HttpRequestHeader In c_SendHeaders.Keys
+          For Each key In c_SendHeaders.Keys
             wsUpload.Headers.Add(key, c_SendHeaders(key))
           Next
         End If
