@@ -156,53 +156,47 @@
         txtProxyDomain.Text = String.Empty
       End If
     End If
+    chkNetworkProtocolSSL3.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3
+    chkNetworkProtocolTLS10.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10
+    chkNetworkProtocolTLS11.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11
+    chkNetworkProtocolTLS12.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12
+    Dim useTLSProxy As Boolean = False
     Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
-      chkNetworkProtocolSSL3.Visible = True
-      chkNetworkProtocolSSL3.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3
     Catch ex As Exception
-      chkNetworkProtocolSSL3.Visible = False
-      chkNetworkProtocolSSL3.Checked = False
+      useTLSProxy = True
     End Try
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls10
-      chkNetworkProtocolTLS10.Visible = True
-      chkNetworkProtocolTLS10.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10
     Catch ex As Exception
-      chkNetworkProtocolTLS10.Visible = False
-      chkNetworkProtocolTLS10.Checked = False
+      useTLSProxy = True
     End Try
     If (Environment.OSVersion.Version.Major < 6) OrElse
        (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
-      chkNetworkProtocolTLS11.Visible = False
-      chkNetworkProtocolTLS11.Checked = False
-      chkNetworkProtocolTLS12.Visible = False
-      chkNetworkProtocolTLS12.Checked = False
+      useTLSProxy = True
     ElseIf Environment.Version.Revision < 17929 Then
-      chkNetworkProtocolTLS11.Visible = False
-      chkNetworkProtocolTLS11.Checked = False
-      chkNetworkProtocolTLS12.Visible = False
-      chkNetworkProtocolTLS12.Checked = False
+      useTLSProxy = True
     Else
       Try
         Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls11
-        chkNetworkProtocolTLS11.Visible = True
-        chkNetworkProtocolTLS11.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11
       Catch ex As Exception
-        chkNetworkProtocolTLS11.Visible = False
-        chkNetworkProtocolTLS11.Checked = False
+        useTLSProxy = True
       End Try
       Try
         Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls12
-        chkNetworkProtocolTLS12.Visible = True
-        chkNetworkProtocolTLS12.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12
       Catch ex As Exception
-        chkNetworkProtocolTLS12.Visible = False
-        chkNetworkProtocolTLS12.Checked = False
+        useTLSProxy = True
       End Try
     End If
     Net.ServicePointManager.SecurityProtocol = myProtocol
+    If useTLSProxy Then
+      chkTLSProxy.Visible = True
+      chkTLSProxy.Checked = mySettings.TLSProxy
+    Else
+      chkTLSProxy.Checked = False
+      chkTLSProxy.Visible = False
+    End If
     If String.IsNullOrEmpty(mySettings.NetTestURL) Then
       optNetTestNone.Checked = True
     Else
@@ -374,7 +368,7 @@
                                                                              chkStartUp.CheckedChanged, chkAutoHide.CheckedChanged,
                                                                              txtOverSize.KeyPress, txtOverSize.KeyUp, txtOverSize.Scroll, txtOverSize.ValueChanged,
                                                                              txtOverTime.KeyPress, txtOverTime.KeyUp, txtOverTime.Scroll, txtOverTime.ValueChanged,
-                                                                             chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged,
+                                                                             chkTLSProxy.CheckedChanged, chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged,
                                                                              txtProxyAddress.TextChanged,
                                                                              txtProxyPort.KeyPress, txtProxyPort.KeyUp, txtProxyPort.Scroll, txtProxyPort.ValueChanged,
                                                                              txtProxyUser.TextChanged,
@@ -1213,6 +1207,7 @@
           End If
         End If
     End Select
+    mySettings.TLSProxy = chkTLSProxy.Checked
     mySettings.SecurityProtocol = SecurityProtocolTypeEx.None
     If chkNetworkProtocolSSL3.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Ssl3
     If chkNetworkProtocolTLS10.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls10
@@ -1537,6 +1532,7 @@
         End If
       End If
     End If
+    If Not mySettings.TLSProxy = chkTLSProxy.Checked Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3) = (Not chkNetworkProtocolSSL3.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10) = (Not chkNetworkProtocolTLS10.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11) = (Not chkNetworkProtocolTLS11.Checked) Then Return True

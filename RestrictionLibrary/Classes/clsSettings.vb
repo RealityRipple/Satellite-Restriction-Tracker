@@ -8,6 +8,7 @@ Class AppSettings
   Private m_HistoryDir As String
   Private m_PassCrypt As String
   Private m_Timeout As Integer
+  Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
   Private m_Protocol As Net.SecurityProtocolType
   Public Loaded As Boolean
@@ -55,6 +56,8 @@ Class AppSettings
                     m_PassCrypt = xValue
                   ElseIf xName.CompareTo("Timeout") = 0 Then
                     If Not Integer.TryParse(xValue, m_Timeout) Then m_Timeout = 120
+                  ElseIf xName.CompareTo("TLSProxy") = 0 Then
+                    m_TLSProxy = (xValue = "True")
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
                   ElseIf xName.CompareTo("Protocol") = 0 Then
@@ -99,6 +102,7 @@ Class AppSettings
     m_HistoryDir = Nothing
     m_PassCrypt = Nothing
     m_Timeout = 120
+    m_TLSProxy = False
     m_ProxySetting = "None"
     m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
   End Sub
@@ -156,6 +160,14 @@ Class AppSettings
     End Get
     Set(value As Integer)
       m_Timeout = value
+    End Set
+  End Property
+  Public Property TLSProxy As Boolean
+    Get
+      Return m_TLSProxy
+    End Get
+    Set(value As Boolean)
+      m_TLSProxy = value
     End Set
   End Property
   Public Property Proxy As Net.IWebProxy

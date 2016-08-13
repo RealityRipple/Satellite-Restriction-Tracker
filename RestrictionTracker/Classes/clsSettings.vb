@@ -184,6 +184,7 @@ Class AppSettings
   Private m_TrayAnim As Boolean
   Private m_TrayClose As Boolean
   Private m_AutoHide As Boolean
+  Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
   Private m_LastNag As Date
   Private m_NetTest As String
@@ -558,6 +559,17 @@ Class AppSettings
           m_AutoHide = True
         End Try
       End If
+      Dim xTLSProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TLSProxy")
+      If xTLSProxy Is Nothing Then
+        m_TLSProxy = False
+      Else
+        Try
+          m_TLSProxy = xTLSProxy.Element("value").Value = "True"
+        Catch ex As Exception
+          m_TLSProxy = False
+        End Try
+      End If
+
       Dim xProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
       If xProxy Is Nothing Then
         m_ProxySetting = "None"
@@ -1013,6 +1025,7 @@ Class AppSettings
     m_TrayAnim = True
     m_TrayClose = False
     m_AutoHide = True
+    m_TLSProxy = False
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
     m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
@@ -1108,6 +1121,7 @@ Class AppSettings
                                                                        New XElement("setting", New XAttribute("name", "Animation"), New XElement("value", IIf(m_TrayAnim, "True", "False"))),
                                                                        New XElement("setting", New XAttribute("name", "OnClose"), New XElement("value", IIf(m_TrayClose, "True", "False")))),
                                                           New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
+                                                          New XElement("setting", New XAttribute("name", "TLSProxy"), New XElement("value", IIf(m_TLSProxy, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
@@ -1470,6 +1484,14 @@ Class AppSettings
     End Get
     Set(value)
       m_AutoHide = value
+    End Set
+  End Property
+  Public Property TLSProxy
+    Get
+      Return m_TLSProxy
+    End Get
+    Set(value)
+      m_TLSProxy = value
     End Set
   End Property
   Public Property Proxy As Net.IWebProxy
