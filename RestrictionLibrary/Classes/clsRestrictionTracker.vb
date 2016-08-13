@@ -1590,24 +1590,53 @@
     ElseIf (c_Protocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3 Then
       sProtocol = "ssl3"
     End If
-    Dim sCookieData As String = Nothing
-    Dim k As Hashtable = c_Jar.GetType().GetField("m_domainTable", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).GetValue(c_Jar)
-    For Each dEntry As DictionaryEntry In k
-      Dim l As SortedList = dEntry.Value.GetType.GetField("m_list", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).GetValue(dEntry.Value)
-      For Each e As DictionaryEntry In l
-        Dim cl As Net.CookieCollection = e.Value
-        For Each cookie As Net.Cookie In cl
-          sCookieData &= cookie.Domain & vbTab &
-                                 (Not cookie.HttpOnly).ToString.ToLower & vbTab &
-                                 cookie.Secure.ToString.ToLower & vbTab &
-                                 cookie.Domain.StartsWith(".").ToString.ToLower & vbTab &
-                                 cookie.Path & vbTab &
-                                 (cookie.Expires.ToUniversalTime - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds & vbTab &
-                                 cookie.Name & vbTab &
-                                 cookie.Value & vbLf
+    Dim sFields As String = Nothing
+    Dim cl As Net.CookieCollection = Nothing
+    For Each cField As Reflection.FieldInfo In c_Jar.GetType().GetFields(Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
+      If cField.Name = "m_domainTable" Then
+        cl = New Net.CookieCollection
+        Dim k As Hashtable = cField.GetValue(c_Jar)
+        For Each dEntry As DictionaryEntry In k
+          Dim l As SortedList = dEntry.Value.GetType().GetField("m_list", Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic).GetValue(dEntry.Value)
+          For Each e As DictionaryEntry In l
+            Dim cTmp As Net.CookieCollection = e.Value
+            If cTmp IsNot Nothing Then cl.Add(cTmp)
+          Next
         Next
-      Next
+        sFields = Nothing
+        Exit For
+      End If
+      If cField.Name = "cookies" Then
+        cl = New Net.CookieCollection
+        Dim cTmp As Net.CookieCollection = cField.GetValue(c_Jar)
+        If cTmp IsNot Nothing Then cl.Add(cTmp)
+        sFields = Nothing
+        Exit For
+      End If
+      sFields &= cField.Name & ", "
     Next
+    If cl Is Nothing Then
+      If Not String.IsNullOrEmpty(sFields) Then
+        If sFields.EndsWith(", ") Then sFields = sFields.Substring(0, sFields.Length - 2)
+        RaiseError("Unsupported CookieContainer: Unable to use TLS Proxy on this Framework.", "Send TLS Proxy", sFields)
+      End If
+      ReturnURL = Nothing
+      ReturnData = "Unsupported CookieContainer: Unable to use TLS Proxy on this Framework."
+      Return
+    End If
+    Dim sCookieData As String = Nothing
+    If cl IsNot Nothing Then
+      For Each cookie As Net.Cookie In cl
+        sCookieData &= cookie.Domain & vbTab &
+                       (Not cookie.HttpOnly).ToString.ToLower & vbTab &
+                       cookie.Secure.ToString.ToLower & vbTab &
+                       cookie.Domain.StartsWith(".").ToString.ToLower & vbTab &
+                       cookie.Path & vbTab &
+                       (cookie.Expires.ToUniversalTime - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds & vbTab &
+                       cookie.Name & vbTab &
+                       cookie.Value & vbLf
+      Next
+    End If
     Dim sPOST As String = Nothing
     sPOST &= "protocol=" & PercentEncode(ToBase64(sProtocol))
     sPOST &= "&url=" & PercentEncode(ToBase64(SendURL.OriginalString))
