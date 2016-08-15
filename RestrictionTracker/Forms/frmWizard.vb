@@ -23,6 +23,7 @@ Public Class frmWizard
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
   Private AccountType As SatHostTypes = SatHostTypes.Other
+  Private NeedsTLSProxy As Boolean = False
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Public Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
@@ -170,6 +171,7 @@ Public Class frmWizard
         newSettings.Overuse = 0
         newSettings.Overtime = 15
       End If
+      If NeedsTLSProxy Then newSettings.TLSProxy = True
       newSettings.Save()
       If newSettings.Service Then
         Dim cSave As New SvcSettings
@@ -407,6 +409,17 @@ Public Class frmWizard
       Return
     End If
     If Busy Then
+      txtAccountUsername.Enabled = False
+      cmbAccountHost.Enabled = False
+      txtAccountPass.Enabled = False
+      optRemote.Enabled = False
+      txtKey1.Enabled = False
+      txtKey2.Enabled = False
+      txtKey3.Enabled = False
+      txtKey4.Enabled = False
+      txtKey5.Enabled = False
+      optLocal.Enabled = False
+      optNone.Enabled = False
       cmdPrevious.Enabled = False
       cmdNext.Enabled = False
       lblActivity.Text = Message
@@ -415,6 +428,17 @@ Public Class frmWizard
       cmdPrevious.Enabled = Not tbsWizardPages.SelectedIndex = 0
       cmdNext.Enabled = Not tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1
       lblActivity.Text = Nothing
+      txtAccountUsername.Enabled = True
+      cmbAccountHost.Enabled = True
+      txtAccountPass.Enabled = True
+      optRemote.Enabled = True
+      txtKey1.Enabled = optRemote.Checked
+      txtKey2.Enabled = optRemote.Checked
+      txtKey3.Enabled = optRemote.Checked
+      txtKey4.Enabled = optRemote.Checked
+      txtKey5.Enabled = optRemote.Checked
+      optLocal.Enabled = True
+      optNone.Enabled = True
       If cmdNext.Enabled Then
         cmdNext.Focus()
       Else
@@ -548,10 +572,11 @@ Public Class frmWizard
     newSettings.PassCrypt = StoredPassword.EncryptApp(txtAccountPass.Text)
     newSettings.Service = False
     newSettings.RemoteKey = Nothing
+    If NeedsTLSProxy Then newSettings.TLSProxy = True
     newSettings.Save()
     newSettings = Nothing
 
-    localTest = New localRestrictionTracker(LocalAppDataDirectory)
+    localTest = New localRestrictionTracker(LocalAppDataDirectory, True)
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
@@ -567,9 +592,10 @@ Public Class frmWizard
       sckHostList.BeginGetResponse(Nothing, Nothing)
     Catch ex As Exception
     End Try
-  End Sub
-  Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
-    LocalComplete(SatHostTypes.DishNet_EXEDE)
+    If localTest IsNot Nothing Then
+      localTest.Dispose()
+      localTest = Nothing
+    End If
   End Sub
   Private Sub localTest_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
@@ -578,20 +604,37 @@ Public Class frmWizard
     End If
     If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
     AccountType = SatHostTypes.Other
+    Dim skipIt As Boolean = False
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.LoginFailure
-        If e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
-          Dim sMessage As String = e.Message.Substring(21)
-          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-            MsgDlg(Me, "Your Operating System is too old for this connection. I'm trying to find a way around this problem." & vbNewLine & "For more information, search for ""TLS 1.2 Windows XP"".", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-            MsgDlg(Me, "Your version of the .NET Framework is too old for this connection. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-          Else
-            MsgDlg(Me, sMessage, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-          End If
+        If NeedsTLSProxy = True Then
+          skipIt = True
         Else
-          MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          If e.Message = "TLS ERROR" Then
+            If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+              If MsgDlg(Me, "Your Operating System is too old to support the Security Protocol required to log in." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True
+            ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+              skipIt = True
+              MsgDlg(Me, "Your version of the .NET Framework is too old to support the Security Protocol required to log in. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+            Else
+              skipIt = True
+              MsgDlg(Me, "Security Protocol not supported for some reason. Please let me know you got this message.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+            End If
+          ElseIf e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
+            Dim sMessage As String = e.Message.Substring(21)
+            If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+              If MsgDlg(Me, "Your Operating System is too old to support the Security Protocol required to log in." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure." & vbNewLine & sMessage, "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True
+            ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+              skipIt = True
+              MsgDlg(Me, "Your version of the .NET Framework is too old to support the Security Protocol required to log in. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter)
+            Else
+              skipIt = True
+              MsgDlg(Me, "Security Protocol not supported for some reason. Please let me know you got this message.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter)
+            End If
+          Else
+            MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+          End If
         End If
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
@@ -601,13 +644,18 @@ Public Class frmWizard
       localTest.Dispose()
       localTest = Nothing
     End If
+    If skipIt Then
+      DrawStatus(False)
+      AccountType = SatHostTypes.WildBlue_EXEDE
+      tbsWizardPages.SelectedIndex += 1
+      Return
+    End If
+    If NeedsTLSProxy Then
+      DrawStatus(True, "Retrying with TLS Proxy...")
+      UsageTest()
+      Return
+    End If
     DrawStatus(False)
-  End Sub
-  Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
-    LocalComplete(SatHostTypes.RuralPortal_LEGACY)
-  End Sub
-  Private Sub localTest_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionRPXResult
-    LocalComplete(SatHostTypes.RuralPortal_EXEDE)
   End Sub
   Private Sub localTest_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
     Select Case e.Status
@@ -640,6 +688,18 @@ Public Class frmWizard
       Case ConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
   End Sub
+  Private Sub localTest_LoginComplete(sender As Object, e As RestrictionLibrary.localRestrictionTracker.LoginCompletionEventArgs) Handles localTest.LoginComplete
+    LocalComplete(e.HostType)
+  End Sub
+  Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
+    LocalComplete(SatHostTypes.DishNet_EXEDE)
+  End Sub
+  Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
+    LocalComplete(SatHostTypes.RuralPortal_LEGACY)
+  End Sub
+  Private Sub localTest_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionRPXResult
+    LocalComplete(SatHostTypes.RuralPortal_EXEDE)
+  End Sub
   Private Sub localTest_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
     LocalComplete(SatHostTypes.WildBlue_LEGACY)
   End Sub
@@ -647,4 +707,6 @@ Public Class frmWizard
     LocalComplete(SatHostTypes.WildBlue_EXEDE)
   End Sub
 #End Region
+
+
 End Class

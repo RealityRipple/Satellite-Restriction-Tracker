@@ -202,12 +202,26 @@
     End Property
   End Class
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
+  Public Class LoginCompletionEventArgs
+    Inherits EventArgs
+    Private m_HostType As SatHostTypes
+    Public Sub New(myHostType As SatHostTypes)
+      m_HostType = myHostType
+    End Sub
+    Public ReadOnly Property HostType As SatHostTypes
+      Get
+        Return m_HostType
+      End Get
+    End Property
+  End Class
+  Public Event LoginComplete(sender As Object, e As LoginCompletionEventArgs)
 #End Region
   Private acType As DetermineType
   Private mySettings As AppSettings
   Private Const MBPerGB As Integer = 1000
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
+  Private justATest As Boolean
   Private sAccount, sUsername, sPassword, sProvider As String
   Private sAttemptedURL As String
   Private AttemptedTag As ConnectionStates
@@ -227,7 +241,8 @@
   Private sDataPath As String
   Private wsSocket As WebClientEx
 #Region "Initialization Functions"
-  Public Sub New(ConfigPath As String)
+  Public Sub New(ConfigPath As String, Optional OnlyLogin As Boolean = False)
+    justATest = OnlyLogin
     Randomize()
     ClosingTime = False
     sDataPath = ConfigPath
@@ -396,8 +411,16 @@
   Private Sub WB_Login_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Response.Contains("usage.jsp") Then
+      If justATest Then
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_LEGACY))
+        Return
+      End If
       WB_Usage("usage")
     ElseIf Response.Contains("usage_bm.jsp") Then
+      If justATest Then
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_LEGACY))
+        Return
+      End If
       WB_Usage("usage_bm")
     ElseIf Response.Contains("<div class=""error"">") Then
       Dim sMessage As String = Response.Substring(Response.IndexOf("<div class=""error"">"))
@@ -735,6 +758,10 @@
       Else
         sURL = "https://" & ResponseURI.Host & "/dashboard"
       End If
+      If justATest Then
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE))
+        Return
+      End If
       EX_Download_Homepage(sURL)
       Return
     End If
@@ -978,6 +1005,10 @@
   End Sub
   Private Sub RP_Read_Table(Table As String)
     If Table.Contains("MB)") Then
+      If justATest Then
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_LEGACY))
+        Return
+      End If
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sUp As String = String.Empty, sUpT As String = String.Empty
       For Each row In sRows
@@ -1006,6 +1037,10 @@
         RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
       End If
     ElseIf Table.Contains(" GB (") Then
+      If justATest Then
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_EXEDE))
+        Return
+      End If
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
       For Each row In sRows
@@ -1246,6 +1281,10 @@
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("/processsynacoreresponse.do") Then
       RaiseError("Login Failed: Could not understand response.", True, "DishNet Login Verify Response", Response, ResponseURI)
+      Return
+    End If
+    If justATest Then
+      RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.DishNet_EXEDE))
       Return
     End If
     DN_Download_Home()
@@ -1696,7 +1735,11 @@
     End If
     Dim sRet As String = wsSocket.DownloadString(SendURL.OriginalString)
     ReturnData = sRet
-    ReturnURL = wsSocket.ResponseURI
+    If wsSocket Is Nothing Then
+      ReturnURL = Nothing
+    Else
+      ReturnURL = wsSocket.ResponseURI
+    End If
   End Sub
   Private Sub SendPOST(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String)
     If c_TLSProxy Then
@@ -1707,7 +1750,11 @@
     wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)
     Dim sRet As String = wsSocket.UploadString(SendURL.OriginalString, "POST", SendData)
     ReturnData = sRet
-    ReturnURL = wsSocket.ResponseURI
+    If wsSocket Is Nothing Then
+      ReturnURL = Nothing
+    Else
+      ReturnURL = wsSocket.ResponseURI
+    End If
   End Sub
   Private Function FromBase64(base64Str As String) As String
     Dim bRet() As Byte
