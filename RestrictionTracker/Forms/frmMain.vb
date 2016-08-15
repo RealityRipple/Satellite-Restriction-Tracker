@@ -566,39 +566,41 @@ Public Class frmMain
   Friend Sub ReLoadSettings()
     If mySettings IsNot Nothing Then mySettings = Nothing
     mySettings = New AppSettings
-    Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
-    For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
-      If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then
-        Try
-          Net.ServicePointManager.SecurityProtocol = protocolTest
-          useProtocol = useProtocol Or protocolTest
-        Catch ex As Exception
-        End Try
-      End If
-    Next
-    If useProtocol = SecurityProtocolTypeEx.None Then
-      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
-        For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+    If Not mySettings.TLSProxy Then
+      Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
+      For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+        If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then
           Try
             Net.ServicePointManager.SecurityProtocol = protocolTest
             useProtocol = useProtocol Or protocolTest
           Catch ex As Exception
           End Try
-        Next
+        End If
+      Next
+      If useProtocol = SecurityProtocolTypeEx.None Then
+        If String.IsNullOrEmpty(mySettings.RemoteKey) Then
+          For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+            Try
+              Net.ServicePointManager.SecurityProtocol = protocolTest
+              useProtocol = useProtocol Or protocolTest
+            Catch ex As Exception
+            End Try
+          Next
+          Try
+            Net.ServicePointManager.SecurityProtocol = useProtocol
+            mySettings.SecurityProtocol = useProtocol
+            mySettings.Save()
+          Catch ex As Exception
+          End Try
+        Else
+          Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.None
+        End If
+      Else
         Try
           Net.ServicePointManager.SecurityProtocol = useProtocol
-          mySettings.SecurityProtocol = useProtocol
-          mySettings.Save()
         Catch ex As Exception
         End Try
-      Else
-        Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.None
       End If
-    Else
-      Try
-        Net.ServicePointManager.SecurityProtocol = useProtocol
-      Catch ex As Exception
-      End Try
     End If
     If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
@@ -931,14 +933,22 @@ Public Class frmMain
         SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.LoginFailure
-        If e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
+        If e.Message = "TLS ERROR" Then
+          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature for now.", True)
+          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer.", True)
+          Else
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported for some reason. Please use the TLS Proxy feature for now. Also, let me know you got this message.", True)
+          End If
+        ElseIf e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
           Dim sMessage As String = e.Message.Substring(21)
           If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Your Operating System is too old for this connection. I'm trying to find a way around this problem." & vbNewLine & "For more information, search for ""TLS 1.2 Windows XP"".", True)
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature for now." & vbNewLine & sMessage, True)
           ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Your version of the .NET Framework is too old for this connection. Please update to .NET 4.5 or newer.", True)
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer." & vbNewLine & sMessage, True)
           Else
-            SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported for some reason. Please use the TLS Proxy feature for now. Also, let me know you got this message." & vbNewLine & sMessage, True)
           End If
         Else
           SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)

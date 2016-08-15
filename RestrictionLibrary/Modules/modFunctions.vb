@@ -101,7 +101,7 @@ Module modFunctions
         Return "Connection to the server timed out. Please try again."
       ElseIf ex.Message.StartsWith("The request was aborted:") Then
         If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
-          Return "POSSIBLE TLS ERROR - Unable to create secure connection. Please change your Network Security Protocol settings and try again."
+          Return "TLS ERROR" 'Windows Vista doesn't support TLS error message
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return "Connection aborted."
         Else
@@ -124,6 +124,8 @@ Module modFunctions
             If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection Error - " & ex.Message
           End If
+        ElseIf ex.Message.Contains("SecureChannelFailure") Then
+          Return "POSSIBLE TLS ERROR - " & ex.Message
         Else
           If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
           Return "Error - " & ex.Message
@@ -309,7 +311,7 @@ Module modFunctions
           ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
             Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
-            Return "POSSIBLE TLS ERROR - The server closed the connection."
+            Return "TLS ERROR" 'Windows XP doesn't support TLS error message
           Else
             If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
@@ -404,13 +406,24 @@ Module modFunctions
               If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
               Return "Send Header Error - " & ex.InnerException.Message
             End If
+          ElseIf ex.InnerException.Message.Contains("Unsupported security protocol type") Then
+            Return "TLS ERROR" 'This error will mean MONO is too old and needs to be updated to 4.6(?) or higher
           Else
             If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
             Return "Send Error - " & ex.InnerException.Message
           End If
+        ElseIf ex.Message.Contains("SecureChannelFailure") Then
+          If ex.InnerException.Message.Contains("Value cannot be null") Then
+            Return "TLS ERROR" 'This error will mean MONO is supposed to have TLS 1.2 support, but it doesn't work yet
+          ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed") Then
+            'there's inner exception data here
+            Return "TLS ERROR" 'This error will mean MONO is updated but being forced to use an outdated version, probably due to environment variables
+          Else
+            Return "POSSIBLE TLS ERROR - " & ex.Message & " - " & ex.InnerException.Message
+          End If
         Else
           If Not String.IsNullOrEmpty(sDataPath) Then reportHandler.BeginInvoke(ex, sDataPath, Nothing, Nothing)
-          Return "Error - " & ex.Message
+          Return "Error - " & ex.Message & " - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("An error occurred performing a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
