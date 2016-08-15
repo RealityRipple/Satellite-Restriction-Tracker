@@ -348,8 +348,8 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsDownload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsDownload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim uriAddr As Uri
@@ -440,8 +440,8 @@ Public Class WebClientEx
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsDownload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsDownload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim sRet As String = Nothing
@@ -513,8 +513,8 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsUpload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsUpload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim sRet As String = Nothing
@@ -631,8 +631,8 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsUpload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsUpload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim sRet As String = Nothing
@@ -705,8 +705,8 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsUpload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsUpload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim sRet As String = Nothing
@@ -824,8 +824,8 @@ Public Class WebClientEx
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
-          For Each key In c_SendHeaders.Keys
-            wsUpload.Headers.Add(key, c_SendHeaders(key))
+          For I As Integer = 0 To c_SendHeaders.Count - 1
+            wsUpload.Headers.Add(c_SendHeaders.GetKey(I), c_SendHeaders(I))
           Next
         End If
         Dim sRet As String = Nothing
