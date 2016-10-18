@@ -17,7 +17,7 @@
     End Get
   End Property
   Public Sub LOG_Add(ByVal dTime As Date, ByVal lDown As Long, ByVal lDownLim As Long, ByVal lUp As Long, ByVal lUpLim As Long)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If Math.Abs(DateDiff("n", dTime, LOG_GetLast)) >= HistoryAge Then
       If lDownLim > 0 And lUpLim > 0 Then
         If wbDB Is Nothing Then wbDB = New DataBase
@@ -27,7 +27,7 @@
     End If
   End Sub
   Public Sub LOG_Get(ByVal lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If LOG_GetCount() > lngIndex Then
       Dim dbRow As DataBase.DataRow = wbDB(lngIndex)
       dtDate = dbRow.DATETIME
@@ -57,15 +57,15 @@
     isLoaded = True
   End Sub
   Public Sub LOG_Terminate(withSave As Boolean)
-    If Not isLoaded Then Exit Sub
-    If isSaving Then Exit Sub
+    If Not isLoaded Then Return
+    If isSaving Then Return
     If wbDB IsNot Nothing Then
       If withSave Then LOG_Save()
       wbDB = Nothing
     End If
   End Sub
   Private Sub LOG_Save(Optional SecondTry As Boolean = False)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If Not String.IsNullOrEmpty(sFile) Then
       isSaving = True
       If Not My.Computer.FileSystem.DirectoryExists(IO.Path.GetDirectoryName(sFile)) Then My.Computer.FileSystem.CreateDirectory(IO.Path.GetDirectoryName(sFile))

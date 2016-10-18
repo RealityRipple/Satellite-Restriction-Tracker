@@ -499,7 +499,7 @@ Public Class TaskbarNotifier
       If MyBase.Cursor = Cursors.Hand Then
         NativeMethods.SetCursor(NativeMethods.LoadCursor(0, 32649))
         msg.Result = IntPtr.Zero
-        Exit Sub
+        Return
       End If
     End If
     MyBase.WndProc(msg)

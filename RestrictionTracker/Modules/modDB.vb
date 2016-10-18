@@ -17,7 +17,7 @@
     End Get
   End Property
   Public Sub LOG_Add(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, Optional Save As Boolean = True)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If Math.Abs(DateDiff(DateInterval.Minute, dTime, LOG_GetLast)) >= HistoryAge Then
       If lDownLim > 0 Then
         If usageDB Is Nothing Then
@@ -34,7 +34,7 @@
     End If
   End Sub
   Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If LOG_GetCount() > lngIndex Then
       Dim dbRow As DataBase.DataRow = usageDB(lngIndex)
       dtDate = dbRow.DATETIME
@@ -67,7 +67,7 @@
       If sFile = MySaveDir(True) & "\History-" & sAccount & ".xml" Then
         sFile = MySaveDir(True) & "\History-" & sAccount & ".wb"
         usageDB.Save(sFile, withDisplay)
-        If InUseChecker(MySaveDir(True) & "\History-" & sAccount & ".xml", IO.FileAccess.Write) Then
+        If srlFunctions.InUseChecker(MySaveDir(True) & "\History-" & sAccount & ".xml", IO.FileAccess.Write) Then
           My.Computer.FileSystem.DeleteFile(MySaveDir(True) & "\History-" & sAccount & ".xml")
         End If
       End If
@@ -79,7 +79,7 @@
   Public Sub LOG_Terminate(withSave As Boolean)
     If Not isLoaded Then
       If usageDB IsNot Nothing Then usageDB.StopNew = True
-      Exit Sub
+      Return
     End If
     Do While isSaving
       Application.DoEvents()
@@ -90,7 +90,7 @@
     End If
   End Sub
   Public Sub LOG_Sort()
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     Do While isSaving
       Application.DoEvents()
     Loop
@@ -99,11 +99,11 @@
     End If
   End Sub
   Friend Sub LOG_Save(withDisplay As Boolean)
-    If Not isLoaded Then Exit Sub
+    If Not isLoaded Then Return
     If Not String.IsNullOrEmpty(sFile) Then
       isSaving = True
       If Not My.Computer.FileSystem.DirectoryExists(IO.Path.GetDirectoryName(sFile)) Then My.Computer.FileSystem.CreateDirectory(IO.Path.GetDirectoryName(sFile))
-      If InUseChecker(sFile, IO.FileAccess.Write) Then
+      If srlFunctions.InUseChecker(sFile, IO.FileAccess.Write) Then
         usageDB.Save(sFile, withDisplay)
       Else
         MsgDlg(Nothing, "Your history file could not be saved because another program is using it!", "History could not be saved.", "File in Use", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)

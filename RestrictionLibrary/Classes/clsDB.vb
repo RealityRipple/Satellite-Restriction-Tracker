@@ -129,7 +129,7 @@ Public Class DataBase
             Else
               Add(New DataRow(DT, Down, DownLim, Up, UpLim))
             End If
-            If StopNew Then Exit Sub
+            If StopNew Then Return
           Next
           m_xmld = Nothing
         ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".wb") = 0 Then
@@ -149,7 +149,7 @@ Public Class DataBase
                 Else
                   Add(New DataRow(DT, Down, DownLim, Up, UpLim))
                 End If
-                If StopNew Then Exit Sub
+                If StopNew Then Return
               Next
               nIn.Close()
             End Using
@@ -195,7 +195,7 @@ Public Class DataBase
                 Else
                   Add(New DataRow(DT, Down, DownLim, Up, UpLim))
                 End If
-                If StopNew Then Exit Sub
+                If StopNew Then Return
               Loop
               nIn.Close()
             End Using

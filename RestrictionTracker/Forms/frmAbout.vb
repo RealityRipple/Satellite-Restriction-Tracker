@@ -1,5 +1,5 @@
 ﻿Public NotInheritable Class frmAbout
-  Private sEXEPath As String = LocalAppDataDirectory & "Setup.exe"
+  Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
   Private tReset As Threading.Timer
@@ -14,11 +14,13 @@
     Me.Text = String.Format("About {0}", ApplicationTitle)
     lblProduct.Text = My.Application.Info.ProductName
     lblVersion.Text = String.Format("Version {0}", DisplayVersion(Application.ProductVersion))
+    lblCLR.Text = String.Format("on {0}", srlFunctions.GetCLRCleanVersion)
     lblCompany.Text = My.Application.Info.CompanyName
     txtDescription.Text = My.Application.Info.Description
     lblUpdate.Visible = False
     pnlAbout.Controls.Remove(lblUpdate)
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
+    pnlAbout.SetColumnSpan(cmdUpdate, 3)
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Check for &Updates"
     ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
@@ -32,13 +34,7 @@
       updateChecker.Dispose()
       updateChecker = Nothing
     End If
-    If e.CloseReason = CloseReason.ApplicationExitCall Then
-      Try
-        If My.Computer.FileSystem.FileExists(sEXEPath) Then ShellEx(sEXEPath, UpdateParam)
-      Catch ex As Exception
-        MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & "If you are running Anti-Virus software, please make sure it isn't blocking the " & My.Application.Info.ProductName & " Installer.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-      End Try
-    Else
+    If Not e.CloseReason = CloseReason.ApplicationExitCall Then
       Try
         If My.Computer.FileSystem.FileExists(sEXEPath) Then My.Computer.FileSystem.DeleteFile(sEXEPath)
       Catch ex As Exception
@@ -48,7 +44,15 @@
 #End Region
 #Region "Buttons"
   Private Sub cmdOK_Click(sender As System.Object, e As System.EventArgs) Handles cmdOK.Click
-    Me.Close()
+    If tReset IsNot Nothing Then
+      tReset.Dispose()
+      tReset = Nothing
+    End If
+    If updateChecker IsNot Nothing Then
+      updateChecker.Dispose()
+      updateChecker = Nothing
+    End If
+    Me.Hide()
   End Sub
   Private Sub LogoPictureBox_MouseDoubleClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles LogoPictureBox.MouseDoubleClick
     If My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And Not My.Computer.Keyboard.ShiftKeyDown Then
@@ -57,7 +61,7 @@
       Err.Raise(vbObjectError + 72, "Error Test", "This is simply a test of the error report system.")
     ElseIf Not My.Computer.Keyboard.CtrlKeyDown And My.Computer.Keyboard.AltKeyDown And My.Computer.Keyboard.ShiftKeyDown Then
       If NOTIFIER_STYLE.Background Is Nothing Or NOTIFIER_STYLE.CloseButton Is Nothing Then
-        Exit Sub
+        Return
       End If
       If taskNotifier Is Nothing Then taskNotifier = New TaskbarNotifier
       If taskNotifier.Visible Then
@@ -126,6 +130,7 @@
       cmdUpdate.Visible = False
       pnlAbout.Controls.Remove(cmdUpdate)
       pnlAbout.Controls.Add(lblUpdate, 1, 2)
+      pnlAbout.SetColumnSpan(lblUpdate, 3)
       lblUpdate.Visible = True
       Dim lState As Byte = LOG_State
       lblUpdate.Link = False
@@ -135,7 +140,7 @@
           SetUpdateValue("Initializing Update Check", True)
           Dim checkInvoker As New MethodInvoker(AddressOf BeginCheck)
           checkInvoker.BeginInvoke(Nothing, Nothing)
-          Exit Sub
+          Return
         Case 2 : SetUpdateValue("Update Skipped: Log is being saved", False)
         Case Else : SetUpdateValue("Update Skipped: Log is being edited", False)
       End Select
@@ -145,15 +150,45 @@
       End If
       tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
     ElseIf cmdUpdate.Text = "Apply &Update" Then
-      Try
-        Application.Exit()
-      Catch ex As Exception
-      End Try
+      Dim RecheckOnMissing As Boolean = False
+      Do
+        Application.DoEvents()
+        Try
+          If My.Computer.FileSystem.FileExists(sEXEPath) Then
+            ShellEx(sEXEPath, UpdateParam)
+            Application.Exit()
+            Return
+          ElseIf RecheckOnMissing Then
+            If MsgDlg(Me, "The update file no longer exists in the location it was downloaded to." & vbNewLine & "If you are running Anti-Virus software, please make sure it hasn't quarantined or deleted the " & My.Application.Info.ProductName & " Installer." & vbNewLine, "The update installer is missing.", "Software Update Error", MessageBoxButtons.RetryCancel, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning) = Windows.Forms.DialogResult.Cancel Then Exit Do
+          Else
+            MsgDlg(Me, "The update file no longer exists in the location it was downloaded to." & vbNewLine & "If you are running Anti-Virus software, please make sure it hasn't quarantined or deleted the " & My.Application.Info.ProductName & " Installer." & vbNewLine, "The update installer is missing.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning)
+            Exit Do
+          End If
+        Catch ex As Exception
+          If MsgDlg(Me, "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & "If you are running Anti-Virus software, please make sure it isn't blocking the " & My.Application.Info.ProductName & " Installer.", "There was an error starting the update.", "Software Update Error", MessageBoxButtons.RetryCancel, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details") = Windows.Forms.DialogResult.Cancel Then Exit Do
+          RecheckOnMissing = True
+        End Try
+      Loop
+      If tReset IsNot Nothing Then
+        tReset.Dispose()
+        tReset = Nothing
+      End If
+      cmdUpdate.Visible = False
+      pnlAbout.Controls.Remove(cmdUpdate)
+      pnlAbout.Controls.Add(lblUpdate, 1, 2)
+      pnlAbout.SetColumnSpan(lblUpdate, 3)
+      lblUpdate.Visible = True
+      lblUpdate.Link = False
+      SetUpdateValue("Update Failure")
+      tReset = New Threading.Timer(New Threading.TimerCallback(AddressOf ResetUpdate), Nothing, 3500, 2000)
     End If
   End Sub
   Private Sub ResetUpdate()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf ResetUpdate))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf ResetUpdate))
+      Catch ex As Exception
+      End Try
       Return
     End If
     If tReset Is Nothing Then Return
@@ -162,17 +197,22 @@
     lblUpdate.Visible = False
     pnlAbout.Controls.Remove(lblUpdate)
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
+    pnlAbout.SetColumnSpan(cmdUpdate, 3)
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Check for &Updates"
     ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
+    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, 0)
   End Sub
   Private Sub NewUpdate()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf NewUpdate))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf NewUpdate))
+      Catch ex As Exception
+      End Try
       Return
     End If
     If tReset Is Nothing Then
-      Exit Sub
+      Return
     Else
       tReset.Dispose()
       tReset = Nothing
@@ -180,10 +220,11 @@
     lblUpdate.Visible = False
     pnlAbout.Controls.Remove(lblUpdate)
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
+    pnlAbout.SetColumnSpan(cmdUpdate, 3)
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Apply &Update"
     ttAbout.SetToolTip(cmdUpdate, My.Application.Info.ProductName & " must restart before the update can be applied.")
-    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
+    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, 1)
   End Sub
   Private Sub BeginCheck()
     updateChecker = New clsUpdate
@@ -201,26 +242,37 @@
       End If
       If Not lblUpdate.Text = Message Then lblUpdate.Text = Message
     End If
-    ttAbout.SetTooltip(lblUpdate, ToolTip)
+    ttAbout.SetToolTip(lblUpdate, ToolTip)
   End Sub
   Private Sub updateChecker_CheckingVersion(sender As Object, e As System.EventArgs) Handles updateChecker.CheckingVersion
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_CheckingVersion), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckingVersion), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetUpdateValue("Checking for Updates", True)
+    lblUpdate.Link = False
   End Sub
   Private Sub updateChecker_CheckProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.CheckProgressChanged
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_CheckProgressChanged), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckProgressChanged), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim sProgress As String = "(" & e.ProgressPercentage & "%)"
     SetUpdateValue("Checking for Updates " & sProgress, True)
+    lblUpdate.Link = False
   End Sub
   Private Sub updateChecker_CheckResult(sender As Object, e As clsUpdate.CheckEventArgs) Handles updateChecker.CheckResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If tReset IsNot Nothing Then
@@ -333,7 +385,10 @@
   End Sub
   Private Sub updateChecker_DownloadingUpdate(sender As Object, e As System.EventArgs) Handles updateChecker.DownloadingUpdate
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     tmrSpeed.Enabled = True
@@ -342,15 +397,20 @@
   End Sub
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     tmrSpeed.Enabled = False
     If e.Error IsNot Nothing Then
       SetUpdateValue(e.Error.Message)
+      lblUpdate.Link = False
     ElseIf e.Cancelled Then
       updateChecker.Dispose()
       SetUpdateValue("Download Cancelled")
+      lblUpdate.Link = False
     Else
       updateChecker.Dispose()
       SetUpdateValue("Download Complete")
@@ -372,7 +432,10 @@
   Private CurPercent As Integer
   Private Sub updateChecker_UpdateProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.UpdateProgressChanged
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     CurSize = e.BytesReceived
@@ -394,6 +457,7 @@
       sProgress = "(Waiting for Response)"
     End If
     SetUpdateValue("Downloading Update " & sProgress, True, sStatus)
+    lblUpdate.Link = False
   End Sub
 #End Region
 End Class

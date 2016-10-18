@@ -34,6 +34,7 @@ Partial Class frmAbout
     Me.txtDescription = New System.Windows.Forms.TextBox()
     Me.cmdOK = New System.Windows.Forms.Button()
     Me.cmdDonate = New System.Windows.Forms.Button()
+    Me.lblCLR = New System.Windows.Forms.Label()
     Me.tmrSpeed = New System.Windows.Forms.Timer(Me.components)
     Me.cmdUpdate = New System.Windows.Forms.Button()
     Me.ttAbout = New RestrictionTracker.ToolTip(Me.components)
@@ -56,7 +57,8 @@ Partial Class frmAbout
     'pnlAbout
     '
     Me.pnlAbout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAbout.ColumnCount = 3
+    Me.pnlAbout.ColumnCount = 4
+    Me.pnlAbout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlAbout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlAbout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAbout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
@@ -66,8 +68,9 @@ Partial Class frmAbout
     Me.pnlAbout.Controls.Add(Me.lblUpdate, 1, 2)
     Me.pnlAbout.Controls.Add(Me.lblCompany, 1, 3)
     Me.pnlAbout.Controls.Add(Me.txtDescription, 1, 4)
-    Me.pnlAbout.Controls.Add(Me.cmdOK, 2, 5)
+    Me.pnlAbout.Controls.Add(Me.cmdOK, 3, 5)
     Me.pnlAbout.Controls.Add(Me.cmdDonate, 1, 5)
+    Me.pnlAbout.Controls.Add(Me.lblCLR, 2, 1)
     Me.pnlAbout.Location = New System.Drawing.Point(9, 9)
     Me.pnlAbout.Name = "pnlAbout"
     Me.pnlAbout.RowCount = 6
@@ -84,7 +87,7 @@ Partial Class frmAbout
     '
     Me.lblProduct.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblProduct.AutoSize = True
-    Me.pnlAbout.SetColumnSpan(Me.lblProduct, 2)
+    Me.pnlAbout.SetColumnSpan(Me.lblProduct, 3)
     Me.lblProduct.Cursor = System.Windows.Forms.Cursors.Hand
     Me.lblProduct.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblProduct.ForeColor = System.Drawing.Color.MediumBlue
@@ -102,12 +105,11 @@ Partial Class frmAbout
     '
     Me.lblVersion.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblVersion.AutoSize = True
-    Me.pnlAbout.SetColumnSpan(Me.lblVersion, 2)
     Me.lblVersion.Cursor = System.Windows.Forms.Cursors.Hand
     Me.lblVersion.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblVersion.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblVersion.Location = New System.Drawing.Point(136, 34)
-    Me.lblVersion.Margin = New System.Windows.Forms.Padding(6, 0, 3, 0)
+    Me.lblVersion.Margin = New System.Windows.Forms.Padding(6, 0, 0, 0)
     Me.lblVersion.Name = "lblVersion"
     Me.lblVersion.Size = New System.Drawing.Size(42, 13)
     Me.lblVersion.TabIndex = 3
@@ -120,7 +122,7 @@ Partial Class frmAbout
     '
     Me.lblUpdate.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblUpdate.AutoEllipsis = True
-    Me.pnlAbout.SetColumnSpan(Me.lblUpdate, 2)
+    Me.pnlAbout.SetColumnSpan(Me.lblUpdate, 3)
     Me.lblUpdate.Cursor = System.Windows.Forms.Cursors.Default
     Me.lblUpdate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblUpdate.ForeColor = System.Drawing.SystemColors.ControlText
@@ -139,7 +141,7 @@ Partial Class frmAbout
     '
     Me.lblCompany.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblCompany.AutoSize = True
-    Me.pnlAbout.SetColumnSpan(Me.lblCompany, 2)
+    Me.pnlAbout.SetColumnSpan(Me.lblCompany, 3)
     Me.lblCompany.Cursor = System.Windows.Forms.Cursors.Hand
     Me.lblCompany.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblCompany.ForeColor = System.Drawing.Color.MediumBlue
@@ -155,7 +157,7 @@ Partial Class frmAbout
     '
     'txtDescription
     '
-    Me.pnlAbout.SetColumnSpan(Me.txtDescription, 2)
+    Me.pnlAbout.SetColumnSpan(Me.txtDescription, 3)
     Me.txtDescription.Dock = System.Windows.Forms.DockStyle.Fill
     Me.txtDescription.Location = New System.Drawing.Point(136, 111)
     Me.txtDescription.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
@@ -185,6 +187,7 @@ Partial Class frmAbout
     '
     Me.cmdDonate.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.cmdDonate.AutoSize = True
+    Me.pnlAbout.SetColumnSpan(Me.cmdDonate, 2)
     Me.cmdDonate.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.cmdDonate.Location = New System.Drawing.Point(167, 221)
     Me.cmdDonate.Name = "cmdDonate"
@@ -193,6 +196,21 @@ Partial Class frmAbout
     Me.cmdDonate.Text = "Make a &Donation"
     Me.ttAbout.SetToolTip(Me.cmdDonate, "Donate to RealityRipple Software to keep Satellite Restriction Tracker alive.")
     Me.cmdDonate.UseVisualStyleBackColor = True
+    '
+    'lblCLR
+    '
+    Me.lblCLR.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblCLR.AutoSize = True
+    Me.pnlAbout.SetColumnSpan(Me.lblCLR, 2)
+    Me.lblCLR.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblCLR.Location = New System.Drawing.Point(178, 34)
+    Me.lblCLR.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+    Me.lblCLR.Name = "lblCLR"
+    Me.lblCLR.Size = New System.Drawing.Size(47, 13)
+    Me.lblCLR.TabIndex = 3
+    Me.lblCLR.TabStop = True
+    Me.lblCLR.Text = "on .NET"
+    Me.lblCLR.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
     '
     'tmrSpeed
     '
@@ -247,4 +265,5 @@ Partial Class frmAbout
   Friend WithEvents tmrSpeed As System.Windows.Forms.Timer
   Friend WithEvents ttAbout As RestrictionTracker.ToolTip
   Friend WithEvents cmdUpdate As System.Windows.Forms.Button
+  Friend WithEvents lblCLR As Label
 End Class

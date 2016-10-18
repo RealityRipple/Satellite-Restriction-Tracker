@@ -137,7 +137,7 @@ Public Class remoteRestrictionTracker
         ServerChallenge = Convert.FromBase64String(response)
       Catch ex As Exception
         RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, response))
-        Exit Sub
+        Return
       End Try
       SendCC()
     End If
@@ -147,7 +147,7 @@ Public Class remoteRestrictionTracker
     GenCC()
     ClientResponse = HashA()
     MakeSocket()
-    Dim sPost As String = "s=verify&cc=" & PercentEncode(Convert.ToBase64String(ClientChallenge)) & "&cr=" & PercentEncode(Convert.ToBase64String(ClientResponse))
+    Dim sPost As String = "s=verify&cc=" & srlFunctions.PercentEncode(Convert.ToBase64String(ClientChallenge)) & "&cr=" & srlFunctions.PercentEncode(Convert.ToBase64String(ClientResponse))
     Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
     If ClosingTime Then Return
     If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
@@ -165,10 +165,10 @@ Public Class remoteRestrictionTracker
         ServerResponse = Convert.FromBase64String(Response)
       Catch ex As Exception
         RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, Response))
-        Exit Sub
+        Return
       End Try
       CalculatedServerResponse = HashB()
-      If IterativeEqualityCheck(ServerResponse, CalculatedServerResponse) Then
+      If srlFunctions.IterativeEqualityCheck(ServerResponse, CalculatedServerResponse) Then
         RaiseEvent OKKey(Me, New EventArgs)
         If Not String.IsNullOrEmpty(sPassword) Then SendCR()
       Else
@@ -201,7 +201,7 @@ Public Class remoteRestrictionTracker
     End Using
     CSP = Nothing
     MakeSocket()
-    Dim sPost As String = "s=login&pass=" & PercentEncode(Convert.ToBase64String(bPass))
+    Dim sPost As String = "s=login&pass=" & srlFunctions.PercentEncode(Convert.ToBase64String(bPass))
     Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
     If ClosingTime Then Return
     If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
@@ -215,7 +215,7 @@ Public Class remoteRestrictionTracker
         bRet = Convert.FromBase64String(Response)
       Catch ex As Exception
         RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NotBase64, Response))
-        Exit Sub
+        Return
       End Try
       Dim outData() As Byte = DecompressData(bRet)
       sRet = System.Text.Encoding.UTF8.GetString(outData)
@@ -239,7 +239,7 @@ Public Class remoteRestrictionTracker
       Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
       For Each row In sRows
         If row.Contains("PROVIDER ") Then
-          iProv = StringToHostType(row.Substring(9))
+          iProv = srlFunctions.StringToHostType(row.Substring(9))
         ElseIf row.Contains(":") And row.Contains("|") Then
           Dim sTime As String = Split(row, ":", 2)(0)
           Dim dish As Boolean = False
@@ -320,11 +320,11 @@ Public Class remoteRestrictionTracker
     Else
       RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.NoData, sRet))
     End If
-    SendSocketErrors(sDataPath)
+    srlFunctions.SendSocketErrors(sDataPath)
   End Sub
 
   Private Sub MakeSocket()
-    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     If wsSocket IsNot Nothing Then
       oldEncoding = wsSocket.Encoding
       If wsSocket.IsBusy Then wsSocket.Cancel()

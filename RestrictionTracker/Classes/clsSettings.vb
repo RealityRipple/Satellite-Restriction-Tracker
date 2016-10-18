@@ -8,7 +8,7 @@ Class SvcSettings
   Private m_Timeout As Integer
   Private m_ProxySetting As String
   Public Sub Save()
-    Dim sAccountType As String = HostTypeToString(m_AccountType)
+    Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionLogger.My.MySettings",
@@ -17,7 +17,7 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
-    If InUseChecker(CommonAppDataDirectory & "\user.config", IO.FileAccess.Write) Then
+    If srlFunctions.InUseChecker(CommonAppDataDirectory & "\user.config", IO.FileAccess.Write) Then
       Try
         xConfig.Save(CommonAppDataDirectory & "\user.config")
       Catch ex As Exception
@@ -221,13 +221,13 @@ Class AppSettings
       Catch ex As Exception
         Reset()
         Loaded = True
-        Exit Sub
+        Return
       End Try
       Dim xuserSettings As XElement = xConfig.Element("userSettings")
       If xuserSettings Is Nothing Then
         Reset()
         Loaded = True
-        Exit Sub
+        Return
       End If
       Dim xMySettings As XElement
       If xuserSettings.Element("WildBlueUsage.My.MySettings") IsNot Nothing Then
@@ -237,7 +237,7 @@ Class AppSettings
       Else
         Reset()
         Loaded = True
-        Exit Sub
+        Return
       End If
       Dim xAccount As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
       If xAccount Is Nothing Then
@@ -254,7 +254,7 @@ Class AppSettings
           If xAccountType Is Nothing Then
             m_AccountType = SatHostTypes.Other
           Else
-            m_AccountType = StringToHostType(xAccountType.Value)
+            m_AccountType = srlFunctions.StringToHostType(xAccountType.Value)
           End If
         Catch ex As Exception
           m_AccountType = SatHostTypes.Other
@@ -1073,7 +1073,7 @@ Class AppSettings
     Colors.HistoryDarkGrid = Color.Transparent
   End Sub
   Public Sub Save()
-    Dim sAccountType As String = HostTypeToString(m_AccountType)
+    Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim sUpdateType As String = "Ask"
     Select Case m_UpdateType
       Case UpdateTypes.Auto : sUpdateType = "Auto"
@@ -1165,7 +1165,7 @@ Class AppSettings
                                                           New XElement("section", New XAttribute("name", "Grid"),
                                                                        New XElement("setting", New XAttribute("name", "Light"), New XElement("value", ColorToStr(Colors.HistoryLightGrid))),
                                                                        New XElement("setting", New XAttribute("name", "Dark"), New XElement("value", ColorToStr(Colors.HistoryDarkGrid)))))))
-    If InUseChecker(ConfigFile, IO.FileAccess.Write) Then
+    If srlFunctions.InUseChecker(ConfigFile, IO.FileAccess.Write) Then
       MakeBackup()
       Try
         xConfig.Save(ConfigFile)

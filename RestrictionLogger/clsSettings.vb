@@ -16,7 +16,7 @@
       m_Interval = "15"
       m_Timeout = "60"
       m_ProxySetting = "None"
-      Exit Sub
+      Return
     End Try
     Dim xuserSettings As XElement = xConfig.Element("userSettings")
     Dim xwbMySettings As XElement = xuserSettings.Element("RestrictionLogger.My.MySettings")

@@ -42,7 +42,7 @@ Class AppSettings
                   If xName.CompareTo("Account") = 0 Then
                     m_Account = xValue
                     If m_node.Attributes.Count > 1 Then
-                      m_AccountType = StringToHostType(m_node.Attributes(1).InnerText)
+                      m_AccountType = srlFunctions.StringToHostType(m_node.Attributes(1).InnerText)
                     Else
                       m_AccountType = localRestrictionTracker.SatHostTypes.Other
                     End If
@@ -72,23 +72,23 @@ Class AppSettings
                 Loaded = True
               Else
                 Reset()
-                Exit Sub
+                Return
               End If
             Else
               Reset()
-              Exit Sub
+              Return
             End If
           Else
             Reset()
-            Exit Sub
+            Return
           End If
         Else
           Reset()
-          Exit Sub
+          Return
         End If
       Else
         Reset()
-        Exit Sub
+        Return
       End If
     Else
       Reset()

@@ -329,7 +329,7 @@
       End Try
     End Sub
     Private Function DoubleEncode(inString As String) As String
-      Return PercentEncode(PercentEncode(inString))
+      Return srlFunctions.PercentEncode(srlFunctions.PercentEncode(inString))
     End Function
   End Class
 End Namespace

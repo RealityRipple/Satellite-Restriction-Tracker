@@ -46,34 +46,34 @@ Public Class frmWizard
         If String.IsNullOrEmpty(cmbAccountHost.Text) Then
           cmbAccountHost.Focus()
           Beep()
-          Exit Sub
+          Return
         End If
         If String.IsNullOrEmpty(txtAccountUsername.Text) Then
           txtAccountUsername.Focus()
           Beep()
-          Exit Sub
+          Return
         End If
         If String.IsNullOrEmpty(txtAccountPass.Text) Then
           txtAccountPass.Focus()
           Beep()
-          Exit Sub
+          Return
         End If
         If AccountType = SatHostTypes.Other Then
           DrawStatus(True, "Determining your Account Type...")
           UsageTest()
-          Exit Sub
+          Return
         End If
       Case 2
         If Not (optRemote.Checked Or optLocal.Checked Or optNone.Checked) Then
           optNone.Focus()
           Beep()
-          Exit Sub
+          Return
         ElseIf optRemote.Checked Then
           If Not pnlKey.Tag = 1 Then
             If txtKey1.TextLength = 6 And txtKey2.TextLength = 4 And txtKey3.TextLength = 4 And txtKey4.TextLength = 4 And txtKey5.TextLength = 6 Then
               DrawStatus(True, "Checking your Product Key...")
               KeyCheck()
-              Exit Sub
+              Return
             Else
               If txtKey1.TextLength < 6 Then
                 txtKey1.Focus()
@@ -87,7 +87,7 @@ Public Class frmWizard
                 txtKey5.Focus()
               End If
               Beep()
-              Exit Sub
+              Return
             End If
           End If
         End If
@@ -405,7 +405,10 @@ Public Class frmWizard
   Private Delegate Sub DrawStatusInvoker(Busy As Boolean, Message As String)
   Private Sub DrawStatus(Busy As Boolean, Optional Message As String = Nothing)
     If Me.InvokeRequired Then
-      Me.Invoke(New DrawStatusInvoker(AddressOf DrawStatus), Busy, Message)
+      Try
+        Me.Invoke(New DrawStatusInvoker(AddressOf DrawStatus), Busy, Message)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If Busy Then
@@ -459,7 +462,10 @@ Public Class frmWizard
   Private Delegate Sub SetHostListDataCallback(sHosts As String)
   Private Sub SetHostListData(sHosts As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New SetHostListDataCallback(AddressOf SetHostListData), sHosts)
+      Try
+        Me.Invoke(New SetHostListDataCallback(AddressOf SetHostListData), sHosts)
+      Catch ex As Exception
+      End Try
       Return
     End If
     DrawStatus(False)
@@ -488,14 +494,14 @@ Public Class frmWizard
       txtAccountUsername.Focus()
       DrawStatus(False)
       MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Exit Sub
+      Return
     End If
     If String.IsNullOrEmpty(cmbAccountHost.Text) Then
       tbsWizardPages.SelectedIndex = 1
       cmbAccountHost.Focus()
       DrawStatus(False)
       MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
-      Exit Sub
+      Return
     End If
     If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
     sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
@@ -506,13 +512,16 @@ Public Class frmWizard
       pChecker.Dispose()
       pChecker = Nothing
     Else
-      Exit Sub
+      Return
     End If
     remoteTest = New remoteRestrictionTracker(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim sErr As String = "There was an error verifying your key!"
@@ -545,7 +554,10 @@ Public Class frmWizard
   End Sub
   Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If pChecker IsNot Nothing Then
@@ -580,7 +592,10 @@ Public Class frmWizard
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
-      Me.Invoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
+      Try
+        Me.Invoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
@@ -599,7 +614,10 @@ Public Class frmWizard
   End Sub
   Private Sub localTest_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
-      Me.Invoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
+      Try
+        Me.Invoke(New ConnectionFailureEventHandler(AddressOf localTest_ConnectionFailure), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")

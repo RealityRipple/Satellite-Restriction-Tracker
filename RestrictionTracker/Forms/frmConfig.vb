@@ -270,14 +270,17 @@
   End Sub
   Private Sub RunAccountTest(sKey As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
+      Try
+        Me.Invoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If pChecker IsNot Nothing Then
       pChecker.Dispose()
       pChecker = Nothing
     Else
-      Exit Sub
+      Return
     End If
     remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
@@ -313,7 +316,7 @@
         ElseIf saveRet = Windows.Forms.DialogResult.Cancel Then
           e.Cancel = True
           Me.DialogResult = Windows.Forms.DialogResult.None
-          Exit Sub
+          Return
         End If
       Else
         Me.DialogResult = Windows.Forms.DialogResult.No
@@ -380,7 +383,7 @@
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged, cmbProvider.KeyPress, cmbProvider.TextChanged, cmbProvider.SelectedIndexChanged
-    If Not bLoaded Then Exit Sub
+    If Not bLoaded Then Return
     If pChecker IsNot Nothing Then
       pctKeyState.Tag = IIf(CheckState, 1, 0)
       pChecker.Dispose()
@@ -475,7 +478,7 @@
     End If
   End Sub
   Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
-    If Not bLoaded Then Exit Sub
+    If Not bLoaded Then Return
     If pChecker IsNot Nothing Then
       pctKeyState.Tag = IIf(CheckState, 1, 0)
       pChecker.Dispose()
@@ -718,20 +721,20 @@
       cmdMakePortable.Enabled = False
       ttConfig.SetToolTip(cmdMakePortable, "No directory selected!")
       pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
-      Exit Sub
+      Return
     End If
     Try
       If Not IO.Directory.Exists(txtPortableDir.Text) Then
         cmdMakePortable.Enabled = False
         ttConfig.SetToolTip(cmdMakePortable, "Selected directory does not exist!")
         pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
-        Exit Sub
+        Return
       End If
     Catch ex As Exception
       cmdMakePortable.Enabled = False
       ttConfig.SetToolTip(cmdMakePortable, "Error accessing selected directory!")
       pctAdvancedPortableIcon.Image = My.Resources.advanced_portable_missing
-      Exit Sub
+      Return
     End Try
     cmdMakePortable.Enabled = True
     ttConfig.SetToolTip(cmdMakePortable, "Copy " & My.Application.Info.ProductName & " to the selected directory.")
@@ -740,7 +743,10 @@
 #Region "Host List"
   Private Sub PopulateHostList()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim wsHostList As New WebClientEx
@@ -772,7 +778,10 @@
 #Region "Net Test"
   Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
-      Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
+      Try
+        Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
+      Catch ex As Exception
+      End Try
       Return
     End If
     If [Error] IsNot Nothing Then
@@ -859,7 +868,10 @@
   End Sub
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim bToSave As Boolean = True
@@ -891,7 +903,10 @@
   End Sub
   Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim bToSave As Boolean = True
@@ -977,16 +992,16 @@
   Private Sub cmdMakePortable_Click(sender As System.Object, e As System.EventArgs) Handles cmdMakePortable.Click
     If String.IsNullOrEmpty(txtPortableDir.Text) Then
       txtPortableDir.Focus()
-      Exit Sub
+      Return
     End If
     Try
       If Not IO.Directory.Exists(txtPortableDir.Text) Then
         txtPortableDir.Focus()
-        Exit Sub
+        Return
       End If
     Catch ex As Exception
       txtPortableDir.Focus()
-      Exit Sub
+      Return
     End Try
     Dim sPath As String = txtPortableDir.Text
     If Not sPath.EndsWith(IO.Path.DirectorySeparatorChar) Then sPath &= IO.Path.DirectorySeparatorChar
@@ -996,14 +1011,14 @@
       IO.Directory.CreateDirectory(sPath & "Config\")
       For Each file In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
         If file.Name = "user.config" Or file.Name = "backup.config" Then
-          Dim sConfig As String = My.Computer.FileSystem.ReadAllText(file.FullName, System.Text.Encoding.GetEncoding(LATIN_1))
+          Dim sConfig As String = My.Computer.FileSystem.ReadAllText(file.FullName, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
           If sConfig.Contains("<setting name=""HistoryDir"">") Then
             Dim sHistory As String = sConfig.Substring(sConfig.IndexOf("<setting name=""HistoryDir"">"))
             sHistory = sHistory.Substring(0, sHistory.IndexOf("</setting>") + 10)
             Dim sNewHistory As String = "<setting name=""HistoryDir"">" & vbNewLine & "        <value></value>" & vbNewLine & "      </setting>"
             sConfig = sConfig.Replace(sHistory, sNewHistory)
           End If
-          My.Computer.FileSystem.WriteAllText(sPath & "Config\" & file.Name, sConfig, False, System.Text.Encoding.GetEncoding(LATIN_1))
+          My.Computer.FileSystem.WriteAllText(sPath & "Config\" & file.Name, sConfig, False, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
         Else
           file.CopyTo(sPath & "Config\" & file.Name, True)
         End If
@@ -1017,7 +1032,7 @@
     Catch ex As Exception
       txtPortableDir.Focus()
       MsgDlg(Me, "There was an error trying to create a portable install in """ & sPath & """!", "Portable application creation error.", "Drive Error", MessageBoxButtons.OK, _TaskDialogIcon.DriveLockedRemovable, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-      Exit Sub
+      Return
     End Try
   End Sub
   Private Sub cmdPortableDir_Click(sender As System.Object, e As System.EventArgs) Handles cmdPortableDir.Click
@@ -1046,17 +1061,17 @@
     If String.IsNullOrEmpty(txtAccount.Text) Then
       MsgDlg(Me, "You must enter your ViaSat account Username before saving the Configuration.", "Please enter your Username.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Information)
       txtAccount.Focus()
-      Exit Sub
+      Return
     End If
     If String.IsNullOrEmpty(txtPassword.Text) Then
       MsgDlg(Me, "You must enter your ViaSat account Password before saving the Configuration.", "Please enter your Password.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
       txtPassword.Focus()
-      Exit Sub
+      Return
     End If
     If String.IsNullOrEmpty(cmbProvider.Text) Then
       MsgDlg(Me, "Please enter your ViaSat Provider domain or select one from the list before saving the Configuration.", "Please select your Provider.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Internet, MessageBoxIcon.Information)
       cmbProvider.Focus()
-      Exit Sub
+      Return
     End If
     If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked) Then
       MsgDlg(Me, "Please select at least one Security Protocol type to connect with before saving the Configuration.", "Please select your Security Protocol.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
@@ -1071,7 +1086,7 @@
       Else
         lblNetworkProtocolDescription.Focus()
       End If
-      Exit Sub
+      Return
     End If
     If String.IsNullOrEmpty(txtHistoryDir.Text) Then txtHistoryDir.Text = MySaveDir(True)
     For Each c As Char In IO.Path.GetInvalidPathChars
@@ -1092,9 +1107,9 @@
             sC = "Tab"
             sHD = Replace(sHD, c, "[Tab]")
         End Select
-        MsgDlg(Me, "The directory you have entered contains invalid characters. You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , "Directory: """ & sHD & """" & vbNewLine & "Invalid Character: " & sC & " (0x" & PadHex(AscW(c)) & ")", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Directory Details", "Hide Directory Details")
+        MsgDlg(Me, "The directory you have entered contains invalid characters. You will need to choose a different directory to store your Usage History.", "Please choose a different directory.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.SearchFolder, MessageBoxIcon.Error, , "Directory: """ & sHD & """" & vbNewLine & "Invalid Character: " & sC & " (0x" & srlFunctions.PadHex(AscW(c)) & ")", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Directory Details", "Hide Directory Details")
         txtHistoryDir.Focus()
-        Exit Sub
+        Return
       End If
     Next
     If cmbProvider.Text.ToLower.Contains("excede") Or
@@ -1180,7 +1195,7 @@
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
           MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
           txtProxyAddress.Focus()
-          Exit Sub
+          Return
         End If
         If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
           mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text, Integer.Parse(txtProxyPort.Value))
@@ -1195,7 +1210,7 @@
         If String.IsNullOrEmpty(txtProxyAddress.Text) Then
           MsgDlg(Me, "Please enter a Proxy Address or choose a different Proxy Type.", "No Proxy Address specified.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Information)
           txtProxyAddress.Focus()
-          Exit Sub
+          Return
         End If
         If String.IsNullOrEmpty(txtProxyUser.Text) And String.IsNullOrEmpty(txtProxyPassword.Text) And String.IsNullOrEmpty(txtProxyDomain.Text) Then
           mySettings.Proxy = New Net.WebProxy(txtProxyAddress.Text)
@@ -1263,7 +1278,7 @@
           optHistoryCustom.Checked = True
           txtHistoryDir.Enabled = True
           txtHistoryDir.Focus()
-          Exit Sub
+          Return
         End Try
       End If
       LOG_Terminate(True)

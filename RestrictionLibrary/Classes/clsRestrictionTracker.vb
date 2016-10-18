@@ -349,7 +349,7 @@
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
     MakeSocket()
-    Dim sSend As String = "uid=" & PercentEncode(sUsername) & "&userPassword=" & PercentEncode(sPassword)
+    Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -373,7 +373,7 @@
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, "login")
     MakeSocket()
-    Dim sSend As String = "warningTrip=false&userName=" & PercentEncode(sUsername) & "&passwd=" & PercentEncode(sPassword)
+    Dim sSend As String = "warningTrip=false&userName=" & srlFunctions.PercentEncode(sUsername) & "&passwd=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -405,7 +405,7 @@
       Case SatHostTypes.DishNet_EXEDE : DN_Read_Table(Table)
     End Select
     c_Jar = New Net.CookieContainer
-    SendSocketErrors(sDataPath)
+    srlFunctions.SendSocketErrors(sDataPath)
   End Sub
 #Region "WB"
   Private Sub WB_Login_Response(Response As String, ResponseURI As Uri)
@@ -609,12 +609,12 @@
   End Sub
   Private Sub EX_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
     MakeSocket()
-    Dim sSend As String = "realm=" & PercentEncode("/") &
-                         "&IDToken1=" & PercentEncode(sUsername) &
-                         "&IDToken2=" & PercentEncode(sPassword) &
+    Dim sSend As String = "realm=" & srlFunctions.PercentEncode("/") &
+                         "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
+                         "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
                          "&IDButton=Sign+in" &
-                         "&goto=" & PercentEncode(sGOTO) &
-                         "&SunQueryParamsString=" & PercentEncode(sSQPS) &
+                         "&goto=" & srlFunctions.PercentEncode(sGOTO) &
+                         "&SunQueryParamsString=" & srlFunctions.PercentEncode(sSQPS) &
                          "&encoded=true" &
                          "&gx_charset=UTF-8"
     If TryCount = 0 Then
@@ -672,7 +672,7 @@
         sURI = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
         sURI = sURI.Substring(0, sURI.IndexOf(""">"))
-        sURI = HexDecode(sURI)
+        sURI = srlFunctions.HexDecode(sURI)
       End If
       If String.IsNullOrEmpty(sURI) Then sURI = ResponseURI.AbsoluteUri
       Dim sSAMLResponse As String = Nothing
@@ -723,7 +723,7 @@
   End Sub
   Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
     MakeSocket()
-    Dim sSend As String = "SAMLResponse=" & PercentEncode(HexDecode(SAMLResponse)) & "&RelayState=" & PercentEncode(HexDecode(RelayState))
+    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse)) & "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -854,10 +854,10 @@
     End If
     Dim sSend As String = "AJAXREQUEST=_viewRoot" &
              "&j_id0%3AidForm=j_id0%3AidForm" &
-             "&com.salesforce.visualforce.ViewState=" & PercentEncode(sViewState) &
-             "&com.salesforce.visualforce.ViewStateVersion=" & PercentEncode(sVSVersion) &
-             "&com.salesforce.visualforce.ViewStateMAC=" & PercentEncode(sVSMAC) &
-             "&com.salesforce.visualforce.ViewStateCSRF=" & PercentEncode(sVSCSRF) &
+             "&com.salesforce.visualforce.ViewState=" & srlFunctions.PercentEncode(sViewState) &
+             "&com.salesforce.visualforce.ViewStateVersion=" & srlFunctions.PercentEncode(sVSVersion) &
+             "&com.salesforce.visualforce.ViewStateMAC=" & srlFunctions.PercentEncode(sVSMAC) &
+             "&com.salesforce.visualforce.ViewStateCSRF=" & srlFunctions.PercentEncode(sVSCSRF) &
              "&j_id0%3AidForm%3Aj_id" & AjaxID(0) & "=j_id0%3AidForm%3Aj_id" & AjaxID(0)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -907,7 +907,7 @@
   Private Sub RP_Login_Retry(sURI As String)
     MakeSocket()
     Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-    Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & PercentEncode(sPassword)
+    Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1083,7 +1083,7 @@
       RaiseError("Login Prepare Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
       Return
     End If
-    DN_Login("https://my.dish.com/customercare/saml/login?target=" & PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet") & "&message=&forceAuthn=true")
+    DN_Login("https://my.dish.com/customercare/saml/login?target=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet") & "&message=&forceAuthn=true")
   End Sub
   Private Sub DN_Login(sURI As String)
     MakeSocket(False)
@@ -1148,8 +1148,8 @@
   End Sub
   Private Sub DN_Login_Authenticate(sURI As String)
     MakeSocket(False)
-    Dim sSend As String = "username=" & PercentEncode(sUsername) &
-                          "&password=" & PercentEncode(sPassword) &
+    Dim sSend As String = "username=" & srlFunctions.PercentEncode(sUsername) &
+                          "&password=" & srlFunctions.PercentEncode(sPassword) &
                           "&login_type=username,password" &
                           "&source=" &
                           "&source_button="
@@ -1264,7 +1264,7 @@
   Private Sub DN_Login_Verify(SAMLResponse As String)
     MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
-    Dim sSend As String = "SAMLResponse=" & PercentEncode(SAMLResponse) & "&RelayState=" & PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet")
+    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet")
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1605,7 +1605,7 @@
 #End Region
 #Region "Useful Functions"
   Private Sub MakeSocket(Optional ManualRedirect As Boolean = True)
-    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+    Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     If wsSocket IsNot Nothing Then
       oldEncoding = wsSocket.Encoding
       If wsSocket.IsBusy Then wsSocket.Cancel()
@@ -1677,12 +1677,12 @@
       Next
     End If
     Dim sPOST As String = Nothing
-    sPOST &= "protocol=" & PercentEncode(ToBase64(sProtocol))
-    sPOST &= "&url=" & PercentEncode(ToBase64(SendURL.OriginalString))
-    If Not String.IsNullOrEmpty(SendData) Then sPOST &= "&post=" & PercentEncode(ToBase64(SendData))
+    sPOST &= "protocol=" & srlFunctions.PercentEncode(ToBase64(sProtocol))
+    sPOST &= "&url=" & srlFunctions.PercentEncode(ToBase64(SendURL.OriginalString))
+    If Not String.IsNullOrEmpty(SendData) Then sPOST &= "&post=" & srlFunctions.PercentEncode(ToBase64(SendData))
     If Not String.IsNullOrEmpty(sCookieData) Then
       If sCookieData.EndsWith(vbLf) Then sCookieData = sCookieData.Substring(0, sCookieData.Length - 1)
-      sPOST &= "&cookies=" & PercentEncode(ToBase64(sCookieData))
+      sPOST &= "&cookies=" & srlFunctions.PercentEncode(ToBase64(sCookieData))
     End If
     wsSocket.SendHeaders = New Net.WebHeaderCollection
     wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)

@@ -189,12 +189,12 @@
             mySettings = Nothing
           Else
             RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Reading Error", New Exception("Empty Version String")), e.Cancelled))
-            Exit Sub
+            Return
           End If
         End If
       Catch ex As Exception
         RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Version Parsing Error", ex), e.Cancelled))
-        Exit Sub
+        Return
       End Try
     End If
     RaiseEvent CheckResult(sender, New CheckEventArgs(rRet, VerNumber, e))

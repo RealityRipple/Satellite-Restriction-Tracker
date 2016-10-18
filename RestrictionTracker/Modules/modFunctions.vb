@@ -2,30 +2,6 @@
 Imports Microsoft.WindowsAPICodePack.Dialogs
 
 Module modFunctions
-  Public Function HostTypeToString(ht As localRestrictionTracker.SatHostTypes) As String
-    Select Case ht
-      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
-      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : Return "DNX"
-      Case Else : Return "O"
-    End Select
-  End Function
-  Public Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
-    Select Case st.ToUpper
-      Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-      Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-      Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DISHNET" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
-      Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-      Case Else : Return localRestrictionTracker.SatHostTypes.Other
-    End Select
-  End Function
   Private Class MCIPlayer
     Implements IDisposable
     Private sAlias As String
@@ -94,7 +70,6 @@ Module modFunctions
   Public Const TOPMOST_MENU_TEXT As String = "&Topmost"
   Public Const SCALE_MENU_ID As Int64 = &H4816
   Public Const SCALE_MENU_TEXT As String = "Sc&ale Text"
-  Public Const LATIN_1 As Integer = 28591
   Public NOTIFIER_STYLE As NotifierStyle
 #Region "Alert Notifier"
   Public Class NotifierStyle
@@ -138,7 +113,7 @@ Module modFunctions
       End Using
 
 
-      Dim locData As String = My.Computer.FileSystem.ReadAllText(LocPath, System.Text.Encoding.GetEncoding(LATIN_1))
+      Dim locData As String = My.Computer.FileSystem.ReadAllText(LocPath, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
       locData = locData.Replace(vbNewLine, vbCr).Replace(vbLf, vbCr)
       Do While locData.Contains(vbCr & vbCr)
         locData = locData.Replace(vbCr & vbCr, vbCr)
@@ -321,7 +296,7 @@ Module modFunctions
     If customStyle Is Nothing Then customStyle = NOTIFIER_STYLE
     If customStyle.Background Is Nothing Or customStyle.CloseButton Is Nothing Then
       taskNotifier = Nothing
-      Exit Sub
+      Return
     End If
     If taskNotifier Is Nothing Then taskNotifier = New TaskbarNotifier
     taskNotifier.TitleClickable = False
@@ -751,23 +726,6 @@ Module modFunctions
       callback.Invoke("error")
     End Try
   End Sub
-  Public Function PercentEncode(inString As String) As String
-    Dim sRet As String = String.Empty
-    For I As Integer = inString.Length - 1 To 0 Step -1
-      Dim iChar As Integer = Asc(inString(I))
-      Select Case iChar
-        Case 48 To 57, 65 To 90, 97 To 122 : sRet = inString(I) & sRet
-        Case 32 : sRet = "+" & sRet
-        Case Else : sRet = "%" & PadHex(iChar, 2) & sRet
-      End Select
-    Next
-    Return sRet
-  End Function
-  Private Function PadHex(Value As UInt32, Length As UInt16) As String
-    Dim sVal As String = Hex(Value)
-    Do While sVal.Length < Length : sVal = "0" & sVal : Loop
-    Return sVal
-  End Function
   Public Function CopyDirectory(FromDir As String, ToDir As String) As TriState
     If My.Computer.FileSystem.DirectoryExists(FromDir) Then
       Dim bDidSomething As Boolean = False
@@ -1479,7 +1437,7 @@ Module modFunctions
 #Region "Tray"
   Private Const Alpha As Integer = 192
   Public Sub CreateTrayIcon_Left(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
-    If lLim = 0 Then Exit Sub
+    If lLim = 0 Then Return
     Dim fillBrush As Drawing2D.LinearGradientBrush
     If cB = Color.Transparent Then
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
@@ -1496,7 +1454,7 @@ Module modFunctions
     g.FillRectangle(fillBrush, 0, yUsed, CInt(Math.Floor(icoX / 2)), icoY - yUsed)
   End Sub
   Public Sub CreateTrayIcon_Right(ByRef g As Graphics, lUsed As Long, lLim As Long, cA As Color, cB As Color, cC As Color, icoX As Integer, icoY As Integer)
-    If lLim = 0 Then Exit Sub
+    If lLim = 0 Then Return
     Dim fillBrush As Drawing2D.LinearGradientBrush
     If cB = Color.Transparent Then
       fillBrush = New Drawing2D.LinearGradientBrush(New Point(0, 0), New Point(0, icoY), Color.FromArgb(Alpha, cC), Color.FromArgb(Alpha, cA))
@@ -1908,19 +1866,19 @@ Module modFunctions
     ExpandContent
     ExpandFooter
   End Enum
-  Public Function MsgDlg(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
+  Public Function MsgDlg(owner As Form, Text As String, Optional Header As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
     Try
-      Return MsgDlgInternal(owner, Text, Title, Caption, Buttons, Icon, OldIcon, DefaultButton, Details, DetailsMode, ShowDetails, HideDetails, OldHelpLink)
+      Return MsgDlgInternal(owner, Text, Header, Caption, Buttons, Icon, OldIcon, DefaultButton, Details, DetailsMode, ShowDetails, HideDetails, OldHelpLink)
     Catch ex As Exception
-      Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+      Return MsgDlgLegacy(owner, Text, Header, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
     End Try
   End Function
-  Private Function MsgDlgInternal(owner As Form, Text As String, Optional Title As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
+  Private Function MsgDlgInternal(owner As Form, Text As String, Optional Header As String = Nothing, Optional Caption As String = Nothing, Optional Buttons As MessageBoxButtons = MessageBoxButtons.OK, Optional Icon As _TaskDialogIcon = _TaskDialogIcon.None, Optional OldIcon As MessageBoxIcon = MessageBoxIcon.None, Optional DefaultButton As MessageBoxDefaultButton = MessageBoxDefaultButton.Button1, Optional Details As String = Nothing, Optional DetailsMode As _TaskDialogExpandedDetailsLocation = _TaskDialogExpandedDetailsLocation.Hide, Optional ShowDetails As String = "View Details", Optional HideDetails As String = "Hide Details", Optional OldHelpLink As Boolean = False) As DialogResult
     If TaskDialog.IsPlatformSupported Then
       Using dlgMessage As New TaskDialog
         dlgMessage.Cancelable = True
         dlgMessage.Caption = My.Application.Info.ProductName & " - " & Caption
-        dlgMessage.InstructionText = Title
+        dlgMessage.InstructionText = Header
         dlgMessage.Text = Text
         dlgMessage.Icon = Icon
         dlgMessage.HyperlinksEnabled = True
@@ -2046,7 +2004,7 @@ Module modFunctions
         Try
           ret = dlgMessage.Show()
         Catch ex As Exception
-          Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+          Return MsgDlgLegacy(owner, Text, Header, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
         End Try
         Select Case ret
           Case TaskDialogResult.Yes : Return DialogResult.Yes
@@ -2059,7 +2017,7 @@ Module modFunctions
         Return DialogResult.None
       End Using
     Else
-      Return MsgDlgLegacy(owner, Text, Title, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
+      Return MsgDlgLegacy(owner, Text, Header, My.Application.Info.ProductName & " - " & Caption, Buttons, OldIcon, DefaultButton, Details, OldHelpLink)
     End If
   End Function
   Private Sub SelectionDialogButton_Click(sender As TaskDialogButton, e As EventArgs)
@@ -2153,55 +2111,6 @@ Module modFunctions
     Return PathStr
   End Function
 #End Region
-  ''' <summary>
-  ''' Attempts to see if a file is in use, waiting up to five seconds for it to be freed.
-  ''' </summary>
-  ''' <param name="Filename">The exact path to the file which needs to be checked.</param>
-  ''' <param name="access">Write permissions required for checking.</param>
-  ''' <returns>True on available, false on in use.</returns>
-  ''' <remarks></remarks>
-  Public Function InUseChecker(Filename As String, access As IO.FileAccess) As Boolean
-    If Not My.Computer.FileSystem.FileExists(Filename) Then Return True
-    Dim iStart As Long = TickCount()
-    Do
-      Try
-        Select Case access
-          Case FileAccess.Read
-            Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite Or FileShare.Delete)
-              If fs.CanRead Then
-                Return True
-                Exit Do
-              End If
-            End Using
-          Case FileAccess.Write, FileAccess.ReadWrite
-            Using fs As FileStream = IO.File.Open(Filename, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite Or FileShare.Delete)
-              If fs.CanWrite Then
-                Return True
-                Exit Do
-              End If
-            End Using
-        End Select
-      Catch ex As Exception
-      End Try
-      Application.DoEvents()
-    Loop While TickCount() - iStart < 5000
-    Return False
-  End Function
-  Public Function TickCount() As Long
-    Return (Stopwatch.GetTimestamp / Stopwatch.Frequency) * 1000
-  End Function
-  Public Function PadHex(Val As ULong) As String
-    Dim sHex As String = Hex(Val)
-    Select Case sHex.Length
-      Case 0 : Return "00"
-      Case 1, 3, 5, 7 : Return "0" & sHex
-      Case 2, 4, 6, 8 : Return sHex
-      Case Is < 17 : Return StrDup(16 - sHex.Length, "0") & sHex
-      Case Is < 33 : Return StrDup(32 - sHex.Length, "0") & sHex
-      Case Is < 65 : Return StrDup(64 - sHex.Length, "0") & sHex
-      Case Else : Return sHex
-    End Select
-  End Function
   Private Sub SelectionDialogHyperlink_Click(sender As Object, e As TaskDialogHyperlinkClickedEventArgs)
     Try
       If String.IsNullOrEmpty(e.LinkText) Then Return

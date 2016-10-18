@@ -93,7 +93,7 @@
   Public Event Failure(sender As Object, e As ErrorEventArgs)
   Public Shared ReadOnly Property UserAgent As String
     Get
-      Return "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & Environment.Version.ToString & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
+      Return "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & srlFunctions.GetCLRVersion & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
     End Get
   End Property
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
@@ -129,7 +129,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
         End Try
       ElseIf response.ContentType.ToLower.Contains("charset=") Then
         Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
@@ -138,7 +138,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
         End Try
       End If
       Return response
@@ -169,7 +169,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
         End Try
       ElseIf response.ContentType.ToLower.Contains("charset=") Then
         Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
@@ -178,7 +178,7 @@
         Try
           Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
         Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
         End Try
       End If
       Return response
@@ -294,7 +294,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
-    c_Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+    c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = DataPath
     c_Busy = False
     c_ErrorBypass = True
@@ -306,7 +306,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
-    c_Encoding = System.Text.Encoding.GetEncoding(LATIN_1)
+    c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = Nothing
     c_Busy = False
     c_ErrorBypass = True
@@ -364,7 +364,7 @@ Public Class WebClientEx
           sRet = wsDownload.DownloadString(uriAddr)
           c_ResponseURI = wsDownload.ResponseURI
         Catch ex As Exception
-          Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+          Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           If sNetErr.Contains("Please try again.") And iteration < 5 Then
             AsyncDownloadString({RunName, address, iteration + 1})
           Else
@@ -394,7 +394,7 @@ Public Class WebClientEx
     Dim tDownload As New Threading.Thread(AddressOf AsyncDownloadString)
     c_Busy = True
     tDownload.Start({RunName, address, 0})
-    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
+    Dim WaitTime As Long = srlFunctions.TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(DownloadResults(RunName))
       Windows.Forms.Application.DoEvents()
       Threading.Thread.Sleep(1)
@@ -407,7 +407,7 @@ Public Class WebClientEx
         If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
         c_Busy = False
         Return "Connection aborted."
-      ElseIf TickCount() > WaitTime Then
+      ElseIf srlFunctions.TickCount() > WaitTime Then
         Try
           tDownload.Abort()
         Catch ex As Exception
@@ -449,7 +449,7 @@ Public Class WebClientEx
           sRet = wsDownload.DownloadString(address)
           c_ResponseURI = wsDownload.ResponseURI
         Catch ex As Exception
-          Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+          Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           If sNetErr.Contains("Please try again.") And iteration < 5 Then
             AsyncDownloadStringWithCallback({callback, aState, address, iteration + 1})
           Else
@@ -531,7 +531,7 @@ Public Class WebClientEx
             sRet = wsUpload.UploadString(uriAddr, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
@@ -552,7 +552,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(uriAddr)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
@@ -583,7 +583,7 @@ Public Class WebClientEx
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadString)
     c_Busy = True
     tUpload.Start({RunName, address, method, data, 0})
-    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
+    Dim WaitTime As Long = srlFunctions.TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(UploadResults(RunName))
       Windows.Forms.Application.DoEvents()
       Threading.Thread.Sleep(1)
@@ -596,7 +596,7 @@ Public Class WebClientEx
         If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
         c_Busy = False
         Return "Connection aborted."
-      ElseIf TickCount() > WaitTime Then
+      ElseIf srlFunctions.TickCount() > WaitTime Then
         Try
           tUpload.Abort()
         Catch ex As Exception
@@ -642,7 +642,7 @@ Public Class WebClientEx
             sRet = wsUpload.UploadString(address, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -656,7 +656,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(address)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -723,7 +723,7 @@ Public Class WebClientEx
             bRet = wsUpload.UploadValues(uriAddr, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
@@ -745,7 +745,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(uriAddr)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
@@ -776,7 +776,7 @@ Public Class WebClientEx
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadValues)
     c_Busy = True
     tUpload.Start({RunName, address, method, data, 0})
-    Dim WaitTime As Long = TickCount() + (c_Timeout * 1000)
+    Dim WaitTime As Long = srlFunctions.TickCount() + (c_Timeout * 1000)
     Do While String.IsNullOrEmpty(UploadResults(RunName))
       Windows.Forms.Application.DoEvents()
       Threading.Thread.Sleep(1)
@@ -789,7 +789,7 @@ Public Class WebClientEx
         If c_ResponseURI Is Nothing Then c_ResponseURI = New Uri(address)
         c_Busy = False
         Return "Connection aborted."
-      ElseIf TickCount() > WaitTime Then
+      ElseIf srlFunctions.TickCount() > WaitTime Then
         Try
           tUpload.Abort()
         Catch ex As Exception
@@ -835,7 +835,7 @@ Public Class WebClientEx
             bRet = wsUpload.UploadValues(address, method, data)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -850,7 +850,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(address)
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
-            Dim sNetErr As String = NetworkErrorToString(ex, sDataPath)
+            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else

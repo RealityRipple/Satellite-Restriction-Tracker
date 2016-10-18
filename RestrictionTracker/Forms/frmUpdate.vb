@@ -23,7 +23,7 @@
     txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
     lblBETA.Visible = BETA
     chkStopBETA.Visible = BETA
-    If UACIcon Then NativeMethods.SendMessage(cmdDownload.Handle, NativeMethods.BCM_SETSHIELD, 0, &HFFFFFFFFUI)
+    If UACIcon Then NativeMethods.SendMessage(cmdDownload.Handle, NativeMethods.BCM_SETSHIELD, 0, 1)
   End Sub
   Private Sub cmdDownload_Click(sender As System.Object, e As System.EventArgs) Handles cmdDownload.Click
     If chkStopBETA.Visible And chkStopBETA.Checked Then
@@ -74,7 +74,10 @@
   Private Delegate Sub SetVerInfoCallback(Message As String)
   Private Sub SetVerInfo(Message As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New SetVerInfoCallback(AddressOf SetVerInfo), Message)
+      Try
+        Me.Invoke(New SetVerInfoCallback(AddressOf SetVerInfo), Message)
+      Catch ex As Exception
+      End Try
       Return
     End If
     pctThrobber.Visible = False

@@ -312,7 +312,7 @@ Public Class frmCustomColors
   Private Sub chkB_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkMainDownB.CheckedChanged, chkMainUpB.CheckedChanged, chkTrayDownB.CheckedChanged, chkTrayUpB.CheckedChanged, chkHistoryDownB.CheckedChanged, chkHistoryUpB.CheckedChanged
     Dim chkThis As CheckBox = sender
     Dim pctThis As PictureBox = getControlFromName(Me, chkThis.Name.Replace("chk", "pct"))
-    If pctThis Is Nothing Then Exit Sub
+    If pctThis Is Nothing Then Return
     If chkThis.Checked Then
       pctThis.Enabled = True
       If pctThis.Tag Is Nothing Then

@@ -31,7 +31,7 @@ Public Class frmMain
   Private sDisp_TT_M = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
-  Private sEXEPath As String = LocalAppDataDirectory & "Setup.exe"
+  Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
   Private imSlowed As Boolean
@@ -136,10 +136,13 @@ Public Class frmMain
   End Class
   Private Sub TypeDetermination_TypeDetermined(HostGroup As DetermineType.SatHostGroup)
     If Me.InvokeRequired Then
-      Me.Invoke(New DetermineType.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
+      Try
+        Me.Invoke(New DetermineType.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
+      Catch ex As Exception
+      End Try
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     If HostGroup = DetermineType.SatHostGroup.Other Then
       tmrIcon.Enabled = False
       Dim TypeDeterminationOffline As New DetermineTypeOffline(sProvider, AddressOf TypeDeterminationOffline_TypeDetermined)
@@ -165,10 +168,13 @@ Public Class frmMain
   End Sub
   Private Sub TypeDeterminationOffline_TypeDetermined(HostType As SatHostTypes)
     If Me.InvokeRequired Then
-      Me.Invoke(New DetermineTypeOffline.TypeDeterminedOfflineCallback(AddressOf TypeDeterminationOffline_TypeDetermined), HostType)
+      Try
+        Me.Invoke(New DetermineTypeOffline.TypeDeterminedOfflineCallback(AddressOf TypeDeterminationOffline_TypeDetermined), HostType)
+      Catch ex As Exception
+      End Try
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     If HostType = SatHostTypes.Other Then
       tmrIcon.Enabled = False
       DisplayUsage(False, True)
@@ -341,7 +347,10 @@ Public Class frmMain
   End Sub
   Private Sub HideLater()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf HideLater))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf HideLater))
+      Catch ex As Exception
+      End Try
       Return
     End If
     Threading.Thread.Sleep(100)
@@ -350,7 +359,10 @@ Public Class frmMain
   End Sub
   Private Sub frmMain_SizeChanged(sender As Object, e As System.EventArgs) Handles Me.SizeChanged
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf frmMain_SizeChanged), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf frmMain_SizeChanged), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If Me.WindowState = FormWindowState.Minimized Then
@@ -665,19 +677,19 @@ Public Class frmMain
       Me.Invoke(New MethodInvoker(AddressOf EnableProgressIcon))
       SetStatusText("Reloading", "Reloading History...", False)
       LOG_Initialize(sAccount, False)
-      If ClosingTime Then Exit Sub
+      If ClosingTime Then Return
       DisplayUsage(False, False)
       SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
       Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
       UsageInvoker.BeginInvoke(Nothing, Nothing)
     End If
-    If ClosingTime Then Exit Sub
+    If ClosingTime Then Return
     Dim sizeChangeInvoker As New EventHandler(AddressOf frmMain_SizeChanged)
     sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
   End Sub
   Private Sub EnableProgressIcon()
     Try
-      If ClosingTime Then Exit Sub
+      If ClosingTime Then Return
       tmrIcon.Enabled = True
     Catch ex As Exception
 
@@ -685,7 +697,10 @@ Public Class frmMain
   End Sub
   Private Sub StartTimer()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf StartTimer))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf StartTimer))
+      Catch ex As Exception
+      End Try
       Return
     End If
     NextGrabTick = Long.MinValue
@@ -693,7 +708,10 @@ Public Class frmMain
   End Sub
   Private Sub SetTag(Tag As LoadStates)
     If Me.InvokeRequired Then
-      Me.Invoke(New ParamaterizedInvoker(AddressOf SetTag), Tag)
+      Try
+        Me.Invoke(New ParamaterizedInvoker(AddressOf SetTag), Tag)
+      Catch ex As Exception
+      End Try
       Return
     End If
     myState = Tag
@@ -702,7 +720,7 @@ Public Class frmMain
     SetTag(LoadStates.Lookup)
     SetStatusText("Loading History", "Reading usage history into memory...", False)
     LOG_Initialize(sAccount, False)
-    If ClosingTime Then Exit Sub
+    If ClosingTime Then Return
     If mySettings.AccountType = SatHostTypes.Other Then
       If mySettings.AccountTypeForced Then
         SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
@@ -739,13 +757,13 @@ Public Class frmMain
         Dim minutesSinceLast As Long = DateDiff(DateInterval.Minute, LOG_GetLast, Now)
         If minutesSinceLast < mySettings.Interval Then
           Dim msSinceLast As Long = minutesSinceLast * 60 * 1000
-          NextGrabTick = TickCount() + (msInterval - msSinceLast) + (2 * 60 * 1000)
+          NextGrabTick = srlFunctions.TickCount() + (msInterval - msSinceLast) + (2 * 60 * 1000)
         Else
-          NextGrabTick = TickCount()
+          NextGrabTick = srlFunctions.TickCount()
         End If
-        If NextGrabTick - TickCount() < mySettings.StartWait * 60 * 1000 Then NextGrabTick = TickCount() + (mySettings.StartWait * 60 * 1000)
+        If NextGrabTick - srlFunctions.TickCount() < mySettings.StartWait * 60 * 1000 Then NextGrabTick = srlFunctions.TickCount() + (mySettings.StartWait * 60 * 1000)
       End If
-      If TickCount() >= NextGrabTick Then
+      If srlFunctions.TickCount() >= NextGrabTick Then
         If Not mySettings.UpdateType = AppSettings.UpdateTypes.None AndAlso Math.Abs(DateDiff(DateInterval.Day, mySettings.LastUpdate, Now)) > mySettings.UpdateTime Then
           CheckForUpdates()
         Else
@@ -754,7 +772,7 @@ Public Class frmMain
               sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
               SetStatusText("Reloading", "Reloading History...", False)
               LOG_Initialize(sAccount, False)
-              If ClosingTime Then Exit Sub
+              If ClosingTime Then Return
             End If
             If Math.Abs(DateDiff(DateInterval.Minute, LOG_GetLast, Now)) >= 10 Then
               If Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then
@@ -764,18 +782,21 @@ Public Class frmMain
                 SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
                 Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
                 UsageInvoker.BeginInvoke(Nothing, Nothing)
-                Exit Sub
+                Return
               End If
             End If
           End If
-          NextGrabTick = TickCount() + msInterval
+          NextGrabTick = srlFunctions.TickCount() + msInterval
         End If
       End If
     End If
   End Sub
   Private Sub GetUsage()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf GetUsage))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf GetUsage))
+      Catch ex As Exception
+      End Try
       Return
     End If
     If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Or Not sAccount.Contains("@") Then
@@ -797,7 +818,7 @@ Public Class frmMain
     Else
       If cmdRefresh.Enabled Then
         cmdRefresh.Enabled = False
-        NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+        NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
         If KeyCheck(mySettings.RemoteKey) Then
           Dim remoteCallback As New MethodInvoker(AddressOf GetRemoteUsage)
           remoteCallback.BeginInvoke(Nothing, Nothing)
@@ -820,7 +841,7 @@ Public Class frmMain
         Application.DoEvents()
         SetStatusText(LOG_GetLast.ToString("g"), "Restarting Connection in 5 Seconds...", False)
         DisplayUsage(False, False)
-        NextGrabTick = TickCount() + 5000
+        NextGrabTick = srlFunctions.TickCount() + 5000
       End If
     End If
   End Sub
@@ -848,13 +869,16 @@ Public Class frmMain
   End Sub
   Private Sub DisplayUsage(bStatusText As Boolean, bHardTime As Boolean)
     If Me.InvokeRequired Then
-      Me.Invoke(New ParamaterizedInvoker2(AddressOf DisplayUsage), bStatusText, bHardTime)
+      Try
+        Me.Invoke(New ParamaterizedInvoker2(AddressOf DisplayUsage), bStatusText, bHardTime)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If Not cmdRefresh.Enabled Then cmdRefresh.Enabled = True
     If tmrIcon.Enabled Then tmrIcon.Enabled = False
     If bHardTime Then
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     Else
       NextGrabTick = Long.MinValue
     End If
@@ -879,19 +903,22 @@ Public Class frmMain
       remoteData = Nothing
     End If
     If MinutesAhead > -1 Then
-      NextGrabTick = TickCount() + (MinutesAhead * 60 * 1000)
+      NextGrabTick = srlFunctions.TickCount() + (MinutesAhead * 60 * 1000)
     Else
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     End If
   End Sub
 #End Region
 #Region "Local Usage Events"
   Private Sub localData_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localData.ConnectionStatus
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionStatus), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionStatus), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
-    NextGrabTick = TickCount() + ((mySettings.Timeout + 15) * 1000)
+    NextGrabTick = srlFunctions.TickCount() + ((mySettings.Timeout + 15) * 1000)
     Select Case e.Status
       Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection...", False)
       Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In...", False)
@@ -923,7 +950,10 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localData.ConnectionFailure
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionFailure), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionFailure), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Select Case e.Type
@@ -995,11 +1025,14 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionDNXResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionDNXResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
     myPanel = SatHostTypes.DishNet_EXEDE
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
@@ -1015,11 +1048,14 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPXResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPXResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.RuralPortal_EXEDE
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
@@ -1035,11 +1071,14 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPLResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPLResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
     myPanel = SatHostTypes.RuralPortal_LEGACY
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
@@ -1055,11 +1094,14 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBLResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBLResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
     myPanel = SatHostTypes.WildBlue_LEGACY
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
@@ -1075,11 +1117,14 @@ Public Class frmMain
   End Sub
   Private Sub localData_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.WildBlue_EXEDE
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
@@ -1097,10 +1142,13 @@ Public Class frmMain
   Private didHostListSave As Boolean = False
   Private Sub SaveToHostList()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf SaveToHostList))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf SaveToHostList))
+      Catch ex As Exception
+      End Try
       Return
     End If
-    If didHostListSave Then Exit Sub
+    If didHostListSave Then Return
     Try
       Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
       Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & myProvider)
@@ -1115,7 +1163,10 @@ Public Class frmMain
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteData_Failure), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteData_Failure), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     Dim sErr As String = "There was an error verifying your Product Key."
@@ -1154,18 +1205,24 @@ Public Class frmMain
   End Sub
   Private Sub remoteData_OKKey(sender As Object, e As System.EventArgs) Handles remoteData.OKKey
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteData_OKKey), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteData_OKKey), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     SetStatusText(LOG_GetLast.ToString("g"), "Account Accessed! Getting Usage...", False)
   End Sub
   Private Sub remoteData_Success(sender As Object, e As remoteRestrictionTracker.SuccessEventArgs) Handles remoteData.Success
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf remoteData_Success), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf remoteData_Success), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
-    NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     Dim LastTime As String = LOG_GetLast.ToString("g")
     If FullCheck Then
       SetStatusText(LastTime, "Synchronizing History...", False)
@@ -1178,7 +1235,7 @@ Public Class frmMain
       mySettings.Save()
       Dim iPercent As Integer = 0
       Dim iInterval As Integer = 1
-      Dim iStart As Long = TickCount()
+      Dim iStart As Long = srlFunctions.TickCount()
       ttUI.UseFading = False
       For I As Integer = 0 To e.Results.Length - 1
         Dim Row As remoteRestrictionTracker.SuccessEventArgs.Result = e.Results(I)
@@ -1187,7 +1244,7 @@ Public Class frmMain
             iPercent = Math.Floor((I / (e.Results.Length - 1)) * 100)
             SetStatusText(LastTime, "Synchronizing History [" & iPercent & "%]...", False)
             If (iPercent = 4) Then
-              Dim iDur As Long = TickCount() - iStart
+              Dim iDur As Long = srlFunctions.TickCount() - iStart
               If iDur <= 700 Then iInterval = 2
             End If
           End If
@@ -1232,7 +1289,7 @@ Public Class frmMain
       tmrChanges.Dispose()
       tmrChanges = Nothing
     Else
-      Exit Sub
+      Return
     End If
     Select Case state
       Case "RURAL"
@@ -1247,7 +1304,7 @@ Public Class frmMain
         ResizePanels()
         If lUsed = 0 And lLim = 0 And lRemain = 0 Then
           AskForDonations()
-          Exit Sub
+          Return
         End If
       Case "WB"
         Dim lDown As Long = wb_down
@@ -1267,7 +1324,7 @@ Public Class frmMain
         ResizePanels()
         If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then
           AskForDonations()
-          Exit Sub
+          Return
         End If
     End Select
     If tmrChanges IsNot Nothing Then
@@ -1336,7 +1393,7 @@ Public Class frmMain
   Private Sub DisplayRResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     If lDown <> lUp And lDownLim <> lUpLim Then
       DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-      Exit Sub
+      Return
     End If
     Dim sTTT As String = Me.Text
     If lDown >= lDownLim Then imSlowed = True
@@ -1558,7 +1615,7 @@ Public Class frmMain
   End Sub
   Private Sub DisplayResultAlert(Type As localRestrictionTracker.SatHostTypes, lDown As Long, lUp As Long)
     If mySettings.Overuse > 0 Then
-      If lastBalloon > 0 AndAlso TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Exit Sub
+      If lastBalloon > 0 AndAlso srlFunctions.TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Return
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
         Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
@@ -1570,14 +1627,14 @@ Public Class frmMain
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
                 If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", My.Application.Info.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = TickCount()
+                lastBalloon = srlFunctions.TickCount()
                 Exit For
               ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
                 If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", My.Application.Info.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = TickCount()
+                lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
             Case SatHostTypes.WildBlue_EXEDE, SatHostTypes.RuralPortal_EXEDE
@@ -1586,7 +1643,7 @@ Public Class frmMain
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
                 If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = TickCount()
+                lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
             Case SatHostTypes.DishNet_EXEDE
@@ -1595,14 +1652,14 @@ Public Class frmMain
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
                 If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = TickCount()
+                lastBalloon = srlFunctions.TickCount()
                 Exit For
               ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
                 MakeNotifier(taskNotifier, False)
                 If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", My.Application.Info.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = TickCount()
+                lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
           End Select
@@ -1626,7 +1683,7 @@ Public Class frmMain
         frmDBProgress.SetAction("Reloading History...", "Reading DataBase...")
         LOG_Initialize(sAccount, True)
         frmDBProgress.Close()
-        If ClosingTime Then Exit Sub
+        If ClosingTime Then Return
         cmdRefresh.Enabled = True
       End If
       SetStatusText(LOG_GetLast.ToString("g"), "Beginning Usage Request...", False)
@@ -1677,7 +1734,7 @@ Public Class frmMain
     Using dlgConfig As New frmConfig
       dRet = dlgConfig.ShowDialog(Me)
     End Using
-    Dim WaitTime As Long = TickCount() + 2000
+    Dim WaitTime As Long = srlFunctions.TickCount() + 2000
     If Not myState = LoadStates.Loaded Then
       If Not myState = LoadStates.Lookup Then
         Dim lookupInvoker As New MethodInvoker(AddressOf LookupProvider)
@@ -1686,7 +1743,7 @@ Public Class frmMain
       Do Until myState = LoadStates.Loaded
         Application.DoEvents()
         Threading.Thread.Sleep(1)
-        If TickCount() > WaitTime Then Exit Do
+        If srlFunctions.TickCount() > WaitTime Then Exit Do
       Loop
     End If
     Select Case dRet
@@ -1996,7 +2053,7 @@ Public Class frmMain
   Private Sub CheckForUpdates()
     If Not frmAbout.Visible Then
       SetStatusText(LOG_GetLast.ToString("g"), "Checking for Software Update...", False)
-      NextGrabTick = TickCount() + (mySettings.Interval * 60 * 1000)
+      NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
       If updateChecker IsNot Nothing Then
         updateChecker.Dispose()
         updateChecker = Nothing
@@ -2007,7 +2064,10 @@ Public Class frmMain
   End Sub
   Private Sub updateChecker_CheckResult(sender As Object, e As clsUpdate.CheckEventArgs) Handles updateChecker.CheckResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     mySettings.LastUpdate = Now
@@ -2149,7 +2209,10 @@ Public Class frmMain
   End Sub
   Private Sub updateChecker_DownloadingUpdate(sender As Object, e As System.EventArgs) Handles updateChecker.DownloadingUpdate
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadingUpdate), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     tmrSpeed.Enabled = True
@@ -2157,7 +2220,10 @@ Public Class frmMain
   End Sub
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     tmrSpeed.Enabled = False
@@ -2177,20 +2243,27 @@ Public Class frmMain
         updateChecker = Nothing
       End If
       SetStatusText(LOG_GetLast.ToString("g"), "Software Update Download Complete", False)
-      Application.DoEvents()
-      If My.Computer.FileSystem.FileExists(sEXEPath) Then
+      Dim RecheckOnMissing As Boolean = False
+      Do
+        Application.DoEvents()
         Try
-          ShellEx(sEXEPath, UpdateParam)
-          Application.Exit()
+          If My.Computer.FileSystem.FileExists(sEXEPath) Then
+            ShellEx(sEXEPath, UpdateParam)
+            Application.Exit()
+            Return
+          ElseIf RecheckOnMissing Then
+            If MsgDlg(Me, "The update file no longer exists in the location it was downloaded to." & vbNewLine & vbNewLine & "If you are running Anti-Virus software, please make sure it hasn't quarantined or deleted the " & My.Application.Info.ProductName & " Installer." & vbNewLine, "The update installer is missing.", "Software Update Error", MessageBoxButtons.RetryCancel, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning) = Windows.Forms.DialogResult.Cancel Then Exit Do
+          Else
+            MsgDlg(Me, "The update file no longer exists in the location it was downloaded to." & vbNewLine & vbNewLine & "If you are running Anti-Virus software, please make sure it hasn't quarantined or deleted the " & My.Application.Info.ProductName & " Installer." & vbNewLine, "The update installer is missing.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning)
+            Exit Do
+          End If
         Catch ex As Exception
-          MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run.", "The update installer failed to start.", "Software Update Error", MessageBoxButtons.OK, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Error, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-          SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
-          NextGrabTick = Long.MinValue
+          If MsgDlg(Me, "There was an error starting the update process." & vbNewLine & vbNewLine & "If you have User Account Control enabled," & vbNewLine & "please allow the " & My.Application.Info.ProductName & " Installer to run." & vbNewLine & "If you are running Anti-Virus software, please make sure it isn't blocking the " & My.Application.Info.ProductName & " Installer." & vbNewLine, "The update installer failed to start.", "Software Update Error", MessageBoxButtons.RetryCancel, _TaskDialogIcon.ShieldWarning, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details") = Windows.Forms.DialogResult.Cancel Then Exit Do
+          RecheckOnMissing = True
         End Try
-      Else
-        SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
-        NextGrabTick = Long.MinValue
-      End If
+      Loop
+      SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
+      NextGrabTick = Long.MinValue
     End If
   End Sub
   Private CurSize As Long
@@ -2199,7 +2272,10 @@ Public Class frmMain
   Private CurPercent As Integer
   Private Sub updateChecker_UpdateProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.UpdateProgressChanged
     If Me.InvokeRequired Then
-      Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+      Try
+        Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+      Catch ex As Exception
+      End Try
       Return
     End If
     CurSize = e.BytesReceived
@@ -2214,11 +2290,11 @@ Public Class frmMain
       DownSpeed = 0
     End If
     LastSize = CurSize
-    Dim sProgress As String = "(" & CurPercent & "%)"
+    Dim sProgress As String = "[" & CurPercent & "%]"
     Dim sStatus As String = ByteSize(CurSize) & " of " & ByteSize(TotalSize) & " at " & ByteSize(DownSpeed) & "/s..."
     If TotalSize = 0 Then
       sStatus = "Downloading Update (Waiting for Response)..."
-      sProgress = "(Waiting for Response)"
+      sProgress = "[Waiting for Response]"
     End If
     SetStatusText("Downloading Update " & sProgress, sStatus, False)
   End Sub
@@ -2271,7 +2347,10 @@ Public Class frmMain
 #Region "Failure Reports"
   Public Sub FailResponse(sRet As String)
     If Me.InvokeRequired Then
-      Me.Invoke(New ParamaterizedInvoker(AddressOf FailResponse), sRet)
+      Try
+        Me.Invoke(New ParamaterizedInvoker(AddressOf FailResponse), sRet)
+      Catch ex As Exception
+      End Try
       Return
     End If
     MakeNotifier(taskNotifier, False)
@@ -2296,7 +2375,10 @@ Public Class frmMain
   Private Delegate Sub SetStatusTextCallBack(Status As String, Details As String, Alert As Boolean)
   Private Sub SetStatusText(Status As String, Details As String, Alert As Boolean)
     If Me.InvokeRequired Then
-      Me.Invoke(New SetStatusTextCallBack(AddressOf SetStatusText), Status, Details, Alert)
+      Try
+        Me.Invoke(New SetStatusTextCallBack(AddressOf SetStatusText), Status, Details, Alert)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If Status = "1/1/1970 12:00 AM" Then
@@ -2322,7 +2404,7 @@ Public Class frmMain
   End Sub
   Private Sub tmrStatus_Tick(sender As System.Object, e As System.EventArgs) Handles tmrStatus.Tick
     Dim lNext As Long = NextGrabTick
-    Dim lNow As Long = TickCount()
+    Dim lNow As Long = srlFunctions.TickCount()
     If lNext = Long.MaxValue Then
       ttUI.SetToolTip(lblStatus, "Update Temporarily Paused - " & PauseActivity)
     ElseIf lNext = Long.MinValue Then
@@ -2390,7 +2472,10 @@ Public Class frmMain
   End Sub
   Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
-      Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
+      Try
+        Me.Invoke(New clsFavicon.DownloadIconCompletedCallback(AddressOf wsFavicon_DownloadIconCompleted), icon16, icon32, token, [Error])
+      Catch ex As Exception
+      End Try
       Return
     End If
     Try

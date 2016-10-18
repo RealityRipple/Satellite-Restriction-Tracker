@@ -82,7 +82,10 @@ Public Class frmHistory
   End Sub
   Private Sub ChangeStyle()
     If Me.InvokeRequired Then
-      Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf ChangeStyle))
+      Catch ex As Exception
+      End Try
       Return
     End If
     Select Case useStyle
@@ -125,7 +128,10 @@ Public Class frmHistory
 #Region "Graph"
   Private Sub DidResize(downRet As Bitmap, upRet As Bitmap)
     If Me.InvokeRequired Then
-      Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), downRet, upRet)
+      Try
+        Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), downRet, upRet)
+      Catch ex As Exception
+      End Try
       Return
     End If
     If downRet Is Nothing Then
@@ -155,11 +161,11 @@ Public Class frmHistory
         Dim upSize As Size = state(3)
         Dim bDown As Bitmap = DrawLineGraph(graphData, True, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
         Dim bUp As Bitmap = DrawLineGraph(pnlGraph.Tag, False, pctUld.Size, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryUpA, mySettings.Colors.HistoryUpB, mySettings.Colors.HistoryUpC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryUpMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
+        If Me.IsDisposed OrElse Me.Disposing Then Return
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bDown, bUp)
       Case 1
         Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        If Me.IsDisposed OrElse Me.Disposing Then Exit Sub
+        If Me.IsDisposed OrElse Me.Disposing Then Return
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bGraph, Nothing)
     End Select
   End Sub
@@ -270,7 +276,7 @@ Public Class frmHistory
       If gShow.IsEmpty Then Return
       Dim showTime As String = gShow.sDATETIME
       Dim Show As String = showTime & " : " & gShow.sDOWNLOAD & " MB / " & gShow.sDOWNLIM & " MB"
-      If lastShow = Show Then Exit Sub
+      If lastShow = Show Then Return
       lastShow = Show
       ttHistory.Show(Show, pctDld, e.X + 16, e.Y + 32)
     Else
@@ -285,7 +291,7 @@ Public Class frmHistory
       Dim gShow As DataBase.DataRow = GetGraphData(dNow, False)
       If gShow.IsEmpty Then Return
       Dim Show As String = gShow.sDATETIME & " : " & gShow.sUPLOAD & " MB / " & gShow.sUPLIM & " MB"
-      If lastShow = Show Then Exit Sub
+      If lastShow = Show Then Return
       lastShow = Show
       ttHistory.Show(Show, pctUld, e.X + 16, e.Y + 32)
     Else
@@ -616,7 +622,7 @@ Public Class frmHistory
   Private Sub cmdImport_Click(sender As System.Object, e As System.EventArgs) Handles cmdImport.Click
     If (usageDB Is Nothing OrElse usageDB.Count = 0) And Not modDB.LOG_State = 1 Then
       MsgDlg(Me, "The Database has not been loaded yet, please wait.", "Unable to import data.", "Database not Loaded", MessageBoxButtons.OK, _TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Warning)
-      Exit Sub
+      Return
     End If
     Dim cdlOpen As New OpenFileDialog With {.AddExtension = True, .CheckFileExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .ShowReadOnly = False, .Title = "Import History Database"}
     If cdlOpen.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
@@ -659,7 +665,7 @@ Public Class frmHistory
   Private Sub cmdExport_Click(sender As System.Object, e As System.EventArgs) Handles cmdExport.Click
     If (usageDB Is Nothing OrElse usageDB.Count = 0) Then
       MsgDlg(Me, "The Database has not been loaded yet, please wait.", "Unable to export data.", "Database not Loaded", MessageBoxButtons.OK, _TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Warning)
-      Exit Sub
+      Return
     End If
     Dim cdlSave As New SaveFileDialog With {.AddExtension = True, .CheckPathExists = True, .DefaultExt = "xml", .FileName = "Backup-" & mySettings.Account & ".xml", .Filter = "XML File|*.xml|CSV File|*.csv|Satellite Restriction Tracker Database|*.wb", .InitialDirectory = My.Computer.FileSystem.SpecialDirectories.MyDocuments, .Title = "Export History Database"}
     If cdlSave.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then

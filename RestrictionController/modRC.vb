@@ -28,7 +28,7 @@
           Select Case Console.ReadKey.Key
             Case ConsoleKey.R : Run()
             Case ConsoleKey.S : [Stop]()
-            Case ConsoleKey.C : Exit Sub
+            Case ConsoleKey.C : Return
             Case Else : Main()
           End Select
       End Select

@@ -22,8 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\RestrictionTracker\bin\Debug\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>RestrictionTrackerLib.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,8 +31,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\RestrictionTracker\bin\Release\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>RestrictionTrackerLib.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -77,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\clsDB.vb" />
+    <Compile Include="Classes\clsFunctions.vb" />
     <Compile Include="Classes\clsHMACSHA.vb" />
     <Compile Include="Classes\clsRemote.vb" />
     <Compile Include="Classes\clsRestrictionTracker.vb" />
@@ -86,7 +85,6 @@
     <Compile Include="Classes\clsWebClient.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Modules\modFunctions.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -126,6 +124,7 @@
   <ItemGroup>
     <None Include="sat.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>
