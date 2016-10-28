@@ -1009,7 +1009,7 @@
       IO.File.Copy(Application.ExecutablePath, sPath & "RestrictionTracker.exe", True)
       IO.File.Copy(Application.StartupPath & "\RestrictionTrackerLib.dll", sPath & "RestrictionTrackerLib.dll", True)
       IO.Directory.CreateDirectory(sPath & "Config\")
-      For Each file In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
+      For Each file As IO.FileInfo In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
         If file.Name = "user.config" Or file.Name = "backup.config" Then
           Dim sConfig As String = My.Computer.FileSystem.ReadAllText(file.FullName, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
           If sConfig.Contains("<setting name=""HistoryDir"">") Then
@@ -1024,7 +1024,7 @@
         End If
       Next
       If Not AppDataPath = MySaveDir Then
-        For Each file In New IO.DirectoryInfo(MySaveDir(True)).EnumerateFiles
+        For Each file As IO.FileInfo In New IO.DirectoryInfo(MySaveDir(True)).EnumerateFiles
           file.CopyTo(sPath & "Config\" & file.Name, True)
         Next
       End If
