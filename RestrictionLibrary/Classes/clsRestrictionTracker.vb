@@ -1520,7 +1520,7 @@
               opM = htmlParts(0)
             Else
               If Not opM = htmlParts(0) Then
-                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Off-Peak Max). Gonna take a closer look...", Table))
+                RaiseError("Not sure about this usage data (Off-Peak Max). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
                 opM = htmlParts(0)
               End If
             End If
@@ -1530,7 +1530,7 @@
               atM = htmlParts(1)
             Else
               If Not atM = htmlParts(1) Then
-                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Anytime Max). Gonna take a closer look...", Table))
+                RaiseError("Not sure about this usage data (Anytime Max). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
                 atM = htmlParts(1)
               End If
             End If
@@ -1540,7 +1540,7 @@
               opV = htmlParts(2)
             Else
               If Not opV = htmlParts(2) Then
-                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Off-Peak Value). Gonna take a closer look...", Table))
+                RaiseError("Not sure about this usage data (Off-Peak Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
                 opV = htmlParts(2)
               End If
             End If
@@ -1550,22 +1550,18 @@
               atV = htmlParts(3)
             Else
               If Not atV = htmlParts(3) Then
-                RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Anytime Value). Gonna take a closer look...", Table))
+                RaiseError("Not sure about this usage data (Anytime Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
                 atV = htmlParts(3)
               End If
             End If
           End If
           If Not String.IsNullOrEmpty(htmlParts(4)) Then
-            If String.IsNullOrEmpty(atxM) Then
-              atxM = htmlParts(4)
+            If String.IsNullOrEmpty(atxV) Then
+              atxV = htmlParts(4)
             Else
-              If Not atxM = htmlParts(4) Then
-                If atxM = "15.0" And htmlParts(4) = "0.0" Then
-                  atxM = "0.0"
-                Else
-                  RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Not sure about this usage data (Added Max). Gonna take a closer look...", Table))
-                  atxM = htmlParts(4)
-                End If
+              If Not atxV = htmlParts(4) Then
+                RaiseError("Not sure about this usage data (Additional Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
+                atxV = htmlParts(4)
               End If
             End If
           End If
@@ -1787,6 +1783,10 @@
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
       Return True
     End If
+    If response.StartsWith("Could not resolve host: ") Then
+      RaiseError("The server is unavailable. Please try again later.")
+      Return True
+    End If
     If responseURI Is Nothing Then
       RaiseError(response)
       Return True
@@ -1796,14 +1796,14 @@
   Private Sub RaiseError(ErrorMessage As String)
     If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
     Dim FailureText As String = Nothing
-    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage, Nothing))
+    RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage))
   End Sub
   Private Sub RaiseError(ErrorMessage As String, AccountTypeGetsReset As Boolean)
     If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
     If AccountTypeGetsReset Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, ErrorMessage, Nothing))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.FatalLoginFailure, ErrorMessage))
     Else
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage, Nothing))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage))
     End If
   End Sub
   Private Sub RaiseError(ErrorMessage As String, FailureLocation As String, FailureData As String, Optional FailureAddress As Uri = Nothing)
