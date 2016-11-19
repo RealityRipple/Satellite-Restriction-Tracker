@@ -771,6 +771,25 @@
       RaiseError("Authentication Failed: Could not understand response.", True, "EX Authenticate Response", Response, ResponseURI)
     End If
   End Sub
+  Private Structure AjaxEntry
+    Public ID As Byte
+    Public Iteration As Byte
+    Public Sub New(bID As Byte, bI As Byte)
+      ID = bID
+      Iteration = bI
+    End Sub
+  End Structure
+  Private AJAXOrder() As Byte = {4, 5, 10}
+  Public ReadOnly Property ExedeAJAXFirstTryRequests As Integer
+    Get
+      Return AJAXOrder.Length - 1
+    End Get
+  End Property
+  Public ReadOnly Property ExedeAJAXSecondTryRequests As Integer
+    Get
+      Return 12 - 1
+    End Get
+  End Property
   Private Sub EX_Download_Homepage(sURI As String)
     MakeSocket()
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
@@ -778,9 +797,9 @@
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Ajax_Response(responseData, responseURI, "2a")
+    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(AJAXOrder(0), 1))
   End Sub
-  Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, AjaxID As String)
+  Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
       RaiseError("AJAX Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
@@ -824,7 +843,7 @@
       Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
       sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
       sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
-      EX_Download_Ajax("https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard", AjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
+      EX_Download_Ajax("https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard", NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
     ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my.exede.net/atlasPlanInvalid") Then
       RaiseError("AJAX Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
     ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
@@ -839,18 +858,37 @@
       RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response", Response, ResponseURI)
     End If
   End Sub
-  Private Sub EX_Download_Ajax(sURI As String, AjaxID As String, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
+  Private Sub EX_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket()
-    If AjaxID(0) = "8" Then
+    Dim newID As Byte = AjaxID.ID
+    Dim newType As Byte = AjaxID.Iteration
+    If AjaxID.ID > ExedeAJAXSecondTryRequests Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
-    ElseIf AjaxID(1) = "a" Then
-      If AjaxID(0) = "6" Then
-        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 4, sURI)
-      Else
-        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, Val(AjaxID(0)), sURI)
+      newID = 1
+      newType += 1
+    ElseIf AjaxID.Iteration = 1 Then
+      Dim bShown As Boolean = False
+      For I As Integer = 0 To AJAXOrder.Length - 1
+        If AjaxID.ID = AJAXOrder(I) Then
+          If I >= AJAXOrder.Length - 1 Then
+            BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
+            newID = 1
+            newType += 1
+          Else
+            BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, sURI)
+            newID = AJAXOrder(I + 1)
+          End If
+          bShown = True
+          Exit For
+        End If
+      Next
+      If Not bShown Then
+        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, AjaxID.ID, sURI)
+        newID += 1
       End If
     Else
-      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, Val(AjaxID(0)), sURI)
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, AjaxID.ID, sURI)
+      newID += 1
     End If
     Dim sSend As String = "AJAXREQUEST=_viewRoot" &
              "&j_id0%3AidForm=j_id0%3AidForm" &
@@ -858,24 +896,12 @@
              "&com.salesforce.visualforce.ViewStateVersion=" & srlFunctions.PercentEncode(sVSVersion) &
              "&com.salesforce.visualforce.ViewStateMAC=" & srlFunctions.PercentEncode(sVSMAC) &
              "&com.salesforce.visualforce.ViewStateCSRF=" & srlFunctions.PercentEncode(sVSCSRF) &
-             "&j_id0%3AidForm%3Aj_id" & AjaxID(0) & "=j_id0%3AidForm%3Aj_id" & AjaxID(0)
+             "&j_id0%3AidForm%3Aj_id" & AjaxID.ID & "=j_id0%3AidForm%3Aj_id" & AjaxID.ID
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    Dim newAjaxID As Integer = Val(AjaxID(0))
-    Dim newAjaxType As String = AjaxID(1)
-    If AjaxID(1) = "a" Then
-      Select Case Val(AjaxID)
-        Case 2 : newAjaxID = 3
-        Case 3 : newAjaxID = 6
-        Case 6 : newAjaxID = 8
-        Case Else : newAjaxID = 1 : newAjaxType = "b"
-      End Select
-    Else
-      newAjaxID += 1
-    End If
-    EX_Ajax_Response(responseData, responseURI, Trim(Str(newAjaxID)) & newAjaxType)
+    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(newID, newType))
   End Sub
   Private Sub EX_Read_Table(Table As String)
     If Not Table.Contains("amount-used") Then

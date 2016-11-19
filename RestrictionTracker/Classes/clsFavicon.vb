@@ -177,6 +177,7 @@
             pctPNG32 = GenerateCloneImage(ico, 32, 32)
           End Using
         Case Else
+          'TODO: Handle other image header types that may be used as favicons
           Debug.Print("Unknown Header ID: " & Hex(BitConverter.ToUInt32(imgHeader, 0)))
           Using ico As Image = Image.FromFile(imgFile)
             pctPNG16 = GenerateCloneImage(ico, 16, 16)

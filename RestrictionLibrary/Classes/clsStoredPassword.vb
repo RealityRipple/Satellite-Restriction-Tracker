@@ -57,24 +57,48 @@
     Dim cryptHASH = sessionKeyHMAC.ComputeHash(bSeed)
     crypter = New RC4(cryptHASH)
   End Sub
+  ''' <summary>
+  ''' Decrypt a password that was encrypted with the Tracker EXE GUID.
+  ''' </summary>
+  ''' <param name="PassCrypt">The base64 encoded encrypted password.</param>
+  ''' <returns>The raw password which was encrypted.</returns>
+  ''' <remarks></remarks>
   Shared Function DecryptApp(PassCrypt As String) As String
     GenKey()
     Dim bCrypt() As Byte = Convert.FromBase64String(PassCrypt)
     crypter.Transform(bCrypt, 0, bCrypt.Length)
     Return System.Text.Encoding.GetEncoding(28591).GetString(bCrypt)
   End Function
+  ''' <summary>
+  ''' Encrypt a password using the Tracker EXE GUID.
+  ''' </summary>
+  ''' <param name="Password">The password to encrypt.</param>
+  ''' <returns>An base64 output of the encrypted password.</returns>
+  ''' <remarks></remarks>
   Shared Function EncryptApp(Password As String) As String
     GenKey()
     Dim bPass() As Byte = System.Text.Encoding.GetEncoding(28591).GetBytes(Password)
     crypter.Transform(bPass, 0, bPass.Length)
     Return Convert.ToBase64String(bPass)
   End Function
+  ''' <summary>
+  ''' Decrypt a password that was encrypted with the Logger EXE GUID.
+  ''' </summary>
+  ''' <param name="PassCrypt">The base64 encoded encrypted password.</param>
+  ''' <returns>The raw password which was encrypted.</returns>
+  ''' <remarks></remarks>
   Shared Function DecryptLogger(PassCrypt As String) As String
-    genLoggerKey()
+    GenLoggerKey()
     Dim bCrypt() As Byte = Convert.FromBase64String(PassCrypt)
     crypter.Transform(bCrypt, 0, bCrypt.Length)
     Return System.Text.Encoding.GetEncoding(28591).GetString(bCrypt)
   End Function
+  ''' <summary>
+  ''' Encrypt a password using the Logger EXE GUID.
+  ''' </summary>
+  ''' <param name="Password">The password to encrypt.</param>
+  ''' <returns>An base64 output of the encrypted password.</returns>
+  ''' <remarks></remarks>
   Shared Function EncryptLogger(Password As String) As String
     GenLoggerKey()
     Dim bPass() As Byte = System.Text.Encoding.GetEncoding(28591).GetBytes(Password)

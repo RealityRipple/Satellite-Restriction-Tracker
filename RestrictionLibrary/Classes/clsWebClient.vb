@@ -1,5 +1,10 @@
 ﻿Public Class WebClientCore
   Inherits Net.WebClient
+  ''' <summary>
+  ''' Create a new instance of the <see cref="WebClientCore" /> Class.
+  ''' </summary>
+  ''' <param name="useEvents">If set to <c>True</c>, failures will trigger events, if <c>False</c>, failures will throw errors.</param>
+  ''' <remarks></remarks>
   Public Sub New(useEvents As Boolean)
     MyBase.New()
     c_Events = useEvents
@@ -9,8 +14,13 @@
     c_HTVer = Net.HttpVersion.Version11
     c_ErrorBypass = True
     c_ManualRedirect = True
+    c_ResponseURI = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
+  ''' <summary>
+  ''' Create a new instance of the <see cref="WebClientCore" /> Class.
+  ''' </summary>
+  ''' <remarks></remarks>
   Sub New()
     MyBase.New()
     c_Events = False
@@ -20,16 +30,32 @@
     c_HTVer = Net.HttpVersion.Version11
     c_ErrorBypass = True
     c_ManualRedirect = True
+    c_ResponseURI = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
+  ''' <summary>
+  ''' A <see cref="WebClientCore" /> Upload or Download request failure message containing an <see cref="Exception" />.
+  ''' </summary>
+  ''' <remarks></remarks>
   Public Class ErrorEventArgs
     Inherits EventArgs
     Public [Error] As Exception
+    ''' <summary>
+    ''' Create a new instance of the <see cref="ErrorEventArgs" /> Class for use with the <see cref="Failure" /> event.
+    ''' </summary>
+    ''' <param name="Err">The Exception being passed through the <see cref="Failure" /> event.</param>
+    ''' <remarks></remarks>
     Public Sub New(Err As Exception)
       [Error] = Err
     End Sub
   End Class
   Private c_CookieJar As Net.CookieContainer
+  ''' <summary>
+  ''' Acts as the container for a collection of <see cref="System.Net.CookieCollection" /> objects for use with an instance of the <see cref="WebClientCore" /> class.
+  ''' </summary>
+  ''' <value>A new CookieJar to use in place of the default empty Jar. This is useful for sharing and storing sessions and cookies across multiple <see cref="WebClientCore" /> instances.</value>
+  ''' <returns>The current CookieJar for this <see cref="WebClientCore" />.</returns>
+  ''' <remarks></remarks>
   Public Property CookieJar As Net.CookieContainer
     Get
       Return c_CookieJar
@@ -39,12 +65,23 @@
     End Set
   End Property
   Private c_ResponseURI As Uri
+  ''' <summary>
+  ''' The <see cref="Uri" /> of the last <see cref="GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="GetWebResponse" /> event occurs. It may be equal to the <see cref="Uri" /> sent in a Download or Upload request, or it may be modified during the request as per page redirection standards*.</returns>
+  ''' <remarks>*Page Redirection can be disabled using the <see cref="ManualRedirect" /> property. The standards followed if <see cref="ManualRedirect" /> is set to <c>False</c> are the HTTP 300 Status Code set of errors. Up to 50 redirects are allowed if <see cref="Net.HttpWebRequest.MaximumAutomaticRedirections" /> has not been set manually.</remarks>
   Public ReadOnly Property ResponseURI As Uri
     Get
       Return c_ResponseURI
     End Get
   End Property
   Private c_Timeout As Integer
+  ''' <summary>
+  ''' Gets or sets the time-out value in seconds for the <see cref="System.Net.HttpWebRequest.GetResponse" /> and <see cref="System.Net.HttpWebRequest.GetRequestStream" /> methods.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>The number of milliseconds to wait before the request times out. The default is 120 seconds.</returns>
+  ''' <remarks></remarks>
   Public Property Timeout As Integer
     Get
       Return c_Timeout
@@ -54,6 +91,12 @@
     End Set
   End Property
   Private c_RWTimeout As Integer
+  ''' <summary>
+  ''' Gets or sets a time-out in seconds when writing to or reading from a stream.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>The number of seconds before the writing or reading times out. The default value is 300 seconds (5 minutes).</returns>
+  ''' <remarks></remarks>
   Public Property ReadWriteTimeout As Integer
     Get
       Return c_RWTimeout
@@ -63,6 +106,12 @@
     End Set
   End Property
   Private c_HTVer As Version
+  ''' <summary>
+  ''' Gets or sets the version of HTTP to use for the request.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>The HTTP version to use for the request. The default is <see cref="System.Net.HttpVersion.Version11" />.</returns>
+  ''' <remarks></remarks>
   Public Property HTTPVersion As Version
     Get
       Return c_HTVer
@@ -72,6 +121,12 @@
     End Set
   End Property
   Private c_ErrorBypass As Boolean
+  ''' <summary>
+  ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 400 Status Code set of errors.
+  ''' </summary>
+  ''' <value>If set to <c>True</c> and the error contains a <see cref="System.Net.WebResponse" /> value, that response is sent instead of an error.</value>
+  ''' <returns>If <c>True</c>, errors may be bypassed and trigger Upload and Download completion events, if possible. If <c>False</c>, all error responses are treated as errors. The default value is <c>True</c>.</returns>
+  ''' <remarks></remarks>
   Public Property ErrorBypass As Boolean
     Get
       Return c_ErrorBypass
@@ -81,6 +136,12 @@
     End Set
   End Property
   Private c_ManualRedirect As Boolean
+  ''' <summary>
+  ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 300 Status Code set of errors.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns><c>False</c> if the request should automatically follow redirection responses from the Internet resource; otherwise, <c>True</c>. The default value is <c>True</c>.</returns>
+  ''' <remarks></remarks>
   Public Property ManualRedirect As Boolean
     Get
       Return c_ManualRedirect
@@ -90,7 +151,19 @@
     End Set
   End Property
   Private c_Events As Boolean
+  ''' <summary>
+  ''' A <see cref="WebClientCore" /> Upload or Download request has failed.
+  ''' </summary>
+  ''' <param name="sender">The class which is triggering the event.</param>
+  ''' <param name="e">The exception contained in an EventArg</param>
+  ''' <remarks></remarks>
   Public Event Failure(sender As Object, e As ErrorEventArgs)
+  ''' <summary>
+  ''' The User Agent for Satellite Restriction Tracker
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns></returns>
+  ''' <remarks></remarks>
   Public Shared ReadOnly Property UserAgent As String
     Get
       Return "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & srlFunctions.GetCLRVersion & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
@@ -204,6 +277,12 @@ End Class
 
 Public Class WebClientEx
   Private c_Timeout As Integer
+  ''' <summary>
+  ''' Gets or sets the time-out value in seconds for the <see cref="System.Net.HttpWebRequest.GetResponse" /> and <see cref="System.Net.HttpWebRequest.GetRequestStream" /> methods.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>The number of milliseconds to wait before the request times out. The default is 180 seconds.</returns>
+  ''' <remarks></remarks>
   Public Property Timeout As Integer
     Get
       Return c_Timeout
@@ -213,6 +292,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_RWTimeout As Integer
+  ''' <summary>
+  ''' Gets or sets a time-out in seconds when writing to or reading from a stream.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>The number of seconds before the writing or reading times out. The default value is 7200 seconds (2 hours).</returns>
+  ''' <remarks></remarks>
   Public Property ReadWriteTimeout As Integer
     Get
       Return c_RWTimeout
@@ -222,6 +307,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_Proxy As Net.IWebProxy
+  ''' <summary>
+  ''' Gets or sets the proxy used by this <see cref="WebClientEx" /> object.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>An <see cref="System.Net.IWebProxy" /> instance used to send requests.</returns>
+  ''' <remarks></remarks>
   Public Property Proxy As Net.IWebProxy
     Get
       Return c_Proxy
@@ -231,6 +322,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_Jar As Net.CookieContainer
+  ''' <summary>
+  ''' Acts as the container for a collection of <see cref="System.Net.CookieCollection" /> objects for use with an instance of the <see cref="WebClientEx" /> class.
+  ''' </summary>
+  ''' <value>A new CookieJar to use in place of the default empty Jar. This is useful for sharing and storing sessions and cookies across multiple <see cref="WebClientEx" /> instances.</value>
+  ''' <returns>The current CookieJar for this <see cref="WebClientEx" />.</returns>
+  ''' <remarks></remarks>
   Public Property CookieJar As Net.CookieContainer
     Get
       Return c_Jar
@@ -240,6 +337,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_Encoding As System.Text.Encoding
+  ''' <summary>
+  ''' Gets and sets the System.Text.Encoding used to upload and download strings.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>A System.Text.Encoding that is used to encode strings. The default value of this property is <see cref="srlFunctions.LATIN_1" />.</returns>
+  ''' <remarks></remarks>
   Public Property Encoding As System.Text.Encoding
     Get
       Return c_Encoding
@@ -249,12 +352,23 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_ResponseURI As Uri
+''' <summary>
+  ''' The <see cref="Uri" /> of the last <see cref="WebClientCore.GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="WebClientCore.GetWebResponse" /> event occurs. It may be equal to the <see cref="Uri" /> sent in a Download or Upload request, or it may be modified during the request as per page redirection standards*.</returns>
+  ''' <remarks>*Page Redirection can be disabled using the <see cref="ManualRedirect" /> property. The standards followed if <see cref="ManualRedirect" /> is set to <c>False</c> are the HTTP 300 Status Code set of errors. Up to 50 redirects are allowed if <see cref="Net.HttpWebRequest.MaximumAutomaticRedirections" /> has not been set manually.</remarks>
   Public ReadOnly Property ResponseURI As Uri
     Get
       Return c_ResponseURI
     End Get
   End Property
   Private c_ErrorBypass As Boolean
+  ''' <summary>
+  ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 400 Status Code set of errors.
+  ''' </summary>
+  ''' <value>If set to <c>True</c> and the error contains a <see cref="System.Net.WebResponse" /> value, that response is sent instead of an error.</value>
+  ''' <returns>If <c>True</c>, errors may be bypassed and trigger Upload and Download completion events, if possible. If <c>False</c>, all error responses are treated as errors. The default value is <c>True</c>.</returns>
+  ''' <remarks></remarks>
   Public Property ErrorBypass As Boolean
     Get
       Return c_ErrorBypass
@@ -264,6 +378,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_ManualRedirect As Boolean
+  ''' <summary>
+  ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 300 Status Code set of errors.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns><c>False</c> if the request should automatically follow redirection responses from the Internet resource; otherwise, <c>True</c>. The default value is <c>True</c>.</returns>
+  ''' <remarks></remarks>
   Public Property ManualRedirect As Boolean
     Get
       Return c_ManualRedirect
@@ -273,6 +393,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_SendHeaders As Net.WebHeaderCollection
+  ''' <summary>
+  ''' Gets or sets a collection of header name/value pairs associated with the request.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>A <see cref="System.Net.WebHeaderCollection" /> containing header name/value pairs associated with this request.</returns>
+  ''' <remarks></remarks>
   Public Property SendHeaders As Net.WebHeaderCollection
     Get
       Return c_SendHeaders
@@ -282,6 +408,12 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_Busy As Boolean
+  ''' <summary>
+  ''' Returns a Boolean value that provides information about the state of the request.
+  ''' </summary>
+  ''' <value></value>
+  ''' <returns>If <c>True</c>, the request has been processed and is being sent, the client is waiting for the server, or data is being received in response. Otherwise, the request has not yet been sent or a response has already been received.</returns>
+  ''' <remarks></remarks>
   Public ReadOnly Property IsBusy As Boolean
     Get
       Return c_Busy
@@ -549,8 +681,10 @@ Public Class WebClientEx
             Return
           End Try
           Try
+            'TODO: Make this asynchronous, maybe?
             sRet = wsUpload.DownloadString(uriAddr)
             c_ResponseURI = wsUpload.ResponseURI
+            '
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
@@ -898,10 +1032,34 @@ Public Class WebClientEx
   End Function
 End Class
 
-Public Enum SecurityProtocolTypeEx
+''' <summary>
+''' Specifies the security protocols that are supported by the Schannel security package.
+''' </summary>
+''' <remarks>This contains the additional TLS 1.1 and 1.2 standards lacking in <see cref="System.Net.SecurityProtocolType" />, which require newer .NET Framework versions.</remarks>
+Public Enum SecurityProtocolTypeEx As Integer
+  ''' <summary>
+  ''' Specifies no security protocol is to be used.
+  ''' </summary>
+  ''' <remarks>This value is technically invalid, but exists for use with Settings to allow no protocol to be selected in the case of a Remote Usage Service subscription.</remarks>
   None = 0
+  ''' <summary>
+  ''' Specifies the Secure Socket Layer (SSL) 3.0 security protocol.
+  ''' </summary>
+  ''' <remarks></remarks>
   Ssl3 = &H30
+  ''' <summary>
+  ''' Specifies the Transport Layer Security (TLS) 1.0 security protocol.
+  ''' </summary>
+  ''' <remarks></remarks>
   Tls10 = &HC0
+  ''' <summary>
+  ''' Specifies the Transport Layer Security (TLS) 1.1 security protocol.
+  ''' </summary>
+  ''' <remarks></remarks>
   Tls11 = &H300
+  ''' <summary>
+  ''' Specifies the Transport Layer Security (TLS) 1.2 security protocol.
+  ''' </summary>
+  ''' <remarks></remarks>
   Tls12 = &HC00
 End Enum

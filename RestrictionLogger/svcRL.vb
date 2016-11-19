@@ -97,8 +97,8 @@ Public Class svcRL
           If rpP > wbP And exP > wbP And rpP = exP Then
             Return SatHostTypes.Exede
           Else
+            'TODO: Handle unknown host type
             Return SatHostTypes.Other
-            Stop
           End If
         End If
       End If

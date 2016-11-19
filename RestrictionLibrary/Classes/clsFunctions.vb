@@ -511,12 +511,18 @@ Public Class srlFunctions
   ''' <remarks>See Also: <seealso cref="NetworkErrorToString" />, <seealso cref="SendSocketErrors" />.</remarks>
   Public Shared Sub ReportSocketError(ex As Exception, dataPath As String)
     Dim ReportList As String = dataPath & "\sckerrs.log"
+    If String.IsNullOrEmpty(ex.Message) Then Return
+    Dim sErrMsg As String = ex.Message
+    If ex.InnerException IsNot Nothing AndAlso Not String.IsNullOrEmpty(ex.InnerException.Message) Then
+      sErrMsg &= vbNewLine & ex.InnerException.Message
+      If ex.InnerException.InnerException IsNot Nothing AndAlso Not String.IsNullOrEmpty(ex.InnerException.InnerException.Message) Then sErrMsg &= vbNewLine & ex.InnerException.InnerException.Message
+    End If
     If IO.File.Exists(ReportList) Then
       If InUseChecker(ReportList, FileAccess.ReadWrite) Then
-        My.Computer.FileSystem.WriteAllText(ReportList, ex.ToString & vbNewLine & vbNewLine, True)
+        My.Computer.FileSystem.WriteAllText(ReportList, sErrMsg & vbNewLine & vbNewLine, True)
       End If
     Else
-      My.Computer.FileSystem.WriteAllText(ReportList, ex.ToString & vbNewLine & vbNewLine, False)
+      My.Computer.FileSystem.WriteAllText(ReportList, sErrMsg & vbNewLine & vbNewLine, False)
     End If
     SendSocketErrors(dataPath)
   End Sub
