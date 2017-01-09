@@ -643,7 +643,11 @@
         End If
         MakeSocket()
         Dim sRedirURI As String = Nothing
-        sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
+        If Response.Contains("window.location.href = url + escapedHash;") Then
+          sRedirURI = Response.Substring(Response.IndexOf("var url"))
+        Else
+          sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
+        End If
         sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
         sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
         If sRedirURI = "/" Then
