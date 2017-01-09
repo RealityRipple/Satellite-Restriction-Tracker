@@ -749,6 +749,7 @@ Public Class srlFunctions
     Dim sVer As String = GetCLRVersion()
     If Not sVer.Substring(0, 9) = "4.0.30319" Then Return String.Format("Unknown Runtime ({0})", sVer)
     Dim clrID, clrID2 As Integer
+    Dim monoID As String = Nothing
     If Not sVer.Substring(10).Contains("_") Then
       clrID = Val(sVer.Substring(10))
       clrID2 = 0
@@ -758,9 +759,10 @@ Public Class srlFunctions
       clrRel = clrRel.Substring(clrRel.IndexOf("_") + 1)
       clrID = Val(clrBld)
       clrID2 = Val(clrRel)
+      monoID = clrRel
     End If
     If clrID = 17020 Then
-      If Not clrID2 = 0 Then Return String.Format("MONO {0}", clrID2)
+      If Not String.IsNullOrEmpty(monoID) Then Return String.Format("MONO {0}", monoID)
       Return "MONO"
     End If
     If clrID < 17929 Then
