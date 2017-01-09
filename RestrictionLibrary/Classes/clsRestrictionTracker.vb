@@ -348,7 +348,7 @@
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
-    MakeSocket()
+    MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
@@ -360,7 +360,7 @@
   Private Sub LoginExede()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my.exede.net/login"
-    MakeSocket()
+    MakeSocket(True)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -372,7 +372,7 @@
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, "login")
-    MakeSocket()
+    MakeSocket(False)
     Dim sSend As String = "warningTrip=false&userName=" & srlFunctions.PercentEncode(sUsername) & "&passwd=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
@@ -385,7 +385,7 @@
     iHist = 0
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
-    MakeSocket(False)
+    MakeSocket(False, False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -442,7 +442,7 @@
     End If
   End Sub
   Private Sub WB_Usage(File As String)
-    MakeSocket()
+    MakeSocket(False)
     Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
     Dim responseData As String = Nothing
@@ -608,7 +608,7 @@
     EX_Login(sURI, sGOTO, sSQPS, TryCount)
   End Sub
   Private Sub EX_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
-    MakeSocket()
+    MakeSocket(True)
     Dim sSend As String = "realm=" & srlFunctions.PercentEncode("/") &
                          "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
                          "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
@@ -641,7 +641,7 @@
           RaiseError("Login Failed: Server redirected too many times.")
           Return
         End If
-        MakeSocket()
+        MakeSocket(True)
         Dim sRedirURI As String = Nothing
         If Response.Contains("window.location.href = url + escapedHash;") Then
           sRedirURI = Response.Substring(Response.IndexOf("var url"))
@@ -726,7 +726,7 @@
     End If
   End Sub
   Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
-    MakeSocket()
+    MakeSocket(True)
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse)) & "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
     Dim responseData As String = Nothing
@@ -795,7 +795,7 @@
     End Get
   End Property
   Private Sub EX_Download_Homepage(sURI As String)
-    MakeSocket()
+    MakeSocket(True)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -863,7 +863,7 @@
     End If
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
-    MakeSocket()
+    MakeSocket(True)
     Dim newID As Byte = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
     If AjaxID.ID > ExedeAJAXSecondTryRequests Then
@@ -935,7 +935,7 @@
 #End Region
 #Region "RP"
   Private Sub RP_Login_Retry(sURI As String)
-    MakeSocket()
+    MakeSocket(False)
     Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
     Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURI)
@@ -992,7 +992,7 @@
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(sRP, sProvider, File)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
-    MakeSocket()
+    MakeSocket(False)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
@@ -1116,7 +1116,7 @@
     DN_Login("https://my.dish.com/customercare/saml/login?target=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet") & "&message=&forceAuthn=true")
   End Sub
   Private Sub DN_Login(sURI As String)
-    MakeSocket(False)
+    MakeSocket(False, False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1147,7 +1147,7 @@
     DN_Login_FirstBook(sURI)
   End Sub
   Private Sub DN_Login_FirstBook(sURI As String)
-    MakeSocket(False)
+    MakeSocket(False, False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1177,7 +1177,7 @@
     DN_Login_Authenticate(ResponseURI.OriginalString)
   End Sub
   Private Sub DN_Login_Authenticate(sURI As String)
-    MakeSocket(False)
+    MakeSocket(False, False)
     Dim sSend As String = "username=" & srlFunctions.PercentEncode(sUsername) &
                           "&password=" & srlFunctions.PercentEncode(sPassword) &
                           "&login_type=username,password" &
@@ -1221,7 +1221,7 @@
         If sURL = "/" Then
           sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
         End If
-        MakeSocket(False)
+        MakeSocket(False, False)
         BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
         Dim response2Data As String = Nothing
         Dim response2URI As Uri = Nothing
@@ -1253,7 +1253,7 @@
     End If
   End Sub
   Private Sub DN_Login_LastBook(sURI As String)
-    MakeSocket(False)
+    MakeSocket(False, False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1292,7 +1292,7 @@
     End If
   End Sub
   Private Sub DN_Login_Verify(SAMLResponse As String)
-    MakeSocket(False)
+    MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet")
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
@@ -1320,7 +1320,7 @@
     DN_Download_Home()
   End Sub
   Private Sub DN_Download_Home()
-    MakeSocket(False)
+    MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
@@ -1350,7 +1350,7 @@
     End If
   End Sub
   Private Sub DN_Download_Table()
-    MakeSocket(False)
+    MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
     Dim responseData As String = Nothing
@@ -1630,7 +1630,7 @@
 #End Region
 #End Region
 #Region "Useful Functions"
-  Private Sub MakeSocket(Optional ManualRedirect As Boolean = True)
+  Private Sub MakeSocket(KeepAlive As Boolean, Optional ManualRedirect As Boolean = True)
     Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     If wsSocket IsNot Nothing Then
       oldEncoding = wsSocket.Encoding
@@ -1638,6 +1638,7 @@
       wsSocket = Nothing
     End If
     wsSocket = New WebClientEx(sDataPath)
+    wsSocket.KeepAlive = KeepAlive
     wsSocket.Timeout = c_Timeout
     wsSocket.Proxy = c_Proxy
     wsSocket.CookieJar = c_Jar

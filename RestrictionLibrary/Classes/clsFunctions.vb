@@ -541,6 +541,7 @@ Public Class srlFunctions
           Dim e As String = err.Replace(vbNewLine, " - ")
           Try
             Dim sckUpload As New WebClientEx(dataPath)
+            sckUpload.KeepAlive = False
             Dim params As New Collections.Specialized.NameValueCollection
             params.Add("e", e)
             Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)

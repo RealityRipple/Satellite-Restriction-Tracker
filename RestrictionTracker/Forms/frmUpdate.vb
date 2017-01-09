@@ -64,6 +64,7 @@
   Private Sub GetVerInfo()
     Dim sRet As String = Nothing
     Dim sckVerInfo As New WebClientEx
+    sckVerInfo.KeepAlive = False
     If lblBETA.Visible Then
       sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/infob")
     Else

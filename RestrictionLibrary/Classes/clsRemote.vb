@@ -331,6 +331,7 @@ Public Class remoteRestrictionTracker
       wsSocket = Nothing
     End If
     wsSocket = New WebClientEx(sDataPath)
+    wsSocket.KeepAlive = False
     wsSocket.Timeout = c_Timeout
     wsSocket.Proxy = c_Proxy
     wsSocket.CookieJar = c_Jar

@@ -750,6 +750,7 @@
       Return
     End If
     Dim wsHostList As New WebClientEx
+    wsHostList.KeepAlive = False
     Dim sHostList As String = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
     If sHostList.StartsWith("Error: ") Then Return
     Try

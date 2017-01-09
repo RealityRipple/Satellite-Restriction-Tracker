@@ -712,6 +712,7 @@ Module modFunctions
       Dim bData As Byte() = System.Text.Encoding.UTF8.GetBytes(sData)
       Dim sBase64Data As String = Convert.ToBase64String(bData, Base64FormattingOptions.None)
       Dim sckUpload As New WebClientEx()
+      sckUpload.KeepAlive = False
       Dim params As New Collections.Specialized.NameValueCollection
       params.Add("eFile", sBase64Data)
       Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)

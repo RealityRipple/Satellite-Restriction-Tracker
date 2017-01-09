@@ -39,6 +39,7 @@
     Try
       Dim wsString As New WebClientEx
       wsString.ManualRedirect = False
+      wsString.KeepAlive = False
       Dim sRet As String = wsString.DownloadString(URI.OriginalString)
       If sRet.StartsWith("Error: ") Then
         Try
@@ -105,6 +106,7 @@
     Try
       wsFile = New WebClientCore
       wsFile.ManualRedirect = False
+      wsFile.KeepAlive = False
       Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadFile), New Object() {URL, Filename, token, trySimpler}, 250, System.Threading.Timeout.Infinite)
     Catch ex As Exception
       c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!"))

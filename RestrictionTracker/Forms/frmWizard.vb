@@ -453,6 +453,7 @@ Public Class frmWizard
     Try
       Dim sRet As String
       Dim wsHostList As New WebClientEx
+      wsHostList.KeepAlive = False
       sRet = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
       SetHostListData(sRet)
     Catch ex As Exception

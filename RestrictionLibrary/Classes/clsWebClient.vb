@@ -13,6 +13,7 @@
     c_RWTimeout = 300
     c_HTVer = Net.HttpVersion.Version11
     c_ErrorBypass = True
+    c_KeepAlive = True
     c_ManualRedirect = True
     c_ResponseURI = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
@@ -29,6 +30,7 @@
     c_RWTimeout = 300
     c_HTVer = Net.HttpVersion.Version11
     c_ErrorBypass = True
+    c_KeepAlive = True
     c_ManualRedirect = True
     c_ResponseURI = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
@@ -135,6 +137,21 @@
       c_ErrorBypass = value
     End Set
   End Property
+  Private c_KeepAlive As Boolean
+  ''' <summary>
+  ''' Gets or sets a value that indicates whether to make a persistent connection to the Internet resource.
+  ''' </summary>
+  ''' <value>If set to <c>True</c>, the <see cref="WebClientCore" /> will send a Connection HTTP header with the value Keep-alive; if <c>False</c>, Close.</value>
+  ''' <returns><c>True</c> if the request to the Internet resource should contain a Connection HTTP header with the value Keep-alive; otherwise, <c>False</c>. The default is <c>True</c>.</returns>
+  ''' <remarks></remarks>
+  Public Property KeepAlive As Boolean
+    Get
+      Return c_KeepAlive
+    End Get
+    Set(value As Boolean)
+      c_KeepAlive = value
+    End Set
+  End Property
   Private c_ManualRedirect As Boolean
   ''' <summary>
   ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 300 Status Code set of errors.
@@ -178,7 +195,7 @@
         CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
         CType(request, Net.HttpWebRequest).CookieContainer = c_CookieJar
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
-        CType(request, Net.HttpWebRequest).KeepAlive = False
+        CType(request, Net.HttpWebRequest).KeepAlive = c_KeepAlive
         CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
         CType(request, Net.HttpWebRequest).CachePolicy = New Net.Cache.HttpRequestCachePolicy(Net.Cache.HttpRequestCacheLevel.BypassCache)
       End If
@@ -377,6 +394,21 @@ Public Class WebClientEx
       c_ErrorBypass = value
     End Set
   End Property
+  Private c_KeepAlive As Boolean
+  ''' <summary>
+  ''' Gets or sets a value that indicates whether to make a persistent connection to the Internet resource.
+  ''' </summary>
+  ''' <value>If set to <c>True</c>, the <see cref="WebClientCore" /> will send a Connection HTTP header with the value Keep-alive; if <c>False</c>, Close.</value>
+  ''' <returns><c>True</c> if the request to the Internet resource should contain a Connection HTTP header with the value Keep-alive; otherwise, <c>False</c>. The default is <c>True</c>.</returns>
+  ''' <remarks></remarks>
+  Public Property KeepAlive As Boolean
+    Get
+      Return c_KeepAlive
+    End Get
+    Set(value As Boolean)
+      c_KeepAlive = value
+    End Set
+  End Property
   Private c_ManualRedirect As Boolean
   ''' <summary>
   ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 300 Status Code set of errors.
@@ -430,6 +462,7 @@ Public Class WebClientEx
     sDataPath = DataPath
     c_Busy = False
     c_ErrorBypass = True
+    c_KeepAlive = True
     c_ManualRedirect = True
     ClosingTime = False
   End Sub
@@ -442,6 +475,7 @@ Public Class WebClientEx
     sDataPath = Nothing
     c_Busy = False
     c_ErrorBypass = True
+    c_KeepAlive = True
     c_ManualRedirect = True
     ClosingTime = False
   End Sub
@@ -478,6 +512,7 @@ Public Class WebClientEx
         wsDownload.CookieJar = c_Jar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
+        wsDownload.KeepAlive = c_KeepAlive
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1
@@ -570,6 +605,7 @@ Public Class WebClientEx
         wsDownload.CookieJar = c_Jar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
+        wsDownload.KeepAlive = c_KeepAlive
         wsDownload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1
@@ -643,6 +679,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.KeepAlive = c_KeepAlive
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1
@@ -763,6 +800,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.KeepAlive = c_KeepAlive
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1
@@ -837,6 +875,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.KeepAlive = c_KeepAlive
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1
@@ -956,6 +995,7 @@ Public Class WebClientEx
         wsUpload.CookieJar = c_Jar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
+        wsUpload.KeepAlive = c_KeepAlive
         wsUpload.ManualRedirect = c_ManualRedirect
         If Not c_SendHeaders Is Nothing Then
           For I As Integer = 0 To c_SendHeaders.Count - 1

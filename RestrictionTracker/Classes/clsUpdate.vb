@@ -77,6 +77,7 @@
   Public Sub CheckVersion()
     Dim myS As New AppSettings
     wsVer = New WebClientCore(True)
+    wsVer.KeepAlive = False
     wsVer.Proxy = myS.Proxy
     wsVer.Timeout = myS.Timeout
     myS = Nothing
@@ -91,6 +92,7 @@
     Dim sVerStr As String
     Dim mySettings As New AppSettings
     Dim wsCheck As New WebClientEx
+    wsCheck.KeepAlive = False
     wsCheck.Proxy = mySettings.Proxy
     wsCheck.Timeout = mySettings.Timeout
     sVerStr = wsCheck.DownloadString(VersionURL)

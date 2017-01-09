@@ -39,6 +39,7 @@
     pD1.Add("make_default", Nothing)
     Dim httpToken As New WebClientEx
     cJar = New Net.CookieContainer
+    httpToken.KeepAlive = False
     httpToken.CookieJar = cJar
     httpToken.SendHeaders = New Net.WebHeaderCollection
     httpToken.SendHeaders.Add(Net.HttpRequestHeader.Referer, "http://bugs.realityripple.com/login_select_proj_page.php?bug_report_page.php")
@@ -72,6 +73,7 @@
     pData.Add("report_stay", Nothing)
     Dim sRet As String
     Dim httpReport As New WebClientEx
+    httpReport.KeepAlive = False
     httpReport.CookieJar = cJar
     sRet = httpReport.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
     If sRet.StartsWith("Error: ") Then Return "Failed to Send Report - " & sRet.Substring(7)
