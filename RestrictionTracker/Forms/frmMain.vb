@@ -456,28 +456,38 @@ Public Class frmMain
     End If
   End Sub
   Private Sub ResizePanels()
+    Dim trayIcoVal As Icon = Nothing
     If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.DishNet_EXEDE Then
       If wb_dlim = 0 And wb_ulim = 0 Then
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = MakeIcon(IconName.norm)
+        trayIcoVal = MakeIcon(IconName.norm)
       Else
         pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, wb_down, wb_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
+        trayIcoVal = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
       End If
     ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Then
       If r_lim = 0 Then
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = MakeIcon(IconName.norm)
+        trayIcoVal = MakeIcon(IconName.norm)
       Else
         pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, r_used, r_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcon.Icon = CreateRTrayIcon(r_used, r_lim)
+        trayIcoVal = CreateRTrayIcon(r_used, r_lim)
       End If
     ElseIf myPanel = SatHostTypes.Other Then
       lblNothing.Text = My.Application.Info.ProductName
       lblRRS.Text = "by " & Application.CompanyName
-      ttUI.SetTooltip(lblRRS, "Visit realityripple.com.")
+      ttUI.SetToolTip(lblRRS, "Visit realityripple.com.")
+    End If
+    If trayIcoVal IsNot Nothing Then
+      If tmrIcon.Enabled Then
+        iconBefore = trayIcoVal.Clone
+      Else
+        trayIcon.Icon = trayIcoVal.Clone
+      End If
+      trayIcoVal.Dispose()
+      trayIcoVal = Nothing
     End If
   End Sub
   Private Sub frmMain_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -1948,8 +1958,8 @@ Public Class frmMain
   Private Sub tmrIcon_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcon.Tick
     Try
       If iconItem = 0 And iconStop Then
-        trayIcon.Icon = iconBefore
         tmrIcon.Enabled = False
+        trayIcon.Icon = iconBefore
         iconStop = False
         Return
       End If
