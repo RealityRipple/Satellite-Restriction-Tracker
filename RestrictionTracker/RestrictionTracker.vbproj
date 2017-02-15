@@ -326,6 +326,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\tray_32\throbsprite\0.ico" />
+    <None Include="Resources\tray_32\throbsprite\11.ico" />
+    <None Include="Resources\tray_32\throbsprite\6.ico" />
     <None Include="Resources\config\account_key.png" />
     <None Include="Resources\config\account_provider.png" />
     <None Include="Resources\config\account_user.png" />
@@ -347,23 +350,26 @@
     <None Include="Resources\config\advanced_nettest_load.png" />
     <None Include="Resources\config\advanced_nettest_none.png" />
     <None Include="Resources\config\net_security.png" />
-    <Content Include="Resources\config\prefs_interface.png" />
-    <Content Include="Resources\default_alert.png" />
-    <Content Include="Resources\default_close.png" />
+    <None Include="Resources\config\prefs_interface.png" />
+    <None Include="Resources\default_alert.png" />
+    <None Include="Resources\default_close.png" />
     <None Include="Resources\modem16.png" />
     <None Include="Resources\modem32.png" />
-    <Content Include="Resources\tray_16\free.ico" />
-    <Content Include="Resources\tray_16\norm.ico" />
-    <Content Include="Resources\tray_16\restricted.ico" />
-    <Content Include="Resources\tray_16\throbsprite\1.ico" />
-    <Content Include="Resources\tray_16\throbsprite\10.ico" />
-    <Content Include="Resources\tray_16\throbsprite\2.ico" />
-    <Content Include="Resources\tray_16\throbsprite\3.ico" />
-    <Content Include="Resources\tray_16\throbsprite\4.ico" />
-    <Content Include="Resources\tray_16\throbsprite\5.ico" />
-    <Content Include="Resources\tray_16\throbsprite\7.ico" />
-    <Content Include="Resources\tray_16\throbsprite\8.ico" />
-    <Content Include="Resources\tray_16\throbsprite\9.ico" />
+    <None Include="Resources\tray_16\free.ico" />
+    <None Include="Resources\tray_16\norm.ico" />
+    <None Include="Resources\tray_16\restricted.ico" />
+    <None Include="Resources\tray_16\throbsprite\0.ico" />
+    <None Include="Resources\tray_16\throbsprite\1.ico" />
+    <None Include="Resources\tray_16\throbsprite\10.ico" />
+    <None Include="Resources\tray_16\throbsprite\11.ico" />
+    <None Include="Resources\tray_16\throbsprite\2.ico" />
+    <None Include="Resources\tray_16\throbsprite\3.ico" />
+    <None Include="Resources\tray_16\throbsprite\4.ico" />
+    <None Include="Resources\tray_16\throbsprite\5.ico" />
+    <None Include="Resources\tray_16\throbsprite\6.ico" />
+    <None Include="Resources\tray_16\throbsprite\7.ico" />
+    <None Include="Resources\tray_16\throbsprite\8.ico" />
+    <None Include="Resources\tray_16\throbsprite\9.ico" />
     <None Include="Resources\wizard\wizService.jpg" />
     <None Include="Resources\wizard\wizFinished.jpg" />
     <None Include="Resources\wizard\wizDisplay.jpg" />

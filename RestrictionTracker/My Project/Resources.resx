@@ -329,4 +329,22 @@ kiamichiwb.org
 kmwb.net
 directv.net</value>
   </data>
+  <data name="t16_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_16\throbsprite\0.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="t16_11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_16\throbsprite\11.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="t16_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_16\throbsprite\6.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="t32_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_32\throbsprite\0.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="t32_11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_32\throbsprite\11.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="t32_6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\tray_32\throbsprite\6.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

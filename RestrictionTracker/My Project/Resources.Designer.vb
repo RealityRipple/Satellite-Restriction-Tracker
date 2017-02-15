@@ -407,6 +407,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         '''</summary>
+        Friend ReadOnly Property t16_0() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_0", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
         Friend ReadOnly Property t16_1() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t16_1", resourceCulture)
@@ -420,6 +430,16 @@ Namespace My.Resources
         Friend ReadOnly Property t16_10() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t16_10", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_11() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_11", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
@@ -460,6 +480,16 @@ Namespace My.Resources
         Friend ReadOnly Property t16_5() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t16_5", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t16_6() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t16_6", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
@@ -527,6 +557,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         '''</summary>
+        Friend ReadOnly Property t32_0() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_0", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
         Friend ReadOnly Property t32_1() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t32_1", resourceCulture)
@@ -540,6 +580,16 @@ Namespace My.Resources
         Friend ReadOnly Property t32_10() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t32_10", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_11() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_11", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property
@@ -580,6 +630,16 @@ Namespace My.Resources
         Friend ReadOnly Property t32_5() As System.Drawing.Icon
             Get
                 Dim obj As Object = ResourceManager.GetObject("t32_5", resourceCulture)
+                Return CType(obj,System.Drawing.Icon)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        '''</summary>
+        Friend ReadOnly Property t32_6() As System.Drawing.Icon
+            Get
+                Dim obj As Object = ResourceManager.GetObject("t32_6", resourceCulture)
                 Return CType(obj,System.Drawing.Icon)
             End Get
         End Property

@@ -45,6 +45,9 @@ Public Class frmMain
   Private r_used, r_lim As Long
   Private lastBalloon As Long
   Private c_PauseActivity As String
+  Private iconItem As Integer
+  Private iconStop As Boolean
+  Private iconBefore As Icon
   Public Property PauseActivity As String
     Get
       Return c_PauseActivity
@@ -145,7 +148,7 @@ Public Class frmMain
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     If HostGroup = DetermineType.SatHostGroup.Other Then
-      tmrIcon.Enabled = False
+      iconStop = True
       Dim TypeDeterminationOffline As New DetermineTypeOffline(sProvider, AddressOf TypeDeterminationOffline_TypeDetermined)
     Else
       If HostGroup = DetermineType.SatHostGroup.DishNet Then
@@ -177,7 +180,7 @@ Public Class frmMain
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     If HostType = SatHostTypes.Other Then
-      tmrIcon.Enabled = False
+      iconStop = True
       DisplayUsage(False, True)
       SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
     Else
@@ -268,7 +271,7 @@ Public Class frmMain
         lookupInvoker.BeginInvoke(Nothing, Nothing)
       Else
         mnuRestore.Text = "&Focus"
-        tmrIcon.Enabled = False
+        iconStop = True
         trayIcon.Icon = MakeIcon(IconName.norm)
         Me.ShowInTaskbar = True
         If Me.Opacity = 0 Then Me.Opacity = 1
@@ -691,6 +694,9 @@ Public Class frmMain
   Private Sub EnableProgressIcon()
     Try
       If ClosingTime Then Return
+      iconBefore = trayIcon.Icon
+      iconStop = False
+      iconItem = 0
       tmrIcon.Enabled = True
     Catch ex As Exception
 
@@ -730,7 +736,7 @@ Public Class frmMain
         Dim TypeDetermination As New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy, AddressOf TypeDetermination_TypeDetermined)
       End If
     Else
-      tmrIcon.Enabled = False
+      iconStop = True
       SetStatusText("No History", String.Empty, False)
       DisplayUsage(True, False)
       Dim TimerInvoker As New MethodInvoker(AddressOf StartTimer)
@@ -877,7 +883,7 @@ Public Class frmMain
       Return
     End If
     If Not cmdRefresh.Enabled Then cmdRefresh.Enabled = True
-    If tmrIcon.Enabled Then tmrIcon.Enabled = False
+    If tmrIcon.Enabled Then iconStop = True
     If bHardTime Then
       NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     Else
@@ -1433,8 +1439,8 @@ Public Class frmMain
     ElseIf lDownLim < lDown Then
       sTTT &= vbCr & MBorGB(lDown - lDownLim) & " Over"
     End If
-    tmrIcon.Enabled = False
-    trayIcon.Icon = CreateRTrayIcon(lDown, lDownLim)
+    iconBefore = CreateRTrayIcon(lDown, lDownLim)
+    iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
@@ -1510,8 +1516,8 @@ Public Class frmMain
              "A-T: " & AccuratePercent(lDown / lDownLim) & atFree & vbCr &
              "O-P: " & AccuratePercent(lUp / lUpLim) & opFree
     End If
-    tmrIcon.Enabled = False
-    trayIcon.Icon = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
@@ -1587,8 +1593,8 @@ Public Class frmMain
              "D: " & AccuratePercent(lDown / lDownLim) & dFree & vbCr &
              "U: " & AccuratePercent(lUp / lUpLim) & uFree
     End If
-    tmrIcon.Enabled = False
-    trayIcon.Icon = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
@@ -1610,8 +1616,8 @@ Public Class frmMain
       pnlNothing.Visible = True
       myPanel = SatHostTypes.Other
       trayIcon.Text = Me.Text
-      tmrIcon.Enabled = False
-      trayIcon.Icon = MakeIcon(IconName.norm)
+      iconBefore = MakeIcon(IconName.norm)
+      iconStop = True
     End If
   End Sub
   Private Sub DisplayResultAlert(Type As localRestrictionTracker.SatHostTypes, lDown As Long, lUp As Long)
@@ -1892,15 +1898,18 @@ Public Class frmMain
     norm
     free
     restricted
+    throb0
     throb1
     throb2
     throb3
     throb4
     throb5
+    throb6
     throb7
     throb8
     throb9
     throb10
+    throb11
   End Enum
   Private Function MakeIcon(name As IconName, Optional icoX As Integer = -1, Optional icoY As Integer = -1) As Icon
     If icoX < 0 Then icoX = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
@@ -1910,30 +1919,21 @@ Public Class frmMain
     Using g As Graphics = Graphics.FromImage(imgICO)
       g.Clear(Color.Transparent)
       Select Case name
-        Case IconName.norm
-          g.DrawIcon(IIf(large, My.Resources.t32_norm, My.Resources.t16_norm), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.free
-          g.DrawIcon(IIf(large, My.Resources.t32_free, My.Resources.t16_free), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.restricted
-          g.DrawIcon(IIf(large, My.Resources.t32_restricted, My.Resources.t16_restricted), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb1
-          g.DrawIcon(IIf(large, My.Resources.t32_1, My.Resources.t16_1), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb2
-          g.DrawIcon(IIf(large, My.Resources.t32_2, My.Resources.t16_2), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb3
-          g.DrawIcon(IIf(large, My.Resources.t32_3, My.Resources.t16_3), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb4
-          g.DrawIcon(IIf(large, My.Resources.t32_4, My.Resources.t16_4), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb5
-          g.DrawIcon(IIf(large, My.Resources.t32_5, My.Resources.t16_5), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb7
-          g.DrawIcon(IIf(large, My.Resources.t32_7, My.Resources.t16_7), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb8
-          g.DrawIcon(IIf(large, My.Resources.t32_8, My.Resources.t16_8), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb9
-          g.DrawIcon(IIf(large, My.Resources.t32_9, My.Resources.t16_9), New Rectangle(0, 0, icoX, icoY))
-        Case IconName.throb10
-          g.DrawIcon(IIf(large, My.Resources.t32_10, My.Resources.t16_10), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.norm : g.DrawIcon(IIf(large, My.Resources.t32_norm, My.Resources.t16_norm), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.free : g.DrawIcon(IIf(large, My.Resources.t32_free, My.Resources.t16_free), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.restricted : g.DrawIcon(IIf(large, My.Resources.t32_restricted, My.Resources.t16_restricted), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb0 : g.DrawIcon(IIf(large, My.Resources.t32_0, My.Resources.t16_0), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb1 : g.DrawIcon(IIf(large, My.Resources.t32_1, My.Resources.t16_1), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb2 : g.DrawIcon(IIf(large, My.Resources.t32_2, My.Resources.t16_2), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb3 : g.DrawIcon(IIf(large, My.Resources.t32_3, My.Resources.t16_3), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb4 : g.DrawIcon(IIf(large, My.Resources.t32_4, My.Resources.t16_4), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb5 : g.DrawIcon(IIf(large, My.Resources.t32_5, My.Resources.t16_5), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb6 : g.DrawIcon(IIf(large, My.Resources.t32_6, My.Resources.t16_6), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb7 : g.DrawIcon(IIf(large, My.Resources.t32_7, My.Resources.t16_7), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb8 : g.DrawIcon(IIf(large, My.Resources.t32_8, My.Resources.t16_8), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb9 : g.DrawIcon(IIf(large, My.Resources.t32_9, My.Resources.t16_9), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb10 : g.DrawIcon(IIf(large, My.Resources.t32_10, My.Resources.t16_10), New Rectangle(0, 0, icoX, icoY))
+        Case IconName.throb11 : g.DrawIcon(IIf(large, My.Resources.t32_11, My.Resources.t16_11), New Rectangle(0, 0, icoX, icoY))
       End Select
     End Using
     Try
@@ -1947,23 +1947,29 @@ Public Class frmMain
   End Function
   Private Sub tmrIcon_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcon.Tick
     Try
-      Static iItem As Integer
-      Select Case iItem
-        Case 0, 6, 11 : trayIcon.Icon = MakeIcon(IconName.norm)
+      If iconItem = 0 And iconStop Then
+        trayIcon.Icon = iconBefore
+        tmrIcon.Enabled = False
+        iconStop = False
+        Return
+      End If
+      Select Case iconItem
+        Case 0 : trayIcon.Icon = MakeIcon(IconName.throb0)
         Case 1 : trayIcon.Icon = MakeIcon(IconName.throb1)
         Case 2 : trayIcon.Icon = MakeIcon(IconName.throb2)
         Case 3 : trayIcon.Icon = MakeIcon(IconName.throb3)
         Case 4 : trayIcon.Icon = MakeIcon(IconName.throb4)
         Case 5 : trayIcon.Icon = MakeIcon(IconName.throb5)
+        Case 6 : trayIcon.Icon = MakeIcon(IconName.throb6)
         Case 7 : trayIcon.Icon = MakeIcon(IconName.throb7)
         Case 8 : trayIcon.Icon = MakeIcon(IconName.throb8)
         Case 9 : trayIcon.Icon = MakeIcon(IconName.throb9)
         Case 10 : trayIcon.Icon = MakeIcon(IconName.throb10)
+        Case 11 : trayIcon.Icon = MakeIcon(IconName.throb11)
       End Select
-      iItem += 1
-      If iItem >= 12 Then iItem = 0
+      iconItem += 1
+      If iconItem >= 12 Then iconItem = 0
     Catch ex As Exception
-
     End Try
   End Sub
   Private Sub SetNotifyIconText(ni As NotifyIcon, text As String)
