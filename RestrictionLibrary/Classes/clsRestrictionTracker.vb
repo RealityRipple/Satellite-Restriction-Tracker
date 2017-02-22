@@ -1337,17 +1337,15 @@
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And Not ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
-      RaiseError("Login Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
+    If (ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And ResponseURI.Query.ToLower.Contains("myinternet")) Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
+      DN_Download_Table_Response(Response, ResponseURI)
       Return
     End If
-    If ResponseURI.Query = "?page=myaccountsummary_res" Then
+    If (ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And ResponseURI.Query.ToLower.Contains("myaccountsummary")) Or ResponseURI.AbsolutePath.ToLower.Contains("/myaccountsummary") Then
       DN_Download_Table()
-    ElseIf ResponseURI.Query = "?pageurl=myinternet" Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
-      DN_Download_Table_Response(Response, ResponseURI)
-    Else
-      RaiseError("Home Read Failed.", "DN Download Home Response", Response, ResponseURI)
+      Return
     End If
+    RaiseError("Home Read Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
   End Sub
   Private Sub DN_Download_Table()
     MakeSocket(False, False)
