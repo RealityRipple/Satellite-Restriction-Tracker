@@ -340,14 +340,19 @@
     c_Jar = New Net.CookieContainer
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : LoginWB()
-      Case SatHostTypes.WildBlue_EXEDE : LoginExede()
+      Case SatHostTypes.WildBlue_EXEDE
+        If sProvider.ToLower = "exede.net" Then
+          LoginExede()
+        Else
+          LoginWB()
+        End If
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP()
       Case SatHostTypes.DishNet_EXEDE : LoginDN()
     End Select
   End Sub
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = String.Format(sWB, sProvider, "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), "servLogin", sProvider)
     MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
@@ -400,7 +405,12 @@
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
-      Case SatHostTypes.WildBlue_EXEDE : EX_Read_Table(Table)
+      Case SatHostTypes.WildBlue_EXEDE
+        If sProvider.ToLower = "exede.net" Then
+          EX_Read_Table(Table)
+        Else
+          WB_Read_Table(Table)
+        End If
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
       Case SatHostTypes.DishNet_EXEDE : DN_Read_Table(Table)
     End Select
@@ -418,7 +428,7 @@
       WB_Usage("usage")
     ElseIf Response.Contains("usage_bm.jsp") Then
       If justATest Then
-        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_LEGACY))
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE))
         Return
       End If
       WB_Usage("usage_bm")
@@ -443,7 +453,7 @@
   End Sub
   Private Sub WB_Usage(File As String)
     MakeSocket(False)
-    Dim uriString As String = String.Format(sWB, sProvider, File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), File, sProvider)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -453,7 +463,7 @@
   End Sub
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myaccount." & sProvider Then
+    If Not ResponseURI.Host.ToLower = "myaccount." & IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider.ToLower) Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
@@ -548,6 +558,33 @@
         RaiseError("Usage Read Failed: Unable to parse data!", "WB Read Table", Table)
       Else
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
+      End If
+    ElseIf Table.Contains("allowance") Then
+      Dim sPlusT As String = String.Empty
+      For I As Integer = 0 To sRows.Length - 1
+        If Not String.IsNullOrEmpty(sRows(I)) Then
+          If sRows(I).Contains("<strong>") Then
+            If String.IsNullOrEmpty(sDownT) Then
+              sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+              sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
+            ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
+              If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
+                sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
+                sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
+              End If
+            ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
+              If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+                sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
+                sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
+              End If
+            End If
+          End If
+        End If
+      Next
+      If String.IsNullOrEmpty(sDownT) Then
+        RaiseError("Usage Read Failed: Unable to parse data!", "WB-B Read Table", Table)
+      Else
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
       End If
     Else
       RaiseError("Usage Read Failed: Unable to locate data table!", "WB Read Table", Table)
