@@ -726,6 +726,4 @@ Public Class frmWizard
     LocalComplete(SatHostTypes.WildBlue_EXEDE)
   End Sub
 #End Region
-
-
 End Class
