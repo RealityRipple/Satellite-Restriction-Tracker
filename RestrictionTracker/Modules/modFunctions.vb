@@ -1097,7 +1097,6 @@ Module modFunctions
     For I As Long = 0 To lMaxTime
       Dim lVal As Long = -1
       Dim lLow As Long = Long.MaxValue
-      Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jLim As Long = 0
@@ -1106,16 +1105,47 @@ Module modFunctions
           Else
             jLim = Data(J).DOWNLIM
           End If
-          If lHigh < jLim Then
-            lHigh = jLim
-          End If
-          If lLow > jLim Then
-            lLow = jLim
-          End If
+          If lLow > jLim Then lLow = jLim
         End If
       Next
-      If lHigh > 0 And lLow < Long.MaxValue Then lVal = (lHigh + lLow) / 2
-      If lVal = -1 And lastLVal > 0 Then lVal = lastLVal
+      If lLow < Long.MaxValue Then
+        lVal = lLow
+      Else
+        If I = lMaxTime Then
+          If lastLVal > 0 Then
+            lVal = lastLVal
+          Else
+            lVal = 0
+          End If
+        Else
+          Dim NextLVal As Long = Long.MaxValue
+          Dim K As Integer = I
+          Do Until NextLVal < Long.MaxValue
+            K += 1
+            If K > lMaxTime Then Exit Do
+            For J As Integer = 0 To Data.Length - 1
+              If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, K, lStart))) = 0 Then
+                Dim jLim As Long = 0
+                If GraphDir = Direction.Up Then
+                  jLim = Data(J).UPLIM
+                Else
+                  jLim = Data(J).DOWNLIM
+                End If
+                If NextLVal > jLim Then NextLVal = jLim
+              End If
+            Next
+          Loop
+          If NextLVal < Long.MaxValue Then
+            If lastLVal > NextLVal Then
+              lVal = NextLVal
+            Else
+              lVal = lastLVal
+            End If
+          Else
+            lVal = lastLVal
+          End If
+        End If
+      End If
       lMaxPoints(I).X = lYWidth + (I * dCompInter) + 1
       lMaxPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lMaxPoints(I - 1).X = 0 And lMaxPoints(I - 1).Y = 0) Then
@@ -1128,13 +1158,12 @@ Module modFunctions
           lMaxPoints(I - K).Y = (lMaxPoints(I - J).Y + lMaxPoints(I).Y) / 2
         Next
       End If
-      lastLVal = lVal
+      If lVal > 0 Then lastLVal = lVal
     Next I
     lastLVal = 0
     For I As Long = 0 To lMaxTime
       Dim lVal As Long = -1
       Dim lLow As Long = Long.MaxValue
-      Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
           Dim jVal As Long = 0
@@ -1143,16 +1172,47 @@ Module modFunctions
           Else
             jVal = Data(J).DOWNLOAD
           End If
-          If lHigh < jVal Then
-            lHigh = jVal
-          End If
-          If lLow > jVal Then
-            lLow = jVal
-          End If
+          If lLow > jVal Then lLow = jVal
         End If
       Next
-      If lHigh > 0 And lLow < Long.MaxValue Then lVal = (lHigh + lLow) / 2
-      If lVal = -1 And lastLVal > 0 Then lVal = lastLVal
+      If lLow < Long.MaxValue Then
+        lVal = lLow
+      Else
+        If I = lMaxTime Then
+          If lastLVal > 0 Then
+            lVal = lastLVal
+          Else
+            lVal = 0
+          End If
+        Else
+          Dim NextLVal As Long = Long.MaxValue
+          Dim K As Integer = I
+          Do Until NextLVal < Long.MaxValue
+            K += 1
+            If K > lMaxTime Then Exit Do
+            For J As Integer = 0 To Data.Length - 1
+              If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, K, lStart))) = 0 Then
+                Dim jVal As Long = 0
+                If GraphDir = Direction.Up Then
+                  jVal = Data(J).UPLOAD
+                Else
+                  jVal = Data(J).DOWNLOAD
+                End If
+                If NextLVal > jVal Then NextLVal = jVal
+              End If
+            Next
+          Loop
+          If NextLVal < Long.MaxValue Then
+            If lastLVal > NextLVal Then
+              lVal = NextLVal
+            Else
+              lVal = lastLVal
+            End If
+          Else
+            lVal = lastLVal
+          End If
+        End If
+      End If
       lPoints(I).X = lYWidth + (I * dCompInter) + IIf(I > 0, 1, 0)
       lPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lPoints(I - 1).X = 0 And lPoints(I - 1).Y = 0) Then
@@ -1165,7 +1225,7 @@ Module modFunctions
           lPoints(I - K).Y = (lPoints(I - J).Y + lPoints(I).Y) / 2
         Next
       End If
-      lastLVal = lVal
+      If lVal > 0 Then lastLVal = lVal
     Next I
     If lPoints(lMaxTime).IsEmpty Then lPoints(lMaxTime) = New Point(ImgSize.Width, yTop + yHeight)
     lPoints(lMaxTime + 1) = New Point(ImgSize.Width, yTop + yHeight)
