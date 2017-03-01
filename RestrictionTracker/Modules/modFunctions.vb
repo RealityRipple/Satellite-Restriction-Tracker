@@ -1119,7 +1119,7 @@ Module modFunctions
           End If
         Else
           Dim NextLVal As Long = Long.MaxValue
-          Dim K As Integer = I
+          Dim K As Long = I
           Do Until NextLVal < Long.MaxValue
             K += 1
             If K > lMaxTime Then Exit Do
@@ -1186,7 +1186,7 @@ Module modFunctions
           End If
         Else
           Dim NextLVal As Long = Long.MaxValue
-          Dim K As Integer = I
+          Dim K As Long = I
           Do Until NextLVal < Long.MaxValue
             K += 1
             If K > lMaxTime Then Exit Do
