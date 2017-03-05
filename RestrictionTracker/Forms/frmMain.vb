@@ -265,8 +265,8 @@ Public Class frmMain
         End If
         If Me.Opacity = 0 Then Me.Opacity = 1
         SetStatusText("Initializing", "Beginning application initialization process...", False)
-        pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         Dim lookupInvoker As New MethodInvoker(AddressOf LookupProvider)
         lookupInvoker.BeginInvoke(Nothing, Nothing)
       Else
@@ -426,25 +426,17 @@ Public Class frmMain
         Else
           pctNetTest.Top = 0
         End If
-        If pnlWildBlue.Visible Then
-          If pctNetTest.Bottom > pnlWildBlue.Top - 1 Then
-            pctNetTest.Height = pnlWildBlue.Top - 1 - pctNetTest.Top
+        If pnlTypeA.Visible Then
+          If pctNetTest.Bottom > pnlTypeA.Top - 1 Then
+            pctNetTest.Height = pnlTypeA.Top - 1 - pctNetTest.Top
             pctNetTest.Width = pctNetTest.Height
           Else
             pctNetTest.Height = 16
             pctNetTest.Width = pctNetTest.Height
           End If
-        ElseIf pnlExede.Visible Then
-          If pctNetTest.Bottom > pnlExede.Top - 1 Then
-            pctNetTest.Height = pnlExede.Top - 1 - pctNetTest.Top
-            pctNetTest.Width = pctNetTest.Height
-          Else
-            pctNetTest.Height = 16
-            pctNetTest.Width = pctNetTest.Height
-          End If
-        ElseIf pnlRural.Visible Then
-          If pctNetTest.Bottom > pnlRural.Top - 1 Then
-            pctNetTest.Height = pnlRural.Top - 1 - pctNetTest.Top
+        ElseIf pnlTypeB.Visible Then
+          If pctNetTest.Bottom > pnlTypeB.Top - 1 Then
+            pctNetTest.Height = pnlTypeB.Top - 1 - pctNetTest.Top
             pctNetTest.Width = pctNetTest.Height
           Else
             pctNetTest.Height = 16
@@ -459,20 +451,20 @@ Public Class frmMain
     Dim trayIcoVal As Icon = Nothing
     If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.DishNet_EXEDE Then
       If wb_dlim = 0 And wb_ulim = 0 Then
-        pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
       Else
-        pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, wb_down, wb_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, wb_down, wb_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
       End If
     ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Then
       If r_lim = 0 Then
-        pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
       Else
-        pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, r_used, r_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, r_used, r_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = CreateRTrayIcon(r_used, r_lim)
       End If
     ElseIf myPanel = SatHostTypes.Other Then
@@ -1055,6 +1047,8 @@ Public Class frmMain
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    If e.FreeDetected Then imFree = True
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1078,6 +1072,8 @@ Public Class frmMain
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    If e.FreeDetected Then imFree = True
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1101,6 +1097,8 @@ Public Class frmMain
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.RuralPortal_LEGACY
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    If e.FreeDetected Then imFree = True
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1124,6 +1122,8 @@ Public Class frmMain
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    If e.FreeDetected Then imFree = True
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1147,6 +1147,8 @@ Public Class frmMain
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    If e.FreeDetected Then imFree = True
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1309,21 +1311,7 @@ Public Class frmMain
       Return
     End If
     Select Case state
-      Case "RURAL"
-        Dim lUsed As Long = r_used
-        Dim lLim As Long = r_lim
-        Dim lRemain As Long = lLim - lUsed
-        If lUsed <> 0 Or r_lim > 0 Or lRemain <> 0 Then
-          DoChange(lblRuralUsedVal, lUsed)
-          DoChange(lblRuralRemainVal, lRemain)
-          DoChange(lblRuralAllowedVal, lLim)
-        End If
-        ResizePanels()
-        If lUsed = 0 And lLim = 0 And lRemain = 0 Then
-          AskForDonations()
-          Return
-        End If
-      Case "WB"
+      Case "TYPEA"
         Dim lDown As Long = wb_down
         Dim lDLim As Long = wb_dlim
         Dim lUp As Long = wb_up
@@ -1331,15 +1319,29 @@ Public Class frmMain
         Dim lDFree As Long = lDLim - lDown
         Dim lUFree As Long = lULim - lUp
         If lDown > 0 Or lDFree <> 0 Or lDLim > 0 Or lUp > 0 Or lUFree <> 0 Or lULim > 0 Then
-          DoChange(lblDldUsed, lDown)
-          DoChange(lblDldFree, lDFree)
-          DoChange(lblDldTotal, lDLim)
-          DoChange(lblUldUsed, lUp)
-          DoChange(lblUldFree, lUFree)
-          DoChange(lblUldTotal, lULim)
+          DoChange(lblTypeADldUsedVal, lDown)
+          DoChange(lblTypeADldFreeVal, lDFree)
+          DoChange(lblTypeADldLimitVal, lDLim)
+          DoChange(lblTypeAUldUsedVal, lUp)
+          DoChange(lblTypeAUldFreeVal, lUFree)
+          DoChange(lblTypeAUldLimitVal, lULim)
         End If
         ResizePanels()
         If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then
+          AskForDonations()
+          Return
+        End If
+      Case "TYPEB"
+        Dim lUsed As Long = r_used
+        Dim lLim As Long = r_lim
+        Dim lRemain As Long = lLim - lUsed
+        If lUsed <> 0 Or r_lim > 0 Or lRemain <> 0 Then
+          DoChange(lblTypeBUsedVal, lUsed)
+          DoChange(lblTypeBFreeVal, lRemain)
+          DoChange(lblTypeBLimitVal, lLim)
+        End If
+        ResizePanels()
+        If lUsed = 0 And lLim = 0 And lRemain = 0 Then
           AskForDonations()
           Return
         End If
@@ -1407,64 +1409,18 @@ Public Class frmMain
   Private Function AccuratePercent(value As Double) As String
     Return FormatPercent(value, mySettings.Accuracy, TriState.True, TriState.False, TriState.False)
   End Function
-  Private Sub DisplayRResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
-    If lDown <> lUp And lDownLim <> lUpLim Then
-      DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-      Return
-    End If
+  Private Sub DisplayTypeAResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
-    If lDown >= lDownLim Then imSlowed = True
-    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
-      If lDown < lDownLim Then imSlowed = False
-      If lDownLim = 150000 Then imSlowed = False
-    Else
-      If lDown < lDownLim * 0.7 Then imSlowed = False
+    Dim overDown, overUp As Boolean
+    overDown = (lDown >= lDownLim)
+    overUp = (lUp >= lUpLim)
+    If overDown Or overUp Then
+      imSlowed = True
+    ElseIf (lDown < (lDownLim * 0.7)) And (lUp < (lUpLim * 0.7)) Then
+      imSlowed = False
     End If
-    pnlWildBlue.Visible = False
-    pnlExede.Visible = False
-    pnlRural.Visible = True
-    pnlNothing.Visible = False
-    r_used = lDown
-    r_lim = lDownLim
-    If tmrChanges IsNot Nothing Then
-      tmrChanges.Dispose()
-      tmrChanges = Nothing
-    End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "RURAL", 75, System.Threading.Timeout.Infinite)
-    If imSlowed Then
-      lblRuralUsedVal.ForeColor = Color.Red
-    Else
-      lblRuralUsedVal.ForeColor = SystemColors.ControlText
-    End If
-    pctRural.Image = DisplayRProgress(pctRural.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
-           "Updated " & sLastUpdate & vbCr &
-            MBorGB(lDown) & " of " & MBorGB(lDownLim) & " (" & AccuratePercent(lDown / lDownLim) & ")"
-    If sTTT.Length > ttLimit Then
-      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-            AccuratePercent(lDown / lDownLim)
-    End If
-    If lDownLim > lDown Then
-      sTTT &= vbCr & MBorGB(lDownLim - lDown) & " Free"
-    ElseIf lDownLim < lDown Then
-      sTTT &= vbCr & MBorGB(lDown - lDownLim) & " Over"
-    End If
-    iconBefore = CreateRTrayIcon(lDown, lDownLim)
-    iconStop = True
-    SetNotifyIconText(trayIcon, sTTT)
-    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
-  End Sub
-  Private Sub DisplayDResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
-    Dim sTTT As String = Me.Text
-    If lDown >= lDownLim Then imSlowed = True
-    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
-      If lDown < lDownLim Then imSlowed = False
-    Else
-      If lDown < lDownLim * 0.7 Then imSlowed = False
-    End If
-    pnlWildBlue.Visible = True
-    pnlExede.Visible = False
-    pnlRural.Visible = False
+    pnlTypeA.Visible = True
+    pnlTypeB.Visible = False
     pnlNothing.Visible = False
     wb_down = lDown
     wb_dlim = lDownLim
@@ -1474,97 +1430,38 @@ Public Class frmMain
       tmrChanges.Dispose()
       tmrChanges = Nothing
     End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "WB", 75, System.Threading.Timeout.Infinite)
+    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEA", 75, System.Threading.Timeout.Infinite)
+    If overDown Then
+      lblTypeADldFreeVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeADldFreeVal, "You are over your Download limit!")
+    Else
+      lblTypeADldFreeVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeADldFreeVal, Nothing)
+    End If
+    If overUp Then
+      lblTypeAUldFreeVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeAUldFreeVal, "You are over your Upload limit!")
+    Else
+      lblTypeAUldFreeVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeAUldFreeVal, Nothing)
+    End If
     If imSlowed Then
-      lblDldUsed.ForeColor = Color.Red
-      lblUldUsed.ForeColor = Color.Red
+      lblTypeADldLimitVal.ForeColor = Color.Red
+      lblTypeAUldLimitVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeADldLimitVal, "Your connection has been restricted!")
+      ttUI.SetToolTip(lblTypeAUldLimitVal, "Your connection has been restricted!")
     Else
-      lblUldUsed.ForeColor = SystemColors.ControlText
-      lblDldUsed.ForeColor = SystemColors.ControlText
+      lblTypeADldLimitVal.ForeColor = SystemColors.ControlText
+      lblTypeAUldLimitVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeADldLimitVal, Nothing)
+      ttUI.SetToolTip(lblTypeAUldLimitVal, Nothing)
     End If
-    gbDld.Text = "Anytime (" & AccuratePercent(lDown / lDownLim) & ")"
-    gbUld.Text = "Off-Peak (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetToolTip(pctDld, "Graph representing your Anytime usage.")
-    ttUI.SetToolTip(pctUld, "Graph representing your Off-Peak usage (used between 2am and 8am).")
-    pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    Dim atFree, opFree As String
-    If lDownLim > lDown Then
-      atFree = ", " & MBorGB(lDownLim - lDown) & " Free"
-    ElseIf lDownLim < lDown Then
-      atFree = ", " & MBorGB(lDown - lDownLim) & " Over"
-    Else
-      atFree = String.Empty
-    End If
-    If lUpLim > lUp Then
-      opFree = ", " & MBorGB(lUpLim - lUp) & " Free"
-    ElseIf lUpLim < lUp Then
-      opFree = ", " & MBorGB(lUp - lUpLim) & " Over"
-    Else
-      opFree = String.Empty
-    End If
-    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
-           "Updated " & sLastUpdate & vbCr &
-           "Anytime: " & MBorGB(lDown) & " (" & AccuratePercent(lDown / lDownLim) & ")" & atFree & vbCr &
-           "Off-Peak: " & MBorGB(lUp) & " (" & AccuratePercent(lUp / lUpLim) & ")" & opFree
-    If sTTT.Length > ttLimit Then
-      If lDownLim > lDown Then
-        atFree = " (" & MBorGB(lDownLim - lDown) & " Free)"
-      ElseIf lDownLim < lDown Then
-        atFree = " (" & MBorGB(lDown - lDownLim) & " Free)"
-      Else
-        atFree = String.Empty
-      End If
-      If lUpLim > lUp Then
-        opFree = " (" & MBorGB(lUpLim - lUp) & " Free)"
-      ElseIf lUpLim < lUp Then
-        opFree = " (" & MBorGB(lUp - lUpLim) & " Free)"
-      Else
-        opFree = String.Empty
-      End If
-      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-             "A-T: " & AccuratePercent(lDown / lDownLim) & atFree & vbCr &
-             "O-P: " & AccuratePercent(lUp / lUpLim) & opFree
-    End If
-    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
-    iconStop = True
-    SetNotifyIconText(trayIcon, sTTT)
-    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
-  End Sub
-  Private Sub DisplayWResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
-    Dim sTTT As String = Me.Text
-    If lDown >= lDownLim Or lUp >= lUpLim Then imSlowed = True
-    If mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Or mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE Or mySettings.AccountType = SatHostTypes.DishNet_EXEDE Then
-      If lDown < lDownLim And lUp < lUpLim Then imSlowed = False
-    Else
-      If lDown < lDownLim * 0.7 And lUp < lUpLim * 0.7 Then imSlowed = False
-    End If
-    pnlWildBlue.Visible = True
-    pnlExede.Visible = False
-    pnlRural.Visible = False
-    pnlNothing.Visible = False
-    wb_down = lDown
-    wb_dlim = lDownLim
-    wb_up = lUp
-    wb_ulim = lUpLim
-    If tmrChanges IsNot Nothing Then
-      tmrChanges.Dispose()
-      tmrChanges = Nothing
-    End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "WB", 75, System.Threading.Timeout.Infinite)
-    If imSlowed Then
-      lblDldUsed.ForeColor = Color.Red
-      lblUldUsed.ForeColor = Color.Red
-    Else
-      lblUldUsed.ForeColor = SystemColors.ControlText
-      lblDldUsed.ForeColor = SystemColors.ControlText
-    End If
-    gbDld.Text = "Download (" & AccuratePercent(lDown / lDownLim) & ")"
-    gbUld.Text = "Upload (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetToolTip(pctDld, "Graph representing your download usage.")
-    ttUI.SetToolTip(pctUld, "Graph representing your upload usage.")
-    pctDld.Image = DisplayProgress(pctDld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    pctUld.Image = DisplayProgress(pctUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+    gbTypeADld.Text = "Download (" & AccuratePercent(lDown / lDownLim) & ")"
+    gbTypeAUld.Text = "Upload (" & AccuratePercent(lUp / lUpLim) & ")"
+    ttUI.SetToolTip(pctTypeADld, "Graph representing your download usage.")
+    ttUI.SetToolTip(pctTypeAUld, "Graph representing your upload usage.")
+    pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+    pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     Dim dFree, uFree As String
     If lDownLim > lDown Then
       dFree = ", " & MBorGB(lDownLim - lDown) & " Free"
@@ -1608,21 +1505,151 @@ Public Class frmMain
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
   End Sub
+  Private Sub DisplayTypeA2Results(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
+    Dim sTTT As String = Me.Text
+    imSlowed = (lDown >= lDownLim)
+    pnlTypeA.Visible = True
+    pnlTypeB.Visible = False
+    pnlNothing.Visible = False
+    wb_down = lDown
+    wb_dlim = lDownLim
+    wb_up = lUp
+    wb_ulim = lUpLim
+    If tmrChanges IsNot Nothing Then
+      tmrChanges.Dispose()
+      tmrChanges = Nothing
+    End If
+    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEA", 75, System.Threading.Timeout.Infinite)
+    If imSlowed Then
+      lblTypeADldFreeVal.ForeColor = Color.Red
+      lblTypeADldLimitVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeADldFreeVal, "You are over your Anytime limit!")
+      ttUI.SetToolTip(lblTypeADldLimitVal, "Your Anytime connection has been restricted!")
+    Else
+      lblTypeADldFreeVal.ForeColor = SystemColors.ControlText
+      lblTypeADldLimitVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeADldFreeVal, Nothing)
+      ttUI.SetToolTip(lblTypeADldLimitVal, Nothing)
+    End If
+    If lUp >= lUpLim Then
+      lblTypeAUldFreeVal.ForeColor = Color.Red
+      lblTypeAUldLimitVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeAUldFreeVal, "You are over your Off-Peak limit!")
+      ttUI.SetToolTip(lblTypeAUldLimitVal, "Your Off-Peak connection has been restricted!")
+    Else
+      lblTypeAUldFreeVal.ForeColor = SystemColors.ControlText
+      lblTypeAUldLimitVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeAUldFreeVal, Nothing)
+      ttUI.SetToolTip(lblTypeAUldLimitVal, Nothing)
+    End If
+    gbTypeADld.Text = "Anytime (" & AccuratePercent(lDown / lDownLim) & ")"
+    gbTypeAUld.Text = "Off-Peak (" & AccuratePercent(lUp / lUpLim) & ")"
+    ttUI.SetToolTip(pctTypeADld, "Graph representing your Anytime usage.")
+    ttUI.SetToolTip(pctTypeAUld, "Graph representing your Off-Peak usage (used between 2am and 8am).")
+    pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+    pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+    Dim atFree, opFree As String
+    If lDownLim > lDown Then
+      atFree = ", " & MBorGB(lDownLim - lDown) & " Free"
+    ElseIf lDownLim < lDown Then
+      atFree = ", " & MBorGB(lDown - lDownLim) & " Over"
+    Else
+      atFree = String.Empty
+    End If
+    If lUpLim > lUp Then
+      opFree = ", " & MBorGB(lUpLim - lUp) & " Free"
+    ElseIf lUpLim < lUp Then
+      opFree = ", " & MBorGB(lUp - lUpLim) & " Over"
+    Else
+      opFree = String.Empty
+    End If
+    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
+           "Updated " & sLastUpdate & vbCr &
+           "Anytime: " & MBorGB(lDown) & " (" & AccuratePercent(lDown / lDownLim) & ")" & atFree & vbCr &
+           "Off-Peak: " & MBorGB(lUp) & " (" & AccuratePercent(lUp / lUpLim) & ")" & opFree
+    If sTTT.Length > ttLimit Then
+      If lDownLim > lDown Then
+        atFree = " (" & MBorGB(lDownLim - lDown) & " Free)"
+      ElseIf lDownLim < lDown Then
+        atFree = " (" & MBorGB(lDown - lDownLim) & " Free)"
+      Else
+        atFree = String.Empty
+      End If
+      If lUpLim > lUp Then
+        opFree = " (" & MBorGB(lUpLim - lUp) & " Free)"
+      ElseIf lUpLim < lUp Then
+        opFree = " (" & MBorGB(lUp - lUpLim) & " Free)"
+      Else
+        opFree = String.Empty
+      End If
+      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
+             "A-T: " & AccuratePercent(lDown / lDownLim) & atFree & vbCr &
+             "O-P: " & AccuratePercent(lUp / lUpLim) & opFree
+    End If
+    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconStop = True
+    SetNotifyIconText(trayIcon, sTTT)
+    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
+  End Sub
+  Private Sub DisplayTypeBResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
+    If Not (lDown = lUp And lDownLim = lUpLim) Then
+      DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+      Return
+    End If
+    Dim sTTT As String = Me.Text
+    imSlowed = (lDown >= lDownLim)
+    pnlTypeA.Visible = False
+    pnlTypeB.Visible = True
+    pnlNothing.Visible = False
+    r_used = lDown
+    r_lim = lDownLim
+    If tmrChanges IsNot Nothing Then
+      tmrChanges.Dispose()
+      tmrChanges = Nothing
+    End If
+    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEB", 75, System.Threading.Timeout.Infinite)
+    If imSlowed Then
+      lblTypeBFreeVal.ForeColor = Color.Red
+      lblTypeBLimitVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblTypeBFreeVal, "You are over your usage limit!")
+      ttUI.SetToolTip(lblTypeBLimitVal, "Your connection has been restricted!")
+    Else
+      lblTypeBFreeVal.ForeColor = SystemColors.ControlText
+      lblTypeBLimitVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblTypeBFreeVal, Nothing)
+      ttUI.SetToolTip(lblTypeBLimitVal, Nothing)
+    End If
+    pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
+           "Updated " & sLastUpdate & vbCr &
+            MBorGB(lDown) & " of " & MBorGB(lDownLim) & " (" & AccuratePercent(lDown / lDownLim) & ")"
+    If sTTT.Length > ttLimit Then
+      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
+            AccuratePercent(lDown / lDownLim)
+    End If
+    If lDownLim > lDown Then
+      sTTT &= vbCr & MBorGB(lDownLim - lDown) & " Free"
+    ElseIf lDownLim < lDown Then
+      sTTT &= vbCr & MBorGB(lDown - lDownLim) & " Over"
+    End If
+    iconBefore = CreateRTrayIcon(lDown, lDownLim)
+    iconStop = True
+    SetNotifyIconText(trayIcon, sTTT)
+    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
+  End Sub
   Private Sub DisplayResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
     If lDownLim > 0 Or lUpLim > 0 Then
       Dim lastUpdate As Date = LOG_GetLast()
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE : DisplayRResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.DishNet_EXEDE : DisplayDResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case Else : DisplayWResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.DishNet_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case Else : DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
       End Select
     Else
-      pnlWildBlue.Visible = False
-      pnlExede.Visible = False
-      pnlRural.Visible = False
+      pnlTypeA.Visible = False
+      pnlTypeB.Visible = False
       pnlNothing.Visible = True
       myPanel = SatHostTypes.Other
       trayIcon.Text = Me.Text

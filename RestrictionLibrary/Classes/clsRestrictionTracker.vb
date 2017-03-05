@@ -71,12 +71,25 @@
     Private m_DownLim As Long
     Private m_UpLim As Long
     Private m_Update As Date
+    Private m_slow As Boolean
+    Private m_free As Boolean
     Public Sub New(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, dUpdate As Date)
       m_Down = lDown
       m_Up = lUp
       m_DownLim = lDownLim
       m_UpLim = lUpLim
       m_Update = dUpdate
+      m_slow = False
+      m_free = False
+    End Sub
+    Public Sub New(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
+      m_Down = lDown
+      m_Up = lUp
+      m_DownLim = lDownLim
+      m_UpLim = lUpLim
+      m_Update = dUpdate
+      m_slow = bSlow
+      m_free = bFree
     End Sub
     Public ReadOnly Property Download As Long
       Get
@@ -103,6 +116,16 @@
         Return m_Update
       End Get
     End Property
+    Public ReadOnly Property SlowedDetected As Boolean
+      Get
+        Return m_slow
+      End Get
+    End Property
+    Public ReadOnly Property FreeDetected As Boolean
+      Get
+        Return m_free
+      End Get
+    End Property
   End Class
   Public Class TYPEA2ResultEventArgs
     Inherits EventArgs
@@ -111,12 +134,25 @@
     Private m_OffPeak As Long
     Private m_OffPeakLim As Long
     Private m_Update As Date
+    Private m_slow As Boolean
+    Private m_free As Boolean
     Public Sub New(lAnyTime As Long, lAnyTimeLim As Long, lOffPeak As Long, lOffPeakLim As Long, dUpdate As Date)
       m_AnyTime = lAnyTime
       m_AnyTimeLim = lAnyTimeLim
       m_OffPeak = lOffPeak
       m_OffPeakLim = lOffPeakLim
       m_Update = dUpdate
+      m_slow = False
+      m_free = False
+    End Sub
+    Public Sub New(lAnyTime As Long, lAnyTimeLim As Long, lOffPeak As Long, lOffPeakLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
+      m_AnyTime = lAnyTime
+      m_AnyTimeLim = lAnyTimeLim
+      m_OffPeak = lOffPeak
+      m_OffPeakLim = lOffPeakLim
+      m_Update = dUpdate
+      m_slow = bSlow
+      m_free = bFree
     End Sub
     Public ReadOnly Property AnyTime As Long
       Get
@@ -143,16 +179,37 @@
         Return m_Update
       End Get
     End Property
+    Public ReadOnly Property SlowedDetected As Boolean
+      Get
+        Return m_slow
+      End Get
+    End Property
+    Public ReadOnly Property FreeDetected As Boolean
+      Get
+        Return m_free
+      End Get
+    End Property
   End Class
   Public Class TYPEBResultEventArgs
     Inherits EventArgs
     Private m_Used As Long
     Private m_Limit As Long
     Private m_Update As Date
+    Private m_slow As Boolean
+    Private m_free As Boolean
     Public Sub New(lUsed As Long, lLimit As Long, dUpdate As Date)
       m_Used = lUsed
       m_Limit = lLimit
       m_Update = dUpdate
+      m_slow = False
+      m_free = False
+    End Sub
+    Public Sub New(lUsed As Long, lLimit As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
+      m_Used = lUsed
+      m_Limit = lLimit
+      m_Update = dUpdate
+      m_slow = bSlow
+      m_free = bFree
     End Sub
     Public ReadOnly Property Used As Long
       Get
@@ -167,6 +224,16 @@
     Public ReadOnly Property Update As Date
       Get
         Return m_Update
+      End Get
+    End Property
+    Public ReadOnly Property SlowedDetected As Boolean
+      Get
+        Return m_slow
+      End Get
+    End Property
+    Public ReadOnly Property FreeDetected As Boolean
+      Get
+        Return m_free
       End Get
     End Property
   End Class
@@ -557,7 +624,7 @@
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "WB Read Table", Table)
       Else
-        RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
+        RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
       End If
     ElseIf Table.Contains("allowance") Then
       Dim sPlusT As String = String.Empty
@@ -584,7 +651,7 @@
       If String.IsNullOrEmpty(sDownT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "WB-B Read Table", Table)
       Else
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now))
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now, imSlowed, imFree))
       End If
     Else
       RaiseError("Usage Read Failed: Unable to locate data table!", "WB Read Table", Table)
@@ -963,9 +1030,9 @@
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
     Else
       If lTotal > 0 Then
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now))
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
       Else
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now))
+        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now, imSlowed, imFree))
       End If
     End If
   End Sub
@@ -1101,7 +1168,7 @@
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
       Else
-        RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now))
+        RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
       End If
     ElseIf Table.Contains(" GB (") Then
       If justATest Then
@@ -1131,7 +1198,7 @@
       If String.IsNullOrEmpty(sDownT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
       Else
-        RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now))
+        RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
       End If
     Else
       RaiseError("Usage Read Failed: Unable to locate data table!", "RP Read Table", Table)
@@ -1657,7 +1724,7 @@
         If Not StrToFloat(atxV) = 0.0 Then lDown += StrToVal(atxV, MBPerGB)
         If Not StrToFloat(atxM) = 0.0 Then lDownT += StrToVal(atxV, MBPerGB)
       End If
-      RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now))
+      RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
     Else
       RaiseError("Usage Read Failed: Unable to locate data table!", "DN Read Table", Table)
     End If

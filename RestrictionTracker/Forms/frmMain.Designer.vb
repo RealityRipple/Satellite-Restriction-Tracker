@@ -35,66 +35,49 @@ Partial Class frmMain
     Me.pnlNothing = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNothing = New System.Windows.Forms.Label()
     Me.lblRRS = New RestrictionTracker.LinkLabel()
-    Me.pnlWildBlue = New System.Windows.Forms.TableLayoutPanel()
-    Me.gbUld = New System.Windows.Forms.GroupBox()
-    Me.pnlUld = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctUld = New System.Windows.Forms.PictureBox()
+    Me.pnlTypeA = New System.Windows.Forms.TableLayoutPanel()
+    Me.gbTypeAUld = New System.Windows.Forms.GroupBox()
+    Me.pnlTypeAUld = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctTypeAUld = New System.Windows.Forms.PictureBox()
     Me.mnuGraph = New System.Windows.Forms.ContextMenu()
     Me.mnuGraphRefresh = New System.Windows.Forms.MenuItem()
     Me.mnuGraphSpace = New System.Windows.Forms.MenuItem()
     Me.mnuGraphInvert = New System.Windows.Forms.MenuItem()
     Me.mnuGraphColors = New System.Windows.Forms.MenuItem()
     Me.pnlUldText = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlUldTextUsed = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblUldUsed = New System.Windows.Forms.Label()
-    Me.lblUUsed = New System.Windows.Forms.Label()
-    Me.pnlUldTextFree = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblUldFree = New System.Windows.Forms.Label()
-    Me.lblUFree = New System.Windows.Forms.Label()
-    Me.pnlUldTextTotal = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblUldTotal = New System.Windows.Forms.Label()
-    Me.lblUTotal = New System.Windows.Forms.Label()
-    Me.gbDld = New System.Windows.Forms.GroupBox()
-    Me.pnlDld = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctDld = New System.Windows.Forms.PictureBox()
+    Me.pnlTypeAUldUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeAUldUsedVal = New System.Windows.Forms.Label()
+    Me.lblTypeAUldUsed = New System.Windows.Forms.Label()
+    Me.pnlTypeAUldFree = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeAUldFreeVal = New System.Windows.Forms.Label()
+    Me.lblTypeAUldFree = New System.Windows.Forms.Label()
+    Me.pnlTypeAUldLimit = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeAUldLimitVal = New System.Windows.Forms.Label()
+    Me.lblTypeAUldLimit = New System.Windows.Forms.Label()
+    Me.gbTypeADld = New System.Windows.Forms.GroupBox()
+    Me.pnlTypeADld = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctTypeADld = New System.Windows.Forms.PictureBox()
     Me.pnlDldText = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlDldTextUsed = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblDldUsed = New System.Windows.Forms.Label()
-    Me.lblDUsed = New System.Windows.Forms.Label()
-    Me.pnlDldTextFree = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblDldFree = New System.Windows.Forms.Label()
-    Me.lblDFree = New System.Windows.Forms.Label()
-    Me.pnlDldTextTotal = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblDldTotal = New System.Windows.Forms.Label()
-    Me.lblDTotal = New System.Windows.Forms.Label()
-    Me.pnlExede = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlExedeUp = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblExedeUp = New System.Windows.Forms.Label()
-    Me.lblExedeUpVal = New System.Windows.Forms.Label()
-    Me.pnlExedeUsed = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblExedeTotal = New System.Windows.Forms.Label()
-    Me.lblExedeTotalVal = New System.Windows.Forms.Label()
-    Me.pnlExedeFree = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblExedeRemain = New System.Windows.Forms.Label()
-    Me.lblExedeRemainVal = New System.Windows.Forms.Label()
-    Me.pnlExedeTotal = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblExedeAllowed = New System.Windows.Forms.Label()
-    Me.lblExedeAllowedVal = New System.Windows.Forms.Label()
-    Me.pnlExedeDown = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblExedeDown = New System.Windows.Forms.Label()
-    Me.lblExedeDownVal = New System.Windows.Forms.Label()
-    Me.pctExede = New System.Windows.Forms.PictureBox()
-    Me.pnlRural = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlRuralUsed = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblRuralUsed = New System.Windows.Forms.Label()
-    Me.lblRuralUsedVal = New System.Windows.Forms.Label()
-    Me.pnlRuralFree = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblRuralRemain = New System.Windows.Forms.Label()
-    Me.lblRuralRemainVal = New System.Windows.Forms.Label()
-    Me.pnlRuralTotal = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblRuralAllowed = New System.Windows.Forms.Label()
-    Me.lblRuralAllowedVal = New System.Windows.Forms.Label()
-    Me.pctRural = New System.Windows.Forms.PictureBox()
+    Me.pnlTypeADldUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeADldUsedVal = New System.Windows.Forms.Label()
+    Me.lblTypeADldUsed = New System.Windows.Forms.Label()
+    Me.pnlTypeADldFree = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeADldFreeVal = New System.Windows.Forms.Label()
+    Me.lblTypeADldFree = New System.Windows.Forms.Label()
+    Me.pnlTypeADldLimit = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeADldLimitVal = New System.Windows.Forms.Label()
+    Me.lblTypeADldLimit = New System.Windows.Forms.Label()
+    Me.pnlTypeB = New System.Windows.Forms.TableLayoutPanel()
+    Me.pnlTypeBUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeBUsed = New System.Windows.Forms.Label()
+    Me.lblTypeBUsedVal = New System.Windows.Forms.Label()
+    Me.pnlTypeBFree = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeBFree = New System.Windows.Forms.Label()
+    Me.lblTypeBFreeVal = New System.Windows.Forms.Label()
+    Me.pnlTypeBLimit = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTypeBLimit = New System.Windows.Forms.Label()
+    Me.lblTypeBLimitVal = New System.Windows.Forms.Label()
+    Me.pctTypeB = New System.Windows.Forms.PictureBox()
     Me.trayIcon = New System.Windows.Forms.NotifyIcon(Me.components)
     Me.mnuTray = New System.Windows.Forms.ContextMenu()
     Me.mnuRestore = New System.Windows.Forms.MenuItem()
@@ -112,33 +95,26 @@ Partial Class frmMain
     Me.gbUsage.SuspendLayout()
     CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNothing.SuspendLayout()
-    Me.pnlWildBlue.SuspendLayout()
-    Me.gbUld.SuspendLayout()
-    Me.pnlUld.SuspendLayout()
-    CType(Me.pctUld, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.pnlTypeA.SuspendLayout()
+    Me.gbTypeAUld.SuspendLayout()
+    Me.pnlTypeAUld.SuspendLayout()
+    CType(Me.pctTypeAUld, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlUldText.SuspendLayout()
-    Me.pnlUldTextUsed.SuspendLayout()
-    Me.pnlUldTextFree.SuspendLayout()
-    Me.pnlUldTextTotal.SuspendLayout()
-    Me.gbDld.SuspendLayout()
-    Me.pnlDld.SuspendLayout()
-    CType(Me.pctDld, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.pnlTypeAUldUsed.SuspendLayout()
+    Me.pnlTypeAUldFree.SuspendLayout()
+    Me.pnlTypeAUldLimit.SuspendLayout()
+    Me.gbTypeADld.SuspendLayout()
+    Me.pnlTypeADld.SuspendLayout()
+    CType(Me.pctTypeADld, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlDldText.SuspendLayout()
-    Me.pnlDldTextUsed.SuspendLayout()
-    Me.pnlDldTextFree.SuspendLayout()
-    Me.pnlDldTextTotal.SuspendLayout()
-    Me.pnlExede.SuspendLayout()
-    Me.pnlExedeUp.SuspendLayout()
-    Me.pnlExedeUsed.SuspendLayout()
-    Me.pnlExedeFree.SuspendLayout()
-    Me.pnlExedeTotal.SuspendLayout()
-    Me.pnlExedeDown.SuspendLayout()
-    CType(Me.pctExede, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.pnlRural.SuspendLayout()
-    Me.pnlRuralUsed.SuspendLayout()
-    Me.pnlRuralFree.SuspendLayout()
-    Me.pnlRuralTotal.SuspendLayout()
-    CType(Me.pctRural, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.pnlTypeADldUsed.SuspendLayout()
+    Me.pnlTypeADldFree.SuspendLayout()
+    Me.pnlTypeADldLimit.SuspendLayout()
+    Me.pnlTypeB.SuspendLayout()
+    Me.pnlTypeBUsed.SuspendLayout()
+    Me.pnlTypeBFree.SuspendLayout()
+    Me.pnlTypeBLimit.SuspendLayout()
+    CType(Me.pctTypeB, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'pnlDetails
@@ -242,9 +218,8 @@ Partial Class frmMain
     Me.gbUsage.Controls.Add(Me.pctNetTest)
     Me.gbUsage.Controls.Add(Me.lblStatus)
     Me.gbUsage.Controls.Add(Me.pnlNothing)
-    Me.gbUsage.Controls.Add(Me.pnlWildBlue)
-    Me.gbUsage.Controls.Add(Me.pnlExede)
-    Me.gbUsage.Controls.Add(Me.pnlRural)
+    Me.gbUsage.Controls.Add(Me.pnlTypeA)
+    Me.gbUsage.Controls.Add(Me.pnlTypeB)
     Me.gbUsage.Dock = System.Windows.Forms.DockStyle.Fill
     Me.gbUsage.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.gbUsage.Location = New System.Drawing.Point(3, 31)
@@ -306,7 +281,7 @@ Partial Class frmMain
     '
     Me.lblRRS.AutoSize = True
     Me.lblRRS.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
+    Me.lblRRS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
     Me.lblRRS.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblRRS.Location = New System.Drawing.Point(214, 76)
     Me.lblRRS.Name = "lblRRS"
@@ -314,63 +289,63 @@ Partial Class frmMain
     Me.lblRRS.TabIndex = 1
     Me.lblRRS.Text = "by RealityRipple Software"
     '
-    'pnlWildBlue
+    'pnlTypeA
     '
-    Me.pnlWildBlue.ColumnCount = 2
-    Me.pnlWildBlue.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlWildBlue.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlWildBlue.Controls.Add(Me.gbUld, 1, 0)
-    Me.pnlWildBlue.Controls.Add(Me.gbDld, 0, 0)
-    Me.pnlWildBlue.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlWildBlue.Location = New System.Drawing.Point(3, 16)
-    Me.pnlWildBlue.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlWildBlue.Name = "pnlWildBlue"
-    Me.pnlWildBlue.RowCount = 1
-    Me.pnlWildBlue.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlWildBlue.Size = New System.Drawing.Size(422, 109)
-    Me.pnlWildBlue.TabIndex = 1
+    Me.pnlTypeA.ColumnCount = 2
+    Me.pnlTypeA.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlTypeA.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlTypeA.Controls.Add(Me.gbTypeAUld, 1, 0)
+    Me.pnlTypeA.Controls.Add(Me.gbTypeADld, 0, 0)
+    Me.pnlTypeA.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeA.Location = New System.Drawing.Point(3, 16)
+    Me.pnlTypeA.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeA.Name = "pnlTypeA"
+    Me.pnlTypeA.RowCount = 1
+    Me.pnlTypeA.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlTypeA.Size = New System.Drawing.Size(422, 109)
+    Me.pnlTypeA.TabIndex = 1
     '
-    'gbUld
+    'gbTypeAUld
     '
-    Me.gbUld.Controls.Add(Me.pnlUld)
-    Me.gbUld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.gbUld.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.gbUld.Location = New System.Drawing.Point(214, 3)
-    Me.gbUld.Name = "gbUld"
-    Me.gbUld.Size = New System.Drawing.Size(205, 103)
-    Me.gbUld.TabIndex = 0
-    Me.gbUld.TabStop = False
-    Me.gbUld.Text = "Upload"
+    Me.gbTypeAUld.Controls.Add(Me.pnlTypeAUld)
+    Me.gbTypeAUld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.gbTypeAUld.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.gbTypeAUld.Location = New System.Drawing.Point(214, 3)
+    Me.gbTypeAUld.Name = "gbTypeAUld"
+    Me.gbTypeAUld.Size = New System.Drawing.Size(205, 103)
+    Me.gbTypeAUld.TabIndex = 0
+    Me.gbTypeAUld.TabStop = False
+    Me.gbTypeAUld.Text = "Upload"
     '
-    'pnlUld
+    'pnlTypeAUld
     '
-    Me.pnlUld.ColumnCount = 2
-    Me.pnlUld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUld.Controls.Add(Me.pctUld, 1, 0)
-    Me.pnlUld.Controls.Add(Me.pnlUldText, 0, 0)
-    Me.pnlUld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlUld.Location = New System.Drawing.Point(3, 16)
-    Me.pnlUld.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlUld.Name = "pnlUld"
-    Me.pnlUld.RowCount = 1
-    Me.pnlUld.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUld.Size = New System.Drawing.Size(199, 84)
-    Me.pnlUld.TabIndex = 1
+    Me.pnlTypeAUld.ColumnCount = 2
+    Me.pnlTypeAUld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeAUld.Controls.Add(Me.pctTypeAUld, 1, 0)
+    Me.pnlTypeAUld.Controls.Add(Me.pnlUldText, 0, 0)
+    Me.pnlTypeAUld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeAUld.Location = New System.Drawing.Point(3, 16)
+    Me.pnlTypeAUld.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeAUld.Name = "pnlTypeAUld"
+    Me.pnlTypeAUld.RowCount = 1
+    Me.pnlTypeAUld.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeAUld.Size = New System.Drawing.Size(199, 84)
+    Me.pnlTypeAUld.TabIndex = 1
     '
-    'pctUld
+    'pctTypeAUld
     '
-    Me.pctUld.BackColor = System.Drawing.Color.White
-    Me.pctUld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctUld.ContextMenu = Me.mnuGraph
-    Me.pctUld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctUld.Location = New System.Drawing.Point(57, 0)
-    Me.pctUld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
-    Me.pctUld.Name = "pctUld"
-    Me.pctUld.Size = New System.Drawing.Size(139, 81)
-    Me.pctUld.TabIndex = 0
-    Me.pctUld.TabStop = False
-    Me.ttUI.SetToolTip(Me.pctUld, "Graph representing your upload usage.")
+    Me.pctTypeAUld.BackColor = System.Drawing.Color.White
+    Me.pctTypeAUld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTypeAUld.ContextMenu = Me.mnuGraph
+    Me.pctTypeAUld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pctTypeAUld.Location = New System.Drawing.Point(57, 0)
+    Me.pctTypeAUld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
+    Me.pctTypeAUld.Name = "pctTypeAUld"
+    Me.pctTypeAUld.Size = New System.Drawing.Size(139, 81)
+    Me.pctTypeAUld.TabIndex = 0
+    Me.pctTypeAUld.TabStop = False
+    Me.ttUI.SetToolTip(Me.pctTypeAUld, "Graph representing your upload usage.")
     '
     'mnuGraph
     '
@@ -404,9 +379,9 @@ Partial Class frmMain
     Me.pnlUldText.ColumnCount = 1
     Me.pnlUldText.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlUldText.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlUldText.Controls.Add(Me.pnlUldTextUsed, 0, 0)
-    Me.pnlUldText.Controls.Add(Me.pnlUldTextFree, 0, 1)
-    Me.pnlUldText.Controls.Add(Me.pnlUldTextTotal, 0, 2)
+    Me.pnlUldText.Controls.Add(Me.pnlTypeAUldUsed, 0, 0)
+    Me.pnlUldText.Controls.Add(Me.pnlTypeAUldFree, 0, 1)
+    Me.pnlUldText.Controls.Add(Me.pnlTypeAUldLimit, 0, 2)
     Me.pnlUldText.Dock = System.Windows.Forms.DockStyle.Left
     Me.pnlUldText.Location = New System.Drawing.Point(0, 0)
     Me.pnlUldText.Margin = New System.Windows.Forms.Padding(0)
@@ -418,168 +393,168 @@ Partial Class frmMain
     Me.pnlUldText.Size = New System.Drawing.Size(57, 84)
     Me.pnlUldText.TabIndex = 1
     '
-    'pnlUldTextUsed
+    'pnlTypeAUldUsed
     '
-    Me.pnlUldTextUsed.AutoSize = True
-    Me.pnlUldTextUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlUldTextUsed.ColumnCount = 2
-    Me.pnlUldTextUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextUsed.Controls.Add(Me.lblUldUsed, 1, 0)
-    Me.pnlUldTextUsed.Controls.Add(Me.lblUUsed, 0, 0)
-    Me.pnlUldTextUsed.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlUldTextUsed.Location = New System.Drawing.Point(0, 0)
-    Me.pnlUldTextUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlUldTextUsed.Name = "pnlUldTextUsed"
-    Me.pnlUldTextUsed.RowCount = 1
-    Me.pnlUldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUldTextUsed.Size = New System.Drawing.Size(57, 28)
-    Me.pnlUldTextUsed.TabIndex = 6
+    Me.pnlTypeAUldUsed.AutoSize = True
+    Me.pnlTypeAUldUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeAUldUsed.ColumnCount = 2
+    Me.pnlTypeAUldUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldUsed.Controls.Add(Me.lblTypeAUldUsedVal, 1, 0)
+    Me.pnlTypeAUldUsed.Controls.Add(Me.lblTypeAUldUsed, 0, 0)
+    Me.pnlTypeAUldUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeAUldUsed.Location = New System.Drawing.Point(0, 0)
+    Me.pnlTypeAUldUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeAUldUsed.Name = "pnlTypeAUldUsed"
+    Me.pnlTypeAUldUsed.RowCount = 1
+    Me.pnlTypeAUldUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeAUldUsed.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeAUldUsed.TabIndex = 6
     '
-    'lblUldUsed
+    'lblTypeAUldUsedVal
     '
-    Me.lblUldUsed.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblUldUsed.AutoSize = True
-    Me.lblUldUsed.Location = New System.Drawing.Point(38, 7)
-    Me.lblUldUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblUldUsed.Name = "lblUldUsed"
-    Me.lblUldUsed.Size = New System.Drawing.Size(19, 13)
-    Me.lblUldUsed.TabIndex = 1
-    Me.lblUldUsed.Text = " -- "
+    Me.lblTypeAUldUsedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeAUldUsedVal.AutoSize = True
+    Me.lblTypeAUldUsedVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeAUldUsedVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeAUldUsedVal.Name = "lblTypeAUldUsedVal"
+    Me.lblTypeAUldUsedVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeAUldUsedVal.TabIndex = 1
+    Me.lblTypeAUldUsedVal.Text = " -- "
     '
-    'lblUUsed
+    'lblTypeAUldUsed
     '
-    Me.lblUUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblUUsed.AutoSize = True
-    Me.lblUUsed.Location = New System.Drawing.Point(3, 7)
-    Me.lblUUsed.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblUUsed.Name = "lblUUsed"
-    Me.lblUUsed.Size = New System.Drawing.Size(35, 13)
-    Me.lblUUsed.TabIndex = 0
-    Me.lblUUsed.Text = "Used:"
+    Me.lblTypeAUldUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeAUldUsed.AutoSize = True
+    Me.lblTypeAUldUsed.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeAUldUsed.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeAUldUsed.Name = "lblTypeAUldUsed"
+    Me.lblTypeAUldUsed.Size = New System.Drawing.Size(35, 13)
+    Me.lblTypeAUldUsed.TabIndex = 0
+    Me.lblTypeAUldUsed.Text = "Used:"
     '
-    'pnlUldTextFree
+    'pnlTypeAUldFree
     '
-    Me.pnlUldTextFree.AutoSize = True
-    Me.pnlUldTextFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlUldTextFree.ColumnCount = 2
-    Me.pnlUldTextFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextFree.Controls.Add(Me.lblUldFree, 1, 0)
-    Me.pnlUldTextFree.Controls.Add(Me.lblUFree, 0, 0)
-    Me.pnlUldTextFree.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlUldTextFree.Location = New System.Drawing.Point(0, 28)
-    Me.pnlUldTextFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlUldTextFree.Name = "pnlUldTextFree"
-    Me.pnlUldTextFree.RowCount = 1
-    Me.pnlUldTextFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUldTextFree.Size = New System.Drawing.Size(57, 28)
-    Me.pnlUldTextFree.TabIndex = 7
+    Me.pnlTypeAUldFree.AutoSize = True
+    Me.pnlTypeAUldFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeAUldFree.ColumnCount = 2
+    Me.pnlTypeAUldFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldFree.Controls.Add(Me.lblTypeAUldFreeVal, 1, 0)
+    Me.pnlTypeAUldFree.Controls.Add(Me.lblTypeAUldFree, 0, 0)
+    Me.pnlTypeAUldFree.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeAUldFree.Location = New System.Drawing.Point(0, 28)
+    Me.pnlTypeAUldFree.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeAUldFree.Name = "pnlTypeAUldFree"
+    Me.pnlTypeAUldFree.RowCount = 1
+    Me.pnlTypeAUldFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeAUldFree.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeAUldFree.TabIndex = 7
     '
-    'lblUldFree
+    'lblTypeAUldFreeVal
     '
-    Me.lblUldFree.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblUldFree.AutoSize = True
-    Me.lblUldFree.Location = New System.Drawing.Point(38, 7)
-    Me.lblUldFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblUldFree.Name = "lblUldFree"
-    Me.lblUldFree.Size = New System.Drawing.Size(19, 13)
-    Me.lblUldFree.TabIndex = 3
-    Me.lblUldFree.Text = " -- "
+    Me.lblTypeAUldFreeVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeAUldFreeVal.AutoSize = True
+    Me.lblTypeAUldFreeVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeAUldFreeVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeAUldFreeVal.Name = "lblTypeAUldFreeVal"
+    Me.lblTypeAUldFreeVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeAUldFreeVal.TabIndex = 3
+    Me.lblTypeAUldFreeVal.Text = " -- "
     '
-    'lblUFree
+    'lblTypeAUldFree
     '
-    Me.lblUFree.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblUFree.AutoSize = True
-    Me.lblUFree.Location = New System.Drawing.Point(3, 7)
-    Me.lblUFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblUFree.Name = "lblUFree"
-    Me.lblUFree.Size = New System.Drawing.Size(31, 13)
-    Me.lblUFree.TabIndex = 2
-    Me.lblUFree.Text = "Free:"
+    Me.lblTypeAUldFree.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeAUldFree.AutoSize = True
+    Me.lblTypeAUldFree.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeAUldFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeAUldFree.Name = "lblTypeAUldFree"
+    Me.lblTypeAUldFree.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeAUldFree.TabIndex = 2
+    Me.lblTypeAUldFree.Text = "Free:"
     '
-    'pnlUldTextTotal
+    'pnlTypeAUldLimit
     '
-    Me.pnlUldTextTotal.AutoSize = True
-    Me.pnlUldTextTotal.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlUldTextTotal.ColumnCount = 2
-    Me.pnlUldTextTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlUldTextTotal.Controls.Add(Me.lblUldTotal, 1, 0)
-    Me.pnlUldTextTotal.Controls.Add(Me.lblUTotal, 0, 0)
-    Me.pnlUldTextTotal.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlUldTextTotal.Location = New System.Drawing.Point(0, 56)
-    Me.pnlUldTextTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlUldTextTotal.Name = "pnlUldTextTotal"
-    Me.pnlUldTextTotal.RowCount = 1
-    Me.pnlUldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlUldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlUldTextTotal.Size = New System.Drawing.Size(57, 28)
-    Me.pnlUldTextTotal.TabIndex = 8
+    Me.pnlTypeAUldLimit.AutoSize = True
+    Me.pnlTypeAUldLimit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeAUldLimit.ColumnCount = 2
+    Me.pnlTypeAUldLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeAUldLimit.Controls.Add(Me.lblTypeAUldLimitVal, 1, 0)
+    Me.pnlTypeAUldLimit.Controls.Add(Me.lblTypeAUldLimit, 0, 0)
+    Me.pnlTypeAUldLimit.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeAUldLimit.Location = New System.Drawing.Point(0, 56)
+    Me.pnlTypeAUldLimit.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeAUldLimit.Name = "pnlTypeAUldLimit"
+    Me.pnlTypeAUldLimit.RowCount = 1
+    Me.pnlTypeAUldLimit.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeAUldLimit.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
+    Me.pnlTypeAUldLimit.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeAUldLimit.TabIndex = 8
     '
-    'lblUldTotal
+    'lblTypeAUldLimitVal
     '
-    Me.lblUldTotal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblUldTotal.AutoSize = True
-    Me.lblUldTotal.Location = New System.Drawing.Point(38, 7)
-    Me.lblUldTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblUldTotal.Name = "lblUldTotal"
-    Me.lblUldTotal.Size = New System.Drawing.Size(19, 13)
-    Me.lblUldTotal.TabIndex = 5
-    Me.lblUldTotal.Text = " -- "
+    Me.lblTypeAUldLimitVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeAUldLimitVal.AutoSize = True
+    Me.lblTypeAUldLimitVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeAUldLimitVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeAUldLimitVal.Name = "lblTypeAUldLimitVal"
+    Me.lblTypeAUldLimitVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeAUldLimitVal.TabIndex = 5
+    Me.lblTypeAUldLimitVal.Text = " -- "
     '
-    'lblUTotal
+    'lblTypeAUldLimit
     '
-    Me.lblUTotal.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblUTotal.AutoSize = True
-    Me.lblUTotal.Location = New System.Drawing.Point(3, 7)
-    Me.lblUTotal.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblUTotal.Name = "lblUTotal"
-    Me.lblUTotal.Size = New System.Drawing.Size(31, 13)
-    Me.lblUTotal.TabIndex = 4
-    Me.lblUTotal.Text = "Limit:"
+    Me.lblTypeAUldLimit.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeAUldLimit.AutoSize = True
+    Me.lblTypeAUldLimit.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeAUldLimit.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeAUldLimit.Name = "lblTypeAUldLimit"
+    Me.lblTypeAUldLimit.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeAUldLimit.TabIndex = 4
+    Me.lblTypeAUldLimit.Text = "Limit:"
     '
-    'gbDld
+    'gbTypeADld
     '
-    Me.gbDld.Controls.Add(Me.pnlDld)
-    Me.gbDld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.gbDld.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.gbDld.Location = New System.Drawing.Point(3, 3)
-    Me.gbDld.Name = "gbDld"
-    Me.gbDld.Size = New System.Drawing.Size(205, 103)
-    Me.gbDld.TabIndex = 0
-    Me.gbDld.TabStop = False
-    Me.gbDld.Text = "Download"
+    Me.gbTypeADld.Controls.Add(Me.pnlTypeADld)
+    Me.gbTypeADld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.gbTypeADld.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.gbTypeADld.Location = New System.Drawing.Point(3, 3)
+    Me.gbTypeADld.Name = "gbTypeADld"
+    Me.gbTypeADld.Size = New System.Drawing.Size(205, 103)
+    Me.gbTypeADld.TabIndex = 0
+    Me.gbTypeADld.TabStop = False
+    Me.gbTypeADld.Text = "Download"
     '
-    'pnlDld
+    'pnlTypeADld
     '
-    Me.pnlDld.ColumnCount = 2
-    Me.pnlDld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDld.Controls.Add(Me.pctDld, 1, 0)
-    Me.pnlDld.Controls.Add(Me.pnlDldText, 0, 0)
-    Me.pnlDld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlDld.Location = New System.Drawing.Point(3, 16)
-    Me.pnlDld.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlDld.Name = "pnlDld"
-    Me.pnlDld.RowCount = 1
-    Me.pnlDld.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDld.Size = New System.Drawing.Size(199, 84)
-    Me.pnlDld.TabIndex = 0
+    Me.pnlTypeADld.ColumnCount = 2
+    Me.pnlTypeADld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADld.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeADld.Controls.Add(Me.pctTypeADld, 1, 0)
+    Me.pnlTypeADld.Controls.Add(Me.pnlDldText, 0, 0)
+    Me.pnlTypeADld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeADld.Location = New System.Drawing.Point(3, 16)
+    Me.pnlTypeADld.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeADld.Name = "pnlTypeADld"
+    Me.pnlTypeADld.RowCount = 1
+    Me.pnlTypeADld.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeADld.Size = New System.Drawing.Size(199, 84)
+    Me.pnlTypeADld.TabIndex = 0
     '
-    'pctDld
+    'pctTypeADld
     '
-    Me.pctDld.BackColor = System.Drawing.Color.White
-    Me.pctDld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctDld.ContextMenu = Me.mnuGraph
-    Me.pctDld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctDld.Location = New System.Drawing.Point(57, 0)
-    Me.pctDld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
-    Me.pctDld.Name = "pctDld"
-    Me.pctDld.Size = New System.Drawing.Size(139, 81)
-    Me.pctDld.TabIndex = 0
-    Me.pctDld.TabStop = False
-    Me.ttUI.SetToolTip(Me.pctDld, "Graph representing your download usage.")
+    Me.pctTypeADld.BackColor = System.Drawing.Color.White
+    Me.pctTypeADld.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTypeADld.ContextMenu = Me.mnuGraph
+    Me.pctTypeADld.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pctTypeADld.Location = New System.Drawing.Point(57, 0)
+    Me.pctTypeADld.Margin = New System.Windows.Forms.Padding(0, 0, 3, 3)
+    Me.pctTypeADld.Name = "pctTypeADld"
+    Me.pctTypeADld.Size = New System.Drawing.Size(139, 81)
+    Me.pctTypeADld.TabIndex = 0
+    Me.pctTypeADld.TabStop = False
+    Me.ttUI.SetToolTip(Me.pctTypeADld, "Graph representing your download usage.")
     '
     'pnlDldText
     '
@@ -588,9 +563,9 @@ Partial Class frmMain
     Me.pnlDldText.ColumnCount = 1
     Me.pnlDldText.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlDldText.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlDldText.Controls.Add(Me.pnlDldTextUsed, 0, 0)
-    Me.pnlDldText.Controls.Add(Me.pnlDldTextFree, 0, 1)
-    Me.pnlDldText.Controls.Add(Me.pnlDldTextTotal, 0, 2)
+    Me.pnlDldText.Controls.Add(Me.pnlTypeADldUsed, 0, 0)
+    Me.pnlDldText.Controls.Add(Me.pnlTypeADldFree, 0, 1)
+    Me.pnlDldText.Controls.Add(Me.pnlTypeADldLimit, 0, 2)
     Me.pnlDldText.Dock = System.Windows.Forms.DockStyle.Left
     Me.pnlDldText.Location = New System.Drawing.Point(0, 0)
     Me.pnlDldText.Margin = New System.Windows.Forms.Padding(0)
@@ -602,506 +577,276 @@ Partial Class frmMain
     Me.pnlDldText.Size = New System.Drawing.Size(57, 84)
     Me.pnlDldText.TabIndex = 1
     '
-    'pnlDldTextUsed
-    '
-    Me.pnlDldTextUsed.AutoSize = True
-    Me.pnlDldTextUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlDldTextUsed.ColumnCount = 2
-    Me.pnlDldTextUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextUsed.Controls.Add(Me.lblDldUsed, 1, 0)
-    Me.pnlDldTextUsed.Controls.Add(Me.lblDUsed, 0, 0)
-    Me.pnlDldTextUsed.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlDldTextUsed.Location = New System.Drawing.Point(0, 0)
-    Me.pnlDldTextUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlDldTextUsed.Name = "pnlDldTextUsed"
-    Me.pnlDldTextUsed.RowCount = 1
-    Me.pnlDldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDldTextUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
-    Me.pnlDldTextUsed.Size = New System.Drawing.Size(57, 28)
-    Me.pnlDldTextUsed.TabIndex = 6
-    '
-    'lblDldUsed
-    '
-    Me.lblDldUsed.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblDldUsed.AutoSize = True
-    Me.lblDldUsed.Location = New System.Drawing.Point(38, 7)
-    Me.lblDldUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblDldUsed.Name = "lblDldUsed"
-    Me.lblDldUsed.Size = New System.Drawing.Size(19, 13)
-    Me.lblDldUsed.TabIndex = 1
-    Me.lblDldUsed.Text = " -- "
-    '
-    'lblDUsed
-    '
-    Me.lblDUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblDUsed.AutoSize = True
-    Me.lblDUsed.Location = New System.Drawing.Point(3, 7)
-    Me.lblDUsed.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblDUsed.Name = "lblDUsed"
-    Me.lblDUsed.Size = New System.Drawing.Size(35, 13)
-    Me.lblDUsed.TabIndex = 0
-    Me.lblDUsed.Text = "Used:"
-    '
-    'pnlDldTextFree
-    '
-    Me.pnlDldTextFree.AutoSize = True
-    Me.pnlDldTextFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlDldTextFree.ColumnCount = 2
-    Me.pnlDldTextFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextFree.Controls.Add(Me.lblDldFree, 1, 0)
-    Me.pnlDldTextFree.Controls.Add(Me.lblDFree, 0, 0)
-    Me.pnlDldTextFree.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlDldTextFree.Location = New System.Drawing.Point(0, 28)
-    Me.pnlDldTextFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlDldTextFree.Name = "pnlDldTextFree"
-    Me.pnlDldTextFree.RowCount = 1
-    Me.pnlDldTextFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDldTextFree.Size = New System.Drawing.Size(57, 28)
-    Me.pnlDldTextFree.TabIndex = 7
-    '
-    'lblDldFree
-    '
-    Me.lblDldFree.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblDldFree.AutoSize = True
-    Me.lblDldFree.Location = New System.Drawing.Point(38, 7)
-    Me.lblDldFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblDldFree.Name = "lblDldFree"
-    Me.lblDldFree.Size = New System.Drawing.Size(19, 13)
-    Me.lblDldFree.TabIndex = 3
-    Me.lblDldFree.Text = " -- "
-    '
-    'lblDFree
-    '
-    Me.lblDFree.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblDFree.AutoSize = True
-    Me.lblDFree.Location = New System.Drawing.Point(3, 7)
-    Me.lblDFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblDFree.Name = "lblDFree"
-    Me.lblDFree.Size = New System.Drawing.Size(31, 13)
-    Me.lblDFree.TabIndex = 2
-    Me.lblDFree.Text = "Free:"
-    '
-    'pnlDldTextTotal
-    '
-    Me.pnlDldTextTotal.AutoSize = True
-    Me.pnlDldTextTotal.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlDldTextTotal.ColumnCount = 2
-    Me.pnlDldTextTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlDldTextTotal.Controls.Add(Me.lblDldTotal, 1, 0)
-    Me.pnlDldTextTotal.Controls.Add(Me.lblDTotal, 0, 0)
-    Me.pnlDldTextTotal.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlDldTextTotal.Location = New System.Drawing.Point(0, 56)
-    Me.pnlDldTextTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlDldTextTotal.Name = "pnlDldTextTotal"
-    Me.pnlDldTextTotal.RowCount = 1
-    Me.pnlDldTextTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlDldTextTotal.Size = New System.Drawing.Size(57, 28)
-    Me.pnlDldTextTotal.TabIndex = 8
-    '
-    'lblDldTotal
-    '
-    Me.lblDldTotal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblDldTotal.AutoSize = True
-    Me.lblDldTotal.Location = New System.Drawing.Point(38, 7)
-    Me.lblDldTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.lblDldTotal.Name = "lblDldTotal"
-    Me.lblDldTotal.Size = New System.Drawing.Size(19, 13)
-    Me.lblDldTotal.TabIndex = 5
-    Me.lblDldTotal.Text = " -- "
-    '
-    'lblDTotal
-    '
-    Me.lblDTotal.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblDTotal.AutoSize = True
-    Me.lblDTotal.Location = New System.Drawing.Point(3, 7)
-    Me.lblDTotal.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblDTotal.Name = "lblDTotal"
-    Me.lblDTotal.Size = New System.Drawing.Size(31, 13)
-    Me.lblDTotal.TabIndex = 4
-    Me.lblDTotal.Text = "Limit:"
-    '
-    'pnlExede
-    '
-    Me.pnlExede.ColumnCount = 2
-    Me.pnlExede.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExede.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExede.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlExede.Controls.Add(Me.pnlExedeUp, 0, 1)
-    Me.pnlExede.Controls.Add(Me.pnlExedeUsed, 0, 2)
-    Me.pnlExede.Controls.Add(Me.pnlExedeFree, 0, 3)
-    Me.pnlExede.Controls.Add(Me.pnlExedeTotal, 0, 4)
-    Me.pnlExede.Controls.Add(Me.pnlExedeDown, 0, 0)
-    Me.pnlExede.Controls.Add(Me.pctExede, 1, 0)
-    Me.pnlExede.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExede.Location = New System.Drawing.Point(3, 16)
-    Me.pnlExede.Name = "pnlExede"
-    Me.pnlExede.RowCount = 5
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0!))
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0!))
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0!))
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0!))
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0!))
-    Me.pnlExede.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlExede.Size = New System.Drawing.Size(422, 109)
-    Me.pnlExede.TabIndex = 2
-    '
-    'pnlExedeUp
-    '
-    Me.pnlExedeUp.AutoSize = True
-    Me.pnlExedeUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlExedeUp.ColumnCount = 2
-    Me.pnlExedeUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeUp.Controls.Add(Me.lblExedeUp, 0, 0)
-    Me.pnlExedeUp.Controls.Add(Me.lblExedeUpVal, 1, 0)
-    Me.pnlExedeUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExedeUp.Location = New System.Drawing.Point(0, 21)
-    Me.pnlExedeUp.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlExedeUp.Name = "pnlExedeUp"
-    Me.pnlExedeUp.RowCount = 1
-    Me.pnlExedeUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExedeUp.Size = New System.Drawing.Size(89, 21)
-    Me.pnlExedeUp.TabIndex = 19
-    '
-    'lblExedeUp
-    '
-    Me.lblExedeUp.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblExedeUp.AutoSize = True
-    Me.lblExedeUp.Location = New System.Drawing.Point(3, 4)
-    Me.lblExedeUp.Name = "lblExedeUp"
-    Me.lblExedeUp.Size = New System.Drawing.Size(44, 13)
-    Me.lblExedeUp.TabIndex = 5
-    Me.lblExedeUp.Text = "Upload:"
-    '
-    'lblExedeUpVal
-    '
-    Me.lblExedeUpVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblExedeUpVal.AutoSize = True
-    Me.lblExedeUpVal.Location = New System.Drawing.Point(67, 4)
-    Me.lblExedeUpVal.Name = "lblExedeUpVal"
-    Me.lblExedeUpVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblExedeUpVal.TabIndex = 10
-    Me.lblExedeUpVal.Text = " -- "
-    '
-    'pnlExedeUsed
-    '
-    Me.pnlExedeUsed.AutoSize = True
-    Me.pnlExedeUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlExedeUsed.ColumnCount = 2
-    Me.pnlExedeUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeUsed.Controls.Add(Me.lblExedeTotal, 0, 0)
-    Me.pnlExedeUsed.Controls.Add(Me.lblExedeTotalVal, 1, 0)
-    Me.pnlExedeUsed.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExedeUsed.Location = New System.Drawing.Point(0, 42)
-    Me.pnlExedeUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlExedeUsed.Name = "pnlExedeUsed"
-    Me.pnlExedeUsed.RowCount = 1
-    Me.pnlExedeUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExedeUsed.Size = New System.Drawing.Size(89, 21)
-    Me.pnlExedeUsed.TabIndex = 20
-    '
-    'lblExedeTotal
-    '
-    Me.lblExedeTotal.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblExedeTotal.AutoSize = True
-    Me.lblExedeTotal.Location = New System.Drawing.Point(3, 4)
-    Me.lblExedeTotal.Name = "lblExedeTotal"
-    Me.lblExedeTotal.Size = New System.Drawing.Size(35, 13)
-    Me.lblExedeTotal.TabIndex = 6
-    Me.lblExedeTotal.Text = "Used:"
-    '
-    'lblExedeTotalVal
-    '
-    Me.lblExedeTotalVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblExedeTotalVal.AutoSize = True
-    Me.lblExedeTotalVal.Location = New System.Drawing.Point(67, 4)
-    Me.lblExedeTotalVal.Name = "lblExedeTotalVal"
-    Me.lblExedeTotalVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblExedeTotalVal.TabIndex = 12
-    Me.lblExedeTotalVal.Text = " -- "
-    '
-    'pnlExedeFree
-    '
-    Me.pnlExedeFree.AutoSize = True
-    Me.pnlExedeFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlExedeFree.ColumnCount = 2
-    Me.pnlExedeFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeFree.Controls.Add(Me.lblExedeRemain, 0, 0)
-    Me.pnlExedeFree.Controls.Add(Me.lblExedeRemainVal, 1, 0)
-    Me.pnlExedeFree.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExedeFree.Location = New System.Drawing.Point(0, 63)
-    Me.pnlExedeFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlExedeFree.Name = "pnlExedeFree"
-    Me.pnlExedeFree.RowCount = 1
-    Me.pnlExedeFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExedeFree.Size = New System.Drawing.Size(89, 21)
-    Me.pnlExedeFree.TabIndex = 21
-    '
-    'lblExedeRemain
-    '
-    Me.lblExedeRemain.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblExedeRemain.AutoSize = True
-    Me.lblExedeRemain.Location = New System.Drawing.Point(3, 4)
-    Me.lblExedeRemain.Name = "lblExedeRemain"
-    Me.lblExedeRemain.Size = New System.Drawing.Size(31, 13)
-    Me.lblExedeRemain.TabIndex = 15
-    Me.lblExedeRemain.Text = "Free:"
-    '
-    'lblExedeRemainVal
-    '
-    Me.lblExedeRemainVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblExedeRemainVal.AutoSize = True
-    Me.lblExedeRemainVal.Location = New System.Drawing.Point(67, 4)
-    Me.lblExedeRemainVal.Name = "lblExedeRemainVal"
-    Me.lblExedeRemainVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblExedeRemainVal.TabIndex = 16
-    Me.lblExedeRemainVal.Text = " -- "
-    '
-    'pnlExedeTotal
-    '
-    Me.pnlExedeTotal.AutoSize = True
-    Me.pnlExedeTotal.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlExedeTotal.ColumnCount = 2
-    Me.pnlExedeTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeTotal.Controls.Add(Me.lblExedeAllowed, 0, 0)
-    Me.pnlExedeTotal.Controls.Add(Me.lblExedeAllowedVal, 1, 0)
-    Me.pnlExedeTotal.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExedeTotal.Location = New System.Drawing.Point(0, 84)
-    Me.pnlExedeTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlExedeTotal.Name = "pnlExedeTotal"
-    Me.pnlExedeTotal.RowCount = 1
-    Me.pnlExedeTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExedeTotal.Size = New System.Drawing.Size(89, 25)
-    Me.pnlExedeTotal.TabIndex = 22
-    '
-    'lblExedeAllowed
-    '
-    Me.lblExedeAllowed.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblExedeAllowed.AutoSize = True
-    Me.lblExedeAllowed.Location = New System.Drawing.Point(3, 6)
-    Me.lblExedeAllowed.Name = "lblExedeAllowed"
-    Me.lblExedeAllowed.Size = New System.Drawing.Size(31, 13)
-    Me.lblExedeAllowed.TabIndex = 7
-    Me.lblExedeAllowed.Text = "Limit:"
-    '
-    'lblExedeAllowedVal
-    '
-    Me.lblExedeAllowedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblExedeAllowedVal.AutoSize = True
-    Me.lblExedeAllowedVal.Location = New System.Drawing.Point(67, 6)
-    Me.lblExedeAllowedVal.Name = "lblExedeAllowedVal"
-    Me.lblExedeAllowedVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblExedeAllowedVal.TabIndex = 14
-    Me.lblExedeAllowedVal.Text = " -- "
-    '
-    'pnlExedeDown
-    '
-    Me.pnlExedeDown.AutoSize = True
-    Me.pnlExedeDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlExedeDown.ColumnCount = 2
-    Me.pnlExedeDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlExedeDown.Controls.Add(Me.lblExedeDown, 0, 0)
-    Me.pnlExedeDown.Controls.Add(Me.lblExedeDownVal, 1, 0)
-    Me.pnlExedeDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlExedeDown.Location = New System.Drawing.Point(0, 0)
-    Me.pnlExedeDown.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlExedeDown.Name = "pnlExedeDown"
-    Me.pnlExedeDown.RowCount = 1
-    Me.pnlExedeDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlExedeDown.Size = New System.Drawing.Size(89, 21)
-    Me.pnlExedeDown.TabIndex = 17
-    '
-    'lblExedeDown
-    '
-    Me.lblExedeDown.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblExedeDown.AutoSize = True
-    Me.lblExedeDown.Location = New System.Drawing.Point(3, 4)
-    Me.lblExedeDown.Name = "lblExedeDown"
-    Me.lblExedeDown.Size = New System.Drawing.Size(58, 13)
-    Me.lblExedeDown.TabIndex = 4
-    Me.lblExedeDown.Text = "Download:"
-    '
-    'lblExedeDownVal
-    '
-    Me.lblExedeDownVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblExedeDownVal.AutoSize = True
-    Me.lblExedeDownVal.Location = New System.Drawing.Point(67, 4)
-    Me.lblExedeDownVal.Name = "lblExedeDownVal"
-    Me.lblExedeDownVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblExedeDownVal.TabIndex = 8
-    Me.lblExedeDownVal.Text = " -- "
-    '
-    'pctExede
-    '
-    Me.pctExede.BackColor = System.Drawing.Color.White
-    Me.pctExede.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctExede.ContextMenu = Me.mnuGraph
-    Me.pctExede.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctExede.Location = New System.Drawing.Point(89, 0)
-    Me.pctExede.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
-    Me.pctExede.Name = "pctExede"
-    Me.pnlExede.SetRowSpan(Me.pctExede, 5)
-    Me.pctExede.Size = New System.Drawing.Size(330, 109)
-    Me.pctExede.TabIndex = 1
-    Me.pctExede.TabStop = False
-    Me.ttUI.SetToolTip(Me.pctExede, "Graph representing your usage.")
-    '
-    'pnlRural
-    '
-    Me.pnlRural.ColumnCount = 2
-    Me.pnlRural.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRural.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRural.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlRural.Controls.Add(Me.pnlRuralUsed, 0, 0)
-    Me.pnlRural.Controls.Add(Me.pnlRuralFree, 0, 1)
-    Me.pnlRural.Controls.Add(Me.pnlRuralTotal, 0, 2)
-    Me.pnlRural.Controls.Add(Me.pctRural, 1, 0)
-    Me.pnlRural.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlRural.Location = New System.Drawing.Point(3, 16)
-    Me.pnlRural.Name = "pnlRural"
-    Me.pnlRural.RowCount = 3
-    Me.pnlRural.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-    Me.pnlRural.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334!))
-    Me.pnlRural.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-    Me.pnlRural.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlRural.Size = New System.Drawing.Size(422, 109)
-    Me.pnlRural.TabIndex = 3
-    '
-    'pnlRuralUsed
-    '
-    Me.pnlRuralUsed.AutoSize = True
-    Me.pnlRuralUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlRuralUsed.ColumnCount = 2
-    Me.pnlRuralUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralUsed.Controls.Add(Me.lblRuralUsed, 0, 0)
-    Me.pnlRuralUsed.Controls.Add(Me.lblRuralUsedVal, 1, 0)
-    Me.pnlRuralUsed.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlRuralUsed.Location = New System.Drawing.Point(0, 0)
-    Me.pnlRuralUsed.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlRuralUsed.Name = "pnlRuralUsed"
-    Me.pnlRuralUsed.RowCount = 1
-    Me.pnlRuralUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralUsed.Size = New System.Drawing.Size(66, 36)
-    Me.pnlRuralUsed.TabIndex = 18
-    '
-    'lblRuralUsed
-    '
-    Me.lblRuralUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRuralUsed.AutoSize = True
-    Me.lblRuralUsed.Location = New System.Drawing.Point(3, 11)
-    Me.lblRuralUsed.Name = "lblRuralUsed"
-    Me.lblRuralUsed.Size = New System.Drawing.Size(35, 13)
-    Me.lblRuralUsed.TabIndex = 6
-    Me.lblRuralUsed.Text = "Used:"
-    '
-    'lblRuralUsedVal
-    '
-    Me.lblRuralUsedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblRuralUsedVal.AutoSize = True
-    Me.lblRuralUsedVal.Location = New System.Drawing.Point(44, 11)
-    Me.lblRuralUsedVal.Name = "lblRuralUsedVal"
-    Me.lblRuralUsedVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblRuralUsedVal.TabIndex = 12
-    Me.lblRuralUsedVal.Text = " -- "
-    '
-    'pnlRuralFree
-    '
-    Me.pnlRuralFree.AutoSize = True
-    Me.pnlRuralFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlRuralFree.ColumnCount = 2
-    Me.pnlRuralFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralFree.Controls.Add(Me.lblRuralRemain, 0, 0)
-    Me.pnlRuralFree.Controls.Add(Me.lblRuralRemainVal, 1, 0)
-    Me.pnlRuralFree.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlRuralFree.Location = New System.Drawing.Point(0, 36)
-    Me.pnlRuralFree.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlRuralFree.Name = "pnlRuralFree"
-    Me.pnlRuralFree.RowCount = 1
-    Me.pnlRuralFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralFree.Size = New System.Drawing.Size(66, 36)
-    Me.pnlRuralFree.TabIndex = 19
-    '
-    'lblRuralRemain
-    '
-    Me.lblRuralRemain.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRuralRemain.AutoSize = True
-    Me.lblRuralRemain.Location = New System.Drawing.Point(3, 11)
-    Me.lblRuralRemain.Name = "lblRuralRemain"
-    Me.lblRuralRemain.Size = New System.Drawing.Size(31, 13)
-    Me.lblRuralRemain.TabIndex = 15
-    Me.lblRuralRemain.Text = "Free:"
-    '
-    'lblRuralRemainVal
-    '
-    Me.lblRuralRemainVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblRuralRemainVal.AutoSize = True
-    Me.lblRuralRemainVal.Location = New System.Drawing.Point(44, 11)
-    Me.lblRuralRemainVal.Name = "lblRuralRemainVal"
-    Me.lblRuralRemainVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblRuralRemainVal.TabIndex = 16
-    Me.lblRuralRemainVal.Text = " -- "
-    '
-    'pnlRuralTotal
-    '
-    Me.pnlRuralTotal.AutoSize = True
-    Me.pnlRuralTotal.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlRuralTotal.ColumnCount = 2
-    Me.pnlRuralTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralTotal.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlRuralTotal.Controls.Add(Me.lblRuralAllowed, 0, 0)
-    Me.pnlRuralTotal.Controls.Add(Me.lblRuralAllowedVal, 1, 0)
-    Me.pnlRuralTotal.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlRuralTotal.Location = New System.Drawing.Point(0, 72)
-    Me.pnlRuralTotal.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlRuralTotal.Name = "pnlRuralTotal"
-    Me.pnlRuralTotal.RowCount = 1
-    Me.pnlRuralTotal.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlRuralTotal.Size = New System.Drawing.Size(66, 37)
-    Me.pnlRuralTotal.TabIndex = 20
-    '
-    'lblRuralAllowed
-    '
-    Me.lblRuralAllowed.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRuralAllowed.AutoSize = True
-    Me.lblRuralAllowed.Location = New System.Drawing.Point(3, 12)
-    Me.lblRuralAllowed.Name = "lblRuralAllowed"
-    Me.lblRuralAllowed.Size = New System.Drawing.Size(31, 13)
-    Me.lblRuralAllowed.TabIndex = 7
-    Me.lblRuralAllowed.Text = "Limit:"
-    '
-    'lblRuralAllowedVal
-    '
-    Me.lblRuralAllowedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblRuralAllowedVal.AutoSize = True
-    Me.lblRuralAllowedVal.Location = New System.Drawing.Point(44, 12)
-    Me.lblRuralAllowedVal.Name = "lblRuralAllowedVal"
-    Me.lblRuralAllowedVal.Size = New System.Drawing.Size(19, 13)
-    Me.lblRuralAllowedVal.TabIndex = 14
-    Me.lblRuralAllowedVal.Text = " -- "
-    '
-    'pctRural
-    '
-    Me.pctRural.BackColor = System.Drawing.Color.White
-    Me.pctRural.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctRural.ContextMenu = Me.mnuGraph
-    Me.pctRural.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctRural.Location = New System.Drawing.Point(66, 0)
-    Me.pctRural.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
-    Me.pctRural.Name = "pctRural"
-    Me.pnlRural.SetRowSpan(Me.pctRural, 3)
-    Me.pctRural.Size = New System.Drawing.Size(353, 109)
-    Me.pctRural.TabIndex = 1
-    Me.pctRural.TabStop = False
-    Me.ttUI.SetToolTip(Me.pctRural, "Graph representing your usage.")
+    'pnlTypeADldUsed
+    '
+    Me.pnlTypeADldUsed.AutoSize = True
+    Me.pnlTypeADldUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeADldUsed.ColumnCount = 2
+    Me.pnlTypeADldUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldUsed.Controls.Add(Me.lblTypeADldUsedVal, 1, 0)
+    Me.pnlTypeADldUsed.Controls.Add(Me.lblTypeADldUsed, 0, 0)
+    Me.pnlTypeADldUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeADldUsed.Location = New System.Drawing.Point(0, 0)
+    Me.pnlTypeADldUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeADldUsed.Name = "pnlTypeADldUsed"
+    Me.pnlTypeADldUsed.RowCount = 1
+    Me.pnlTypeADldUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeADldUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28.0!))
+    Me.pnlTypeADldUsed.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeADldUsed.TabIndex = 6
+    '
+    'lblTypeADldUsedVal
+    '
+    Me.lblTypeADldUsedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeADldUsedVal.AutoSize = True
+    Me.lblTypeADldUsedVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeADldUsedVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeADldUsedVal.Name = "lblTypeADldUsedVal"
+    Me.lblTypeADldUsedVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeADldUsedVal.TabIndex = 1
+    Me.lblTypeADldUsedVal.Text = " -- "
+    '
+    'lblTypeADldUsed
+    '
+    Me.lblTypeADldUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeADldUsed.AutoSize = True
+    Me.lblTypeADldUsed.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeADldUsed.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeADldUsed.Name = "lblTypeADldUsed"
+    Me.lblTypeADldUsed.Size = New System.Drawing.Size(35, 13)
+    Me.lblTypeADldUsed.TabIndex = 0
+    Me.lblTypeADldUsed.Text = "Used:"
+    '
+    'pnlTypeADldFree
+    '
+    Me.pnlTypeADldFree.AutoSize = True
+    Me.pnlTypeADldFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeADldFree.ColumnCount = 2
+    Me.pnlTypeADldFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldFree.Controls.Add(Me.lblTypeADldFreeVal, 1, 0)
+    Me.pnlTypeADldFree.Controls.Add(Me.lblTypeADldFree, 0, 0)
+    Me.pnlTypeADldFree.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeADldFree.Location = New System.Drawing.Point(0, 28)
+    Me.pnlTypeADldFree.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeADldFree.Name = "pnlTypeADldFree"
+    Me.pnlTypeADldFree.RowCount = 1
+    Me.pnlTypeADldFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeADldFree.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeADldFree.TabIndex = 7
+    '
+    'lblTypeADldFreeVal
+    '
+    Me.lblTypeADldFreeVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeADldFreeVal.AutoSize = True
+    Me.lblTypeADldFreeVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeADldFreeVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeADldFreeVal.Name = "lblTypeADldFreeVal"
+    Me.lblTypeADldFreeVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeADldFreeVal.TabIndex = 3
+    Me.lblTypeADldFreeVal.Text = " -- "
+    '
+    'lblTypeADldFree
+    '
+    Me.lblTypeADldFree.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeADldFree.AutoSize = True
+    Me.lblTypeADldFree.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeADldFree.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeADldFree.Name = "lblTypeADldFree"
+    Me.lblTypeADldFree.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeADldFree.TabIndex = 2
+    Me.lblTypeADldFree.Text = "Free:"
+    '
+    'pnlTypeADldLimit
+    '
+    Me.pnlTypeADldLimit.AutoSize = True
+    Me.pnlTypeADldLimit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeADldLimit.ColumnCount = 2
+    Me.pnlTypeADldLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeADldLimit.Controls.Add(Me.lblTypeADldLimitVal, 1, 0)
+    Me.pnlTypeADldLimit.Controls.Add(Me.lblTypeADldLimit, 0, 0)
+    Me.pnlTypeADldLimit.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeADldLimit.Location = New System.Drawing.Point(0, 56)
+    Me.pnlTypeADldLimit.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeADldLimit.Name = "pnlTypeADldLimit"
+    Me.pnlTypeADldLimit.RowCount = 1
+    Me.pnlTypeADldLimit.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeADldLimit.Size = New System.Drawing.Size(57, 28)
+    Me.pnlTypeADldLimit.TabIndex = 8
+    '
+    'lblTypeADldLimitVal
+    '
+    Me.lblTypeADldLimitVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeADldLimitVal.AutoSize = True
+    Me.lblTypeADldLimitVal.Location = New System.Drawing.Point(38, 7)
+    Me.lblTypeADldLimitVal.Margin = New System.Windows.Forms.Padding(0)
+    Me.lblTypeADldLimitVal.Name = "lblTypeADldLimitVal"
+    Me.lblTypeADldLimitVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeADldLimitVal.TabIndex = 5
+    Me.lblTypeADldLimitVal.Text = " -- "
+    '
+    'lblTypeADldLimit
+    '
+    Me.lblTypeADldLimit.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeADldLimit.AutoSize = True
+    Me.lblTypeADldLimit.Location = New System.Drawing.Point(3, 7)
+    Me.lblTypeADldLimit.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
+    Me.lblTypeADldLimit.Name = "lblTypeADldLimit"
+    Me.lblTypeADldLimit.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeADldLimit.TabIndex = 4
+    Me.lblTypeADldLimit.Text = "Limit:"
+    '
+    'pnlTypeB
+    '
+    Me.pnlTypeB.ColumnCount = 2
+    Me.pnlTypeB.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeB.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeB.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlTypeB.Controls.Add(Me.pnlTypeBUsed, 0, 0)
+    Me.pnlTypeB.Controls.Add(Me.pnlTypeBFree, 0, 1)
+    Me.pnlTypeB.Controls.Add(Me.pnlTypeBLimit, 0, 2)
+    Me.pnlTypeB.Controls.Add(Me.pctTypeB, 1, 0)
+    Me.pnlTypeB.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeB.Location = New System.Drawing.Point(3, 16)
+    Me.pnlTypeB.Name = "pnlTypeB"
+    Me.pnlTypeB.RowCount = 3
+    Me.pnlTypeB.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+    Me.pnlTypeB.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334!))
+    Me.pnlTypeB.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+    Me.pnlTypeB.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlTypeB.Size = New System.Drawing.Size(422, 109)
+    Me.pnlTypeB.TabIndex = 3
+    '
+    'pnlTypeBUsed
+    '
+    Me.pnlTypeBUsed.AutoSize = True
+    Me.pnlTypeBUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeBUsed.ColumnCount = 2
+    Me.pnlTypeBUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBUsed.Controls.Add(Me.lblTypeBUsed, 0, 0)
+    Me.pnlTypeBUsed.Controls.Add(Me.lblTypeBUsedVal, 1, 0)
+    Me.pnlTypeBUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeBUsed.Location = New System.Drawing.Point(0, 0)
+    Me.pnlTypeBUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeBUsed.Name = "pnlTypeBUsed"
+    Me.pnlTypeBUsed.RowCount = 1
+    Me.pnlTypeBUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeBUsed.Size = New System.Drawing.Size(66, 36)
+    Me.pnlTypeBUsed.TabIndex = 18
+    '
+    'lblTypeBUsed
+    '
+    Me.lblTypeBUsed.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeBUsed.AutoSize = True
+    Me.lblTypeBUsed.Location = New System.Drawing.Point(3, 11)
+    Me.lblTypeBUsed.Name = "lblTypeBUsed"
+    Me.lblTypeBUsed.Size = New System.Drawing.Size(35, 13)
+    Me.lblTypeBUsed.TabIndex = 6
+    Me.lblTypeBUsed.Text = "Used:"
+    '
+    'lblTypeBUsedVal
+    '
+    Me.lblTypeBUsedVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeBUsedVal.AutoSize = True
+    Me.lblTypeBUsedVal.Location = New System.Drawing.Point(44, 11)
+    Me.lblTypeBUsedVal.Name = "lblTypeBUsedVal"
+    Me.lblTypeBUsedVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeBUsedVal.TabIndex = 12
+    Me.lblTypeBUsedVal.Text = " -- "
+    '
+    'pnlTypeBFree
+    '
+    Me.pnlTypeBFree.AutoSize = True
+    Me.pnlTypeBFree.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeBFree.ColumnCount = 2
+    Me.pnlTypeBFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBFree.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBFree.Controls.Add(Me.lblTypeBFree, 0, 0)
+    Me.pnlTypeBFree.Controls.Add(Me.lblTypeBFreeVal, 1, 0)
+    Me.pnlTypeBFree.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeBFree.Location = New System.Drawing.Point(0, 36)
+    Me.pnlTypeBFree.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeBFree.Name = "pnlTypeBFree"
+    Me.pnlTypeBFree.RowCount = 1
+    Me.pnlTypeBFree.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeBFree.Size = New System.Drawing.Size(66, 36)
+    Me.pnlTypeBFree.TabIndex = 19
+    '
+    'lblTypeBFree
+    '
+    Me.lblTypeBFree.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeBFree.AutoSize = True
+    Me.lblTypeBFree.Location = New System.Drawing.Point(3, 11)
+    Me.lblTypeBFree.Name = "lblTypeBFree"
+    Me.lblTypeBFree.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeBFree.TabIndex = 15
+    Me.lblTypeBFree.Text = "Free:"
+    '
+    'lblTypeBFreeVal
+    '
+    Me.lblTypeBFreeVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeBFreeVal.AutoSize = True
+    Me.lblTypeBFreeVal.Location = New System.Drawing.Point(44, 11)
+    Me.lblTypeBFreeVal.Name = "lblTypeBFreeVal"
+    Me.lblTypeBFreeVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeBFreeVal.TabIndex = 16
+    Me.lblTypeBFreeVal.Text = " -- "
+    '
+    'pnlTypeBLimit
+    '
+    Me.pnlTypeBLimit.AutoSize = True
+    Me.pnlTypeBLimit.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTypeBLimit.ColumnCount = 2
+    Me.pnlTypeBLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBLimit.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTypeBLimit.Controls.Add(Me.lblTypeBLimit, 0, 0)
+    Me.pnlTypeBLimit.Controls.Add(Me.lblTypeBLimitVal, 1, 0)
+    Me.pnlTypeBLimit.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTypeBLimit.Location = New System.Drawing.Point(0, 72)
+    Me.pnlTypeBLimit.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTypeBLimit.Name = "pnlTypeBLimit"
+    Me.pnlTypeBLimit.RowCount = 1
+    Me.pnlTypeBLimit.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTypeBLimit.Size = New System.Drawing.Size(66, 37)
+    Me.pnlTypeBLimit.TabIndex = 20
+    '
+    'lblTypeBLimit
+    '
+    Me.lblTypeBLimit.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblTypeBLimit.AutoSize = True
+    Me.lblTypeBLimit.Location = New System.Drawing.Point(3, 12)
+    Me.lblTypeBLimit.Name = "lblTypeBLimit"
+    Me.lblTypeBLimit.Size = New System.Drawing.Size(31, 13)
+    Me.lblTypeBLimit.TabIndex = 7
+    Me.lblTypeBLimit.Text = "Limit:"
+    '
+    'lblTypeBLimitVal
+    '
+    Me.lblTypeBLimitVal.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTypeBLimitVal.AutoSize = True
+    Me.lblTypeBLimitVal.Location = New System.Drawing.Point(44, 12)
+    Me.lblTypeBLimitVal.Name = "lblTypeBLimitVal"
+    Me.lblTypeBLimitVal.Size = New System.Drawing.Size(19, 13)
+    Me.lblTypeBLimitVal.TabIndex = 14
+    Me.lblTypeBLimitVal.Text = " -- "
+    '
+    'pctTypeB
+    '
+    Me.pctTypeB.BackColor = System.Drawing.Color.White
+    Me.pctTypeB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTypeB.ContextMenu = Me.mnuGraph
+    Me.pctTypeB.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pctTypeB.Location = New System.Drawing.Point(66, 0)
+    Me.pctTypeB.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+    Me.pctTypeB.Name = "pctTypeB"
+    Me.pnlTypeB.SetRowSpan(Me.pctTypeB, 3)
+    Me.pctTypeB.Size = New System.Drawing.Size(353, 109)
+    Me.pctTypeB.TabIndex = 1
+    Me.pctTypeB.TabStop = False
+    Me.ttUI.SetToolTip(Me.pctTypeB, "Graph representing your usage.")
     '
     'trayIcon
     '
@@ -1180,53 +925,40 @@ Partial Class frmMain
     CType(Me.pctNetTest, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNothing.ResumeLayout(False)
     Me.pnlNothing.PerformLayout()
-    Me.pnlWildBlue.ResumeLayout(False)
-    Me.gbUld.ResumeLayout(False)
-    Me.pnlUld.ResumeLayout(False)
-    Me.pnlUld.PerformLayout()
-    CType(Me.pctUld, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.pnlTypeA.ResumeLayout(False)
+    Me.gbTypeAUld.ResumeLayout(False)
+    Me.pnlTypeAUld.ResumeLayout(False)
+    Me.pnlTypeAUld.PerformLayout()
+    CType(Me.pctTypeAUld, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlUldText.ResumeLayout(False)
     Me.pnlUldText.PerformLayout()
-    Me.pnlUldTextUsed.ResumeLayout(False)
-    Me.pnlUldTextUsed.PerformLayout()
-    Me.pnlUldTextFree.ResumeLayout(False)
-    Me.pnlUldTextFree.PerformLayout()
-    Me.pnlUldTextTotal.ResumeLayout(False)
-    Me.pnlUldTextTotal.PerformLayout()
-    Me.gbDld.ResumeLayout(False)
-    Me.pnlDld.ResumeLayout(False)
-    Me.pnlDld.PerformLayout()
-    CType(Me.pctDld, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.pnlTypeAUldUsed.ResumeLayout(False)
+    Me.pnlTypeAUldUsed.PerformLayout()
+    Me.pnlTypeAUldFree.ResumeLayout(False)
+    Me.pnlTypeAUldFree.PerformLayout()
+    Me.pnlTypeAUldLimit.ResumeLayout(False)
+    Me.pnlTypeAUldLimit.PerformLayout()
+    Me.gbTypeADld.ResumeLayout(False)
+    Me.pnlTypeADld.ResumeLayout(False)
+    Me.pnlTypeADld.PerformLayout()
+    CType(Me.pctTypeADld, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlDldText.ResumeLayout(False)
     Me.pnlDldText.PerformLayout()
-    Me.pnlDldTextUsed.ResumeLayout(False)
-    Me.pnlDldTextUsed.PerformLayout()
-    Me.pnlDldTextFree.ResumeLayout(False)
-    Me.pnlDldTextFree.PerformLayout()
-    Me.pnlDldTextTotal.ResumeLayout(False)
-    Me.pnlDldTextTotal.PerformLayout()
-    Me.pnlExede.ResumeLayout(False)
-    Me.pnlExede.PerformLayout()
-    Me.pnlExedeUp.ResumeLayout(False)
-    Me.pnlExedeUp.PerformLayout()
-    Me.pnlExedeUsed.ResumeLayout(False)
-    Me.pnlExedeUsed.PerformLayout()
-    Me.pnlExedeFree.ResumeLayout(False)
-    Me.pnlExedeFree.PerformLayout()
-    Me.pnlExedeTotal.ResumeLayout(False)
-    Me.pnlExedeTotal.PerformLayout()
-    Me.pnlExedeDown.ResumeLayout(False)
-    Me.pnlExedeDown.PerformLayout()
-    CType(Me.pctExede, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.pnlRural.ResumeLayout(False)
-    Me.pnlRural.PerformLayout()
-    Me.pnlRuralUsed.ResumeLayout(False)
-    Me.pnlRuralUsed.PerformLayout()
-    Me.pnlRuralFree.ResumeLayout(False)
-    Me.pnlRuralFree.PerformLayout()
-    Me.pnlRuralTotal.ResumeLayout(False)
-    Me.pnlRuralTotal.PerformLayout()
-    CType(Me.pctRural, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.pnlTypeADldUsed.ResumeLayout(False)
+    Me.pnlTypeADldUsed.PerformLayout()
+    Me.pnlTypeADldFree.ResumeLayout(False)
+    Me.pnlTypeADldFree.PerformLayout()
+    Me.pnlTypeADldLimit.ResumeLayout(False)
+    Me.pnlTypeADldLimit.PerformLayout()
+    Me.pnlTypeB.ResumeLayout(False)
+    Me.pnlTypeB.PerformLayout()
+    Me.pnlTypeBUsed.ResumeLayout(False)
+    Me.pnlTypeBUsed.PerformLayout()
+    Me.pnlTypeBFree.ResumeLayout(False)
+    Me.pnlTypeBFree.PerformLayout()
+    Me.pnlTypeBLimit.ResumeLayout(False)
+    Me.pnlTypeBLimit.PerformLayout()
+    CType(Me.pctTypeB, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -1234,67 +966,50 @@ Partial Class frmMain
   Friend WithEvents pnlSettings As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents cmdHistory As System.Windows.Forms.Button
   Friend WithEvents gbUsage As System.Windows.Forms.GroupBox
-  Friend WithEvents gbUld As System.Windows.Forms.GroupBox
-  Friend WithEvents gbDld As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlDld As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctDld As System.Windows.Forms.PictureBox
+  Friend WithEvents gbTypeAUld As System.Windows.Forms.GroupBox
+  Friend WithEvents gbTypeADld As System.Windows.Forms.GroupBox
+  Friend WithEvents pnlTypeADld As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pctTypeADld As System.Windows.Forms.PictureBox
   Friend WithEvents pnlDldText As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblDUsed As System.Windows.Forms.Label
-  Friend WithEvents lblDldUsed As System.Windows.Forms.Label
-  Friend WithEvents lblDFree As System.Windows.Forms.Label
-  Friend WithEvents lblDldFree As System.Windows.Forms.Label
-  Friend WithEvents lblDTotal As System.Windows.Forms.Label
-  Friend WithEvents lblDldTotal As System.Windows.Forms.Label
-  Friend WithEvents pnlUld As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctUld As System.Windows.Forms.PictureBox
+  Friend WithEvents lblTypeADldUsed As System.Windows.Forms.Label
+  Friend WithEvents lblTypeADldUsedVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeADldFree As System.Windows.Forms.Label
+  Friend WithEvents lblTypeADldFreeVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeADldLimit As System.Windows.Forms.Label
+  Friend WithEvents lblTypeADldLimitVal As System.Windows.Forms.Label
+  Friend WithEvents pnlTypeAUld As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pctTypeAUld As System.Windows.Forms.PictureBox
   Friend WithEvents pnlUldText As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblUUsed As System.Windows.Forms.Label
-  Friend WithEvents lblUldUsed As System.Windows.Forms.Label
-  Friend WithEvents lblUFree As System.Windows.Forms.Label
-  Friend WithEvents lblUldFree As System.Windows.Forms.Label
-  Friend WithEvents lblUTotal As System.Windows.Forms.Label
-  Friend WithEvents lblUldTotal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldUsed As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldUsedVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldFree As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldFreeVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldLimit As System.Windows.Forms.Label
+  Friend WithEvents lblTypeAUldLimitVal As System.Windows.Forms.Label
   Friend WithEvents trayIcon As System.Windows.Forms.NotifyIcon
   Friend WithEvents ttUI As ToolTip
-  Friend WithEvents pnlWildBlue As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeA As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents tmrUpdate As System.Windows.Forms.Timer
   Friend WithEvents cmdAbout As System.Windows.Forms.Button
   Friend WithEvents cmdRefresh As System.Windows.Forms.Button
   Friend WithEvents cmdConfig As System.Windows.Forms.Button
-  Friend WithEvents pnlExede As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblExedeTotal As System.Windows.Forms.Label
-  Friend WithEvents lblExedeUp As System.Windows.Forms.Label
-  Friend WithEvents lblExedeDown As System.Windows.Forms.Label
-  Friend WithEvents lblExedeAllowed As System.Windows.Forms.Label
-  Friend WithEvents lblExedeDownVal As System.Windows.Forms.Label
-  Friend WithEvents lblExedeUpVal As System.Windows.Forms.Label
-  Friend WithEvents lblExedeTotalVal As System.Windows.Forms.Label
-  Friend WithEvents lblExedeAllowedVal As System.Windows.Forms.Label
-  Friend WithEvents pctExede As System.Windows.Forms.PictureBox
-  Friend WithEvents lblExedeRemainVal As System.Windows.Forms.Label
-  Friend WithEvents lblExedeRemain As System.Windows.Forms.Label
-  Friend WithEvents pnlRural As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctRural As System.Windows.Forms.PictureBox
-  Friend WithEvents lblRuralUsed As System.Windows.Forms.Label
-  Friend WithEvents lblRuralUsedVal As System.Windows.Forms.Label
-  Friend WithEvents lblRuralRemain As System.Windows.Forms.Label
-  Friend WithEvents lblRuralRemainVal As System.Windows.Forms.Label
-  Friend WithEvents lblRuralAllowed As System.Windows.Forms.Label
-  Friend WithEvents lblRuralAllowedVal As System.Windows.Forms.Label
-  Friend WithEvents pnlDldTextUsed As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlDldTextFree As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlDldTextTotal As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlUldTextUsed As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlUldTextFree As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlUldTextTotal As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlExedeDown As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlExedeUp As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlExedeUsed As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlExedeFree As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlExedeTotal As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlRuralUsed As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlRuralFree As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlRuralTotal As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeB As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pctTypeB As System.Windows.Forms.PictureBox
+  Friend WithEvents lblTypeBUsed As System.Windows.Forms.Label
+  Friend WithEvents lblTypeBUsedVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeBFree As System.Windows.Forms.Label
+  Friend WithEvents lblTypeBFreeVal As System.Windows.Forms.Label
+  Friend WithEvents lblTypeBLimit As System.Windows.Forms.Label
+  Friend WithEvents lblTypeBLimitVal As System.Windows.Forms.Label
+  Friend WithEvents pnlTypeADldUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeADldFree As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeADldLimit As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeAUldUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeAUldFree As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeAUldLimit As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeBUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeBFree As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pnlTypeBLimit As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents tmrIcon As System.Windows.Forms.Timer
   Friend WithEvents mnuTray As System.Windows.Forms.ContextMenu
   Friend WithEvents mnuRestore As System.Windows.Forms.MenuItem
