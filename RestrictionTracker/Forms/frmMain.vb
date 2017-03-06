@@ -41,8 +41,8 @@ Public Class frmMain
   Private ClosingTime As Boolean
   Private sFailTray As String
   Private bAlert As TriState
-  Private wb_down, wb_up, wb_dlim, wb_ulim As Long
-  Private r_used, r_lim As Long
+  Private typeA_down, typeA_up, typeA_dlim, typeA_ulim As Long
+  Private typeB_used, typeB_lim As Long
   Private lastBalloon As Long
   Private c_PauseActivity As String
   Private iconItem As Integer
@@ -450,22 +450,22 @@ Public Class frmMain
   Private Sub ResizePanels()
     Dim trayIcoVal As Icon = Nothing
     If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.DishNet_EXEDE Then
-      If wb_dlim = 0 And wb_ulim = 0 Then
+      If typeA_dlim = 0 And typeA_ulim = 0 Then
         pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
       Else
-        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, wb_down, wb_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, wb_up, wb_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = CreateTrayIcon(wb_down, wb_dlim, wb_up, wb_ulim)
+        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, typeA_down, typeA_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, typeA_up, typeA_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        trayIcoVal = CreateTypeATrayIcon(typeA_down, typeA_dlim, typeA_up, typeA_ulim)
       End If
     ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Then
-      If r_lim = 0 Then
+      If typeB_lim = 0 Then
         pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
       Else
-        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, r_used, r_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = CreateRTrayIcon(r_used, r_lim)
+        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, typeB_used, typeB_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+        trayIcoVal = CreateTypeBTrayIcon(typeB_used, typeB_lim)
       End If
     ElseIf myPanel = SatHostTypes.Other Then
       lblNothing.Text = My.Application.Info.ProductName
@@ -1312,10 +1312,10 @@ Public Class frmMain
     End If
     Select Case state
       Case "TYPEA"
-        Dim lDown As Long = wb_down
-        Dim lDLim As Long = wb_dlim
-        Dim lUp As Long = wb_up
-        Dim lULim As Long = wb_ulim
+        Dim lDown As Long = typeA_down
+        Dim lDLim As Long = typeA_dlim
+        Dim lUp As Long = typeA_up
+        Dim lULim As Long = typeA_ulim
         Dim lDFree As Long = lDLim - lDown
         Dim lUFree As Long = lULim - lUp
         If lDown > 0 Or lDFree <> 0 Or lDLim > 0 Or lUp > 0 Or lUFree <> 0 Or lULim > 0 Then
@@ -1332,16 +1332,16 @@ Public Class frmMain
           Return
         End If
       Case "TYPEB"
-        Dim lUsed As Long = r_used
-        Dim lLim As Long = r_lim
-        Dim lRemain As Long = lLim - lUsed
-        If lUsed <> 0 Or r_lim > 0 Or lRemain <> 0 Then
+        Dim lUsed As Long = typeB_used
+        Dim lLim As Long = typeB_lim
+        Dim lFree As Long = lLim - lUsed
+        If lUsed <> 0 Or typeB_lim > 0 Or lFree <> 0 Then
           DoChange(lblTypeBUsedVal, lUsed)
-          DoChange(lblTypeBFreeVal, lRemain)
+          DoChange(lblTypeBFreeVal, lFree)
           DoChange(lblTypeBLimitVal, lLim)
         End If
         ResizePanels()
-        If lUsed = 0 And lLim = 0 And lRemain = 0 Then
+        If lUsed = 0 And lLim = 0 And lFree = 0 Then
           AskForDonations()
           Return
         End If
@@ -1422,10 +1422,10 @@ Public Class frmMain
     pnlTypeA.Visible = True
     pnlTypeB.Visible = False
     pnlNothing.Visible = False
-    wb_down = lDown
-    wb_dlim = lDownLim
-    wb_up = lUp
-    wb_ulim = lUpLim
+    typeA_down = lDown
+    typeA_dlim = lDownLim
+    typeA_up = lUp
+    typeA_ulim = lUpLim
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
       tmrChanges = Nothing
@@ -1500,7 +1500,7 @@ Public Class frmMain
              "D: " & AccuratePercent(lDown / lDownLim) & dFree & vbCr &
              "U: " & AccuratePercent(lUp / lUpLim) & uFree
     End If
-    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconBefore = CreateTypeATrayIcon(lDown, lDownLim, lUp, lUpLim)
     iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
@@ -1511,10 +1511,10 @@ Public Class frmMain
     pnlTypeA.Visible = True
     pnlTypeB.Visible = False
     pnlNothing.Visible = False
-    wb_down = lDown
-    wb_dlim = lDownLim
-    wb_up = lUp
-    wb_ulim = lUpLim
+    typeA_down = lDown
+    typeA_dlim = lDownLim
+    typeA_up = lUp
+    typeA_ulim = lUpLim
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
       tmrChanges = Nothing
@@ -1586,7 +1586,7 @@ Public Class frmMain
              "A-T: " & AccuratePercent(lDown / lDownLim) & atFree & vbCr &
              "O-P: " & AccuratePercent(lUp / lUpLim) & opFree
     End If
-    iconBefore = CreateTrayIcon(lDown, lDownLim, lUp, lUpLim)
+    iconBefore = CreateTypeATrayIcon(lDown, lDownLim, lUp, lUpLim)
     iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
@@ -1601,8 +1601,8 @@ Public Class frmMain
     pnlTypeA.Visible = False
     pnlTypeB.Visible = True
     pnlNothing.Visible = False
-    r_used = lDown
-    r_lim = lDownLim
+    typeB_used = lDown
+    typeB_lim = lDownLim
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
       tmrChanges = Nothing
@@ -1632,7 +1632,7 @@ Public Class frmMain
     ElseIf lDownLim < lDown Then
       sTTT &= vbCr & MBorGB(lDown - lDownLim) & " Over"
     End If
-    iconBefore = CreateRTrayIcon(lDown, lDownLim)
+    iconBefore = CreateTypeBTrayIcon(lDown, lDownLim)
     iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
     DisplayResultAlert(mySettings.AccountType, lDown, lUp)
@@ -2037,7 +2037,7 @@ Public Class frmMain
     sFailTray = Nothing
   End Sub
 #Region "Graphs"
-  Private Function CreateTrayIcon(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long) As Icon
+  Private Function CreateTypeATrayIcon(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long) As Icon
     Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
     Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
     Dim imgTray As New Bitmap(icoX, icoY)
@@ -2064,7 +2064,7 @@ Public Class frmMain
       Return MakeIcon(IconName.norm, icoX, icoY)
     End Try
   End Function
-  Private Function CreateRTrayIcon(lUsed As Long, lLim As Long) As Icon
+  Private Function CreateTypeBTrayIcon(lUsed As Long, lLim As Long) As Icon
     Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
     Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
     Dim imgTray As New Bitmap(icoX, icoY)
