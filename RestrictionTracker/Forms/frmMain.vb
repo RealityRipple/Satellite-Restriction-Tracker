@@ -1048,7 +1048,7 @@ Public Class frmMain
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
-    If e.FreeDetected Then imFree = True
+    imFree = e.FreeDetected
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1073,7 +1073,7 @@ Public Class frmMain
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
-    If e.FreeDetected Then imFree = True
+    imFree = e.FreeDetected
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1098,7 +1098,7 @@ Public Class frmMain
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
-    If e.FreeDetected Then imFree = True
+    imFree = e.FreeDetected
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1123,7 +1123,7 @@ Public Class frmMain
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
-    If e.FreeDetected Then imFree = True
+    imFree = e.FreeDetected
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
@@ -1148,7 +1148,7 @@ Public Class frmMain
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
-    If e.FreeDetected Then imFree = True
+    imFree = e.FreeDetected
     DisplayUsage(True, True)
     If localData IsNot Nothing Then
       localData.Dispose()
