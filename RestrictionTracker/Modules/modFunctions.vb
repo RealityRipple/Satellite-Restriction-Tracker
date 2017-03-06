@@ -968,108 +968,206 @@ Module modFunctions
     Next
     Dim lStart As Date = Data(0).DATETIME
     Dim lEnd As Date = Data(Data.Length - 1).DATETIME
-    Dim dInterval As DateInterval = DateInterval.Minute
-    Dim lInterval As UInteger = 1
-    Dim lBitInterval As Double = 1.0
-    Dim lLabelInterval As UInteger = 5
-    Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
-      Case Is <= 61
-        lInterval = 5
-        lBitInterval = 1
-        lLabelInterval = 10
-        dInterval = DateInterval.Minute
-      Case Is < 60 * 13
-        lInterval = 60
-        lBitInterval = 30
-        lLabelInterval = 60 * 2
-        dInterval = DateInterval.Minute
-      Case Is <= 60 * 24
-        lInterval = 6
-        lBitInterval = 1
-        lLabelInterval = 6
-        dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 2
-        lInterval = 12
-        lBitInterval = 6
-        lLabelInterval = 24
-        dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 6
-        lInterval = 24
-        lBitInterval = 12
-        lLabelInterval = 24
-        dInterval = DateInterval.Hour
-      Case Is <= 60 * 24 * 12
-        lInterval = 2
-        lBitInterval = 1
-        lLabelInterval = 2
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 20
-        lInterval = 2
-        lBitInterval = 1
-        lLabelInterval = 4
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 27
-        lInterval = 2
-        lBitInterval = 1
-        lLabelInterval = 7
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 40
-        lInterval = 4
-        lBitInterval = 2
-        lLabelInterval = 7
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 90
-        lInterval = 14
-        lBitInterval = 7
-        lLabelInterval = 14
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 240
-        lInterval = 30
-        lBitInterval = 15
-        lLabelInterval = 30
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 365
-        lInterval = 60
-        lBitInterval = 30
-        lLabelInterval = 90
-        dInterval = DateInterval.Day
-      Case Is <= 60 * 24 * 365 * 2
-        lInterval = 90
-        lBitInterval = 60
-        lLabelInterval = 180
-        dInterval = DateInterval.Day
-      Case Else
-        lInterval = 365
-        lBitInterval = 180
-        lLabelInterval = 365
-        dInterval = DateInterval.Day
-    End Select
-    Dim lMaxTime As Long = Math.Abs(DateDiff(dInterval, lStart, lEnd))
-    If lMaxTime = 0 Then Return New Bitmap(1, 1)
-    Dim lLineWidth As Long = (ImgSize.Width - 4) - lYWidth - 1
-    Dim dCompInter As Double = lLineWidth / lMaxTime
-    For I As Double = 0 To lMaxTime Step lBitInterval
-      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      If I > 0 Then g.DrawLine(New Pen(ColorGridLight), lX, yTop, lX, ImgSize.Height - (lXHeight + 5))
-    Next
-    For I As Long = 0 To lMaxTime Step lInterval
-      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
-      If I > 0 Then g.DrawLine(New Pen(ColorGridDark), lX, yTop, lX, ImgSize.Height - (lXHeight + 5))
-    Next I
-    Dim lastI As Long = lYWidth + (lMaxTime * dCompInter)
-    If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
+    Dim dAxisInterval As DateInterval = DateInterval.Minute
+    Dim lAxisInterval As UInteger = 1
+    Dim lAxisSubInterval As Double = 1.0
+    Dim lAxisLabelInterval As UInteger = 5
+    Dim dGraphInterval As DateInterval = DateInterval.Second
+    Dim lGraphInterval As UInteger = 6
     Dim sDispV As String = "g"
-    Select Case DateDiff(DateInterval.Day, lStart, lEnd)
-      Case Is > 1 : sDispV = "d"
-      Case Is < 1 : sDispV = "t"
-      Case Else : sDispV = "g"
+    Select Case Math.Abs(DateDiff(DateInterval.Minute, lStart, lEnd))
+      Case Is <= 60
+        lAxisInterval = 5
+        lAxisSubInterval = 2.5
+        lAxisLabelInterval = 10
+        dAxisInterval = DateInterval.Minute
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Minute
+        sDispV = "t"
+      Case Is <= 60 * 12
+        lAxisInterval = 60
+        lAxisSubInterval = 30
+        lAxisLabelInterval = 120
+        dAxisInterval = DateInterval.Minute
+        lGraphInterval = 5
+        dGraphInterval = DateInterval.Minute
+        sDispV = "t"
+      Case Is <= 60 * 24
+        lAxisInterval = 96
+        lAxisSubInterval = 48
+        lAxisLabelInterval = 192
+        dAxisInterval = DateInterval.Minute
+        lGraphInterval = 15
+        dGraphInterval = DateInterval.Minute
+        sDispV = "t"
+      Case Is <= 60 * 24 * 2
+        lAxisInterval = 4
+        lAxisSubInterval = 2
+        lAxisLabelInterval = 12
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 15
+        dGraphInterval = DateInterval.Minute
+        sDispV = "g"
+      Case Is <= 60 * 24 * 3
+        lAxisInterval = 6
+        lAxisSubInterval = 3
+        lAxisLabelInterval = 18
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 30
+        dGraphInterval = DateInterval.Minute
+        sDispV = "g"
+      Case Is <= 60 * 24 * 5
+        lAxisInterval = 12
+        lAxisSubInterval = 6
+        lAxisLabelInterval = 24
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 30
+        dGraphInterval = DateInterval.Minute
+        sDispV = "d"
+      Case Is <= 60 * 24 * 7
+        lAxisInterval = 12
+        lAxisSubInterval = 6
+        lAxisLabelInterval = 24
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 45
+        dGraphInterval = DateInterval.Minute
+        sDispV = "d"
+      Case Is <= 60 * 24 * 13
+        lAxisInterval = 24
+        lAxisSubInterval = 12
+        lAxisLabelInterval = 48
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 18
+        lAxisInterval = 36
+        lAxisSubInterval = 12
+        lAxisLabelInterval = 72
+        dAxisInterval = DateInterval.Hour
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 20
+        lAxisInterval = 2
+        lAxisSubInterval = 1
+        lAxisLabelInterval = 4
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 2
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 27
+        lAxisInterval = 3
+        lAxisSubInterval = 1
+        lAxisLabelInterval = 6
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 3
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 29
+        lAxisInterval = 4
+        lAxisSubInterval = 1
+        lAxisLabelInterval = 8
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 5
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 40
+        lAxisInterval = 3
+        lAxisSubInterval = 1.5
+        lAxisLabelInterval = 6
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 4
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 55
+        lAxisInterval = 4
+        lAxisSubInterval = 2
+        lAxisLabelInterval = 8
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 8
+        dGraphInterval = DateInterval.Hour
+        sDispV = "d"
+      Case Is <= 60 * 24 * 90
+        lAxisInterval = 6
+        lAxisSubInterval = 3
+        lAxisLabelInterval = 12
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Is <= 60 * 24 * 120
+        lAxisInterval = 8
+        lAxisSubInterval = 4
+        lAxisLabelInterval = 16
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Is <= 60 * 24 * 180
+        lAxisInterval = 16
+        lAxisSubInterval = 8
+        lAxisLabelInterval = 32
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Is <= 60 * 24 * 210
+        lAxisInterval = 24
+        lAxisSubInterval = 12
+        lAxisLabelInterval = 48
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 1
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Is <= 60 * 24 * 240
+        lAxisInterval = 30
+        lAxisSubInterval = 15
+        lAxisLabelInterval = 60
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 2
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Is <= 60 * 24 * 365 * 2
+        lAxisInterval = 60
+        lAxisSubInterval = 30
+        lAxisLabelInterval = 90
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 5
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
+      Case Else
+        lAxisInterval = 90
+        lAxisSubInterval = 45
+        lAxisLabelInterval = 180
+        dAxisInterval = DateInterval.Day
+        lGraphInterval = 10
+        dGraphInterval = DateInterval.Day
+        sDispV = "d"
     End Select
+    Dim lMaxAxisTime As Long = Math.Abs(DateDiff(dAxisInterval, lStart, lEnd))
+    Dim lMaxGraphTime As Long = Math.Abs(DateDiff(dGraphInterval, lStart, lEnd))
+    If lMaxAxisTime = 0 Or lMaxGraphTime = 0 Then Return New Bitmap(1, 1)
+    Dim lLineWidth As Long = (ImgSize.Width - 4) - lYWidth - 1
+    Dim dAxisCompInter As Double = lLineWidth / lMaxAxisTime
+    Dim dGraphCompInter As Double = lLineWidth / lMaxGraphTime
+    For I As Double = 0 To lMaxAxisTime Step lAxisSubInterval
+      Dim lX As Integer = lYWidth + (I * dAxisCompInter) + 1
+      If I > 0 Then g.DrawLine(New Pen(ColorGridLight), lX, yTop, lX, ImgSize.Height - (lXHeight))
+    Next
+    For I As Long = 0 To lMaxAxisTime Step lAxisInterval
+      Dim lX As Integer = lYWidth + (I * dAxisCompInter) + 1
+      g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 3), lX, ImgSize.Height - lXHeight)
+      If I > 0 Then g.DrawLine(New Pen(ColorGridDark), lX, yTop, lX, ImgSize.Height - (lXHeight))
+    Next I
+    Dim lastI As Long = lYWidth + (lMaxAxisTime * dAxisCompInter)
+    If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
     Dim sLastDisp As String = lEnd.ToString(sDispV)
     Dim iLastDispWidth As Single = g.MeasureString(sLastDisp, tFont).Width
-    For I As Long = 0 To lMaxTime Step lLabelInterval
-      Dim lX As Integer = lYWidth + (I * dCompInter) + 1
-      Dim sDisp As String = DateAdd(dInterval, I, lStart).ToString(sDispV)
+    For I As Long = 0 To lMaxAxisTime Step lAxisLabelInterval
+      Dim lX As Integer = lYWidth + (I * dAxisCompInter) '+ 1
+      If I < lMaxAxisTime Then lX += 1
+      Dim sDisp As String = DateAdd(dAxisInterval, I, lStart).ToString(sDispV)
       g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
       If lX >= (ImgSize.Width - (g.MeasureString(sDisp, tFont).Width / 2)) Then
         g.DrawString(sDisp, tFont, New SolidBrush(ColorText), (ImgSize.Width - g.MeasureString(sDisp, tFont).Width), ImgSize.Height - lXHeight + 5)
@@ -1090,63 +1188,63 @@ Module modFunctions
     Else
       MaxY = yTop + yHeight - (IIf(GraphDir = Direction.Down, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
     End If
-    Dim lMaxPoints(lMaxTime) As Point
-    Dim lPoints(lMaxTime + 3) As Point
-    Dim lTypes(lMaxTime + 3) As Byte
-    Dim lastLVal As Long = 0
-    For I As Long = 0 To lMaxTime
+    Dim lMaxPoints(lMaxAxisTime) As Point
+    Dim lPoints(lMaxGraphTime + 3) As Point
+    Dim lTypes(lMaxGraphTime + 3) As Byte
+    Dim lastVal As Long = 0
+    For I As Long = 0 To lMaxAxisTime
       Dim lVal As Long = -1
-      Dim lLow As Long = Long.MaxValue
+      Dim lHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
+        If Math.Abs(DateDiff(dAxisInterval, Data(J).DATETIME, DateAdd(dAxisInterval, I, lStart))) = 0 Then
           Dim jLim As Long = 0
           If GraphDir = Direction.Up Then
             jLim = Data(J).UPLIM
           Else
             jLim = Data(J).DOWNLIM
           End If
-          If lLow > jLim Then lLow = jLim
+          If lHigh < jLim Then lHigh = jLim
         End If
       Next
-      If lLow < Long.MaxValue Then
-        lVal = lLow
+      If lHigh > 0 Then
+        lVal = lHigh
       Else
-        If I = lMaxTime Then
-          If lastLVal > 0 Then
-            lVal = lastLVal
+        If I = lMaxAxisTime Then
+          If lastVal > 0 Then
+            lVal = lastVal
           Else
             lVal = 0
           End If
         Else
-          Dim NextLVal As Long = Long.MaxValue
+          Dim nextHVal As Long = 0
           Dim K As Long = I
-          Do Until NextLVal < Long.MaxValue
+          Do Until nextHVal > 0
             K += 1
-            If K > lMaxTime Then Exit Do
+            'If K > lMaxTime Then Exit Do
             For J As Integer = 0 To Data.Length - 1
-              If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, K, lStart))) = 0 Then
+              If Math.Abs(DateDiff(dAxisInterval, Data(J).DATETIME, DateAdd(dAxisInterval, K, lStart))) = 0 Then
                 Dim jLim As Long = 0
                 If GraphDir = Direction.Up Then
                   jLim = Data(J).UPLIM
                 Else
                   jLim = Data(J).DOWNLIM
                 End If
-                If NextLVal > jLim Then NextLVal = jLim
+                If nextHVal < jLim Then nextHVal = jLim
               End If
             Next
           Loop
-          If NextLVal < Long.MaxValue Then
-            If lastLVal > NextLVal Then
-              lVal = NextLVal
+          If nextHVal > 0 Then
+            If lastVal < nextHVal Then
+              lVal = nextHVal
             Else
-              lVal = lastLVal
+              lVal = lastVal
             End If
           Else
-            lVal = lastLVal
+            lVal = lastVal
           End If
         End If
       End If
-      lMaxPoints(I).X = lYWidth + (I * dCompInter) + 1
+      lMaxPoints(I).X = lYWidth + (I * dAxisCompInter) + 1
       lMaxPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lMaxPoints(I - 1).X = 0 And lMaxPoints(I - 1).Y = 0) Then
         Dim J As Long = 1
@@ -1154,66 +1252,175 @@ Module modFunctions
           J += 1
         End While
         For K As Long = 1 To J - 1
-          lMaxPoints(I - K).X = lYWidth + ((I - K) * dCompInter) + 1
+          lMaxPoints(I - K).X = lYWidth + ((I - K) * dAxisCompInter) + 1
           lMaxPoints(I - K).Y = (lMaxPoints(I - J).Y + lMaxPoints(I).Y) / 2
         Next
       End If
-      If lVal > 0 Then lastLVal = lVal
+      If lVal > 0 Then lastVal = lVal
     Next I
-    lastLVal = 0
-    For I As Long = 0 To lMaxTime
+
+    lastVal = 0
+    For I As Long = 0 To lMaxGraphTime
       Dim lVal As Long = -1
       Dim lLow As Long = Long.MaxValue
+      'Dim lHigh As Long = 0
+      Dim mLow As Long = Long.MaxValue
+      'Dim mHigh As Long = 0
       For J As Integer = 0 To Data.Length - 1
-        If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, I, lStart))) = 0 Then
+        If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, DateAdd(dGraphInterval, I, lStart))) = 0 Then
           Dim jVal As Long = 0
+          Dim jMax As Long = 0
           If GraphDir = Direction.Up Then
             jVal = Data(J).UPLOAD
+            jMax = Data(J).UPLIM
           Else
             jVal = Data(J).DOWNLOAD
+            jMax = Data(J).DOWNLIM
           End If
           If lLow > jVal Then lLow = jVal
+          If mLow > jMax Then mLow = jMax
+          'If lHigh < jVal Then lHigh = jVal
+          'If mHigh < jMax Then mHigh = jMax
         End If
       Next
+      'Dim aMax As Long = Math.Floor((mLow + mHigh) / 2)
+      'If lHigh > Math.Floor(aMax / 2) Then
+      '  If lHigh > 0 Then
+      '    lVal = lHigh
+      '  Else
+      '    If I = lMaxGraphTime Then
+      '      If lastVal > 0 Then
+      '        lVal = lastVal
+      '      Else
+      '        lVal = 0
+      '      End If
+      '    Else
+      '      Dim nextHVal As Long = 0
+      '      Dim K As Long = I
+      '      Do Until nextHVal > 0
+      '        K += 1
+      '        If K > lMaxGraphTime Then Exit Do
+      '        For J As Integer = 0 To Data.Length - 1
+      '          If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, DateAdd(dGraphInterval, K, lStart))) = 0 Then
+      '            Dim jVal As Long = 0
+      '            If GraphDir = Direction.Up Then
+      '              jVal = Data(J).UPLOAD
+      '            Else
+      '              jVal = Data(J).DOWNLOAD
+      '            End If
+      '            If nextHVal < jVal Then nextHVal = jVal
+      '          End If
+      '        Next
+      '      Loop
+      '      If nextHVal > 0 Then
+      '        If lastVal < nextHVal Then
+      '          lVal = nextHVal
+      '        Else
+      '          lVal = lastVal
+      '        End If
+      '      Else
+      '        lVal = lastVal
+      '      End If
+      '    End If
+      '  End If
+      'ElseIf lLow < Math.Ceiling(aMax / 2) Then
       If lLow < Long.MaxValue Then
         lVal = lLow
       Else
-        If I = lMaxTime Then
-          If lastLVal > 0 Then
-            lVal = lastLVal
+        If I = lMaxGraphTime Then
+          If lastVal > 0 Then
+            lVal = lastVal
           Else
             lVal = 0
           End If
         Else
-          Dim NextLVal As Long = Long.MaxValue
+          Dim nextLVal As Long = Long.MaxValue
           Dim K As Long = I
-          Do Until NextLVal < Long.MaxValue
+          Do Until nextLVal < Long.MaxValue
             K += 1
-            If K > lMaxTime Then Exit Do
+            If K > lMaxGraphTime Then Exit Do
             For J As Integer = 0 To Data.Length - 1
-              If Math.Abs(DateDiff(dInterval, Data(J).DATETIME, DateAdd(dInterval, K, lStart))) = 0 Then
+              If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, DateAdd(dGraphInterval, K, lStart))) = 0 Then
                 Dim jVal As Long = 0
                 If GraphDir = Direction.Up Then
                   jVal = Data(J).UPLOAD
                 Else
                   jVal = Data(J).DOWNLOAD
                 End If
-                If NextLVal > jVal Then NextLVal = jVal
+                If nextLVal > jVal Then nextLVal = jVal
               End If
             Next
           Loop
-          If NextLVal < Long.MaxValue Then
-            If lastLVal > NextLVal Then
-              lVal = NextLVal
+          If nextLVal < Long.MaxValue Then
+            If lastVal > nextLVal Then
+              lVal = nextLVal
             Else
-              lVal = lastLVal
+              lVal = lastVal
             End If
           Else
-            lVal = lastLVal
+            lVal = lastVal
           End If
         End If
       End If
-      lPoints(I).X = lYWidth + (I * dCompInter) + IIf(I > 0, 1, 0)
+      'Else
+      'If lHigh > 0 And lLow < Long.MaxValue Then
+      '  lVal = Math.Round((lLow + lHigh) / 2)
+      'ElseIf lHigh > 0 Then
+      '  lVal = lHigh
+      'ElseIf lLow < Long.MaxValue Then
+      '  lVal = lLow
+      'Else
+      '  If I = lMaxGraphTime Then
+      '    If lastVal > 0 Then
+      '      lVal = lastVal
+      '    Else
+      '      lVal = 0
+      '    End If
+      '  Else
+      '    Dim nextLVal As Long = Long.MaxValue
+      '    Dim K As Long = I
+      '    Do Until nextLVal < Long.MaxValue
+      '      K += 1
+      '      If K > lMaxGraphTime Then Exit Do
+      '      For J As Integer = 0 To Data.Length - 1
+      '        If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, DateAdd(dGraphInterval, K, lStart))) = 0 Then
+      '          Dim jVal As Long = 0
+      '          If GraphDir = Direction.Up Then
+      '            jVal = Data(J).UPLOAD
+      '          Else
+      '            jVal = Data(J).DOWNLOAD
+      '          End If
+      '          If nextLVal > jVal Then nextLVal = jVal
+      '        End If
+      '      Next
+      '    Loop
+      '    Dim nextHVal As Long = 0
+      '    K = I
+      '    Do Until nextHVal > 0
+      '      K += 1
+      '      If K > lMaxGraphTime Then Exit Do
+      '      For J As Integer = 0 To Data.Length - 1
+      '        If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, DateAdd(dGraphInterval, K, lStart))) = 0 Then
+      '          Dim jVal As Long = 0
+      '          If GraphDir = Direction.Up Then
+      '            jVal = Data(J).UPLOAD
+      '          Else
+      '            jVal = Data(J).DOWNLOAD
+      '          End If
+      '          If nextHVal < jVal Then nextHVal = jVal
+      '        End If
+      '      Next
+      '    Loop
+      '    If nextLVal < Long.MaxValue And nextHVal > 0 Then
+      '      lVal = Math.Round((nextLVal + nextHVal) / 2)
+      '    Else
+      '      lVal = lastVal
+      '    End If
+      '  End If
+      'End If
+      'End If
+      If lVal > 0 Then lastVal = lVal
+      lPoints(I).X = lYWidth + (I * dGraphCompInter) + IIf(I > 0, 1, 0)
       lPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lPoints(I - 1).X = 0 And lPoints(I - 1).Y = 0) Then
         Dim J As Long = 1
@@ -1221,21 +1428,20 @@ Module modFunctions
           J += 1
         End While
         For K As Long = 1 To J - 1
-          lPoints(I - K).X = lYWidth + ((I - K) * dCompInter) + 1
+          lPoints(I - K).X = lYWidth + ((I - K) * dGraphCompInter) + 1
           lPoints(I - K).Y = (lPoints(I - J).Y + lPoints(I).Y) / 2
         Next
       End If
-      If lVal > 0 Then lastLVal = lVal
     Next I
-    If lPoints(lMaxTime).IsEmpty Then lPoints(lMaxTime) = New Point(ImgSize.Width, yTop + yHeight)
-    lPoints(lMaxTime + 1) = New Point(ImgSize.Width, yTop + yHeight)
-    lPoints(lMaxTime + 2) = New Point(lYWidth, yTop + yHeight)
-    lPoints(lMaxTime + 3) = lPoints(0)
+    If lPoints(lMaxGraphTime).IsEmpty Then lPoints(lMaxGraphTime) = New Point(ImgSize.Width, yTop + yHeight)
+    lPoints(lMaxGraphTime + 1) = New Point(ImgSize.Width, yTop + yHeight)
+    lPoints(lMaxGraphTime + 2) = New Point(lYWidth, yTop + yHeight)
+    lPoints(lMaxGraphTime + 3) = lPoints(0)
     lTypes(0) = Drawing2D.PathPointType.Start
-    For I As Long = 1 To lMaxTime + 2
+    For I As Long = 1 To lMaxGraphTime + 2
       lTypes(I) = Drawing2D.PathPointType.Line
     Next
-    lTypes(lMaxTime + 3) = Drawing2D.PathPointType.Line Or Drawing2D.PathPointType.CloseSubpath
+    lTypes(lMaxGraphTime + 3) = Drawing2D.PathPointType.Line Or Drawing2D.PathPointType.CloseSubpath
     g.DrawLines(New Pen(New SolidBrush(ColorMax), 5), lMaxPoints)
     Dim gPath As New Drawing2D.GraphicsPath(lPoints, lTypes)
     Dim fBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(lYWidth, MaxY), New Point(lYWidth, yTop + yHeight), Color.FromArgb(192, ColorA), Color.FromArgb(192, ColorB), Color.FromArgb(192, ColorC))
