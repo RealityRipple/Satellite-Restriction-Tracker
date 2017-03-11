@@ -24,6 +24,7 @@ Public Class frmWizard
   Private pChecker As Threading.Timer
   Private AccountType As SatHostTypes = SatHostTypes.Other
   Private NeedsTLSProxy As Boolean = False
+  Private keyPasting As Boolean = False
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Public Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
@@ -70,7 +71,7 @@ Public Class frmWizard
           Return
         ElseIf optRemote.Checked Then
           If Not pnlKey.Tag = 1 Then
-            If txtKey1.TextLength = 6 And txtKey2.TextLength = 4 And txtKey3.TextLength = 4 And txtKey4.TextLength = 4 And txtKey5.TextLength = 6 Then
+            If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
               DrawStatus(True, "Checking your Product Key...")
               KeyCheck()
               Return
@@ -260,6 +261,11 @@ Public Class frmWizard
     ttWizard.SetToolTip(txtAccountPass.Button, "Toggle display of the Password.")
     txtOverSize.Margin = New Padding(3)
     txtOverTime.Margin = New Padding(3)
+    txtKey1.ContextMenu = mnuKey
+    txtKey2.ContextMenu = mnuKey
+    txtKey3.ContextMenu = mnuKey
+    txtKey4.ContextMenu = mnuKey
+    txtKey5.ContextMenu = mnuKey
   End Sub
   Private Sub cmbAccountHost_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbAccountHost.SelectedIndexChanged
     AccountType = SatHostTypes.Other
@@ -280,11 +286,13 @@ Public Class frmWizard
         If sKey.Contains("-") Then
           Dim sKeys() As String = Split(sKey, "-")
           If sKeys.Length = 5 Then
+            keyPasting = True
             txtKey1.Text = sKeys(0)
             txtKey2.Text = sKeys(1)
             txtKey3.Text = sKeys(2)
             txtKey4.Text = sKeys(3)
             txtKey5.Text = sKeys(4)
+            keyPasting = False
             e.Handled = True
           Else
             sender.Text = sKey
@@ -303,19 +311,19 @@ Public Class frmWizard
             e.Handled = True
           Case "txtKey2"
             txtKey1.Focus()
-            txtKey1.SelectionStart = txtKey1.Text.Length
+            txtKey1.SelectionStart = txtKey1.TextLength
             txtKey1.SelectionLength = 0
           Case "txtKey3"
             txtKey2.Focus()
-            txtKey2.SelectionStart = txtKey2.Text.Length
+            txtKey2.SelectionStart = txtKey2.TextLength
             txtKey2.SelectionLength = 0
           Case "txtKey4"
             txtKey3.Focus()
-            txtKey3.SelectionStart = txtKey3.Text.Length
+            txtKey3.SelectionStart = txtKey3.TextLength
             txtKey3.SelectionLength = 0
           Case "txtKey5"
             txtKey4.Focus()
-            txtKey4.SelectionStart = txtKey4.Text.Length
+            txtKey4.SelectionStart = txtKey4.TextLength
             txtKey4.SelectionLength = 0
         End Select
       End If
@@ -343,6 +351,78 @@ Public Class frmWizard
   Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
     pnlKey.Tag = 0
   End Sub
+#Region "Context Menu"
+  Private Sub mnuKey_Popup(sender As System.Object, e As System.EventArgs) Handles mnuKey.Popup
+    Dim txtKey As TextBox = CType(CType(sender, ContextMenu).SourceControl, TextBox)
+    mnuKeyCut.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
+    mnuKeyCopy.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
+    mnuKeyPaste.Enabled = Not String.IsNullOrEmpty(Clipboard.GetText)
+    mnuKeyDelete.Enabled = Not String.IsNullOrEmpty(txtKey.Text)
+    mnuKeyClear.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
+  End Sub
+  Private Sub mnuKeyPaste_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyPaste.Click
+    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
+    If Not String.IsNullOrEmpty(Clipboard.GetText) Then
+      Dim sKey As String = Trim(Clipboard.GetText)
+      If sKey.Contains("-") Then
+        Dim sKeys() As String = Split(sKey, "-")
+        If sKeys.Length = 5 Then
+          keyPasting = True
+          txtKey1.Text = sKeys(0)
+          txtKey2.Text = sKeys(1)
+          txtKey3.Text = sKeys(2)
+          txtKey4.Text = sKeys(3)
+          keyPasting = False
+          txtKey5.Text = sKeys(4)
+        Else
+          If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
+          txtKey.Text = sKey
+        End If
+      Else
+        If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
+        txtKey.Text = sKey
+      End If
+    End If
+  End Sub
+  Private Sub mnuKeyCut_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCut.Click
+    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
+      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
+        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+        Clipboard.SetText(sKey)
+        txtKey1.Clear()
+        txtKey2.Clear()
+        txtKey3.Clear()
+        txtKey4.Clear()
+        txtKey5.Clear()
+        Return
+      End If
+    End If
+    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
+    txtKey.Cut()
+  End Sub
+  Private Sub mnuKeyCopy_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCopy.Click
+    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
+      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
+        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+        Clipboard.SetText(sKey)
+        Return
+      End If
+    End If
+    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
+    txtKey.Copy()
+  End Sub
+  Private Sub mnuKeyDelete_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyDelete.Click
+    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
+    txtKey.Clear()
+  End Sub
+  Private Sub mnuKeyClear_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyClear.Click
+    txtKey1.Clear()
+    txtKey2.Clear()
+    txtKey3.Clear()
+    txtKey4.Clear()
+    txtKey5.Clear()
+  End Sub
+#End Region
   Private Sub txtSignUp_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles txtSignUp.LinkClicked
     Try
       Process.Start("http://srt.realityripple.com/c_signup.php")

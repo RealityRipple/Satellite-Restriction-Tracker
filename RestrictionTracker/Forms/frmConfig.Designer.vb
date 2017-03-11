@@ -222,6 +222,13 @@ Partial Class frmConfig
     Me.fswController = New System.IO.FileSystemWatcher()
     Me.tmrIcoWait = New System.Windows.Forms.Timer(Me.components)
     Me.ttConfig = New RestrictionTracker.ToolTip(Me.components)
+    Me.mnuKey = New System.Windows.Forms.ContextMenu()
+    Me.mnuKeyCut = New System.Windows.Forms.MenuItem()
+    Me.mnuKeyCopy = New System.Windows.Forms.MenuItem()
+    Me.mnuKeyPaste = New System.Windows.Forms.MenuItem()
+    Me.mnuKeySpacer = New System.Windows.Forms.MenuItem()
+    Me.mnuKeyDelete = New System.Windows.Forms.MenuItem()
+    Me.mnuKeyClear = New System.Windows.Forms.MenuItem()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -3156,6 +3163,40 @@ Partial Class frmConfig
     Me.ttConfig.Persistant = True
     Me.ttConfig.ReshowDelay = 100
     '
+    'mnuKey
+    '
+    Me.mnuKey.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuKeyCut, Me.mnuKeyCopy, Me.mnuKeyPaste, Me.mnuKeySpacer, Me.mnuKeyDelete, Me.mnuKeyClear})
+    '
+    'mnuKeyCut
+    '
+    Me.mnuKeyCut.Index = 0
+    Me.mnuKeyCut.Text = "C&ut"
+    '
+    'mnuKeyCopy
+    '
+    Me.mnuKeyCopy.Index = 1
+    Me.mnuKeyCopy.Text = "&Copy"
+    '
+    'mnuKeyPaste
+    '
+    Me.mnuKeyPaste.Index = 2
+    Me.mnuKeyPaste.Text = "&Paste"
+    '
+    'mnuKeySpacer
+    '
+    Me.mnuKeySpacer.Index = 3
+    Me.mnuKeySpacer.Text = "-"
+    '
+    'mnuKeyDelete
+    '
+    Me.mnuKeyDelete.Index = 4
+    Me.mnuKeyDelete.Text = "&Delete"
+    '
+    'mnuKeyClear
+    '
+    Me.mnuKeyClear.Index = 5
+    Me.mnuKeyClear.Text = "C&lear"
+    '
     'frmConfig
     '
     Me.AcceptButton = Me.cmdSave
@@ -3496,5 +3537,12 @@ Partial Class frmConfig
   Friend WithEvents chkNetworkProtocolTLS11 As System.Windows.Forms.CheckBox
   Friend WithEvents chkNetworkProtocolTLS12 As System.Windows.Forms.CheckBox
   Friend WithEvents chkTLSProxy As System.Windows.Forms.CheckBox
+  Friend WithEvents mnuKey As System.Windows.Forms.ContextMenu
+  Friend WithEvents mnuKeyCut As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuKeyCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuKeyPaste As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuKeySpacer As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuKeyDelete As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuKeyClear As System.Windows.Forms.MenuItem
 
 End Class
