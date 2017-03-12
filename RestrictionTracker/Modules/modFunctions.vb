@@ -1208,7 +1208,7 @@ Module modFunctions
             dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
             For J As Integer = 0 To Data.Length - 1
               If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-                Dim jLim As Long = 0
+                Dim jLim As Long = -1
                 If GraphDir = Direction.Up Then
                   jLim = Data(J).UPLIM
                 Else
