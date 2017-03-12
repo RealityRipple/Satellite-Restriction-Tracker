@@ -907,11 +907,12 @@ Module modFunctions
     Dim yMax As Long = 0
     Dim lMax As Long = 0
     If GraphDir = Direction.No Then
-      Dim yVMax As Long = 0
+      Dim yVMax As Long = -1
       For I As Integer = 0 To Data.Length - 1
         If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
         If yVMax < Data(I).DOWNLIM Then yVMax = Data(I).DOWNLIM
       Next
+      If yVMax = -1 Then yVMax = 0
       yMax = yVMax
       If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
       lMax = yVMax
