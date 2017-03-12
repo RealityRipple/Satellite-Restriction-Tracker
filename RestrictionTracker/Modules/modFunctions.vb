@@ -916,14 +916,16 @@ Module modFunctions
       If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
       lMax = yVMax
     Else
-      Dim yDMax As Long = 0
-      Dim yUMax As Long = 0
+      Dim yDMax As Long = -1
+      Dim yUMax As Long = -1
       For I As Integer = 0 To Data.Length - 1
         If yDMax < Data(I).DOWNLOAD Then yDMax = Data(I).DOWNLOAD
         If yUMax < Data(I).UPLOAD Then yUMax = Data(I).UPLOAD
         If yDMax < Data(I).DOWNLIM Then yDMax = Data(I).DOWNLIM
         If yUMax < Data(I).UPLIM Then yUMax = Data(I).UPLIM
       Next
+      If yDMax = -1 Then yDMax = 0
+      If yUMax = -1 Then yUMax = 0
       yMax = IIf(yDMax > yUMax, yDMax, yUMax)
       If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
       lMax = IIf(GraphDir = Direction.Down, yDMax, yUMax)
@@ -1171,14 +1173,14 @@ Module modFunctions
     Dim lMaxPoints(lMaxGraphTime) As Point
     Dim lPoints(lMaxGraphTime + 3) As Point
     Dim lTypes(lMaxGraphTime + 3) As Byte
-    Dim lastVal As Long = 0
+    Dim lastVal As Long = -1
     For I As Long = 0 To lMaxGraphTime
       Dim lVal As Long = -1
-      Dim lHigh As Long = 0
+      Dim lHigh As Long = -1
       Dim dFind As Date = DateAdd(dGraphInterval, I * lGraphInterval, lStart)
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-          Dim jLim As Long = 0
+          Dim jLim As Long = -1
           If GraphDir = Direction.Up Then
             jLim = Data(J).UPLIM
           Else
@@ -1187,19 +1189,19 @@ Module modFunctions
           If lHigh < jLim Then lHigh = jLim
         End If
       Next
-      If lHigh > 0 Then
+      If lHigh > -1 Then
         lVal = lHigh
       Else
         If I = lMaxGraphTime Then
-          If lastVal > 0 Then
+          If lastVal > -1 Then
             lVal = lastVal
           Else
             lVal = 0
           End If
         Else
-          Dim nextHVal As Long = 0
+          Dim nextHVal As Long = -1
           Dim K As Long = I
-          Do Until nextHVal > 0
+          Do Until nextHVal > -1
             K += 1
             If K > lMaxGraphTime Then Exit Do
             dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
@@ -1215,7 +1217,7 @@ Module modFunctions
               End If
             Next
           Loop
-          If nextHVal > 0 Then
+          If nextHVal > -1 Then
             If lastVal < nextHVal Then
               lVal = nextHVal
             Else
@@ -1238,20 +1240,20 @@ Module modFunctions
           lMaxPoints(I - K).Y = (lMaxPoints(I - J).Y + lMaxPoints(I).Y) / 2
         Next
       End If
-      If lVal > 0 Then lastVal = lVal
+      If lVal > -1 Then lastVal = lVal
     Next I
-    lastVal = 0
+    lastVal = -1
     For I As Long = 0 To lMaxGraphTime
       Dim lVal As Long = -1
       Dim lLow As Long = Long.MaxValue
-      Dim lHigh As Long = 0
+      Dim lHigh As Long = -1
       Dim mLow As Long = Long.MaxValue
-      Dim mHigh As Long = 0
+      Dim mHigh As Long = -1
       Dim dFind As Date = DateAdd(dGraphInterval, I * lGraphInterval, lStart)
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-          Dim jVal As Long = 0
-          Dim jMax As Long = 0
+          Dim jVal As Long = -1
+          Dim jMax As Long = -1
           If GraphDir = Direction.Up Then
             jVal = Data(J).UPLOAD
             jMax = Data(J).UPLIM
@@ -1265,27 +1267,28 @@ Module modFunctions
           If mHigh < jMax Then mHigh = jMax
         End If
       Next
+      If mHigh = -1 Then mHigh = 0
       Dim aMax As Long = Math.Floor((mLow + mHigh) / 2)
       If lHigh > (Math.Floor(aMax / 10) * 9) Then
-        If lHigh > 0 Then
+        If lHigh > -1 Then
           lVal = lHigh
         Else
           If I = lMaxGraphTime Then
-            If lastVal > 0 Then
+            If lastVal > -1 Then
               lVal = lastVal
             Else
               lVal = 0
             End If
           Else
-            Dim nextHVal As Long = 0
+            Dim nextHVal As Long = -1
             Dim K As Long = I
-            Do Until nextHVal > 0
+            Do Until nextHVal > -1
               K += 1
               If K > lMaxGraphTime Then Exit Do
               dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-                  Dim jVal As Long = 0
+                  Dim jVal As Long = -1
                   If GraphDir = Direction.Up Then
                     jVal = Data(J).UPLOAD
                   Else
@@ -1295,7 +1298,7 @@ Module modFunctions
                 End If
               Next
             Loop
-            If nextHVal > 0 Then
+            If nextHVal > -1 Then
               If lastVal < nextHVal Then
                 lVal = nextHVal
               Else
@@ -1311,7 +1314,7 @@ Module modFunctions
           lVal = lLow
         Else
           If I = lMaxGraphTime Then
-            If lastVal > 0 Then
+            If lastVal > -1 Then
               lVal = lastVal
             Else
               lVal = 0
@@ -1325,7 +1328,7 @@ Module modFunctions
               dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-                  Dim jVal As Long = 0
+                  Dim jVal As Long = -1
                   If GraphDir = Direction.Up Then
                     jVal = Data(J).UPLOAD
                   Else
@@ -1347,15 +1350,15 @@ Module modFunctions
           End If
         End If
       Else
-        If lHigh > 0 And lLow < Long.MaxValue Then
+        If lHigh > -1 And lLow < Long.MaxValue Then
           lVal = Math.Round((lLow + lHigh) / 2)
-        ElseIf lHigh > 0 Then
+        ElseIf lHigh > -1 Then
           lVal = lHigh
         ElseIf lLow < Long.MaxValue Then
           lVal = lLow
         Else
           If I = lMaxGraphTime Then
-            If lastVal > 0 Then
+            If lastVal > -1 Then
               lVal = lastVal
             Else
               lVal = 0
@@ -1369,7 +1372,7 @@ Module modFunctions
               dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
-                  Dim jVal As Long = 0
+                  Dim jVal As Long = -1
                   If GraphDir = Direction.Up Then
                     jVal = Data(J).UPLOAD
                   Else
@@ -1379,9 +1382,9 @@ Module modFunctions
                 End If
               Next
             Loop
-            Dim nextHVal As Long = 0
+            Dim nextHVal As Long = -1
             K = I
-            Do Until nextHVal > 0
+            Do Until nextHVal > -1
               K += 1
               If K > lMaxGraphTime Then Exit Do
               dFind = DateAdd(dGraphInterval, K * lGraphInterval, lStart)
@@ -1397,7 +1400,7 @@ Module modFunctions
                 End If
               Next
             Loop
-            If nextLVal < Long.MaxValue And nextHVal > 0 Then
+            If nextLVal < Long.MaxValue And nextHVal > -1 Then
               lVal = Math.Round((nextLVal + nextHVal) / 2)
             Else
               lVal = lastVal
@@ -1405,7 +1408,7 @@ Module modFunctions
           End If
         End If
       End If
-      If lVal > 0 Then lastVal = lVal
+      If lVal > -1 Then lastVal = lVal
       lPoints(I).X = lYWidth + (I * dGraphCompInter) + IIf(I > 0, 1, 0)
       lPoints(I).Y = yTop + yHeight - (lVal / lMax * yHeight)
       If I > 0 AndAlso (lPoints(I - 1).X = 0 And lPoints(I - 1).Y = 0) Then
