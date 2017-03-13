@@ -408,7 +408,7 @@
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : LoginWB()
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Then
+        If sProvider.ToLower = "exede.net" Or sProvider.ToLower = "satelliteinternetco.com" Then
           LoginExede()
         Else
           LoginWB()
@@ -430,8 +430,15 @@
     WB_Login_Response(responseData, responseURI)
   End Sub
   Private Sub LoginExede()
+    If sProvider = "exede.net" Then
+      AJAXOrder = {4, 5, 10}
+    ElseIf sProvider = "satelliteinternetco.com" Then
+      AJAXOrder = {2, 4}
+    Else
+      RaiseError("Prepare Failed: Unknown Provider - Can't determine AJAX order.")
+    End If
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://my.exede.net/login"
+    Dim uriString As String = "https://my." & sProvider & "/login"
     MakeSocket(True)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim responseData As String = Nothing
@@ -473,7 +480,7 @@
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Then
+        If sProvider.ToLower = "exede.net" Or sProvider.ToLower = "satelliteinternetco.com" Then
           EX_Read_Table(Table)
         Else
           WB_Read_Table(Table)
@@ -661,11 +668,11 @@
 #Region "EX"
   Private Sub EX_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso.exede.net" Then
+    If Not ResponseURI.Host.ToLower = "mysso." & sProvider Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" Then
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
       RaiseError("Login Failed: Could not understand response.", "EX Login Prepare Response", Response, ResponseURI)
       Return
     End If
@@ -734,11 +741,11 @@
   End Sub
   Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso.exede.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+    If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" Then
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
       If Response.Contains("window.location.href") Then
         TryCount += 1
         If TryCount > 15 Then
@@ -841,7 +848,7 @@
   End Sub
   Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("Authentication Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
@@ -864,7 +871,13 @@
         RaiseError("Authentication Failed. If you get this error, please let me know immediately!")
         Return
       Else
-        sURL = "https://" & ResponseURI.Host & "/dashboard"
+        If sProvider = "exede.net" Then
+          sURL = "https://" & ResponseURI.Host & "/dashboard"
+        ElseIf sProvider = "satelliteinternetco.com" Then
+          sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard"
+        Else
+          RaiseError("Authentication Failed: Unknown Provider - Can't determine Dashboard URL.")
+        End If
       End If
       If justATest Then
         RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE))
@@ -887,7 +900,7 @@
       Iteration = bI
     End Sub
   End Structure
-  Private AJAXOrder() As Byte = {4, 5, 10}
+  Private AJAXOrder() As Byte
   Public ReadOnly Property ExedeAJAXFirstTryRequests As Integer
     Get
       Return AJAXOrder.Length - 1
@@ -909,11 +922,11 @@
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my.exede.net" Then
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("AJAX Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" Then
+    If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" And Not ResponseURI.AbsolutePath.ToLower = "/subscriber_dashboard" Then
       If Response.Contains("location.href") Then
         Dim sURL As String = Nothing
         sURL = Response.Substring(Response.IndexOf("location.href"))
@@ -933,7 +946,7 @@
       Return
     End If
     If Response.Contains("amount-used") Then
-      Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"">"))
+      Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
       sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
       ReadUsage(sTable)
     ElseIf Response.Contains("<span id=""ajax-view-state""") Then
@@ -951,8 +964,16 @@
       Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
       sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
       sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
-      EX_Download_Ajax("https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard", NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
-    ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my.exede.net/atlasPlanInvalid") Then
+      Dim sURL As String = Nothing
+      If sProvider = "exede.net" Then
+        sURL = "https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard"
+      ElseIf sProvider = "satelliteinternetco.com" Then
+        sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fsubscriber_dashboard"
+      Else
+        RaiseError("AJAX Load Failed: Unknown Provider - Can't determine Dashboard URL.")
+      End If
+      EX_Download_Ajax(sURL, NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
+    ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my." & sProvider & "/atlasPlanInvalid") Then
       RaiseError("AJAX Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
     ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
       RaiseError("AJAX Load Failed: Too many requests. Check for usage data less often.")
@@ -1020,9 +1041,26 @@
     Used = Used.Substring(Used.IndexOf(""">") + 2)
     Used = Used.Substring(0, Used.IndexOf("</"))
     Dim Total As String = Nothing
-    If Table.Contains("<strong>") Then
-      Total = Table.Substring(Table.IndexOf("<strong>") + 8)
-      Total = Total.Substring(0, Total.IndexOf("</"))
+    If sProvider = "exede.net" Then
+      If Table.Contains("<strong>") Then
+        Total = Table.Substring(Table.IndexOf("<strong>") + 8)
+        If Total.Contains("</") Then
+          Total = Total.Substring(0, Total.IndexOf("</"))
+        Else
+          RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+        End If
+      End If
+    ElseIf sProvider = "mysatelliteinternetco.com" Then
+      If Table.Contains("</strong> used of ") Then
+        Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
+        If Total.Contains(" GB allowance") Then
+          Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
+        ElseIf Total.Contains("</") Then
+          Total = Total.Substring(0, Total.IndexOf("</"))
+        Else
+          RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+        End If
+      End If
     End If
     Dim lUsed As Long = StrToVal(Used, MBPerGB)
     Dim lTotal As Long = StrToVal(Total, MBPerGB)

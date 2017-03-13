@@ -11,7 +11,7 @@ Public Class svcRL
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.DishNet
-      If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then Return SatHostTypes.Exede
+      If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then Return SatHostTypes.Exede
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       Provider = Provider & ".ruralportal.net"
       If CheckURL("wildblue.com", Timeout, Proxy) Then

@@ -74,7 +74,7 @@
   Private Sub BeginTest(Provider As String)
     If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
       c_callback.Invoke(SatHostGroup.DishNet)
-    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
+    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then
       c_callback.Invoke(SatHostGroup.Exede)
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
