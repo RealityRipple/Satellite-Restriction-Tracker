@@ -109,44 +109,63 @@ Public Class srlFunctions
   ''' <param name="dataPath">The folder where socket errors will be saved to if they are not recognized.</param>
   ''' <returns>A simpler and cleaner description of the network error passed in <paramref name="ex" />.</returns>
   ''' <remarks>See Also: <seealso cref="ReportSocketError" /></remarks>
-  Public Shared Function NetworkErrorToString(ex As System.Exception, dataPath As String)
+  Public Shared Function NetworkErrorToString(ex As System.Exception, dataPath As String) As String
+    Dim ERRLIST As New Dictionary(Of String, String)
+    ERRLIST.Add("DNS", "Could not connect to your DNS. Check your Firewall and Interntet connection.")
+    ERRLIST.Add("NETWORK", "The network is unreachable. Check your Firewall and Internet connection.")
+    ERRLIST.Add("UNEXPECTED", "The server response was unexpected. Check your Firewall and Internet connection.")
+    ERRLIST.Add("REFUSED", "The connection was refused. Check your Firewall and Internet connection.")
+    ERRLIST.Add("DROPPED", "The connection was dropped. Please try again.")
+    ERRLIST.Add("CLOSED", "The connection was closed. Please try again.")
+    ERRLIST.Add("ABORTED", "The connection has been aborted.")
+    ERRLIST.Add("TIMEOUT", "The connection timed out. Please try again.")
+    ERRLIST.Add("NULL", "The server sent an empty response. Please try again.")
+    ERRLIST.Add("MEMORY", "Too many connections open. Check your network activity or restart your computer.")
+    ERRLIST.Add("BUSY", "The server is too busy to respond. Please try again later.")
+    ERRLIST.Add("BADREQUEST", "The server did not like the request. Please check your provider.")
+    ERRLIST.Add("DOWN", "The server is down right now. Please try again later.")
+    ERRLIST.Add("NOTFOUND", "The file could not be found. The server may be down right now. Please try again later.")
+    ERRLIST.Add("NOTSUPPORTED", "The server's version is not supported. It may be down right now, or you may need to change some network settings.")
+    ERRLIST.Add("NEGATIVE", "Negative Length exception. Check your Firewall and Internet connection.")
+    ERRLIST.Add("SECURITY", "Security exception. Check your Firewall and Internet connection.")
+    ERRLIST.Add("UNKNOWN", "Unable to connect to the server.")
     Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
     If ex.InnerException Is Nothing Then
       If ex.Message.StartsWith("The remote name could not be resolved:") Then
-        Return "Could not connect to your DNS. Check your Internet connection."
+        Return ERRLIST("DNS")
       ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
         If ex.Message.Contains("The connection was closed unexpectedly") Then
-          Return "Connection to server dropped. Please try again."
+          Return ERRLIST("DROPPED")
         ElseIf ex.Message.Contains("A connection that was expected to be kept alive was closed by the server") Then
-          Return "Connection to server closed. Please try again."
+          Return ERRLIST("CLOSED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Connection to server closed - " & ex.InnerException.Message
+          Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
-          Return "The server did not like the request. Please try again."
+          Return ERRLIST("BADREQUEST")
         ElseIf ex.Message.Contains("401") Then
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "The server did not like the login. Please check your provider."
+          Return ERRLIST("BADREQUEST")
         ElseIf ex.Message.Contains("403") Then
-          Return "The server did not like the login. Please check your provider."
+          Return ERRLIST("BADREQUEST")
         ElseIf ex.Message.Contains("404") Then
-          Return "Server 404 (Not Found). The server may not be supported or may be down. Check your account settings and try again."
+          Return ERRLIST("NOTFOUND")
         ElseIf ex.Message.Contains("405") Then
-          Return "The server did not like the method. Please try again."
+          Return ERRLIST("BADREQUEST")
         ElseIf ex.Message.Contains("408") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.Message.Contains("500") Then
-          Return "The server is too busy. Please try again."
+          Return ERRLIST("BUSY")
         ElseIf ex.Message.Contains("502") Then
-          Return "The gateway is unavailable. Please try again later."
+          Return ERRLIST("DOWN")
         ElseIf ex.Message.Contains("503") Then
-          Return "The server is unavailable. Please try again later."
+          Return ERRLIST("DOWN")
         ElseIf ex.Message.Contains("504") Then
-          Return "The server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.Message.Contains("505") Then
-          Return "Server 505 (Version Not Supported). The server may not be supported or may be down. Check your account settings and try again."
+          Return ERRLIST("NOTSUPPORTED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
           If ex.Message.Contains(")") Then
@@ -156,44 +175,44 @@ Public Class srlFunctions
           End If
         End If
       ElseIf ex.Message.StartsWith("The request timed out") Then
-        Return "Connection to the server timed out. Please try again."
+        Return ERRLIST("TIMEOUT")
       ElseIf ex.Message.StartsWith("The operation has timed out") Then
-        Return "Connection to the server timed out. Please try again."
+        Return ERRLIST("TIMEOUT")
       ElseIf ex.Message.StartsWith("The request was aborted:") Then
         If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
           Return "TLS ERROR" 'Windows Vista doesn't support TLS error message
         ElseIf ex.Message.Contains("The request was canceled") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Connection aborted - " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
+          Return ERRLIST("ABORTED") & " " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
         End If
       ElseIf ex.Message = "Aborted." Then
-        Return "Connection aborted."
+        Return ERRLIST("ABORTED")
       ElseIf ex.Message.Contains("Exception of type 'System.OutOfMemoryException' was thrown") Then
-        Return "Out of Memory exception. Check your local network."
+        Return ERRLIST("MEMORY")
       ElseIf ex.Message.Contains("The server committed a protocol violation") Then
-        Return "The server response was unexpected. Check your Internet connection."
+        Return ERRLIST("UNEXPECTED")
       ElseIf ex.Message.StartsWith("Error:") Then
         If ex.Message.Contains("NameResolutionFailure") Then
-          Return "Could not connect to your DNS. Check your Internet connection."
+          Return ERRLIST("DNS")
         ElseIf ex.Message.Contains("ConnectFailure") Then
           If ex.Message.Contains("Network is unreachable") Then
-            Return "The network is unreachable. Check your Internet connection."
+            Return ERRLIST("NETWORK")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Connection Error - " & ex.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.Message
           End If
         ElseIf ex.Message.Contains("SecureChannelFailure") Then
           Return "POSSIBLE TLS ERROR - " & ex.Message
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Error - " & ex.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.Message
         End If
       ElseIf ex.Message.StartsWith("Cannot be negative.") And ex.Message.Contains("Parameter name: length") Then
-        Return "Negative Length exception. Check your local network."
+        Return ERRLIST("NEGATIVE")
       ElseIf ex.Message.StartsWith("Thread was being aborted") Then
-        Return "Connection aborted."
+        Return ERRLIST("ABORTED")
       Else
         If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
         Return ex.Message
@@ -201,276 +220,304 @@ Public Class srlFunctions
     Else
       If ex.Message.StartsWith("Unable to connect to the remote server") Then
         If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable host") Then
-          Return "The host is unreachable. Check your local network."
+          Return ERRLIST("NETWORK")
         ElseIf ex.InnerException.Message.StartsWith("A socket operation was attempted to an unreachable network") Then
-          Return "The network is unreachable. Check your Internet connection."
+          Return ERRLIST("NETWORK")
         ElseIf ex.InnerException.Message.StartsWith("No connection could be made because the target machine actively refused it") Then
-          Return "The server refused the connection. Please try again."
+          Return ERRLIST("REFUSED")
         ElseIf ex.InnerException.Message.StartsWith("An attempt was made to access a socket in a way forbidden by its access permissions") Then
-          Return "The connection was forbidden. Please check your local network and firewall settings."
+          Return ERRLIST("REFUSED")
         ElseIf ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
-          Return "Too many connections open. Check your network activity or restart your computer."
+          Return ERRLIST("MEMORY")
         ElseIf ex.InnerException.Message.StartsWith("An established connection was aborted by the software in your host machine") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.Contains("An operation was attempted on something that is not a socket") Then
-          Return "Unable to connect. Check your local network and firewall settings."
+          Return ERRLIST("NETWORK")
         ElseIf ex.InnerException.Message.Contains("An invalid argument was supplied") Then
-          Return "Unable to connect. An invalid argument was supplied. This may mean the provider you entered is invalid or that you have a network or firewall issue. If you figure it out, tell me."
+          Return ERRLIST("NETWORK")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Can't connect to the server - " & ex.InnerException.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("An exception occurred during a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Received an unexpected EOF or 0 bytes from the transport stream") Then
-          Return "Received empty response from server. Please try again."
+          Return ERRLIST("NULL")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: The connection was closed") Then
-          Return "The server closed the connection. Please try again."
+          Return ERRLIST("CLOSED")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host") Then
-          Return "The server closed the connection. Please try again."
+          Return ERRLIST("CLOSED")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An established connection was aborted by the software in your host machine") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An established connection was aborted by the software in your host machine") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
-          Return "Connection to the server timed out. Please try again."
+          Return ERRLIST("TIMEOUT")
         ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host") Then
-          Return "The server closed the connection. Please try again."
+          Return ERRLIST("CLOSED")
         ElseIf ex.InnerException.Message.StartsWith("Unable to read data from the transport connection: An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
-          Return "Too many connections open. Check your network activity or restart your computer."
+          Return ERRLIST("MEMORY")
         ElseIf ex.InnerException.Message.StartsWith("Cannot open log for source 'Restriction Logger'. You may not have write access") Then
-          Return "Error writing to logging service error log."
+          Return "Error writing to error log. Try running as an administrator?"
         ElseIf ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("Thread was being aborted") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("There were not enough free threads in the ThreadPool to complete the operation") Then
-          Return "Too many threads running. Check your network activity or restart your computer."
+          Return ERRLIST("MEMORY")
         ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("The message or signature supplied for verification has been altered") Then
-              Return "Decryption failure. The message or signature has been altered."
+              Return ERRLIST("SECURITY") & " The message or signature has been altered."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
-              Return "Decryption failure. Data could not be decrypted."
+              Return ERRLIST("SECURITY") & " Data could not be decrypted."
             ElseIf ex.InnerException.InnerException.Message.StartsWith("The token supplied to the function is invalid") Then
-              Return "Decryption failure. Invalid token."
+              Return ERRLIST("SECURITY") & " Invalid token."
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Decryption failure - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
             End If
           Else
-            Return "Decryption failure, but no details are available."
+            Return ERRLIST("SECURITY")
           End If
         ElseIf ex.InnerException.Message.StartsWith("The read operation failed, see inner exception") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("Thread was being aborted") Then
-              Return "Connection aborted."
+              Return ERRLIST("ABORTED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Read failure - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.InnerException.Message
             End If
           Else
-            Return "Read failure, but no details are available."
+            Return ERRLIST("UNKNOWN")
           End If
         ElseIf ex.InnerException.Message.StartsWith("EndRead failure") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("Connection reset by peer") Then
-              Return "The server closed the connection. Please try again."
+              Return ERRLIST("CLOSED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "The server closed the connection - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
             End If
           Else
-            Return "The server closed the connection. Please try again."
+            Return ERRLIST("CLOSED")
           End If
         ElseIf ex.InnerException.Message.StartsWith("Error writing request") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("The socket has been shut down") Then
-              Return "Connection aborted."
+              Return ERRLIST("ABORTED")
             Else
-              Return "The server closed the connection - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
             End If
           Else
-            Return "The server closed the connection. Please try again."
+            Return ERRLIST("CLOSED")
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Error during request - " & ex.InnerException.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("Error getting response stream") Then
         If ex.InnerException.Message.StartsWith("BeginWrite failure") Then
-          Return "Could not write response data. Check your local network."
+          Return ERRLIST("NETWORK")
         ElseIf ex.Message.Contains("ReadDone1") Then
-          Return "The server closed the connection. Please try again."
+          Return ERRLIST("CLOSED")
         ElseIf ex.Message.Contains("ReadDone2") Then
-          Return "Received empty response from server. Please try again."
+          Return ERRLIST("NULL")
         ElseIf ex.Message.Contains("SendFailure") Then
           If ex.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
-            If ex.InnerException.InnerException Is Nothing Then
-              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Error in response - " & ex.InnerException.Message
-            ElseIf ex.InnerException.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
-              Return "POSSIBLE TLS ERROR - The authentication or decryption has failed. Please change your Network Security Protocol settings and try again."
-            ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
-              Return "The server closed the connection. Please try again."
-            ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
-              Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
+            If ex.InnerException.InnerException IsNot Nothing Then
+              If ex.InnerException.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
+                Return "POSSIBLE TLS ERROR - The authentication or decryption has failed. Please change your Network Security Protocol settings and try again."
+              ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
+                Return ERRLIST("CLOSED")
+              ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
+                Return ERRLIST("SECURITY") & " There was a number overflow error."
+              Else
+                If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+                Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
+              End If
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Connection server failed to negotiate - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
             End If
+          ElseIf ex.InnerException.Message.StartsWith("Unsupported security protocol type") Then
+            Return "TLS ERROR" 'TODO: Find out when and why this happens
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Error in response - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Error during response - " & ex.InnerException.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
         If ex.Message.Contains("An unexpected error occurred on a send") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
-              Return "The server is too busy to respond. Please try again later."
+              Return ERRLIST("BUSY")
             ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
-              Return "Connection aborted."
+              Return ERRLIST("ABORTED")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Connection to server failed to read - " & ex.InnerException.Message
+              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
-              Return "The server is too busy to respond. Please try again later."
+              Return ERRLIST("BUSY")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Connection to server failed to write - " & ex.InnerException.Message
+              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
-            Return "The server closed the connection. Please try again."
+            Return ERRLIST("CLOSED")
           ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
-            Return "Connection server failed to negotiate. Please change your Network Security Protocol settings and try again."
+            Return "TLS ERROR" 'TODO: Find out when and why this happens
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
             Return "TLS ERROR" 'Windows XP doesn't support TLS error message
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Connection to server closed with an unexpected error - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
             If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time, or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not respond properly after a period of time or established connection failed because connected host has failed to respond") Then
-              Return "Connection to the server timed out. Please try again."
+              Return ERRLIST("TIMEOUT")
             ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
-              Return "Connection aborted."
+              Return ERRLIST("ABORTED")
             ElseIf ex.InnerException.Message.Contains("The decryption operation failed, see inner exception") Then
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Decryption failure - " & ex.InnerException.InnerException.Message
+              Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
             ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
-              Return "The server closed the connection. Please try again."
+              Return ERRLIST("CLOSED")
             ElseIf ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host.") Then
-              Return "The server closed the connection. Please try again."
+              Return ERRLIST("CLOSED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Read failure - " & ex.InnerException.Message
+              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
-            Return "The server closed the connection. Please change your Network Security Protocol settings and try again."
+            Return ERRLIST("CLOSED")
           ElseIf ex.InnerException.Message.StartsWith("The decryption operation failed, see inner exception") Then
             If ex.InnerException.InnerException IsNot Nothing Then
               If ex.InnerException.InnerException.Message.StartsWith("The specified data could not be decrypted") Then
-                Return "Decryption failure. Data could not be decrypted."
+                Return ERRLIST("SECURITY") & " Data could not be decrypted."
               Else
                 If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-                Return "Decryption failure - " & ex.InnerException.InnerException.Message
+                Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
               End If
             Else
-              Return "Decryption failure, but no details are available."
+              Return ERRLIST("SECURITY")
             End If
+          ElseIf ex.InnerException.Message.StartsWith("The client and server cannot communicate, because they do not possess a common algorithm") Then
+            Return "TLS ERROR" 'TODO: Find out when and why this happens
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Receive failure - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("Could not establish trust relationship for the SSL/TLS secure channel.") Then
           If ex.InnerException.Message.StartsWith("The remote certificate is invalid according to the validation procedure") Then
-            Return "Server certificate is invalid. Please change your Network Security Protocol settings and try again."
+            Return ERRLIST("SECURITY") & " Server certificate is invalid."
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Server security could not be established - " & ex.InnerException.Message
+            Return ERRLIST("SECURITY") & " " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("Unable to connect to the remote server") Then
           If ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
-            Return "Too many connections open. Check your network activity or restart your computer."
+            Return ERRLIST("MEMORY")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Can't connect to the server - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+          End If
+        ElseIf ex.Message.Contains("A connection that was expected to be kept alive was closed by the server") Then
+          If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
+            If ex.InnerException.Message.Contains("A connection attempt failed because the connected party did not properly respond after a period of time") Then
+              Return ERRLIST("TIMEOUT")
+            ElseIf ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
+              Return ERRLIST("CLOSED")
+            ElseIf ex.InnerException.Message.Contains("An established connection was aborted by the software in your host machine") Then
+              Return ERRLIST("ABORTED")
+            Else
+              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+              Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+            End If
+          Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Connection to server closed - " & ex.InnerException.Message
+          Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
         End If
-      ElseIf ex.Message.StartsWith("Error:") Then
+      ElseIf ex.Message.StartsWith("Error:") Or ex.Message.StartsWith("System.Net.WebException: Error:") Then
         If ex.Message.Contains("ConnectFailure") Then
           If ex.InnerException.Message.Contains("No route to host") Then
-            Return "Could not connect to the server. Check your Internet connection."
+            Return ERRLIST("NETWORK")
+          ElseIf ex.InnerException.Message.Contains("Host is down") Then
+            Return ERRLIST("DOWN")
           ElseIf ex.InnerException.Message.Contains("Network is unreachable") Then
-            Return "The network is unreachable. Check your Internet connection."
+            Return ERRLIST("NETWORK")
           ElseIf ex.InnerException.Message.Contains("Connection refused") Then
-            Return "The server refused the connection. Please try again."
+            Return ERRLIST("REFUSED")
           ElseIf ex.InnerException.Message.Contains("Connection timed out") Then
-            Return "Connection to the server timed out. Please try again."
+            Return ERRLIST("TIMEOUT")
           ElseIf ex.InnerException.Message.Contains("Network subsystem is down") Then
-            Return "Your computer's network is down. Check your networking settings."
+            Return ERRLIST("NETWORK")
           ElseIf ex.InnerException.Message.Contains("The requested address is not valid in this context") Then
-            Return "Invalid address. Check your Provider in the Configuration."
+            Return ERRLIST("NETWORK")
           ElseIf ex.InnerException.Message.Contains("System call failed") Then
             Return "System call failed. Please check your installation."
+          ElseIf ex.InnerException.Message.Contains("TLS Support not available") Then
+            Return "TLS ERROR" 'TODO: Find out why and when this happens
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Connection Error - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("SendFailure") Then
           If ex.InnerException.Message.Contains("Error writing headers") Then
             If ex.InnerException.InnerException.Message.Contains("The socket is not connected") Then
-              Return "Connection aborted."
+              Return ERRLIST("ABORTED")
             ElseIf ex.InnerException.InnerException.Message.Contains("The socket has been shut down") Then
-              Return "Connection to server closed. Please try again."
+              Return ERRLIST("CLOSED")
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
               Return "POSSIBLE TLS ERROR - Decryption failure. Please change your Network Security Protocol settings and try again."
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return "Send Header Error - " & ex.InnerException.Message
+              Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
             End If
           ElseIf ex.InnerException.Message.Contains("Unsupported security protocol type") Then
-            Return "TLS ERROR" 'This error will mean MONO is too old and needs to be updated to 4.6(?) or higher
+            Return "TLS ERROR" 'This error will mean MONO is too old and needs to be updated to 4.8 or higher
+          ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed.") Then
+            Return "TLS ERROR" 'TODO: Find out when and why this happens
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return "Send Error - " & ex.InnerException.Message
+            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
           End If
         ElseIf ex.Message.Contains("SecureChannelFailure") Then
           If ex.InnerException.Message.Contains("Value cannot be null") Then
@@ -483,18 +530,29 @@ Public Class srlFunctions
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Error - " & ex.Message & " - " & ex.InnerException.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.Message & " - " & ex.InnerException.Message
         End If
       ElseIf ex.Message.StartsWith("An error occurred performing a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("The object was used after being disposed") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
         ElseIf ex.InnerException.Message.StartsWith("Thread was being aborted") Then
-          Return "Connection aborted."
+          Return ERRLIST("ABORTED")
+        ElseIf ex.InnerException.Message.StartsWith("Exception has been thrown by the target of an invocation") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("Thread was being aborted") Then
+              Return ERRLIST("ABORTED")
+            Else
+              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
+            End If
+          Else
+            Return ERRLIST("ABORTED")
+          End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return "Error during request - " & ex.Message
+          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
         End If
       Else
         If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
