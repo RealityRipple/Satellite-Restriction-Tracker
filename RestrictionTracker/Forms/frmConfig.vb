@@ -292,6 +292,26 @@
     remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub RunNetworkProtocolTest()
+    If pctKeyState.Tag = 1 Then
+      chkTLSProxy.Checked = False
+      chkTLSProxy.Enabled = False
+      ttConfig.SetToolTip(chkTLSProxy, "The TLS Proxy is disabled when using the Remote Usage Service.")
+      chkNetworkProtocolSSL3.Checked = False
+      chkNetworkProtocolSSL3.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "SSL 3.0 is disabled when using the Remote Usage Service.")
+      chkNetworkProtocolTLS10.Checked = False
+      chkNetworkProtocolTLS10.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "TLS 1.0 is disabled when using the Remote Usage Service.")
+      chkNetworkProtocolTLS11.Checked = False
+      chkNetworkProtocolTLS11.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "TLS 1.1 is disabled when using the Remote Usage Service.")
+      chkNetworkProtocolTLS12.Checked = False
+      chkNetworkProtocolTLS12.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
+      Return
+    End If
+    chkTLSProxy.Enabled = True
+    ttConfig.SetToolTip(chkTLSProxy, "If your Operating System does not support the Security Protocol required for your provider, you can use this Proxy to connect through the RealityRipple.com server.")
     If chkTLSProxy.Checked Then
       chkNetworkProtocolSSL3.Enabled = True
       ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
@@ -328,6 +348,11 @@
     Catch ex As Exception
       canTLS12 = False
     End Try
+    If (Environment.OSVersion.Version.Major < 6) OrElse
+      (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
+      canTLS11 = False
+      canTLS12 = False
+    End If
     Net.ServicePointManager.SecurityProtocol = myProtocol
     If canSSL3 Then
       chkNetworkProtocolSSL3.Enabled = True
@@ -849,8 +874,18 @@
 #Region "Context Menu"
   Private Sub mnuKey_Popup(sender As System.Object, e As System.EventArgs) Handles mnuKey.Popup
     Dim txtKey As TextBox = CType(CType(sender, ContextMenu).SourceControl, TextBox)
-    mnuKeyCut.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
-    mnuKeyCopy.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
+    If String.IsNullOrEmpty(txtKey1.Text) Or String.IsNullOrEmpty(txtKey2.Text) Or String.IsNullOrEmpty(txtKey3.Text) Or String.IsNullOrEmpty(txtKey4.Text) Or String.IsNullOrEmpty(txtKey5.Text) Then
+      If Not String.IsNullOrEmpty(txtKey.Text) AndAlso txtKey.SelectionLength > 0 Then
+        mnuKeyCut.Enabled = True
+        mnuKeyCopy.Enabled = True
+      Else
+        mnuKeyCut.Enabled = False
+        mnuKeyCopy.Enabled = False
+      End If
+    Else
+      mnuKeyCut.Enabled = True
+      mnuKeyCopy.Enabled = True
+    End If
     mnuKeyPaste.Enabled = Not String.IsNullOrEmpty(Clipboard.GetText)
     mnuKeyDelete.Enabled = Not String.IsNullOrEmpty(txtKey.Text)
     mnuKeyClear.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
@@ -867,8 +902,9 @@
           txtKey2.Text = sKeys(1)
           txtKey3.Text = sKeys(2)
           txtKey4.Text = sKeys(3)
-          keyPasting = False
           txtKey5.Text = sKeys(4)
+          keyPasting = False
+          txtProductKey_TextChanged(sender, e)
         Else
           If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
           txtKey.Text = sKey
@@ -1766,6 +1802,7 @@
       chkService.Checked = False
       ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not needed when using the Remote Service!")
     End If
+    RunNetworkProtocolTest()
   End Sub
 #Region "FileSystem Watcher"
   Private Sub fswController_Changed(sender As System.Object, e As EventArgs) Handles fswController.Changed, fswController.Created, fswController.Deleted, fswController.Error, fswController.Renamed
