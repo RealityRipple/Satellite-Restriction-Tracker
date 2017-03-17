@@ -2,7 +2,6 @@
 ''' <summary>
 ''' Represents the abstract class from which RR_HMACSHA512 must derive.
 ''' </summary>
-''' <remarks></remarks>
 Public MustInherit Class RR_HMAC
   Inherits KeyedHashAlgorithm
   Private _disposed As Boolean
@@ -27,7 +26,6 @@ Public MustInherit Class RR_HMAC
   ''' </summary>
   ''' <value></value>
   ''' <returns>The name of the hash algorithm.</returns>
-  ''' <remarks></remarks>
   ''' <exception cref="System.Security.Cryptography.CryptographicException">The current hash algorithm cannot be changed.</exception>
   Public Property HashName() As String
     Get
@@ -43,7 +41,6 @@ Public MustInherit Class RR_HMAC
   ''' </summary>
   ''' <value></value>
   ''' <returns>The key to use in the hash algorithm.</returns>
-  ''' <remarks></remarks>
   ''' <exception cref="System.Security.Cryptography.CryptographicException">An attempt is made to change the System.Security.Cryptography.HMAC.Key property after hashing has begun.</exception>
   Public Overrides Property Key() As Byte()
     Get
@@ -111,7 +108,6 @@ Public MustInherit Class RR_HMAC
   ''' <summary>
   ''' Initializes an instance of the default implementation of <see cref="RestrictionLibrary.RR_HMAC" />.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Overrides Sub Initialize()
     If _disposed Then
       Throw New ObjectDisposedException("HMAC")
@@ -127,7 +123,6 @@ Public MustInherit Class RR_HMAC
   ''' Creates an instance of the default implementation of a Hash-based Message Authentication Code (HMAC).
   ''' </summary>
   ''' <returns>A new instance of an HMAC.</returns>
-  ''' <remarks></remarks>
   Public Shared Shadows Function Create() As HMAC
 #If FULL_AOT_RUNTIME Then
 			Return New System.Security.Cryptography.HMACSHA1()
@@ -140,7 +135,6 @@ Public MustInherit Class RR_HMAC
   ''' </summary>
   ''' <param name="algorithmName">The HMAC implementation to use.</param>
   ''' <returns>A new instance of the specified HMAC implementation.</returns>
-  ''' <remarks></remarks>
   Public Shared Shadows Function Create(algorithmName As String) As HMAC
     Return DirectCast(CryptoConfig.CreateFromName(algorithmName), HMAC)
   End Function
@@ -209,6 +203,9 @@ Public MustInherit Class RR_HMAC
     End Function
   End Class
 End Class
+''' <summary>
+''' SHA-512 hashing with support for the Legacy HMAC values of .NET 2.0 and modern values provided by .NET 2.0 SP1 and newer.
+''' </summary>
 Public Class RR_HMACSHA512
   Inherits RR_HMAC
   Shared legacy_mode As Boolean
@@ -219,7 +216,6 @@ Public Class RR_HMACSHA512
   ''' <summary>
   ''' Initializes a new instance of the <see cref="RestrictionLibrary.RR_HMACSHA512" /> class with a randomly generated key.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Sub New()
     Me.New(KeyBuilder.Key(8))
     ProduceLegacyHmacValues = legacy_mode
@@ -228,7 +224,6 @@ Public Class RR_HMACSHA512
   ''' Initializes a new instance of the <see cref="RestrictionLibrary.RR_HMACSHA512" /> class with the specified key data.
   ''' </summary>
   ''' <param name="key__1">The secret key for System.Security.Cryptography.HMACSHA512 encryption. The key can be any length. However, if it is more than 64 bytes long it will be hashed (using SHA-1) to derive a 64-byte key. Therefore, the recommended size of the secret key is 64 bytes.</param>
-  ''' <remarks></remarks>
   Public Sub New(key__1 As Byte())
     ProduceLegacyHmacValues = legacy_mode
     HashName = "SHA512"
@@ -240,7 +235,6 @@ Public Class RR_HMACSHA512
   ''' </summary>
   ''' <value></value>
   ''' <returns>true to enable .NET Framework version 2.0 Service Pack 1 applications to interact with .NET Framework 2.0 applications; otherwise, false.</returns>
-  ''' <remarks></remarks>
   Public Property ProduceLegacyHmacValues() As Boolean
     Get
       Return legacy

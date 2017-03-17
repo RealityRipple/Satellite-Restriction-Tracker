@@ -9,32 +9,26 @@ Public Class DataBase
   ''' <summary>
   ''' Stores information about usage activity at a single date and time.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Structure DataRow
     ''' <summary>
     ''' The Date and Time of the data stored in this row.
     ''' </summary>
-    ''' <remarks></remarks>
     Public DATETIME As Date
     ''' <summary>
     ''' The number of Megabytes used in download activity at the specified date and time.
     ''' </summary>
-    ''' <remarks></remarks>
     Public DOWNLOAD As Long
     ''' <summary>
     ''' The maximum number of Megabytes allowed in download activity for the plan at the specified date and time.
     ''' </summary>
-    ''' <remarks></remarks>
     Public DOWNLIM As Long
     ''' <summary>
     ''' The number of Megabytes used in upload activity at the specified date and time.
     ''' </summary>
-    ''' <remarks></remarks>
     Public UPLOAD As Long
     ''' <summary>
     ''' The maximum number of Megabytes allowed in upload activity for the plan at the specified date and time.
     ''' </summary>
-    ''' <remarks></remarks>
     Public UPLIM As Long
     ''' <summary>
     ''' Create a new DataRow entry.
@@ -44,7 +38,6 @@ Public Class DataBase
     ''' <param name="lDownLim">The maximum number of Megabytes allowed in download activity for this entry.</param>
     ''' <param name="lUp">The number of Megabytes used in upload activity for this entry.</param>
     ''' <param name="lUpLim">The maximum number of Megabytes allowed in upload activity for this entry.</param>
-    ''' <remarks></remarks>
     Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
       DATETIME = dTime
       DOWNLOAD = lDown
@@ -56,7 +49,6 @@ Public Class DataBase
     ''' Get a string representation of the Date and Time of the data stored in this row.
     ''' </summary>
     ''' <returns>The date and time are returned in the format "MM/DD/YYYY HH:MM", or the standard "g".</returns>
-    ''' <remarks></remarks>
     Public ReadOnly Property sDATETIME As String
       Get
         Return DATETIME.ToString("g")
@@ -66,7 +58,6 @@ Public Class DataBase
     ''' Get a string representation of the number of Megabytes used in download activity for this row.
     ''' </summary>
     ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
-    ''' <remarks></remarks>
     Public ReadOnly Property sDOWNLOAD As String
       Get
         Return DOWNLOAD.ToString("N0")
@@ -76,7 +67,6 @@ Public Class DataBase
     ''' Get a string representation of the number of Megabytes allowed in download activity for this row.
     ''' </summary>
     ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
-    ''' <remarks></remarks>
     Public ReadOnly Property sDOWNLIM As String
       Get
         Return DOWNLIM.ToString("N0")
@@ -86,7 +76,6 @@ Public Class DataBase
     ''' Get a string representation of the number of Megabytes used in upload activity for this row.
     ''' </summary>
     ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
-    ''' <remarks></remarks>
     Public ReadOnly Property sUPLOAD As String
       Get
         Return UPLOAD.ToString("N0")
@@ -96,7 +85,6 @@ Public Class DataBase
     ''' Get a string representation of the number of Megabytes allowed in upload activity for this row.
     ''' </summary>
     ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
-    ''' <remarks></remarks>
     Public ReadOnly Property sUPLIM As String
       Get
         Return UPLIM.ToString("N0")
@@ -106,7 +94,6 @@ Public Class DataBase
     ''' Get a string representation of this row in the format "MM/DD/YYYY HH:MM [Down: 0,000/0,000][, ][Up: 0,000/0,000]".
     ''' </summary>
     ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with Download and/or Upload values if either the value or limit is greater than 0.</returns>
-    ''' <remarks></remarks>
     Public Overrides Function ToString() As String
       Dim sRet As String = sDATETIME
       If DOWNLOAD > 0 Or DOWNLIM > 0 Then
@@ -122,7 +109,6 @@ Public Class DataBase
     ''' This is a standard empty DataRow with all values set to zero.
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks></remarks>
     Public Shared ReadOnly Property Empty() As DataRow
       Get
         Return New DataRow(Date.FromBinary(0), 0, 0, 0, 0)
@@ -133,7 +119,6 @@ Public Class DataBase
     ''' </summary>
     ''' <param name="dRow">The <see cref="DataRow" /> entry you wish to check.</param>
     ''' <returns>A boolean value of <c>True</c> is returned if the <paramref name="dRow" /> entry is empty, <c>False</c> otherwise.</returns>
-    ''' <remarks></remarks>
     Public Shared Function IsEmpty(dRow As DataRow) As Boolean
       Return (dRow.DATETIME.ToBinary = 0 And dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0)
     End Function
@@ -141,7 +126,6 @@ Public Class DataBase
     ''' Check this <see cref="DataRow" /> entry to see if it is empty or unset.
     ''' </summary>
     ''' <returns>A boolean value of <c>True</c> is returned if this entry is empty, <c>False</c> otherwise.</returns>
-    ''' <remarks></remarks>
     Public Function IsEmpty() As Boolean
       Return (DATETIME.ToBinary = 0 And DOWNLOAD = 0 And UPLOAD = 0 And DOWNLIM = 0 And UPLIM = 0)
     End Function
@@ -157,7 +141,6 @@ Public Class DataBase
   ''' <summary>
   ''' Set this value to true to stop loading a databased called from the initialization subroutine.
   ''' </summary>
-  ''' <remarks></remarks>
   Public StopNew As Boolean
   Private sPath As String
   Private bWithDisplay As Boolean
@@ -170,7 +153,6 @@ Public Class DataBase
     ''' </summary>
     ''' <param name="Value">The current number of things that have been done.</param>
     ''' <param name="Total">The total number of things there are to do.</param>
-    ''' <remarks></remarks>
     Public Sub New(Value As Integer, Total As Integer)
       m_Value = Value
       m_Total = Total
@@ -178,7 +160,6 @@ Public Class DataBase
     ''' <summary>
     ''' The Current number of things that have been done.
     ''' </summary>
-    ''' <remarks></remarks>
     Public ReadOnly Property Value As Integer
       Get
         Return m_Value
@@ -187,7 +168,6 @@ Public Class DataBase
     ''' <summary>
     ''' The total number of things to do.
     ''' </summary>
-    ''' <remarks></remarks>
     Public ReadOnly Property Total As Integer
       Get
         Return m_Total
@@ -199,7 +179,6 @@ Public Class DataBase
   ''' </summary>
   ''' <param name="sender">A reference to this <see cref="DataBase" /> class.</param>
   ''' <param name="e">A <see cref="ProgressStateEventArgs" /> entry with the current Value and Total of the DataBase load's progress.</param>
-  ''' <remarks></remarks>
   Public Event ProgressState(sender As Object, e As ProgressStateEventArgs)
   ''' <summary>
   ''' Create a new DataBase with entries loaded from the specified <paramref name="Path" />.
@@ -214,7 +193,6 @@ Public Class DataBase
   ''' <summary>
   ''' Begin loading DataBase entries from the path specified in the snitialization subroutine.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Sub StartNew()
     StopNew = False
     If IO.File.Exists(sPath) Then
@@ -330,7 +308,6 @@ Public Class DataBase
   ''' <summary>
   ''' Organize the entire DataBase by date and time.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Sub Sort()
     Array.Sort(Of DataRow)(data, Function(drA As DataBase.DataRow, drB As DataBase.DataRow) Date.Compare(drA.DATETIME, drB.DATETIME))
   End Sub
@@ -383,7 +360,6 @@ Public Class DataBase
   ''' </summary>
   ''' <param name="item">The exact match of the <see cref="DataRow" /> you wish to find.</param>
   ''' <returns><c>True</c> is returned if the DataBase contains at least one copy of the <paramref name="item" />, <c>False</c> otherwise.</returns>
-  ''' <remarks></remarks>
   Public Function Contains(item As DataRow) As Boolean Implements System.Collections.Generic.ICollection(Of DataRow).Contains
     If Array.IndexOf(data, item) > -1 Then
       Return True
@@ -406,7 +382,6 @@ Public Class DataBase
   ''' Convert this DataBase into an array of <see cref="DataRow" /> entries.
   ''' </summary>
   ''' <returns>The full list of entries in this DataBase.</returns>
-  ''' <remarks></remarks>
   Public Function ToArray() As DataRow()
     Return data
   End Function
@@ -425,7 +400,6 @@ Public Class DataBase
   ''' </summary>
   ''' <value></value>
   ''' <returns>This property is always false because it is always false for all arrays.</returns>
-  ''' <remarks></remarks>
   Public ReadOnly Property IsReadOnly As Boolean Implements System.Collections.Generic.ICollection(Of DataRow).IsReadOnly
     Get
       Return data.IsReadOnly
@@ -454,7 +428,6 @@ Public Class DataBase
   ''' </summary>
   ''' <param name="DateTime">The Date and Time of the DataRow entry to remove.</param>
   ''' <returns><c>True</c> if the entry was successfully removed from the DataBase, <c>False</c> if the entry could not be found.</returns>
-  ''' <remarks></remarks>
   Public Function Remove(DateTime As Date) As Boolean
     Return Remove(New DataRow(DateTime, 0, 0, 0, 0))
   End Function
@@ -462,7 +435,6 @@ Public Class DataBase
   ''' Returns an enumerator that iterates through the DataBase.
   ''' </summary>
   ''' <returns>A <see cref="System.Collections.Generic.IEnumerable(Of DataRow)" /> that can be used to iterate through the DataBase.</returns>
-  ''' <remarks></remarks>
   Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of DataRow) Implements System.Collections.Generic.IEnumerable(Of DataRow).GetEnumerator
     If data Is Nothing Then Return Nothing
     Return DirectCast(data, IEnumerable(Of DataRow)).GetEnumerator
@@ -471,7 +443,6 @@ Public Class DataBase
   ''' Returns an enumerator that iterates through the DataBase.
   ''' </summary>
   ''' <returns>A <see cref="System.Collections.Generic.IEnumerator" /> that can be used to iterate through the DataBase.</returns>
-  ''' <remarks></remarks>
   Public Function GetEnumerator1() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
     If data Is Nothing Then Return Nothing
     Return DirectCast(data, IEnumerable(Of DataRow)).GetEnumerator
@@ -538,7 +509,6 @@ Public Class DataBase
   ''' <param name="Path">Path to a save location for the DataBase in either WB, XML, or CSV formats.</param>
   ''' <param name="withDisplay">Return the current progress of the save through the ProgressState event.</param>
   ''' <returns><c>True</c> is returned if </returns>
-  ''' <remarks></remarks>
   Public Function Save(Path As String, withDisplay As Boolean) As Boolean
     If data Is Nothing Then Return False
     Dim bDelBack As Boolean = False

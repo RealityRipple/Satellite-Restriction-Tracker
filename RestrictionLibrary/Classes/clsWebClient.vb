@@ -4,7 +4,6 @@
   ''' Create a new instance of the <see cref="WebClientCore" /> Class.
   ''' </summary>
   ''' <param name="useEvents">If set to <c>True</c>, failures will trigger events, if <c>False</c>, failures will throw errors.</param>
-  ''' <remarks></remarks>
   Public Sub New(useEvents As Boolean)
     MyBase.New()
     c_Events = useEvents
@@ -21,7 +20,6 @@
   ''' <summary>
   ''' Create a new instance of the <see cref="WebClientCore" /> Class.
   ''' </summary>
-  ''' <remarks></remarks>
   Sub New()
     MyBase.New()
     c_Events = False
@@ -38,7 +36,6 @@
   ''' <summary>
   ''' A <see cref="WebClientCore" /> Upload or Download request failure message containing an <see cref="Exception" />.
   ''' </summary>
-  ''' <remarks></remarks>
   Public Class ErrorEventArgs
     Inherits EventArgs
     Public [Error] As Exception
@@ -46,7 +43,6 @@
     ''' Create a new instance of the <see cref="ErrorEventArgs" /> Class for use with the <see cref="Failure" /> event.
     ''' </summary>
     ''' <param name="Err">The Exception being passed through the <see cref="Failure" /> event.</param>
-    ''' <remarks></remarks>
     Public Sub New(Err As Exception)
       [Error] = Err
     End Sub
@@ -57,7 +53,6 @@
   ''' </summary>
   ''' <value>A new CookieJar to use in place of the default empty Jar. This is useful for sharing and storing sessions and cookies across multiple <see cref="WebClientCore" /> instances.</value>
   ''' <returns>The current CookieJar for this <see cref="WebClientCore" />.</returns>
-  ''' <remarks></remarks>
   Public Property CookieJar As Net.CookieContainer
     Get
       Return c_CookieJar
@@ -83,7 +78,6 @@
   ''' </summary>
   ''' <value></value>
   ''' <returns>The number of milliseconds to wait before the request times out. The default is 120 seconds.</returns>
-  ''' <remarks></remarks>
   Public Property Timeout As Integer
     Get
       Return c_Timeout
@@ -98,7 +92,6 @@
   ''' </summary>
   ''' <value></value>
   ''' <returns>The number of seconds before the writing or reading times out. The default value is 300 seconds (5 minutes).</returns>
-  ''' <remarks></remarks>
   Public Property ReadWriteTimeout As Integer
     Get
       Return c_RWTimeout
@@ -113,7 +106,6 @@
   ''' </summary>
   ''' <value></value>
   ''' <returns>The HTTP version to use for the request. The default is <see cref="System.Net.HttpVersion.Version11" />.</returns>
-  ''' <remarks></remarks>
   Public Property HTTPVersion As Version
     Get
       Return c_HTVer
@@ -128,7 +120,6 @@
   ''' </summary>
   ''' <value>If set to <c>True</c> and the error contains a <see cref="System.Net.WebResponse" /> value, that response is sent instead of an error.</value>
   ''' <returns>If <c>True</c>, errors may be bypassed and trigger Upload and Download completion events, if possible. If <c>False</c>, all error responses are treated as errors. The default value is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property ErrorBypass As Boolean
     Get
       Return c_ErrorBypass
@@ -143,7 +134,6 @@
   ''' </summary>
   ''' <value>If set to <c>True</c>, the <see cref="WebClientCore" /> will send a Connection HTTP header with the value Keep-alive; if <c>False</c>, Close.</value>
   ''' <returns><c>True</c> if the request to the Internet resource should contain a Connection HTTP header with the value Keep-alive; otherwise, <c>False</c>. The default is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property KeepAlive As Boolean
     Get
       Return c_KeepAlive
@@ -158,7 +148,6 @@
   ''' </summary>
   ''' <value></value>
   ''' <returns><c>False</c> if the request should automatically follow redirection responses from the Internet resource; otherwise, <c>True</c>. The default value is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property ManualRedirect As Boolean
     Get
       Return c_ManualRedirect
@@ -173,21 +162,29 @@
   ''' </summary>
   ''' <param name="sender">The class which is triggering the event.</param>
   ''' <param name="e">The exception contained in an EventArg</param>
-  ''' <remarks></remarks>
   Public Event Failure(sender As Object, e As ErrorEventArgs)
   ''' <summary>
   ''' The User Agent for Satellite Restriction Tracker
   ''' </summary>
   ''' <value></value>
   ''' <returns></returns>
-  ''' <remarks></remarks>
   Public Shared ReadOnly Property UserAgent As String
     Get
       Return "Mozilla/5.0 (" & Environment.OSVersion.VersionString & "; CLR: " & srlFunctions.GetCLRVersion & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
     End Get
   End Property
+  Private m_Request As Net.WebRequest
+  Private m_Result As Net.WebResponse
   Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
     Try
+      If m_Request IsNot Nothing Then
+        m_Request.Abort()
+        m_Request = Nothing
+      End If
+      If m_Result IsNot Nothing Then
+        m_Result.Close()
+        m_Result = Nothing
+      End If
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
       If request.GetType Is GetType(Net.HttpWebRequest) Then
         CType(request, Net.HttpWebRequest).UserAgent = WebClientCore.UserAgent
@@ -199,6 +196,7 @@
         CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
         CType(request, Net.HttpWebRequest).CachePolicy = New Net.Cache.HttpRequestCachePolicy(Net.Cache.HttpRequestCacheLevel.BypassCache)
       End If
+      m_Request = request
       Return request
     Catch ex As Net.WebException
       MyBase.CancelAsync()
@@ -213,6 +211,7 @@
   Protected Overrides Function GetWebResponse(request As System.Net.WebRequest) As System.Net.WebResponse
     Try
       Dim response As Net.WebResponse = MyBase.GetWebResponse(request)
+      m_Result = response
       c_ResponseURI = response.ResponseUri
       If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
         Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
@@ -235,6 +234,7 @@
     Catch ex As Net.WebException
       If c_ErrorBypass Then
         Dim response As Net.WebResponse = ex.Response
+        m_Result = response
         If response IsNot Nothing Then
           c_ResponseURI = response.ResponseUri
           Return response
@@ -253,6 +253,7 @@
   Protected Overrides Function GetWebResponse(request As System.Net.WebRequest, result As System.IAsyncResult) As System.Net.WebResponse
     Try
       Dim response As Net.WebResponse = MyBase.GetWebResponse(request, result)
+      m_Result = response
       c_ResponseURI = response.ResponseUri
       If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
         Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
@@ -275,6 +276,7 @@
     Catch ex As Net.WebException
       If c_ErrorBypass Then
         Dim response As Net.WebResponse = ex.Response
+        m_Result = response
         If response IsNot Nothing Then
           c_ResponseURI = response.ResponseUri
           Return response
@@ -290,6 +292,16 @@
       Return Nothing
     End Try
   End Function
+  Private Sub WebClientCore_Disposed(sender As Object, e As System.EventArgs) Handles Me.Disposed
+    If m_Request IsNot Nothing Then
+      m_Request.Abort()
+      m_Request = Nothing
+    End If
+    If m_Result IsNot Nothing Then
+      m_Result.Close()
+      m_Result = Nothing
+    End If
+  End Sub
 End Class
 
 Public Class WebClientEx
@@ -299,7 +311,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>The number of milliseconds to wait before the request times out. The default is 180 seconds.</returns>
-  ''' <remarks></remarks>
   Public Property Timeout As Integer
     Get
       Return c_Timeout
@@ -314,7 +325,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>The number of seconds before the writing or reading times out. The default value is 7200 seconds (2 hours).</returns>
-  ''' <remarks></remarks>
   Public Property ReadWriteTimeout As Integer
     Get
       Return c_RWTimeout
@@ -329,7 +339,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>An <see cref="System.Net.IWebProxy" /> instance used to send requests.</returns>
-  ''' <remarks></remarks>
   Public Property Proxy As Net.IWebProxy
     Get
       Return c_Proxy
@@ -344,7 +353,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value>A new CookieJar to use in place of the default empty Jar. This is useful for sharing and storing sessions and cookies across multiple <see cref="WebClientEx" /> instances.</value>
   ''' <returns>The current CookieJar for this <see cref="WebClientEx" />.</returns>
-  ''' <remarks></remarks>
   Public Property CookieJar As Net.CookieContainer
     Get
       Return c_Jar
@@ -359,7 +367,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>A System.Text.Encoding that is used to encode strings. The default value of this property is <see cref="srlFunctions.LATIN_1" />.</returns>
-  ''' <remarks></remarks>
   Public Property Encoding As System.Text.Encoding
     Get
       Return c_Encoding
@@ -369,7 +376,7 @@ Public Class WebClientEx
     End Set
   End Property
   Private c_ResponseURI As Uri
-''' <summary>
+  ''' <summary>
   ''' The <see cref="Uri" /> of the last <see cref="WebClientCore.GetWebResponse" /> event after any redirection.
   ''' </summary>
   ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="WebClientCore.GetWebResponse" /> event occurs. It may be equal to the <see cref="Uri" /> sent in a Download or Upload request, or it may be modified during the request as per page redirection standards*.</returns>
@@ -385,7 +392,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value>If set to <c>True</c> and the error contains a <see cref="System.Net.WebResponse" /> value, that response is sent instead of an error.</value>
   ''' <returns>If <c>True</c>, errors may be bypassed and trigger Upload and Download completion events, if possible. If <c>False</c>, all error responses are treated as errors. The default value is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property ErrorBypass As Boolean
     Get
       Return c_ErrorBypass
@@ -400,7 +406,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value>If set to <c>True</c>, the <see cref="WebClientCore" /> will send a Connection HTTP header with the value Keep-alive; if <c>False</c>, Close.</value>
   ''' <returns><c>True</c> if the request to the Internet resource should contain a Connection HTTP header with the value Keep-alive; otherwise, <c>False</c>. The default is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property KeepAlive As Boolean
     Get
       Return c_KeepAlive
@@ -415,7 +420,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns><c>False</c> if the request should automatically follow redirection responses from the Internet resource; otherwise, <c>True</c>. The default value is <c>True</c>.</returns>
-  ''' <remarks></remarks>
   Public Property ManualRedirect As Boolean
     Get
       Return c_ManualRedirect
@@ -430,7 +434,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>A <see cref="System.Net.WebHeaderCollection" /> containing header name/value pairs associated with this request.</returns>
-  ''' <remarks></remarks>
   Public Property SendHeaders As Net.WebHeaderCollection
     Get
       Return c_SendHeaders
@@ -445,7 +448,6 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>If <c>True</c>, the request has been processed and is being sent, the client is waiting for the server, or data is being received in response. Otherwise, the request has not yet been sent or a response has already been received.</returns>
-  ''' <remarks></remarks>
   Public ReadOnly Property IsBusy As Boolean
     Get
       Return c_Busy
@@ -1085,21 +1087,17 @@ Public Enum SecurityProtocolTypeEx As Integer
   ''' <summary>
   ''' Specifies the Secure Socket Layer (SSL) 3.0 security protocol.
   ''' </summary>
-  ''' <remarks></remarks>
   Ssl3 = &H30
   ''' <summary>
   ''' Specifies the Transport Layer Security (TLS) 1.0 security protocol.
   ''' </summary>
-  ''' <remarks></remarks>
   Tls10 = &HC0
   ''' <summary>
   ''' Specifies the Transport Layer Security (TLS) 1.1 security protocol.
   ''' </summary>
-  ''' <remarks></remarks>
   Tls11 = &H300
   ''' <summary>
   ''' Specifies the Transport Layer Security (TLS) 1.2 security protocol.
   ''' </summary>
-  ''' <remarks></remarks>
   Tls12 = &HC00
 End Enum

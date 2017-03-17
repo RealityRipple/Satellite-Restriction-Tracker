@@ -62,7 +62,6 @@
   ''' </summary>
   ''' <param name="PassCrypt">The base64 encoded encrypted password.</param>
   ''' <returns>The raw password which was encrypted.</returns>
-  ''' <remarks></remarks>
   Shared Function DecryptApp(PassCrypt As String) As String
     GenKey()
     Dim bCrypt() As Byte = Convert.FromBase64String(PassCrypt)
@@ -74,7 +73,6 @@
   ''' </summary>
   ''' <param name="Password">The password to encrypt.</param>
   ''' <returns>An base64 output of the encrypted password.</returns>
-  ''' <remarks></remarks>
   Shared Function EncryptApp(Password As String) As String
     GenKey()
     Dim bPass() As Byte = System.Text.Encoding.GetEncoding(28591).GetBytes(Password)
@@ -86,7 +84,6 @@
   ''' </summary>
   ''' <param name="PassCrypt">The base64 encoded encrypted password.</param>
   ''' <returns>The raw password which was encrypted.</returns>
-  ''' <remarks></remarks>
   Shared Function DecryptLogger(PassCrypt As String) As String
     GenLoggerKey()
     Dim bCrypt() As Byte = Convert.FromBase64String(PassCrypt)
@@ -98,7 +95,6 @@
   ''' </summary>
   ''' <param name="Password">The password to encrypt.</param>
   ''' <returns>An base64 output of the encrypted password.</returns>
-  ''' <remarks></remarks>
   Shared Function EncryptLogger(Password As String) As String
     GenLoggerKey()
     Dim bPass() As Byte = System.Text.Encoding.GetEncoding(28591).GetBytes(Password)
