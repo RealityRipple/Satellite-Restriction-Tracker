@@ -203,6 +203,7 @@
       chkTLSProxy.Checked = False
       chkTLSProxy.Visible = False
     End If
+    RunNetworkProtocolTest()
     If String.IsNullOrEmpty(mySettings.NetTestURL) Then
       optNetTestNone.Checked = True
     Else
@@ -290,6 +291,91 @@
     End If
     remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
+  Private Sub RunNetworkProtocolTest()
+    If chkTLSProxy.Checked Then
+      chkNetworkProtocolSSL3.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
+      chkNetworkProtocolTLS10.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerable to attacks.")
+      chkNetworkProtocolTLS11.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
+      chkNetworkProtocolTLS12.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
+      Return
+    End If
+    Dim canSSL3 As Boolean = True
+    Dim canTLS10 As Boolean = True
+    Dim canTLS11 As Boolean = True
+    Dim canTLS12 As Boolean = True
+    Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
+    Try
+      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
+    Catch ex As Exception
+      canSSL3 = False
+    End Try
+    Try
+      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls10
+    Catch ex As Exception
+      canTLS10 = False
+    End Try
+    Try
+      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls11
+    Catch ex As Exception
+      canTLS11 = False
+    End Try
+    Try
+      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls12
+    Catch ex As Exception
+      canTLS12 = False
+    End Try
+    Net.ServicePointManager.SecurityProtocol = myProtocol
+    If canSSL3 Then
+      chkNetworkProtocolSSL3.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
+    Else
+      chkNetworkProtocolSSL3.Checked = False
+      chkNetworkProtocolSSL3.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Your Operating System or version of the .NET Framework does not allow SSL 3.0 connections. Probably for the best, as this protocol is vulnerable to attacks.")
+    End If
+    If canTLS10 Then
+      chkNetworkProtocolTLS10.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerable to attacks.")
+    Else
+      chkNetworkProtocolTLS10.Checked = False
+      chkNetworkProtocolTLS10.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "Your Operating System or version of the .NET Framework does not allow TLS 1.0 connections. Probably for the best, as this protocol is vulnerable to attacks.")
+    End If
+    If canTLS11 Then
+      chkNetworkProtocolTLS11.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
+    Else
+      chkNetworkProtocolTLS11.Checked = False
+      chkNetworkProtocolTLS11.Enabled = False
+      If (Environment.OSVersion.Version.Major < 6) OrElse
+       (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Your Operating System does not allow TLS 1.1 connections. Enable the TLS Proxy if you need TLS 1.1.")
+      ElseIf Environment.Version.Revision < 17929 Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Your version of the .NET Framework does not allow TLS 1.1 connections. Please update to .NET 4.5 or newer.")
+      Else
+        ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Your Operating System or version of the .NET Framework does not allow TLS 1.1 connections. Try repairing the .NET Framework.")
+      End If
+    End If
+    If canTLS12 Then
+      chkNetworkProtocolTLS12.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
+    Else
+      chkNetworkProtocolTLS12.Checked = False
+      chkNetworkProtocolTLS12.Enabled = False
+      If (Environment.OSVersion.Version.Major < 6) OrElse
+       (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your Operating System does not allow TLS 1.2 connections. Enable the TLS Proxy if you need TLS 1.2.")
+      ElseIf Environment.Version.Revision < 17929 Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your version of the .NET Framework does not allow TLS 1.2 connections. Please update to .NET 4.5 or newer.")
+      Else
+        ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your Operating System or version of the .NET Framework does not allow TLS 1.2 connections. Try repairing the .NET Framework.")
+      End If
+    End If
+  End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then
       pChecker.Dispose()
@@ -302,16 +388,15 @@
     If e.CloseReason = CloseReason.ApplicationExitCall Then
       Me.DialogResult = Windows.Forms.DialogResult.Abort
     Else
-      If bSaved Then
-        If bAccount Then
-          Me.DialogResult = Windows.Forms.DialogResult.Yes
-        Else
-          Me.DialogResult = Windows.Forms.DialogResult.OK
-        End If
-      ElseIf cmdSave.Enabled Then
+      If cmdSave.Enabled Then
         Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your configuration?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, _TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
         If saveRet = Windows.Forms.DialogResult.Yes Then
           cmdSave.PerformClick()
+          If cmdSave.Enabled Then
+            e.Cancel = True
+            Me.DialogResult = Windows.Forms.DialogResult.None
+            Return
+          End If
           If bAccount Then
             Me.DialogResult = Windows.Forms.DialogResult.Yes
           Else
@@ -323,6 +408,12 @@
           e.Cancel = True
           Me.DialogResult = Windows.Forms.DialogResult.None
           Return
+        End If
+      ElseIf bSaved Then
+        If bAccount Then
+          Me.DialogResult = Windows.Forms.DialogResult.Yes
+        Else
+          Me.DialogResult = Windows.Forms.DialogResult.OK
         End If
       Else
         Me.DialogResult = Windows.Forms.DialogResult.No
@@ -377,7 +468,7 @@
                                                                              chkStartUp.CheckedChanged, chkAutoHide.CheckedChanged,
                                                                              txtOverSize.KeyPress, txtOverSize.KeyUp, txtOverSize.Scroll, txtOverSize.ValueChanged,
                                                                              txtOverTime.KeyPress, txtOverTime.KeyUp, txtOverTime.Scroll, txtOverTime.ValueChanged,
-                                                                             chkTLSProxy.CheckedChanged, chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged,
+                                                                             chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged,
                                                                              txtProxyAddress.TextChanged,
                                                                              txtProxyPort.KeyPress, txtProxyPort.KeyUp, txtProxyPort.Scroll, txtProxyPort.ValueChanged,
                                                                              txtProxyUser.TextChanged,
@@ -603,6 +694,10 @@
         lblProxyDomain.Enabled = False
         txtProxyDomain.Enabled = False
     End Select
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+  Private Sub chkTLSProxy_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTLSProxy.CheckedChanged
+    RunNetworkProtocolTest()
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbUpdateAutomation_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbUpdateAutomation.SelectedIndexChanged

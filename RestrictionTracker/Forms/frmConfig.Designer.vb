@@ -1880,8 +1880,8 @@ Partial Class frmConfig
     Me.chkNetworkProtocolSSL3.Size = New System.Drawing.Size(70, 18)
     Me.chkNetworkProtocolSSL3.TabIndex = 2
     Me.chkNetworkProtocolSSL3.Text = "SS&L 3.0"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which may be vulnerabl" & _
-        "e to attacks.")
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to" & _
+        " attacks.")
     Me.chkNetworkProtocolSSL3.UseVisualStyleBackColor = False
     '
     'chkNetworkProtocolTLS10
@@ -1922,8 +1922,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
     Me.chkNetworkProtocolTLS11.TabIndex = 4
     Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer TLS 1.1 protocol, which requires Windows" & _
-        " 7 or newer.")
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
     Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
     '
     'chkNetworkProtocolTLS12
@@ -1935,8 +1934,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolTLS12.Size = New System.Drawing.Size(70, 18)
     Me.chkNetworkProtocolTLS12.TabIndex = 5
     Me.chkNetworkProtocolTLS12.Text = "TLS 1.2"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the newer TLS 1.2 protocol, which requires Windows" & _
-        " 7 or newer.")
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
     Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
     '
     'pnlNetworkProtocolTitle

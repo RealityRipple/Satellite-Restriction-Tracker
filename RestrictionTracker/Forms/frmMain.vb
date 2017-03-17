@@ -968,30 +968,34 @@ Public Class frmMain
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.LoginIssue
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        DisplayUsage(False, False)
+        Return
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
         SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
         DisplayUsage(False, False)
-      Case ConnectionFailureEventArgs.FailureType.LoginFailure
-        If e.Message = "TLS ERROR" Then
-          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature for now.", True)
-          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer.", True)
-          Else
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported for some reason. Please use the TLS Proxy feature for now. Also, let me know you got this message.", True)
-          End If
-        ElseIf e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
-          Dim sMessage As String = e.Message.Substring(21)
-          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature for now." & vbNewLine & sMessage, True)
-          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer." & vbNewLine & sMessage, True)
-          Else
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported for some reason. Please use the TLS Proxy feature for now. Also, let me know you got this message." & vbNewLine & sMessage, True)
-          End If
+      Case ConnectionFailureEventArgs.FailureType.TLSTooOld
+        If mySettings.TLSProxy Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
+          DisplayUsage(False, False)
         Else
-          SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to connect.", True)
+            DisplayUsage(False, False)
+          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer. Please update your .NET Framework version through Windows Updates or the Microsoft website. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
+            DisplayUsage(False, False)
+          Else
+            If e.Message = "VER" Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
+              DisplayUsage(False, False)
+            ElseIf e.Message = "PROXY" Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Even though TLS 1.1 or 1.2 was enabled, the server still didin't like the request. Please let me know you got this message. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
+              DisplayUsage(False, False)
+            End If
+          End If
         End If
+      Case ConnectionFailureEventArgs.FailureType.LoginFailure
+        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, True)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
@@ -1000,6 +1004,8 @@ Public Class frmMain
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+        SetStatusText(LOG_GetLast.ToString("g"), "Please enter your account details in the Config window.", True)
+        DisplayUsage(False, False)
         If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
           If Me.WindowState = FormWindowState.Minimized Then
             Me.WindowState = FormWindowState.Normal

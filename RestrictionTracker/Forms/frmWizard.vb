@@ -172,6 +172,7 @@ Public Class frmWizard
         newSettings.Overuse = 0
         newSettings.Overtime = 15
       End If
+      newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
       If NeedsTLSProxy Then newSettings.TLSProxy = True
       newSettings.Save()
       If newSettings.Service Then
@@ -658,17 +659,16 @@ Public Class frmWizard
       localTest.Dispose()
       localTest = Nothing
     End If
-
     Dim newSettings As New AppSettings
     newSettings.AccountType = SatHostTypes.Other
     newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
     newSettings.PassCrypt = StoredPassword.EncryptApp(txtAccountPass.Text)
     newSettings.Service = False
     newSettings.RemoteKey = Nothing
+    newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     If NeedsTLSProxy Then newSettings.TLSProxy = True
     newSettings.Save()
     newSettings = Nothing
-
     localTest = New localRestrictionTracker(LocalAppDataDirectory, True)
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
@@ -704,37 +704,28 @@ Public Class frmWizard
     If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
     AccountType = SatHostTypes.Other
     Dim skipIt As Boolean = False
+    Dim forceRetry As Boolean = False
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.LoginFailure
+      Case ConnectionFailureEventArgs.FailureType.TLSTooOld
         If NeedsTLSProxy = True Then
           skipIt = True
         Else
-          If e.Message = "TLS ERROR" Then
-            If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-              If MsgDlg(Me, "Your Operating System is too old to support the Security Protocol required to log in." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True
-            ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-              skipIt = True
-              MsgDlg(Me, "Your version of the .NET Framework is too old to support the Security Protocol required to log in. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-            Else
-              skipIt = True
-              MsgDlg(Me, "Security Protocol not supported for some reason. Please let me know you got this message.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-            End If
-          ElseIf e.Message.StartsWith("POSSIBLE TLS ERROR - ") Then
-            Dim sMessage As String = e.Message.Substring(21)
-            If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-              If MsgDlg(Me, "Your Operating System is too old to support the Security Protocol required to log in." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure." & vbNewLine & sMessage, "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True
-            ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-              skipIt = True
-              MsgDlg(Me, "Your version of the .NET Framework is too old to support the Security Protocol required to log in. Please update to .NET 4.5 or newer.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter)
-            Else
-              skipIt = True
-              MsgDlg(Me, "Security Protocol not supported for some reason. Please let me know you got this message.", "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , sMessage, _TaskDialogExpandedDetailsLocation.ExpandFooter)
-            End If
+          If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
+            If MsgDlg(Me, "Your Operating System is too old to support the Security Protocol required to log in." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True : forceRetry = True
+          ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
+            skipIt = True
+            If MsgDlg(Me, "Your version of the .NET Framework is too old to support the Security Protocol required to log in. Please <a href=""control update"">update</a> to <a href=""https://www.microsoft.com/net/download/framework"">.NET 4.5</a> or newer." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True : forceRetry = True
           Else
-            MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+            skipIt = True
+            If e.Message = "VER" Then
+              If MsgDlg(Me, "TLS 1.1 and 1.2 could not be enabled on your computer for an unknown reason. Please let me know you got this message." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True : forceRetry = True
+            ElseIf e.Message = "PROXY" Then
+              If MsgDlg(Me, "Even though TLS 1.1 or 1.2 was enabled, the server still didin't like the request. Please let me know you got this message." & vbNewLine & "Using the TLS Proxy will bypass this problem, but it has limitations and is not secure.", "Would you like to enable the TLS Proxy?", "Failed to Log In", MessageBoxButtons.YesNo, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Question) = Windows.Forms.DialogResult.Yes Then NeedsTLSProxy = True : forceRetry = True
+            End If
           End If
         End If
+      Case ConnectionFailureEventArgs.FailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1
@@ -743,15 +734,15 @@ Public Class frmWizard
       localTest.Dispose()
       localTest = Nothing
     End If
+    If forceRetry Then
+      DrawStatus(True, "Retrying with TLS Proxy...")
+      UsageTest()
+      Return
+    End If
     If skipIt Then
       DrawStatus(False)
       AccountType = SatHostTypes.WildBlue_EXEDE
       tbsWizardPages.SelectedIndex += 1
-      Return
-    End If
-    If NeedsTLSProxy Then
-      DrawStatus(True, "Retrying with TLS Proxy...")
-      UsageTest()
       Return
     End If
     DrawStatus(False)

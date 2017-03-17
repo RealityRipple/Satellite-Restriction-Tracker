@@ -1,69 +1,198 @@
-﻿Public Class localRestrictionTracker
+﻿''' <summary>
+''' Accesses WildBlue, Exede, RuralPortal, and DishNet usage pages and handles all communication internally.
+''' </summary>
+Public Class localRestrictionTracker
   Implements IDisposable
+  ''' <summary>
+  ''' Types of Satellite hosts which are supported by <see cref="localRestrictionTracker" />.
+  ''' </summary>
   Public Enum SatHostTypes
+    ''' <summary>
+    ''' WildBlue type meter with <see cref="localRestrictionTracker.TYPEAResultEventArgs">Type A</see> usage, including Download, Download Limit, Upload, and Upload Limit values, reading through an address of myaccount.DOMAIN/wbisp/DOMAIN/.
+    ''' </summary>
     WildBlue_LEGACY    ' Down, Up, DownLim, UpLim     [TYPEA]
+    ''' <summary>
+    ''' Exede type meter with <see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through either my.exede.net or my.satelliteinternetco.com, using AJAX.
+    ''' </summary>
     WildBlue_EXEDE     ' Used, Limit                  [TYPEB]
+    ''' <summary>
+    ''' RuralPortal WildBlue type meter with <see cref="localRestrictionTracker.TYPEAResultEventArgs">Type A</see> usage, including Download, Download Limit, Upload, and Upload Limit values, reading through an address of DOMAIN.ruralportal.net.
+    ''' </summary>
     RuralPortal_LEGACY ' Down, Up, DownLim, UpLim     [TYPEA]
+    ''' <summary>
+    ''' RuralPortal Exede type meter with <see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through an address of DOMAIN.ruralportal.net.
+    ''' </summary>
     RuralPortal_EXEDE  ' Used, Limit                  [TYPEB]
+    ''' <summary>
+    ''' Exede through Dish Network type meter with <see cref="localRestrictionTracker.TYPEA2ResultEventArgs">Type A2</see> uage, including AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values, reading through dish.com or dish.net.
+    ''' </summary>
     DishNet_EXEDE      ' AnyTime, AnyTimeLim, OffPeak, OffPeakLim [TYPEA2]
+    ''' <summary>
+    ''' The provider is unknown or hasn't been determined yet.
+    ''' </summary>
     Other
   End Enum
+  ''' <summary>
+  ''' Current status of the <see cref="localRestrictionTracker" /> connection.
+  ''' </summary>
   Public Enum ConnectionStates
+    ''' <summary>
+    ''' The class is being initialized.
+    ''' </summary>
     Initialize
+    ''' <summary>
+    ''' Praparing to log in.
+    ''' </summary>
     Prepare
+    ''' <summary>
+    ''' Logging in.
+    ''' </summary>
     Login
+    ''' <summary>
+    ''' Downloading the Usage Table.
+    ''' </summary>
     TableDownload
+    ''' <summary>
+    ''' Reading the Usage Table.
+    ''' </summary>
     TableRead
   End Enum
+  ''' <summary>
+  ''' Current stage of the <see cref="localRestrictionTracker" /> connection (more detailed than <see cref="ConnectionStates" />).
+  ''' </summary>
   Public Enum ConnectionSubStates
+    ''' <summary>
+    ''' Use the <see cref="ConnectionStates" /> value instead of this value. There's no further breakdown of status.
+    ''' </summary>
     None
+    ''' <summary>
+    ''' The login page is being read. Exede and DishNet use this step.
+    ''' </summary>
     ReadLogin
+    ''' <summary>
+    ''' Authentication is being prepared. It's also known as the First Bookend. Only Exede uses this step.
+    ''' </summary>
     AuthPrepare
+    ''' <summary>
+    ''' The username and password are being sent. All providers use this step.
+    ''' </summary>
     Authenticate
+    ''' <summary>
+    ''' Authentication has to be sent a second time. Exede, RuralPortal, and DishNet use this step.
+    ''' </summary>
     AuthenticateRetry
+    ''' <summary>
+    ''' The login is being verified. This is also known as the Last Bookend. Only Exede uses this step.
+    ''' </summary>
     Verify
+    ''' <summary>
+    ''' The home page is being loaded. This is also known as the Dashboard. Exede and DishNet use this step.
+    ''' </summary>
     LoadHome
+    ''' <summary>
+    ''' AJAX data off the home page is being loaded. Only Exede uses this step.
+    ''' </summary>
     LoadAJAX
+    ''' <summary>
+    ''' The previous attempt to load AJAX data failed, so now the system is loading every page of AJAX data it can in an attempt to find the meter. Only Exede uses this step.
+    ''' </summary>
     LoadAJAXRetry
+    ''' <summary>
+    ''' The usage meter is being loaded. This is the final step, unless it has to be retried. All providers use this step.
+    ''' </summary>
     LoadTable
+    ''' <summary>
+    ''' The usage meter is being loaded again. Sometimes it needs to be this way. Only DishNet uses this step.
+    ''' </summary>
     LoadTableRetry
   End Enum
 #Region "Events"
+  ''' <summary>
+  ''' Information regarding the type of <see cref="localRestrictionTracker" /> connection failure received and any details.
+  ''' </summary>
   Public Class ConnectionFailureEventArgs
     Inherits EventArgs
+    ''' <summary>
+    ''' Types of connection failures.
+    ''' </summary>
     Public Enum FailureType
+      ''' <summary>
+      ''' The Account Type is unknown, so the <see cref="localRestrictionTracker" /> connection can not begin. There should be no <see cref="ConnectionFailureEventArgs.Message" /> for this <see cref="ConnectionFailureEventArgs" />.
+      ''' </summary>
       UnknownAccountType
+      ''' <summary>
+      ''' The Username or Password are missing, so the <see cref="localRestrictionTracker" /> connection can not begin. There should be no <see cref="ConnectionFailureEventArgs.Message" /> for this <see cref="ConnectionFailureEventArgs" />.
+      ''' </summary>
       UnknownAccountDetails
+      ''' <summary>
+      ''' There was an issue while logging in, but the login process is still going through. Currently the only issue triggered is from <see cref="DetermineType.SatHostGroup.RuralPortal" /> with the <see cref="ConnectionFailureEventArgs.Message" /> "Your password needs to be changed." when the server is prompting the user to change the password for one reason or another.
+      ''' </summary>
       LoginIssue
+      ''' <summary>
+      ''' There was an issue while logging in. The <see cref="ConnectionFailureEventArgs.Message" /> will contain information about the <see cref="ConnectionFailure" />.
+      ''' </summary>
       LoginFailure
+      ''' <summary>
+      ''' There was an issue while logging in, and the <see cref="AppSettings.AccountType" /> is wrong. The <see cref="ConnectionFailureEventArgs.Message" /> will contain information about the <see cref="ConnectionFailure" />.
+      ''' </summary>
       FatalLoginFailure
+      ''' <summary>
+      ''' The server timed out. There should be no <see cref="ConnectionFailureEventArgs.Message" /> for this <see cref="ConnectionFailureEventArgs" />.
+      ''' </summary>
       ConnectionTimeout
+      ''' <summary>
+      ''' The version of TLS is too old. The <see cref="ConnectionFailureEventArgs.Message" /> for this <see cref="ConnectionFailureEventArgs" /> will either be the string "VER" if TLS 1.1 and 1.2 are both disabled, or "PROXY" if the TLS Proxy is disabled.
+      ''' </summary>
+      TLSTooOld
     End Enum
     Private m_FailType As FailureType
     Private m_Fail As String
     Private m_Message As String
+    ''' <summary>
+    ''' Constructor for a <see cref="ConnectionFailureEventArgs" /> class, used in a <see cref="ConnectionFailure" /> event to notify about a problem during connection.
+    ''' </summary>
+    ''' <param name="ftFailType">The <see cref="FailureType" /> describes the type of <see cref="ConnectionFailure" /> for this event. See the description for each type for details.</param>
+    ''' <param name="sMessage">A message containing information about the <see cref="ConnectionFailure" />. Not all <see cref="FailureType">FailureTypes</see> use messages.</param>
+    ''' <param name="sFailure">Extra data passed to the program about the <see cref="ConnectionFailure" />, which can be reported to the RealityRipple Software servers to resolve in the next version. This is usually HTML and JavaScript from a single page of the login process or the meter.</param>
     Public Sub New(ftFailType As FailureType, Optional sMessage As String = Nothing, Optional sFailure As String = Nothing)
       m_FailType = ftFailType
       m_Message = sMessage
       m_Fail = sFailure
     End Sub
+    ''' <summary>
+    ''' Extra data passed to the program about the <see cref="ConnectionFailure" />, which can be reported to the RealityRipple Software servers to resolve in the next version. This is usually HTML and JavaScript from a single page of the login process or the meter.
+    ''' </summary>
     Public ReadOnly Property Fail As String
       Get
         Return m_Fail
       End Get
     End Property
+    ''' <summary>
+    ''' A message containing information about the <see cref="ConnectionFailure" />. Not all <see cref="FailureType">FailureTypes</see> use messages.
+    ''' </summary>
     Public ReadOnly Property Message As String
       Get
         Return m_Message
       End Get
     End Property
+    ''' <summary>
+    ''' The <see cref="FailureType" /> describes the type of <see cref="ConnectionFailure" /> for this event. See the description for each type for details.
+    ''' </summary>
     Public ReadOnly Property [Type] As FailureType
       Get
         Return m_FailType
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Triggered when the connection to a usage page fails or has an issue.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="ConnectionFailureEventArgs" /> data regarding the failure.</param>
   Public Event ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs)
+  ''' <summary>
+  ''' Result from a Type A usage meter, containing Download, Download Limit, Upload, and Upload Limit values.
+  ''' </summary>
   Public Class TYPEAResultEventArgs
     Inherits EventArgs
     Private m_Down As Long
@@ -73,15 +202,16 @@
     Private m_Update As Date
     Private m_slow As Boolean
     Private m_free As Boolean
-    Public Sub New(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, dUpdate As Date)
-      m_Down = lDown
-      m_Up = lUp
-      m_DownLim = lDownLim
-      m_UpLim = lUpLim
-      m_Update = dUpdate
-      m_slow = False
-      m_free = False
-    End Sub
+    ''' <summary>
+    ''' Constructor for a <see cref="TYPEAResultEventArgs" /> used in <see cref="ConnectionWBLResult" /> and <see cref="ConnectionRPLResult" /> events.
+    ''' </summary>
+    ''' <param name="lDown">Number of megabytes used in download.</param>
+    ''' <param name="lDownLim">Number of megabytes allowed in download.</param>
+    ''' <param name="lUp">Number of megabytes used in upload.</param>
+    ''' <param name="lUpLim">Number of megabytes allowed in upload.</param>
+    ''' <param name="dUpdate">The specific date and time of this usage.</param>
+    ''' <param name="bSlow"><c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.</param>
+    ''' <param name="bFree"><c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.</param>
     Public Sub New(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
       m_Down = lDown
       m_Up = lUp
@@ -91,42 +221,66 @@
       m_slow = bSlow
       m_free = bFree
     End Sub
+    ''' <summary>
+    ''' Number of megabytes used in download.
+    ''' </summary>
     Public ReadOnly Property Download As Long
       Get
         Return m_Down
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes allowed in download.
+    ''' </summary>
     Public ReadOnly Property DownloadLimit As Long
       Get
         Return m_DownLim
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes used in upload.
+    ''' </summary>
     Public ReadOnly Property Upload As Long
       Get
         Return m_Up
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes allowed in upload.
+    ''' </summary>
     Public ReadOnly Property UploadLimit As Long
       Get
         Return m_UpLim
       End Get
     End Property
+    ''' <summary>
+    ''' The specific date and time of this usage.
+    ''' </summary>
     Public ReadOnly Property Update As Date
       Get
         Return m_Update
       End Get
     End Property
+    ''' <summary>
+    ''' <c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.
+    ''' </summary>
     Public ReadOnly Property SlowedDetected As Boolean
       Get
         Return m_slow
       End Get
     End Property
+    ''' <summary>
+    ''' <c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.
+    ''' </summary>
     Public ReadOnly Property FreeDetected As Boolean
       Get
         Return m_free
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Result from Type A2 usage meter, containing AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values.
+  ''' </summary>
   Public Class TYPEA2ResultEventArgs
     Inherits EventArgs
     Private m_AnyTime As Long
@@ -136,15 +290,16 @@
     Private m_Update As Date
     Private m_slow As Boolean
     Private m_free As Boolean
-    Public Sub New(lAnyTime As Long, lAnyTimeLim As Long, lOffPeak As Long, lOffPeakLim As Long, dUpdate As Date)
-      m_AnyTime = lAnyTime
-      m_AnyTimeLim = lAnyTimeLim
-      m_OffPeak = lOffPeak
-      m_OffPeakLim = lOffPeakLim
-      m_Update = dUpdate
-      m_slow = False
-      m_free = False
-    End Sub
+    ''' <summary>
+    ''' Constructor for a <see cref="TYPEA2ResultEventArgs" /> used in <see cref="ConnectionDNXResult" /> events.
+    ''' </summary>
+    ''' <param name="lAnyTime">Number of megabytes used during AnyTime hours.</param>
+    ''' <param name="lAnyTimeLim">Number of megabytes allowed during AnyTime hours.</param>
+    ''' <param name="lOffPeak">Number of megabytes used during Off-Peak hours.</param>
+    ''' <param name="lOffPeakLim">Number of megabytes allowed during Off-Peak hours.</param>
+    ''' <param name="dUpdate">The specific date and time of this usage.</param>
+    ''' <param name="bSlow"><c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.</param>
+    ''' <param name="bFree"><c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.</param>
     Public Sub New(lAnyTime As Long, lAnyTimeLim As Long, lOffPeak As Long, lOffPeakLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
       m_AnyTime = lAnyTime
       m_AnyTimeLim = lAnyTimeLim
@@ -154,42 +309,66 @@
       m_slow = bSlow
       m_free = bFree
     End Sub
+    ''' <summary>
+    ''' Number of megabytes used during AnyTime hours.
+    ''' </summary>
     Public ReadOnly Property AnyTime As Long
       Get
         Return m_AnyTime
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes allowed during AnyTime hours.
+    ''' </summary>
     Public ReadOnly Property AnyTimeLimit As Long
       Get
         Return m_AnyTimeLim
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes used during Off-Peak hours.
+    ''' </summary>
     Public ReadOnly Property OffPeak As Long
       Get
         Return m_OffPeak
       End Get
     End Property
+    ''' <summary>
+    ''' Number of megabytes allowed during Off-Peak hours.
+    ''' </summary>
     Public ReadOnly Property OffPeakLimit As Long
       Get
         Return m_OffPeakLim
       End Get
     End Property
+    ''' <summary>
+    ''' The specific date and time of this usage.
+    ''' </summary>
     Public ReadOnly Property Update As Date
       Get
         Return m_Update
       End Get
     End Property
+    ''' <summary>
+    ''' <c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.
+    ''' </summary>
     Public ReadOnly Property SlowedDetected As Boolean
       Get
         Return m_slow
       End Get
     End Property
+    ''' <summary>
+    ''' <c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.
+    ''' </summary>
     Public ReadOnly Property FreeDetected As Boolean
       Get
         Return m_free
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Result from Type B usage meter, containing Used and Limit values.
+  ''' </summary>
   Public Class TYPEBResultEventArgs
     Inherits EventArgs
     Private m_Used As Long
@@ -197,13 +376,14 @@
     Private m_Update As Date
     Private m_slow As Boolean
     Private m_free As Boolean
-    Public Sub New(lUsed As Long, lLimit As Long, dUpdate As Date)
-      m_Used = lUsed
-      m_Limit = lLimit
-      m_Update = dUpdate
-      m_slow = False
-      m_free = False
-    End Sub
+    ''' <summary>
+    ''' Constructor for a <see cref="TYPEBResultEventArgs" /> used in <see cref="ConnectionWBXResult" /> and <see cref="ConnectionRPXResult" /> events.
+    ''' </summary>
+    ''' <param name="lUsed">Total number of megabytes used.</param>
+    ''' <param name="lLimit">Total number of megabytes allowed.</param>
+    ''' <param name="dUpdate">The specific date and time of this usage.</param>
+    ''' <param name="bSlow"><c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.</param>
+    ''' <param name="bFree"><c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.</param>
     Public Sub New(lUsed As Long, lLimit As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
       m_Used = lUsed
       m_Limit = lLimit
@@ -211,76 +391,154 @@
       m_slow = bSlow
       m_free = bFree
     End Sub
+    ''' <summary>
+    ''' Total number of megabytes used.
+    ''' </summary>
     Public ReadOnly Property Used As Long
       Get
         Return m_Used
       End Get
     End Property
+    ''' <summary>
+    ''' Total number of megabytes allowed.
+    ''' </summary>
     Public ReadOnly Property Limit As Long
       Get
         Return m_Limit
       End Get
     End Property
+    ''' <summary>
+    ''' The specific date and time of this usage.
+    ''' </summary>
     Public ReadOnly Property Update As Date
       Get
         Return m_Update
       End Get
     End Property
+    ''' <summary>
+    ''' If your connection is restricted, this value will be set to <c>True</c>. Currently only set by <see cref="SatHostTypes.WildBlue_LEGACY" />.
+    ''' </summary>
     Public ReadOnly Property SlowedDetected As Boolean
       Get
         Return m_slow
       End Get
     End Property
+    ''' <summary>
+    ''' If the usage isn't being counted, this value will be set to <c>True</c>. Currently rarely used by <see cref="SatHostTypes.WildBlue_LEGACY" />.
+    ''' </summary>
     Public ReadOnly Property FreeDetected As Boolean
       Get
         Return m_free
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_LEGACY" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs)
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.DishNet_EXEDE" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEA2ResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_LEGACY" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs)
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_EXEDE" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs)
+  ''' <summary>
+  ''' Class storing information regarding the current connection status, useful for displaying progress during connection or determining the location of an error.
+  ''' </summary>
   Public Class ConnectionStatusEventArgs
     Inherits EventArgs
     Private m_state As ConnectionStates
     Private m_substate As ConnectionSubStates
     Private m_stage As Integer
+    ''' <summary>
+    ''' Constructor for <see cref="ConnectionStatusEventArgs" /> class.
+    ''' </summary>
+    ''' <param name="status">Current status of the <see cref="localRestrictionTracker" /> connection.</param>
+    ''' <param name="substate">Current stage of the <see cref="localRestrictionTracker" /> connection (more detailed than <see cref="ConnectionStates" />). This value is <see cref="ConnectionSubStates.None" /> by default.</param>
+    ''' <param name="stage">The stage of the stage, so to speak. This numeric value contains detailed information on <paramref name="substate" /> values which may trigger more than one time.</param>
     Public Sub New(status As ConnectionStates, Optional substate As ConnectionSubStates = ConnectionSubStates.None, Optional stage As Integer = 0)
       m_state = status
       m_substate = substate
       m_stage = stage
     End Sub
+    ''' <summary>
+    ''' Current status of the <see cref="localRestrictionTracker" /> connection.
+    ''' </summary>
     Public ReadOnly Property Status As ConnectionStates
       Get
         Return m_state
       End Get
     End Property
+    ''' <summary>
+    ''' Current stage of the <see cref="localRestrictionTracker" /> connection (more detailed than <see cref="ConnectionStates" />).
+    ''' </summary>
     Public ReadOnly Property SubState As ConnectionSubStates
       Get
         Return m_substate
       End Get
     End Property
+    ''' <summary>
+    ''' The stage of the stage, so to speak. This numeric value contains detailed information on <see cref="SubState" /> values which may trigger more than one time.
+    ''' </summary>
     Public ReadOnly Property Stage As Integer
       Get
         Return m_stage
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Triggered when new information regarding the current connection status is available.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="ConnectionStatusEventArgs" /> data regarding the current state of the connection.</param>
   Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
+  ''' <summary>
+  ''' Class storing information regarding a successful connection without data, which contains the <see cref="SatHostTypes">SatHostType</see> for the connected provider.
+  ''' </summary>
   Public Class LoginCompletionEventArgs
     Inherits EventArgs
     Private m_HostType As SatHostTypes
+    ''' <summary>
+    ''' Constructor for the <see cref="LoginCompletionEventArgs" /> class.
+    ''' </summary>
+    ''' <param name="myHostType">The type of host for this provider.</param>
     Public Sub New(myHostType As SatHostTypes)
       m_HostType = myHostType
     End Sub
+    ''' <summary>
+    ''' The type of host for this provider.
+    ''' </summary>
     Public ReadOnly Property HostType As SatHostTypes
       Get
         Return m_HostType
       End Get
     End Property
   End Class
+  ''' <summary>
+  ''' Triggered when the server verifies that the account's login information is correct.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="LoginCompletionEventArgs" /> data regarding the <see cref="SatHostTypes">SatHostType</see> of the account.</param>
   Public Event LoginComplete(sender As Object, e As LoginCompletionEventArgs)
 #End Region
   Private acType As DetermineType
@@ -308,6 +566,11 @@
   Private sDataPath As String
   Private wsSocket As WebClientEx
 #Region "Initialization Functions"
+  ''' <summary>
+  ''' Constructor for the <see cref="localRestrictionTracker" /> class, which also begins the connection process.
+  ''' </summary>
+  ''' <param name="ConfigPath">Directory where the user.config file is stored.</param>
+  ''' <param name="OnlyLogin">If set to <c>True</c>, this connection will abort after verifying that the Username and Password are valid, without returning data. This value is <c>False</c> by default.</param>
   Public Sub New(ConfigPath As String, Optional OnlyLogin As Boolean = False)
     justATest = OnlyLogin
     Randomize()
@@ -439,7 +702,7 @@
     End If
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my." & sProvider & "/login"
-    MakeSocket(True)
+    MakeSocket(False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -667,8 +930,20 @@
 #End Region
 #Region "EX"
   Private Sub EX_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If Response.Contains("To access this website, update your web browser or upgrade your operating system to support TLS 1.1 or TLS 1.2.") Or Response.Contains("Stronger security is required") Or Response = "Error: The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration." Then
+      If (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Or (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Then
+        If c_TLSProxy Then
+          RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "TLS Proxy failed to be of any use!"))
+          Return
+        End If
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.TLSTooOld, "PROXY"))
+        Return
+      End If
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.TLSTooOld, "VER"))
+      Return
+    End If
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso." & sProvider Then
+    If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
@@ -946,6 +1221,7 @@
       Return
     End If
     If Response.Contains("amount-used") Then
+      If Response.Contains("green red") Then imSlowed = True
       Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
       sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
       ReadUsage(sTable)
@@ -1065,7 +1341,7 @@
     Dim lUsed As Long = StrToVal(Used, MBPerGB)
     Dim lTotal As Long = StrToVal(Total, MBPerGB)
     If lUsed = 0 And lTotal = 0 Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
     Else
       If lTotal > 0 Then
         RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
@@ -1124,7 +1400,7 @@
       Catch ex As Exception
       End Try
     Else
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Login Issue: Your password needs to be changed."))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Your password needs to be changed."))
       If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
       Dim uriString As String = String.Format(sRP, sProvider, "login")
       RP_Login_Retry(uriString)
@@ -1213,6 +1489,7 @@
         RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_EXEDE))
         Return
       End If
+      'TODO: If Table.Contains(NOT "Within Normal Usage") Then imSlowed = True
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
       For Each row In sRows
@@ -1756,7 +2033,7 @@
       End If
     End If
     If lDownT = 0 And lUpT = 0 Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Data temporarily unavailable."))
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
     ElseIf lDownT > 0 Then
       If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
         If Not StrToFloat(atxV) = 0.0 Then lDown += StrToVal(atxV, MBPerGB)
@@ -2032,7 +2309,7 @@
       result = ""
     End If
   End Sub
-  Public Function IgnoreCert(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Net.Security.SslPolicyErrors) As Boolean
+  Private Function IgnoreCert(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Net.Security.SslPolicyErrors) As Boolean
     Return True
   End Function
 #End Region
@@ -2042,8 +2319,8 @@
     If Not Me.disposedValue Then
       If disposing Then
         ClosingTime = True
-        If wsSocket IsNot Nothing AndAlso wsSocket.IsBusy Then
-          wsSocket.Cancel()
+        If wsSocket IsNot Nothing Then
+          If wsSocket.IsBusy Then wsSocket.Cancel()
           wsSocket = Nothing
         End If
       End If

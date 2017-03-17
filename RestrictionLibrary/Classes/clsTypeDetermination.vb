@@ -1,9 +1,30 @@
-﻿Public Class DetermineType
+﻿''' <summary>
+''' Class for determining the account type for a provider domain name.
+''' </summary>
+Public Class DetermineType
+  ''' <summary>
+  ''' Enumeration of provider types, which generally describe the login system, though not necessarily the exact provider or usage type.
+  ''' </summary>
   Public Enum SatHostGroup
+    ''' <summary>
+    ''' Provider uses DishNet login system (Unique to dish.com or dish.net).
+    ''' </summary>
     DishNet
+    ''' <summary>
+    ''' Provider uses general RuralPortal login system (DOMAIN.ruralportal.net).
+    ''' </summary>
     RuralPortal
+    ''' <summary>
+    ''' Provider uses legacy WildBlue login system (myaccount.DOMAIN/wbisp/DOMAIN).
+    ''' </summary>
     WildBlue
+    ''' <summary>
+    ''' Provider uses modern Exede login system (exede.net or satelliteinternetco.com, uses AJAX).
+    ''' </summary>
     Exede
+    ''' <summary>
+    ''' The provider is unknown or hasn't been determined yet.
+    ''' </summary>
     Other
   End Enum
   Private Class URLChecker
@@ -58,11 +79,22 @@
       End Try
     End Sub
   End Class
+  ''' <summary>
+  ''' Callback subroutine to be triggered when a type has been determined in the <see cref="DetermineType" /> class.
+  ''' </summary>
+  ''' <param name="HostGroup">Provider type generally describing the provider domain name's login system.</param>
   Public Delegate Sub TypeDeterminedCallback(HostGroup As SatHostGroup)
   Private sProvider As String
   Private iTimeout As Integer
   Private pProxy As Net.IWebProxy
   Private c_callback As TypeDeterminedCallback
+  ''' <summary>
+  ''' Constructor for <see cref="DetermineType" /> class, which also begins the determination procedure.
+  ''' </summary>
+  ''' <param name="Provider">URL to determine the type of.</param>
+  ''' <param name="Timeout">Number of milliseconds to wait for a response from the server while testing the connection.</param>
+  ''' <param name="Proxy">Proxy settings for testing the servers.</param>
+  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
   Public Sub New(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy, callback As TypeDeterminedCallback)
     iTimeout = Timeout
     pProxy = Proxy

@@ -127,6 +127,7 @@ Public Class srlFunctions
     ERRLIST.Add("NOTFOUND", "The file could not be found. The server may be down right now. Please try again later.")
     ERRLIST.Add("NOTSUPPORTED", "The server's version is not supported. It may be down right now, or you may need to change some network settings.")
     ERRLIST.Add("NEGATIVE", "Negative Length exception. Check your Firewall and Internet connection.")
+    ERRLIST.Add("TLS", "The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration.")
     ERRLIST.Add("SECURITY", "Security exception. Check your Firewall and Internet connection.")
     ERRLIST.Add("UNKNOWN", "Unable to connect to the server.")
     Dim reportHandler As New ReportSocketErrorInvoker(AddressOf ReportSocketError)
@@ -140,7 +141,7 @@ Public Class srlFunctions
           Return ERRLIST("CLOSED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("CLOSED"), ex)
         End If
       ElseIf ex.Message.StartsWith("The remote server returned an error:") Then
         If ex.Message.Contains("400") Then
@@ -169,9 +170,9 @@ Public Class srlFunctions
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
           If ex.Message.Contains(")") Then
-            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(")") + 1).Trim
+            Return AppendErrorDetails("The server returned an unsupported error.", ex, ")"c)
           Else
-            Return "The server returned " & ex.Message.Substring(ex.Message.IndexOf(":") + 1).Trim
+            Return AppendErrorDetails("The server returned an unsupported error.", ex, ":"c)
           End If
         End If
       ElseIf ex.Message.StartsWith("The request timed out") Then
@@ -180,12 +181,12 @@ Public Class srlFunctions
         Return ERRLIST("TIMEOUT")
       ElseIf ex.Message.StartsWith("The request was aborted:") Then
         If ex.Message.Contains("Could not create SSL/TLS secure channel") Then
-          Return "TLS ERROR" 'Windows Vista doesn't support TLS error message
+          Return ERRLIST("TLS")
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return ERRLIST("ABORTED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("ABORTED") & " " & ex.Message.Substring(ex.Message.IndexOf(": ") + 2)
+          Return AppendErrorDetails(ERRLIST("ABORTED"), ex, ":"c)
         End If
       ElseIf ex.Message = "Aborted." Then
         Return ERRLIST("ABORTED")
@@ -201,13 +202,13 @@ Public Class srlFunctions
             Return ERRLIST("NETWORK")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex, ":"c)
           End If
         ElseIf ex.Message.Contains("SecureChannelFailure") Then
-          Return "POSSIBLE TLS ERROR - " & ex.Message
+          Return ERRLIST("TLS")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex, ":"c)
         End If
       ElseIf ex.Message.StartsWith("Cannot be negative.") And ex.Message.Contains("Parameter name: length") Then
         Return ERRLIST("NEGATIVE")
@@ -245,7 +246,7 @@ Public Class srlFunctions
           Return ERRLIST("NETWORK")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
         End If
       ElseIf ex.Message.StartsWith("An exception occurred during a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Received an unexpected EOF or 0 bytes from the transport stream") Then
@@ -288,9 +289,10 @@ Public Class srlFunctions
               Return ERRLIST("SECURITY") & " Invalid token."
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("SECURITY"), ex.InnerException.InnerException)
             End If
           Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
             Return ERRLIST("SECURITY")
           End If
         ElseIf ex.InnerException.Message.StartsWith("The read operation failed, see inner exception") Then
@@ -299,9 +301,10 @@ Public Class srlFunctions
               Return ERRLIST("ABORTED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException.InnerException)
             End If
           Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
             Return ERRLIST("UNKNOWN")
           End If
         ElseIf ex.InnerException.Message.StartsWith("EndRead failure") Then
@@ -310,24 +313,27 @@ Public Class srlFunctions
               Return ERRLIST("CLOSED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
             End If
           Else
-            Return ERRLIST("CLOSED")
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
           End If
         ElseIf ex.InnerException.Message.StartsWith("Error writing request") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("The socket has been shut down") Then
               Return ERRLIST("ABORTED")
             Else
-              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
+              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+              Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
             End If
           Else
-            Return ERRLIST("CLOSED")
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
         End If
       ElseIf ex.Message.StartsWith("Error getting response stream") Then
         If ex.InnerException.Message.StartsWith("BeginWrite failure") Then
@@ -340,28 +346,35 @@ Public Class srlFunctions
           If ex.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
             If ex.InnerException.InnerException IsNot Nothing Then
               If ex.InnerException.InnerException.Message.StartsWith("The authentication or decryption has failed") Then
-                Return "POSSIBLE TLS ERROR - The authentication or decryption has failed. Please change your Network Security Protocol settings and try again."
+                Return ERRLIST("TLS")
               ElseIf ex.InnerException.InnerException.Message.StartsWith("The server stopped the handshake") Then
                 Return ERRLIST("CLOSED")
               ElseIf ex.InnerException.InnerException.Message.StartsWith("Number overflow") Then
                 Return ERRLIST("SECURITY") & " There was a number overflow error."
               Else
                 If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-                Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
+                Return AppendErrorDetails(ERRLIST("SECURITY"), ex.InnerException.InnerException)
               End If
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex)
             End If
           ElseIf ex.InnerException.Message.StartsWith("Unsupported security protocol type") Then
-            Return "TLS ERROR" 'TODO: Find out when and why this happens
+            Return ERRLIST("TLS")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex)
+          End If
+        ElseIf ex.Message.Contains("ReceiveFailure") Then
+          If ex.Message.Contains("chunked Read2") Then
+            Return ERRLIST("TLS")
+          Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex)
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex)
         End If
       ElseIf ex.Message.StartsWith("The underlying connection was closed") Then
         If ex.Message.Contains("An unexpected error occurred on a send") Then
@@ -380,24 +393,24 @@ Public Class srlFunctions
               Return ERRLIST("TIMEOUT")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException, ":"c)
             End If
           ElseIf ex.InnerException.Message.StartsWith("Unable to write data to the transport connection") Then
             If ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host") Then
               Return ERRLIST("BUSY")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException, ":"c)
             End If
           ElseIf ex.InnerException.Message.StartsWith("Authentication failed because the remote party has closed the transport stream") Then
             Return ERRLIST("CLOSED")
           ElseIf ex.InnerException.Message.StartsWith("The handshake failed due to an unexpected packet format") Then
-            Return "TLS ERROR" 'TODO: Find out when and why this happens
+            Return ERRLIST("TLS")
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
-            Return "TLS ERROR" 'Windows XP doesn't support TLS error message
+            Return ERRLIST("TLS")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("An unexpected error occurred on a receive") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
@@ -413,14 +426,14 @@ Public Class srlFunctions
               Return ERRLIST("ABORTED")
             ElseIf ex.InnerException.Message.Contains("The decryption operation failed, see inner exception") Then
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("SECURITY"), ex.InnerException.InnerException)
             ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
               Return ERRLIST("CLOSED")
             ElseIf ex.InnerException.Message.Contains("An existing connection was forcibly closed by the remote host.") Then
               Return ERRLIST("CLOSED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException, ":"c)
             End If
           ElseIf ex.InnerException.Message.Contains("Received an unexpected EOF or 0 bytes from the transport stream") Then
             Return ERRLIST("CLOSED")
@@ -430,30 +443,31 @@ Public Class srlFunctions
                 Return ERRLIST("SECURITY") & " Data could not be decrypted."
               Else
                 If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-                Return ERRLIST("SECURITY") & "  " & ex.InnerException.InnerException.Message
+                Return AppendErrorDetails(ERRLIST("SECURITY"), ex.InnerException.InnerException)
               End If
             Else
+              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
               Return ERRLIST("SECURITY")
             End If
           ElseIf ex.InnerException.Message.StartsWith("The client and server cannot communicate, because they do not possess a common algorithm") Then
-            Return "TLS ERROR" 'TODO: Find out when and why this happens
+            Return ERRLIST("TLS")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("Could not establish trust relationship for the SSL/TLS secure channel.") Then
           If ex.InnerException.Message.StartsWith("The remote certificate is invalid according to the validation procedure") Then
             Return ERRLIST("SECURITY") & " Server certificate is invalid."
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("SECURITY") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("SECURITY"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("Unable to connect to the remote server") Then
           If ex.InnerException.Message.StartsWith("An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full") Then
             Return ERRLIST("MEMORY")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("A connection that was expected to be kept alive was closed by the server") Then
           If ex.InnerException.Message.StartsWith("Unable to read data from the transport connection") Then
@@ -465,15 +479,15 @@ Public Class srlFunctions
               Return ERRLIST("ABORTED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException, ":"c)
             End If
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("CLOSED"), ex)
         End If
       ElseIf ex.Message.StartsWith("Error:") Or ex.Message.StartsWith("System.Net.WebException: Error:") Then
         If ex.Message.Contains("ConnectFailure") Then
@@ -494,10 +508,10 @@ Public Class srlFunctions
           ElseIf ex.InnerException.Message.Contains("System call failed") Then
             Return "System call failed. Please check your installation."
           ElseIf ex.InnerException.Message.Contains("TLS Support not available") Then
-            Return "TLS ERROR" 'TODO: Find out why and when this happens
+            Return ERRLIST("TLS")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("SendFailure") Then
           If ex.InnerException.Message.Contains("Error writing headers") Then
@@ -506,31 +520,24 @@ Public Class srlFunctions
             ElseIf ex.InnerException.InnerException.Message.Contains("The socket has been shut down") Then
               Return ERRLIST("CLOSED")
             ElseIf ex.InnerException.InnerException.Message.Contains("The authentication or decryption has failed") Then
-              Return "POSSIBLE TLS ERROR - Decryption failure. Please change your Network Security Protocol settings and try again."
+              Return ERRLIST("TLS")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("CLOSED") & " " & ex.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException)
             End If
           ElseIf ex.InnerException.Message.Contains("Unsupported security protocol type") Then
-            Return "TLS ERROR" 'This error will mean MONO is too old and needs to be updated to 4.8 or higher
+            Return ERRLIST("TLS")
           ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed.") Then
-            Return "TLS ERROR" 'TODO: Find out when and why this happens
+            Return ERRLIST("TLS")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-            Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
           End If
         ElseIf ex.Message.Contains("SecureChannelFailure") Then
-          If ex.InnerException.Message.Contains("Value cannot be null") Then
-            Return "TLS ERROR" 'This error will mean MONO is supposed to have TLS 1.2 support, but it doesn't work yet
-          ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed") Then
-            'there's inner exception data here
-            Return "TLS ERROR" 'This error will mean MONO is updated but being forced to use an outdated version, probably due to environment variables
-          Else
-            Return "POSSIBLE TLS ERROR - " & ex.Message & " - " & ex.InnerException.Message
-          End If
+          Return ERRLIST("TLS")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.Message & " - " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex, ":"c)
         End If
       ElseIf ex.Message.StartsWith("An error occurred performing a WebClient request") Then
         If ex.InnerException.Message.StartsWith("Object reference not set to an instance of an object") Then
@@ -545,18 +552,57 @@ Public Class srlFunctions
               Return ERRLIST("ABORTED")
             Else
               If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-              Return ERRLIST("CLOSED") & " " & ex.InnerException.InnerException.Message
+              Return AppendErrorDetails(ERRLIST("CLOSED"), ex.InnerException.InnerException)
             End If
           Else
             Return ERRLIST("ABORTED")
           End If
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-          Return ERRLIST("UNKNOWN") & " " & ex.InnerException.Message
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
         End If
       Else
         If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
-        Return ex.Message & " - " & ex.InnerException.Message
+        Return AppendErrorDetails(ex.Message, ex)
+      End If
+    End If
+  End Function
+  Private Shared Function AppendErrorDetails(Message As String, ex As System.Exception, Optional skipTo As Char = vbNullChar) As String
+    If ex Is Nothing Then Return Message
+    If ex.InnerException Is Nothing Then
+      If skipTo = vbNullChar Then
+        Return Message & " (" & ex.Message & ")"
+      Else
+        Return Message & " (" & ex.Message.Substring(ex.Message.IndexOf(skipTo) + 1).Trim & ")"
+      End If
+    End If
+    If ex.InnerException.InnerException Is Nothing Then
+      If ex.Message.Contains(ex.InnerException.Message) Then
+        If skipTo = vbNullChar Then
+          Return Message & " (" & ex.Message & ")"
+        Else
+          Return Message & " (" & ex.Message.Substring(ex.Message.IndexOf(skipTo) + 1).Trim & ")"
+        End If
+      Else
+        If skipTo = vbNullChar Then
+          Return Message & vbNewLine & ex.ToString
+        Else
+          Return Message & vbNewLine & ex.ToString.Substring(ex.ToString.IndexOf(skipTo) + 1).Trim
+        End If
+      End If
+    End If
+    Dim sEX() As String = Split(ex.ToString, vbNewLine)
+    If sEX.Length > 3 Then
+      If skipTo = vbNullChar Then
+        Return Message & vbNewLine & sEX(0) & vbNewLine & sEX(1) & vbNewLine & sEX(2) & "..."
+      Else
+        Return Message & vbNewLine & sEX(0).Substring(sEX(0).IndexOf(skipTo) + 1).Trim & vbNewLine & sEX(1) & vbNewLine & sEX(2) & "..."
+      End If
+    Else
+      If skipTo = vbNullChar Then
+        Return Message & vbNewLine & ex.ToString
+      Else
+        Return Message & vbNewLine & ex.ToString.Substring(ex.ToString.IndexOf(skipTo) + 1).Trim
       End If
     End If
   End Function
