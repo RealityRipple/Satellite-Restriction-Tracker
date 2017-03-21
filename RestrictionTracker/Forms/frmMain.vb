@@ -968,6 +968,7 @@ Public Class frmMain
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.LoginIssue
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail, True)
         DisplayUsage(False, False)
         Return
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
@@ -2414,11 +2415,17 @@ Public Class frmMain
       End If
     End If
   End Sub
-  Private Sub FailFile(sFail As String)
+  Private Sub FailFile(sFail As String, Optional bJustFeedback As Boolean = False)
     If clsUpdate.QuickCheckVersion = clsUpdate.CheckEventArgs.ResultType.NoUpdate Then
       sFailTray = sFail
       MakeNotifier(taskNotifier, True)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Error Reading Page Data", My.Application.Info.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
+      If taskNotifier IsNot Nothing Then
+        If bJustFeedback Then
+          taskNotifier.Show("Page Data Feedback Request", Application.CompanyName & " has requested that information from your connection be sent back to the servers for further analysis." & vbNewLine & "Click this alert if you'd like to help out.", 200, 1 * 60 * 1000, 100)
+        Else
+          taskNotifier.Show("Error Reading Page Data", My.Application.Info.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
+        End If
+      End If
     End If
   End Sub
 #End Region
