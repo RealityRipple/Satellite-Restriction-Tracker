@@ -1490,6 +1490,9 @@ Public Class localRestrictionTracker
         Return
       End If
       'TODO: If Table.Contains(NOT "Within Normal Usage") Then imSlowed = True
+      If Not Table.Contains("Within Normal Usage") Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "No ""Within Normal Usage"" message. Requesting page source code for assistance improving the next version...", Table))
+      End If
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
       For Each row In sRows
