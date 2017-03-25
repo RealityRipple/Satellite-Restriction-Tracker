@@ -729,7 +729,7 @@ Public Class localRestrictionTracker
     bpf &= "qN|YMDHS|"
     Dim myID As String = WebClientCore.UserAgent & My.Computer.Screen.WorkingArea.Width & My.Computer.Screen.WorkingArea.Height & My.Computer.Info.OSPlatform & "x86"
     bpf &= DNHash(myID)
-    Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "reCaptcha="
+    Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "&reCaptcha="
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
