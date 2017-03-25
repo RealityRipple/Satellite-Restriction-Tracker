@@ -33,7 +33,7 @@
     Select Case mySettings.AccountType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
-      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : optAccountTypeDNX.Checked = True
+      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : optAccountTypeDNX.Checked = True
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
     End Select
@@ -1332,6 +1332,8 @@
        cmbProvider.Text.ToLower.Contains("mysso") Or
        cmbProvider.Text.ToLower.Contains("myexede") Or
        cmbProvider.Text.ToLower.Contains("my.exede") Then cmbProvider.Text = "exede.net"
+    If cmbProvider.Text.ToLower = "dish.net" Or
+       cmbProvider.Text.ToLower = "dish.com" Then cmbProvider.Text = "mydish.com"
     If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
@@ -1346,7 +1348,7 @@
       ElseIf optAccountTypeWBX.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       ElseIf optAccountTypeDNX.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+        mySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
       ElseIf optAccountTypeRPL.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       ElseIf optAccountTypeRPX.Checked Then
@@ -1691,7 +1693,7 @@
       Select Case mySettings.AccountType
         Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True
       End Select

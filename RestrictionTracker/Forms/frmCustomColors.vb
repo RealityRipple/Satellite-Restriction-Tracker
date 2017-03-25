@@ -46,7 +46,7 @@ Public Class frmCustomColors
           pctHistoryUpMax.Visible = True
           DisplayAs = SatHostTypes.WildBlue_LEGACY
           SetTextBGAlignments(True)
-        Case SatHostTypes.DishNet_EXEDE
+        Case SatHostTypes.Dish_EXEDE
           grpMain.Text = "Main Window Current Usage Graphs"
           grpMainDown.Text = "Anytime Colors"
           grpMainUp.Text = "Off-Peak Colors"
@@ -61,7 +61,7 @@ Public Class frmCustomColors
           grpHistoryUp.Visible = True
           lblHistoryUpMax.Visible = True
           pctHistoryUpMax.Visible = True
-          DisplayAs = SatHostTypes.DishNet_EXEDE
+          DisplayAs = SatHostTypes.Dish_EXEDE
           SetTextBGAlignments(True)
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
           grpMain.Text = "Main Window Graph"
@@ -128,7 +128,7 @@ Public Class frmCustomColors
         pctHistoryUpMax.Visible = True
         DisplayAs = SatHostTypes.WildBlue_LEGACY
         SetTextBGAlignments(True)
-      Case SatHostTypes.DishNet_EXEDE
+      Case SatHostTypes.Dish_EXEDE
         grpMain.Text = "Main Window Current Usage Graphs"
         grpMainDown.Text = "Anytime Colors"
         grpMainUp.Text = "Off-Peak Colors"
@@ -143,7 +143,7 @@ Public Class frmCustomColors
         grpHistoryUp.Visible = True
         lblHistoryUpMax.Visible = True
         pctHistoryUpMax.Visible = True
-        DisplayAs = SatHostTypes.DishNet_EXEDE
+        DisplayAs = SatHostTypes.Dish_EXEDE
         SetTextBGAlignments(True)
       Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
         grpMain.Text = "Main Window Graph"
@@ -573,7 +573,7 @@ Public Class frmCustomColors
         End If
         FakeData.Add(dRow)
       Next
-    ElseIf DisplayAs = SatHostTypes.DishNet_EXEDE Then
+    ElseIf DisplayAs = SatHostTypes.Dish_EXEDE Then
       For I As Integer = 1 To 90
         Dim dRow As New DataBase.DataRow(startDate, startDown, 10000, startUp, 10000)
         Dim DownUsed As Integer = RandSel(50, 500)
@@ -619,7 +619,7 @@ Public Class frmCustomColors
         pctMain.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
         pctMain.Image = DisplayRProgress(pctMain.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-      Case SatHostTypes.DishNet_EXEDE
+      Case SatHostTypes.Dish_EXEDE
         Dim FakeMRect As New Rectangle(0, 0, iWidth, iHeight * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
@@ -663,7 +663,7 @@ Public Class frmCustomColors
           End If
           CreateTrayIcon_Left(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
           CreateTrayIcon_Right(g, lDown, lDownLim, pctTrayDownA.BackColor, pctTrayDownB.BackColor, pctTrayDownC.BackColor, traySquare, traySquare)
-        Case SatHostTypes.DishNet_EXEDE
+        Case SatHostTypes.Dish_EXEDE
           If lDown >= lDownLim Then
             g.DrawIconUnstretched(My.Resources.t16_restricted, New Rectangle(0, 0, traySquare, traySquare))
           Else
@@ -716,7 +716,7 @@ Public Class frmCustomColors
           g.DrawImage(FakeR, dRect, FakeHRect, GraphicsUnit.Pixel)
         End Using
         pctHistory.Image = fakeI
-      Case SatHostTypes.DishNet_EXEDE
+      Case SatHostTypes.Dish_EXEDE
         Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)

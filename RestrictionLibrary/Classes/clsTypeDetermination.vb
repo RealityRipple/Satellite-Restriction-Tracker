@@ -7,9 +7,9 @@ Public Class DetermineType
   ''' </summary>
   Public Enum SatHostGroup
     ''' <summary>
-    ''' Provider uses DishNet login system (Unique to dish.com or dish.net).
+    ''' Provider uses Dish login system (Unique to mydish.com).
     ''' </summary>
-    DishNet
+    Dish
     ''' <summary>
     ''' Provider uses general RuralPortal login system (DOMAIN.ruralportal.net).
     ''' </summary>
@@ -104,8 +104,8 @@ Public Class DetermineType
   End Sub
   Private Delegate Sub BeginTestInvoker(Provider As String)
   Private Sub BeginTest(Provider As String)
-    If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
-      c_callback.Invoke(SatHostGroup.DishNet)
+    If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
+      c_callback.Invoke(SatHostGroup.Dish)
     ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then
       c_callback.Invoke(SatHostGroup.Exede)
     Else

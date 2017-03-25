@@ -1,5 +1,5 @@
 ﻿''' <summary>
-''' Accesses WildBlue, Exede, RuralPortal, and DishNet usage pages and handles all communication internally.
+''' Accesses WildBlue, Exede, RuralPortal, and Dish usage pages and handles all communication internally.
 ''' </summary>
 Public Class localRestrictionTracker
   Implements IDisposable
@@ -24,9 +24,9 @@ Public Class localRestrictionTracker
     ''' </summary>
     RuralPortal_EXEDE  ' Used, Limit                  [TYPEB]
     ''' <summary>
-    ''' Exede through Dish Network type meter with <see cref="localRestrictionTracker.TYPEA2ResultEventArgs">Type A2</see> uage, including AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values, reading through dish.com or dish.net.
+    ''' Exede through Dish Network type meter with <see cref="localRestrictionTracker.TYPEA2ResultEventArgs">Type A2</see> uage, including AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values, reading through mydish.com.
     ''' </summary>
-    DishNet_EXEDE      ' AnyTime, AnyTimeLim, OffPeak, OffPeakLim [TYPEA2]
+    Dish_EXEDE         ' AnyTime, AnyTimeLim, OffPeak, OffPeakLim [TYPEA2]
     ''' <summary>
     ''' The provider is unknown or hasn't been determined yet.
     ''' </summary>
@@ -66,27 +66,23 @@ Public Class localRestrictionTracker
     ''' </summary>
     None
     ''' <summary>
-    ''' The login page is being read. Exede and DishNet use this step.
+    ''' The login page is being read. Only Exede uses this step.
     ''' </summary>
     ReadLogin
-    ''' <summary>
-    ''' Authentication is being prepared. It's also known as the First Bookend. Only Exede uses this step.
-    ''' </summary>
-    AuthPrepare
     ''' <summary>
     ''' The username and password are being sent. All providers use this step.
     ''' </summary>
     Authenticate
     ''' <summary>
-    ''' Authentication has to be sent a second time. Exede, RuralPortal, and DishNet use this step.
+    ''' Authentication has to be sent a second time. Exede and RuralPortal use this step.
     ''' </summary>
     AuthenticateRetry
     ''' <summary>
-    ''' The login is being verified. This is also known as the Last Bookend. Only Exede uses this step.
+    ''' The login is being verified. Only Dish uses this step.
     ''' </summary>
     Verify
     ''' <summary>
-    ''' The home page is being loaded. This is also known as the Dashboard. Exede and DishNet use this step.
+    ''' The home page is being loaded. This is also known as the Dashboard. Exede and Dish use this step.
     ''' </summary>
     LoadHome
     ''' <summary>
@@ -102,7 +98,7 @@ Public Class localRestrictionTracker
     ''' </summary>
     LoadTable
     ''' <summary>
-    ''' The usage meter is being loaded again. Sometimes it needs to be this way. Only DishNet uses this step.
+    ''' The usage meter is being loaded again. Sometimes it needs to be this way. Only Dish uses this step.
     ''' </summary>
     LoadTableRetry
   End Enum
@@ -445,7 +441,7 @@ Public Class localRestrictionTracker
   ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
   ''' <summary>
-  ''' Triggered when the server returns data for a <see cref="SatHostTypes.DishNet_EXEDE" /> account.
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.Dish_EXEDE" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEA2ResultEventArgs" /> data regarding the result.</param>
@@ -643,8 +639,8 @@ Public Class localRestrictionTracker
       Case DetermineType.SatHostGroup.WildBlue
         mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
         GetUsage()
-      Case DetermineType.SatHostGroup.DishNet
-        mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+      Case DetermineType.SatHostGroup.Dish
+        mySettings.AccountType = SatHostTypes.Dish_EXEDE
         GetUsage()
       Case DetermineType.SatHostGroup.RuralPortal
         mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
@@ -677,7 +673,7 @@ Public Class localRestrictionTracker
           LoginWB()
         End If
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP()
-      Case SatHostTypes.DishNet_EXEDE : LoginDN()
+      Case SatHostTypes.Dish_EXEDE : LoginDN()
     End Select
   End Sub
   Private Sub LoginWB()
@@ -724,18 +720,42 @@ Public Class localRestrictionTracker
     RP_Login_Response(responseData, responseURI, False)
   End Sub
   Private Sub LoginDN()
-    iHist = 0
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
+    Dim uriString As String = "https://www.mydish.com/auth/login.ashx"
     MakeSocket(False, False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
+    Dim bpf As String = "U"
+    bpf &= TimeZone.CurrentTimeZone.GetUtcOffset(New Date(2010, 12, 30)).TotalMinutes
+    bpf &= My.Computer.Info.InstalledUICulture.Name.Substring(My.Computer.Info.InstalledUICulture.Name.Length - 2)
+    bpf &= "qN|YMDHS|"
+    Dim myID As String = WebClientCore.UserAgent & My.Computer.Screen.WorkingArea.Width & My.Computer.Screen.WorkingArea.Height & My.Computer.Info.OSPlatform & "x86"
+    bpf &= DNHash(myID)
+    Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "reCaptcha="
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    SendGET(New Uri(uriString), responseURI, responseData)
+    SendPOST(New Uri(uriString), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    iHist += 1
-    DN_Login_Prep_Response(responseData, responseURI)
+    DN_Login_Response(responseData, responseURI)
   End Sub
+  Private Function DNHash(inStr As String) As String
+    If String.IsNullOrEmpty(inStr) Then Return 0
+    Dim a As Integer = 0
+    For I As Integer = 0 To inStr.Length - 1
+      Dim lVal As Long = a << 5
+      lVal = lVal - a
+      lVal = lVal + AscW(inStr(I))
+      If lVal > Integer.MaxValue Then
+        lVal -= &HFFFFFFFFUL
+      ElseIf lVal < Integer.MinValue Then
+        lVal += &HFFFFFFFFUL
+      End If
+      a = lVal
+    Next
+    Dim sA As String = a.ToString
+    If sA.Length > 12 Then sA = sA.Substring(0, 12)
+    If sA(0) = "-" Then sA = "A" & sA.Substring(1)
+    Return sA
+  End Function
 #End Region
 #Region "Parsing Functions"
   Private Sub ReadUsage(Table As String)
@@ -749,7 +769,7 @@ Public Class localRestrictionTracker
           WB_Read_Table(Table)
         End If
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
-      Case SatHostTypes.DishNet_EXEDE : DN_Read_Table(Table)
+      Case SatHostTypes.Dish_EXEDE : DN_Read_Table(Table)
     End Select
     c_Jar = New Net.CookieContainer
     srlFunctions.SendSocketErrors(sDataPath)
@@ -1524,185 +1544,60 @@ Public Class localRestrictionTracker
   End Sub
 #End Region
 #Region "DN"
-  Private iHist As Integer = 0
-  Private Sub DN_Login_Prep_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
-      RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
-      Return
-    End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/preplogon.do") Then
-      RaiseError("Login Prepare Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
-      Return
-    End If
-    DN_Login("https://my.dish.com/customercare/saml/login?target=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet") & "&message=&forceAuthn=true")
-  End Sub
-  Private Sub DN_Login(sURI As String)
-    MakeSocket(False, False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, sURI)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    SendGET(New Uri(sURI), responseURI, responseData)
-    If ClosingTime Then Return
-    iHist += 1
-    DN_Login_Response(responseData, responseURI)
-  End Sub
   Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
-      RaiseError("Login Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
-      Return
-    End If
-    If Not ResponseURI.Query.StartsWith("?") Then
-      RaiseError("Login Prepare Failed: AuthState is missing!")
-      Return
-    End If
-    Dim id As String = "0"
-    If Response.Contains("name=""id"" value=""") Then
-      id = Response.Substring(Response.IndexOf("name=""id"" value=""") + 17)
-      id = id.Substring(0, id.IndexOf(""""))
-    End If
-    Dim sURI As String = ResponseURI.OriginalString
-    If Not sURI.Contains("&id=") Then sURI &= "&id=" & id
-    If Not sURI.Contains("&coeff=") Then sURI &= "&coeff=0"
-    If Not sURI.Contains("&history=") Then sURI &= "&history=" & iHist
-    DN_Login_FirstBook(sURI)
-  End Sub
-  Private Sub DN_Login_FirstBook(sURI As String)
-    MakeSocket(False, False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthPrepare, 0, sURI)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    SendGET(New Uri(sURI), responseURI, responseData)
-    If ClosingTime Then Return
-    iHist += 1
-    DN_Login_FirstBook_Response(responseData, responseURI)
-  End Sub
-  Private Sub DN_Login_FirstBook_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response, ResponseURI, True) Then Return
-    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+    If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If ResponseURI.AbsolutePath.ToLower.Contains("/firstbookend.php") Then
-      DN_Login_Response(Response, ResponseURI)
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.ashx") Then
+      RaiseError("Login Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.php") Then
-      RaiseError("Login Failed: Could not understand response.", True, "DN Login FirstBookend Response", Response, ResponseURI)
-      Return
+    If Response.Contains("""Success"":true") Then
+      DN_Login_Continue("https://www.mydish.com/auth/saml/login.aspx?relaystate=" & srlFunctions.PercentEncode("/usermanagement/processMyDishResponse.do"))
     End If
-    If Not ResponseURI.Query.StartsWith("?") Then
-      RaiseError("Login Failed: AuthState is missing!")
-      Return
-    End If
-    DN_Login_Authenticate(ResponseURI.OriginalString)
+    Dim sFail As String = Response.Substring(Response.IndexOf("""DisplayMessage"":""") + 18)
+    sFail = sFail.Substring(0, sFail.IndexOf(""","""))
+    RaiseError("Login Failed: " & sFail)
   End Sub
-  Private Sub DN_Login_Authenticate(sURI As String)
-    MakeSocket(False, False)
-    Dim sSend As String = "username=" & srlFunctions.PercentEncode(sUsername) &
-                          "&password=" & srlFunctions.PercentEncode(sPassword) &
-                          "&login_type=username,password" &
-                          "&source=" &
-                          "&source_button="
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    SendPOST(New Uri(sURI), sSend, responseURI, responseData)
-    If ClosingTime Then Return
-    iHist += 1
-    DN_Login_Authenticate_Response(responseData, responseURI)
-  End Sub
-  Private Sub DN_Login_Authenticate_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
-      Return
-    End If
-    If ResponseURI.AbsolutePath.ToLower.Contains("/lastbookend.php") Then
-      If Not ResponseURI.Query.StartsWith("?") Then
-        RaiseError("Login Failed: AuthState is missing!")
-        Return
-      End If
-      Dim id As String = "0"
-      If Response.Contains("name=""id"" value=""") Then
-        id = Response.Substring(Response.IndexOf("name=""id"" value=""") + 17)
-        id = id.Substring(0, id.IndexOf(""""))
-      End If
-      Dim sURI As String = ResponseURI.OriginalString
-      If Not sURI.Contains("&id=") Then sURI &= "&id=" & id
-      If Not sURI.Contains("&coeff=") Then sURI &= "&coeff=1"
-      If Not sURI.Contains("&history=") Then sURI &= "&history=" & iHist
-      DN_Login_LastBook(sURI)
-    ElseIf ResponseURI.AbsolutePath.ToLower.Contains("finish.php") Then
-      If Response.Contains("location.href") Then
-        Dim sURL As String = Nothing
-        sURL = Response.Substring(Response.IndexOf("location.href"))
-        sURL = sURL.Substring(sURL.IndexOf("""") + 1)
-        sURL = sURL.Substring(0, sURL.IndexOf(""""))
-        If sURL = "/" Then
-          sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-        End If
-        MakeSocket(False, False)
-        BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, 0, sURL)
-        Dim response2Data As String = Nothing
-        Dim response2URI As Uri = Nothing
-        SendGET(New Uri(sURL), response2URI, response2Data)
-        If ClosingTime Then Return
-        iHist += 1
-        DN_Login_Authenticate_Response(response2Data, response2URI)
-        Return
-      ElseIf Response.Contains("Exception") Then
-        If Response.Contains("Unhandled Exception") Then
-          RaiseError("Login Failed: Unhandled Exception!")
-        ElseIf Response.Contains("<h2>") Then
-          Dim sErrMsg As String = Response.Substring(Response.IndexOf("<h2>") + 4)
-          sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("</h2>"))
-          If sErrMsg.Length > 64 Then sErrMsg = sErrMsg.Substring(0, 64) & "..."
-          RaiseError("Login Failed: " & sErrMsg)
-        Else
-          RaiseError("Login Failed: Unknown Exception!")
-        End If
-      Else
-        RaiseError("Login Failed: Server issue.", "DN Login Authenticate Response", Response, ResponseURI)
-      End If
-    ElseIf Response.ToLower.Contains("you've submitted your request too soon. please wait and try again.") Then
-      RaiseError("Login Failed: Too many requests. Check for usage data less often.")
-    ElseIf Response.ToLower.Contains("captcha") Then
-      RaiseError("Login Failed: Server requires a captcha to be entered to validate your account. Please log in through your web browser, then try again.")
-    Else
-      RaiseError("Login Failed: Could not understand response.", True, "DN Login Authenticate Response", Response, ResponseURI)
-    End If
-  End Sub
-  Private Sub DN_Login_LastBook(sURI As String)
+  Private Sub DN_Login_Continue(sURI As String)
     MakeSocket(False, False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    iHist += 1
-    DN_Login_LastBook_Response(responseData, responseURI)
+    DN_Login_Continue_Response(responseData, responseURI)
   End Sub
-  Private Sub DN_Login_LastBook_Response(Response As String, ResponseURI As Uri)
+  Private Sub DN_Login_Continue_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "identity1.dishnetwork.com" Then
+    If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/lastbookend.php") Then
-      RaiseError("Login Failed: Could not understand response.", True, "DN Login LastBookend Response", Response, ResponseURI)
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.aspx") Then
+      RaiseError("Login Failed: Could not understand response.", True, "DN Login Continue Response", Response, ResponseURI)
       Return
     End If
     If Response.Contains("SAMLResponse"" value=""") Then
       Dim SAMLResponse As String
       SAMLResponse = Response.Substring(Response.IndexOf("SAMLResponse"" value=""") + 21)
-      If SAMLResponse.Contains(""" />") Then
-        SAMLResponse = SAMLResponse.Substring(0, SAMLResponse.IndexOf(""" />"))
-        DN_Login_Verify(SAMLResponse)
+      If SAMLResponse.Contains("""/>") Then
+        SAMLResponse = SAMLResponse.Substring(0, SAMLResponse.IndexOf("""/>"))
       Else
-        RaiseError("Login Failed: Incomplete SAML Response Data.", "DN Login LastBookend Response", Response, ResponseURI)
+        RaiseError("Login Failed: Incomplete SAML Response Data.", "DN Login Continue Response", Response, ResponseURI)
+        Return
       End If
+      Dim RelayState As String
+      RelayState = Response.Substring(Response.IndexOf("RelayState"" value=""") + 19)
+      If RelayState.Contains("""/>") Then
+        RelayState = RelayState.Substring(0, RelayState.IndexOf("""/>"))
+      Else
+        RaiseError("Login Failed: Incomplete Relay State Data.", "DN Login Continue Response", Response, ResponseURI)
+        Return
+      End If
+      DN_Login_Verify(SAMLResponse, RelayState)
     ElseIf Response.Contains("The system is currently unavailable. Please try again later.") Then
       RaiseError("System currently unavailable.")
     ElseIf Response.Contains("<div class=""custom_message_text"">") Then
@@ -1710,19 +1605,18 @@ Public Class localRestrictionTracker
       sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("<"))
       RaiseError(sErrMsg.Trim)
     Else
-      RaiseError("Login Failed: No SAML Response", "DN Login LastBookend Response", Response, ResponseURI)
+      RaiseError("Login Failed: No SAML Response", "DN Login Continue Response", Response, ResponseURI)
     End If
   End Sub
-  Private Sub DN_Login_Verify(SAMLResponse As String)
+  Private Sub DN_Login_Verify(SAMLResponse As String, RelayState As String)
     MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
-    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode("/usermanagement/processSynacoreResponse.do?pageurl=myinternet")
+    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode(RelayState)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    iHist += 1
     DN_Login_Verify_Response(responseData, responseURI)
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
@@ -1731,12 +1625,12 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/processsynacoreresponse.do") Then
-      RaiseError("Login Failed: Could not understand response.", True, "DishNet Login Verify Response", Response, ResponseURI)
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("/processmydishresponse.do") Then
+      RaiseError("Login Failed: Could not understand response.", True, "Dish Login Verify Response", Response, ResponseURI)
       Return
     End If
     If justATest Then
-      RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.DishNet_EXEDE))
+      RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.Dish_EXEDE))
       Return
     End If
     DN_Download_Home()
@@ -1750,7 +1644,6 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    iHist += 1
     DN_Download_Home_Response(responseData, responseURI)
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
@@ -1777,7 +1670,6 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
     If ClosingTime Then Return
-    iHist += 1
     DN_Download_Table_Response(responseData, responseURI)
   End Sub
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
@@ -2040,7 +1932,7 @@ Public Class localRestrictionTracker
     ElseIf lDownT > 0 Then
       If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
         If Not StrToFloat(atxV) = 0.0 Then lDown += StrToVal(atxV, MBPerGB)
-        If Not StrToFloat(atxM) = 0.0 Then lDownT += StrToVal(atxV, MBPerGB)
+        If Not StrToFloat(atxM) = 0.0 Then lDownT += StrToVal(atxM, MBPerGB)
       End If
       RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
     Else

@@ -89,7 +89,7 @@ Public Class frmHistory
       Return
     End If
     Select Case useStyle
-      Case SatHostTypes.DishNet_EXEDE
+      Case SatHostTypes.Dish_EXEDE
         cmd30Days.Text = "T&his Period"
         ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
         cmd60Days.Text = "&Last Period"
@@ -222,7 +222,7 @@ Public Class frmHistory
             Dim GraphInvoker As New ParameterizedInvoker(AddressOf DoGraph)
             Dim bDisplayed As Boolean = False
             Select Case useStyle
-              Case SatHostTypes.DishNet_EXEDE
+              Case SatHostTypes.Dish_EXEDE
                 pnlGraph.RowStyles(0).Height = 50
                 pnlGraph.RowStyles(1).Height = 50
                 lastRect = Me.Bounds
@@ -338,7 +338,7 @@ Public Class frmHistory
         ChangeStyle()
         If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
         Select Case useStyle
-          Case SatHostTypes.DishNet_EXEDE
+          Case SatHostTypes.Dish_EXEDE
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
             For Each lItem As DataBase.DataRow In lItems

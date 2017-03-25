@@ -67,8 +67,8 @@ Public Class frmMain
     End Sub
     Private Delegate Sub BeginTestInvoker(Provider As String)
     Private Sub BeginTest(Provider As String)
-      If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
-        c_callback.Invoke(SatHostTypes.DishNet_EXEDE)
+      If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
+        c_callback.Invoke(SatHostTypes.Dish_EXEDE)
       ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then
         c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
       Else
@@ -151,8 +151,8 @@ Public Class frmMain
       iconStop = True
       Dim TypeDeterminationOffline As New DetermineTypeOffline(sProvider, AddressOf TypeDeterminationOffline_TypeDetermined)
     Else
-      If HostGroup = DetermineType.SatHostGroup.DishNet Then
-        mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+      If HostGroup = DetermineType.SatHostGroup.Dish Then
+        mySettings.AccountType = SatHostTypes.Dish_EXEDE
       ElseIf HostGroup = DetermineType.SatHostGroup.WildBlue Then
         mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
       ElseIf HostGroup = DetermineType.SatHostGroup.RuralPortal Then
@@ -449,7 +449,7 @@ Public Class frmMain
   End Sub
   Private Sub ResizePanels()
     Dim trayIcoVal As Icon = Nothing
-    If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.DishNet_EXEDE Then
+    If myPanel = SatHostTypes.WildBlue_LEGACY Or myPanel = SatHostTypes.RuralPortal_LEGACY Or myPanel = SatHostTypes.Dish_EXEDE Then
       If typeA_dlim = 0 And typeA_ulim = 0 Then
         pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
@@ -848,7 +848,7 @@ Public Class frmMain
           localData = Nothing
         End If
         Application.DoEvents()
-        SetStatusText(LOG_GetLast.ToString("g"), "Restarting Connection in 5 Seconds...", False)
+        SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
         DisplayUsage(False, False)
         NextGrabTick = srlFunctions.TickCount() + 5000
       End If
@@ -934,7 +934,6 @@ Public Class frmMain
       Case ConnectionStates.Login
         Select Case e.SubState
           Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page...", False)
-          Case ConnectionSubStates.AuthPrepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing Authentication...", False)
           Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
           Case ConnectionSubStates.AuthenticateRetry
             If e.Stage < 1 Then
@@ -1050,8 +1049,8 @@ Public Class frmMain
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
-    myPanel = SatHostTypes.DishNet_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.DishNet_EXEDE
+    myPanel = SatHostTypes.Dish_EXEDE
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.Dish_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1651,7 +1650,7 @@ Public Class frmMain
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case SatHostTypes.DishNet_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.Dish_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case Else : DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
       End Select
     Else
@@ -1697,7 +1696,7 @@ Public Class frmMain
                 lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
-            Case SatHostTypes.DishNet_EXEDE
+            Case SatHostTypes.Dish_EXEDE
               If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)

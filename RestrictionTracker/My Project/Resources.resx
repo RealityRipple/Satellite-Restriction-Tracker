@@ -303,9 +303,12 @@
   </data>
   <data name="HostList" xml:space="preserve">
     <value>exede.net
+exede.com
 wildblue.net
-dish.net
+mydish.com
 dishmail.net
+directv.net
+satelliteinternetco.com
 kitcarson.net
 plateauwb.net
 wbaccess.net
@@ -327,7 +330,10 @@ winntelwb.coop
 coopsone.com
 kiamichiwb.org
 kmwb.net
-directv.net</value>
+bcremc.net
+t3cnet.com
+cotcwb.net
+nesloncable.com</value>
   </data>
   <data name="t16_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\tray_16\throbsprite\0.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

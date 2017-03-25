@@ -376,7 +376,7 @@ Public Class remoteRestrictionTracker
             rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
           ElseIf sData.Length = 4 Then
             If dish Then
-              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+              If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.Dish_EXEDE
               rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
             Else
               If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
@@ -417,7 +417,7 @@ Public Class remoteRestrictionTracker
         rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, iUsed, iTotal))
       ElseIf sData.Length = 4 Then
         If dish Then
-          If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+          If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.Dish_EXEDE
           rData.Add(New remoteRestrictionTracker.SuccessEventArgs.Result(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
         Else
           If iProv = localRestrictionTracker.SatHostTypes.Other Then iProv = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY

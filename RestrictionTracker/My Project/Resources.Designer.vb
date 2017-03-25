@@ -182,9 +182,12 @@ Namespace My.Resources
         
         '''<summary>
         '''  Looks up a localized string similar to exede.net
+        '''exede.com
         '''wildblue.net
-        '''dish.net
+        '''mydish.com
         '''dishmail.net
+        '''directv.net
+        '''satelliteinternetco.com
         '''kitcarson.net
         '''plateauwb.net
         '''wbaccess.net
@@ -206,7 +209,10 @@ Namespace My.Resources
         '''coopsone.com
         '''kiamichiwb.org
         '''kmwb.net
-        '''directv.net.
+        '''bcremc.net
+        '''t3cnet.com
+        '''cotcwb.net
+        '''nesloncable.com.
         '''</summary>
         Friend ReadOnly Property HostList() As String
             Get

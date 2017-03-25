@@ -680,7 +680,7 @@ Public Class srlFunctions
   '''  <para>WildBlue_EXEDE: &quot;WBX&quot;</para>
   '''  <para>RuralPortal_LEGACY: &quot;RPL&quot;</para>
   '''  <para>RuralPortal_EXEDE: &quot;RPX&quot;</para>
-  '''  <para>DishNet_EXEDE: &quot;DNX&quot;</para>
+  '''  <para>Dish_EXEDE: &quot;DNX&quot;</para>
   '''  <para>Other Values: &quot;O&quot;</para>
   '''  <para>See Also: <seealso cref="StringToHostType" /></para>
   ''' </remarks>
@@ -690,7 +690,7 @@ Public Class srlFunctions
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
-      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE : Return "DNX"
+      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : Return "DNX"
       Case Else : Return "O"
     End Select
   End Function
@@ -705,7 +705,7 @@ Public Class srlFunctions
   '''  <para>&quot;WBX&quot;, &quot;WBV&quot;, &quot;Exede&quot;: WildBlue_EXEDE</para>
   '''  <para>&quot;RPL&quot;, &quot;RuralPortal&quot;: RuralPortal_LEGACY</para>
   '''  <para>&quot;RPX&quot;: RuralPortal_EXEDE</para>
-  '''  <para>&quot;DNX&quot;, &quot;DishNet&quot;: DishNet_EXEDE</para>
+  '''  <para>&quot;DNX&quot;, &quot;Dish&quot;, &quot;DishNet&quot;: Dish_EXEDE</para>
   '''  <para>Other Values: Other</para>
   '''  <para>See Also: <seealso cref="HostTypeToString" /></para>
   ''' </remarks>
@@ -715,10 +715,10 @@ Public Class srlFunctions
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
       Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DISHNET" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "DISH", "DISHNET" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
       Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case Else : Return localRestrictionTracker.SatHostTypes.Other
     End Select

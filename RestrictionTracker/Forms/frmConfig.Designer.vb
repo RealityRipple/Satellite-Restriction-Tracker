@@ -746,7 +746,7 @@ Partial Class frmConfig
     Me.optAccountTypeDNX.Name = "optAccountTypeDNX"
     Me.optAccountTypeDNX.Size = New System.Drawing.Size(69, 18)
     Me.optAccountTypeDNX.TabIndex = 2
-    Me.optAccountTypeDNX.Text = "DishNet"
+    Me.optAccountTypeDNX.Text = "Dish"
     Me.ttConfig.SetToolTip(Me.optAccountTypeDNX, "Exede package through Dish.")
     Me.optAccountTypeDNX.UseVisualStyleBackColor = True
     '

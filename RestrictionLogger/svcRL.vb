@@ -10,7 +10,7 @@ Public Class svcRL
   Private typeDetermination As DetermineType
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
-      If Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.DishNet
+      If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.Dish
       If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then Return SatHostTypes.Exede
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       Provider = Provider & ".ruralportal.net"
@@ -231,7 +231,7 @@ Public Class svcRL
     End Try
   End Sub
   Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+    MySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
   Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure

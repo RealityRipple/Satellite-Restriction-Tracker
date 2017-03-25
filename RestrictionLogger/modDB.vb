@@ -3,7 +3,7 @@
     WildBlue
     Exede
     RuralPortal
-    DishNet
+    Dish
     Other
   End Enum
   Private Const HistoryAge As Long = 1

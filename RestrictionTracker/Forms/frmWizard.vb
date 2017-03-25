@@ -586,6 +586,7 @@ Public Class frmWizard
       Return
     End If
     If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
+    If cmbAccountHost.Text.ToLower = "dish.net" Or cmbAccountHost.Text.ToLower = "dish.com" Then cmbAccountHost.Text = "mydish.com"
     sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
     pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
   End Sub
@@ -754,7 +755,6 @@ Public Class frmWizard
       Case ConnectionStates.Login
         Select Case e.SubState
           Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
-          Case ConnectionSubStates.AuthPrepare : DrawStatus(True, "Preparing Authentication...")
           Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating...")
           Case ConnectionSubStates.AuthenticateRetry
             If e.Stage < 1 Then
@@ -782,7 +782,7 @@ Public Class frmWizard
     LocalComplete(e.HostType)
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
-    LocalComplete(SatHostTypes.DishNet_EXEDE)
+    LocalComplete(SatHostTypes.Dish_EXEDE)
   End Sub
   Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
     LocalComplete(SatHostTypes.RuralPortal_LEGACY)

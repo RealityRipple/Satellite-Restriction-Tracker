@@ -198,10 +198,10 @@
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
       Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DISHNET" : Return localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case "DISH", "DISHNET" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
       Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case Else : Return localRestrictionTracker.SatHostTypes.Other
     End Select

@@ -1828,7 +1828,7 @@ Module modFunctions
         outColors.HistoryLightGrid = Color.LightGray
         outColors.HistoryDarkGrid = Color.DarkGray
 
-      Case localRestrictionTracker.SatHostTypes.DishNet_EXEDE
+      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE
         outColors.MainDownA = Color.DarkBlue
         outColors.MainDownB = Color.Blue
         outColors.MainDownC = Color.Aqua
