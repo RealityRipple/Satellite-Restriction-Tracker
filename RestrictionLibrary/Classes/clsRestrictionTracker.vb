@@ -730,7 +730,7 @@ Public Class localRestrictionTracker
     Dim myID As String = WebClientCore.UserAgent & My.Computer.Screen.WorkingArea.Width & My.Computer.Screen.WorkingArea.Height & My.Computer.Info.OSPlatform & "x86"
     bpf &= DNHash(myID)
     Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "&reCaptcha="
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.None, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -1550,20 +1550,21 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.ashx") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("login.ashx") Then
       RaiseError("Login Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
       Return
     End If
-    If Response.Contains("""Success"":true") Then
-      DN_Login_Continue("https://www.mydish.com/auth/saml/login.aspx?relaystate=" & srlFunctions.PercentEncode("/usermanagement/processMyDishResponse.do"))
+    If Not Response.Contains("""Success"":true") Then
+      Dim sFail As String = Response.Substring(Response.IndexOf("""DisplayMessage"":""") + 18)
+      sFail = sFail.Substring(0, sFail.IndexOf(""","""))
+      RaiseError("Login Failed: " & sFail)
+      Return
     End If
-    Dim sFail As String = Response.Substring(Response.IndexOf("""DisplayMessage"":""") + 18)
-    sFail = sFail.Substring(0, sFail.IndexOf(""","""))
-    RaiseError("Login Failed: " & sFail)
+    DN_Login_Continue("https://www.mydish.com/auth/saml/login.aspx?relaystate=" & srlFunctions.PercentEncode("/usermanagement/processMyDishResponse.do"))
   End Sub
   Private Sub DN_Login_Continue(sURI As String)
     MakeSocket(False, False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
@@ -1576,7 +1577,7 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/login.aspx") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("login.aspx") Then
       RaiseError("Login Failed: Could not understand response.", True, "DN Login Continue Response", Response, ResponseURI)
       Return
     End If
@@ -1612,20 +1613,20 @@ Public Class localRestrictionTracker
     MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode(RelayState)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    DN_Login_Verify_Response(responseData, responseURI)
+    DN_Login_Verify_Response(responseData, responseURI, RelayState)
   End Sub
-  Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri)
+  Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri, ExpectedURI As String)
     If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/processmydishresponse.do") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains(ExpectedURI.ToLower) Then
       RaiseError("Login Failed: Could not understand response.", True, "Dish Login Verify Response", Response, ResponseURI)
       Return
     End If
@@ -1639,7 +1640,7 @@ Public Class localRestrictionTracker
     MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -1652,20 +1653,16 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If (ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And ResponseURI.Query.ToLower.Contains("myinternet")) Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
-      DN_Download_Table_Response(Response, ResponseURI)
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("accountsummary") Then
+      RaiseError("Home Read Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
       Return
     End If
-    If (ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And ResponseURI.Query.ToLower.Contains("myaccountsummary")) Or ResponseURI.AbsolutePath.ToLower.Contains("/myaccountsummary") Then
-      DN_Download_Table()
-      Return
-    End If
-    RaiseError("Home Read Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
+    DN_Download_Table()
   End Sub
   Private Sub DN_Download_Table()
     MakeSocket(False, False)
     Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTableRetry, 0, uriString)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
@@ -1682,31 +1679,25 @@ Public Class localRestrictionTracker
       RaiseError("Usage Failed: The server rejected the request.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("/loadpage.do") And Not ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
+    If Not ResponseURI.AbsolutePath.ToLower.Contains("internet") Then
       RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Table Response", Response, ResponseURI)
       Return
     End If
-    If ResponseURI.Query = "?page=myaccountsummary_res" Then
-      DN_Download_Table()
-    ElseIf ResponseURI.Query = "?pageurl=myinternet" Or ResponseURI.AbsolutePath.ToLower.Contains("/myinternet") Then
-      If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
-        RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      Dim sUsageDiv As String = Response.Substring(Response.IndexOf("widgetLoadUrls[widgetListCount]"))
-      If Not sUsageDiv.Contains("</form>") Then
-        RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</form>"))
-      If Not sUsageDiv.ToLower.Contains("remaining capacity") Then
-        RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      ReadUsage(sUsageDiv)
-    Else
-      RaiseError("Usage Failed: Redirected to Unknown Page [" & ResponseURI.Query & "]", "DN Download Table Response", Response, ResponseURI)
+    If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
+      RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response", Response, ResponseURI)
+      Return
     End If
+    Dim sUsageDiv As String = Response.Substring(Response.IndexOf("widgetLoadUrls[widgetListCount]"))
+    If Not sUsageDiv.Contains("</form>") Then
+      RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response", Response, ResponseURI)
+      Return
+    End If
+    sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</form>"))
+    If Not sUsageDiv.ToLower.Contains("remaining capacity") Then
+      RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response", Response, ResponseURI)
+      Return
+    End If
+    ReadUsage(sUsageDiv)
   End Sub
   Private Sub DN_Read_Table(Table As String)
     Dim findCRLF As String = vbLf
