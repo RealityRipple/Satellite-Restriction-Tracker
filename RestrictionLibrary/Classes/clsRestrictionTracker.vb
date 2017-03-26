@@ -1626,7 +1626,7 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains(ExpectedURI.ToLower) Then
+    If Not ResponseURI.OriginalString.ToLower.Contains(ExpectedURI.ToLower) Then
       RaiseError("Login Failed: Could not understand response.", True, "Dish Login Verify Response", Response, ResponseURI)
       Return
     End If
