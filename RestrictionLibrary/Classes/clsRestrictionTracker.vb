@@ -1245,6 +1245,8 @@ Public Class localRestrictionTracker
       Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
       sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
       ReadUsage(sTable)
+    ElseIf Response.Contains("<strong>Unable to load Usage information.<br /> Please try again later.</strong>") Then
+      RaiseError("Usage Failed: Data temporarily unavailable.")
     ElseIf Response.Contains("<span id=""ajax-view-state""") Then
       Dim AjaxViewState As String = Response.Substring(Response.IndexOf("<span id=""ajax-view-state"""))
       AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
