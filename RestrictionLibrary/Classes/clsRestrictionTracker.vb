@@ -1511,9 +1511,12 @@ Public Class localRestrictionTracker
         RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_EXEDE))
         Return
       End If
-      'TODO: If Table.Contains(NOT "Within Normal Usage") Then imSlowed = True
-      If Not Table.Contains("Within Normal Usage") Then
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "No ""Within Normal Usage"" message. Requesting page source code for assistance improving the next version...", Table))
+      If Table.Contains("Within Normal Usage") Then
+        imSlowed = False
+      ElseIf Table.Contains("Approaching Package Threshold") Then
+        imSlowed = True
+      Else
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Unknown usage state message. Requesting page source code for assistance improving the next version...", Table))
       End If
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
