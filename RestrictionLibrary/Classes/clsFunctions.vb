@@ -903,6 +903,7 @@ Public Class srlFunctions
       If clrID2 = 393295 Or clrID2 = 393297 Then Return ".NET 4.6"
       If clrID2 = 394254 Or clrID2 = 394271 Then Return ".NET 4.6.1"
       If clrID2 = 394802 Or clrID2 = 394806 Then Return ".NET 4.6.2"
+      If clrID2 >= 460798 Then Return ".NET 4.7"
       If clrID2 > 0 Then Return String.Format(".NET 4.6 ({0})", clrID2)
       Return ".NET 4.6"
     End If

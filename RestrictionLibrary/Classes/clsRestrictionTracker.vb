@@ -1927,8 +1927,10 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
     ElseIf lDownT > 0 Then
       If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
-        If Not StrToFloat(atxV) = 0.0 Then lDown += StrToVal(atxV, MBPerGB)
-        If Not StrToFloat(atxM) = 0.0 Then lDownT += StrToVal(atxM, MBPerGB)
+        If StrToFloat(atxV) > 0.0 Then
+          lDown += StrToVal(atxV, MBPerGB)
+          lDownT += StrToVal(atxM, MBPerGB)
+        End If
       End If
       RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
     Else
