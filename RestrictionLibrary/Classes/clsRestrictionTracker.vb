@@ -1790,7 +1790,9 @@ Public Class localRestrictionTracker
           Next
           If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
             opV = jsLines("progressValueAttr")
+            If opV.Contains("ATTRIBUTE ERROR E11") Then opV = Nothing
             opM = jsLines("maxValueAttr")
+            If opM.Contains("ATTRIBUTE ERROR E11") Then opM = Nothing
           End If
         End If
       End If
@@ -1809,7 +1811,9 @@ Public Class localRestrictionTracker
           Next
           If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
             atV = jsLines("progressValueAttr")
+            If atV.Contains("ATTRIBUTE ERROR E11") Then atV = Nothing
             atM = jsLines("maxValueAttr")
+            If atM.Contains("ATTRIBUTE ERROR E11") Then atM = Nothing
           End If
         End If
       End If
@@ -1828,7 +1832,9 @@ Public Class localRestrictionTracker
           Next
           If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
             atxV = jsLines("progressValueAttr")
+            If atxV.Contains("ATTRIBUTE ERROR E11") Then atxV = Nothing
             atxM = jsLines("maxValueAttr")
+            If atxM.Contains("ATTRIBUTE ERROR E11") Then atxM = Nothing
           End If
         End If
       End If
