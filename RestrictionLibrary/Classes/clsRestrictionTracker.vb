@@ -1513,7 +1513,7 @@ Public Class localRestrictionTracker
       End If
       If Table.Contains("Within Normal Usage") Then
         imSlowed = False
-      ElseIf Table.Contains("Approaching Package Threshold") Then
+      ElseIf Table.Contains("Approaching Package Threshold") Or Table.Contains("Exceeded DAP Threshold") Then
         imSlowed = True
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Unknown usage state message. Requesting page source code for assistance improving the next version...", Table))
