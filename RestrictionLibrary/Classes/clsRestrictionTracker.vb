@@ -1081,7 +1081,12 @@ Public Class localRestrictionTracker
       If Response.Contains("<form method=""post"" action=""") Then
         sURI = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
         sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-        sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+        If sURI.Contains(""">") Then
+          sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+        Else
+          RaiseError("Login Failed: POST URL value cut off. Please try again.", "EX Login Response")
+          Return
+        End If
         sURI = srlFunctions.HexDecode(sURI)
       End If
       If String.IsNullOrEmpty(sURI) Then sURI = ResponseURI.AbsoluteUri
@@ -1089,7 +1094,12 @@ Public Class localRestrictionTracker
       If Response.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
         sSAMLResponse = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
         sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
-        sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+        If sSAMLResponse.Contains(""" />") Then
+          sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+        Else
+          RaiseError("Login Failed: SAML Response value cut off. Please try again.", "EX Login Response")
+          Return
+        End If
       End If
       If String.IsNullOrEmpty(sSAMLResponse) Then
         RaiseError("Login Failed: SAML Response value not found.", "EX Login Response", Response, ResponseURI)
@@ -1099,11 +1109,12 @@ Public Class localRestrictionTracker
       If Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
         sRelay = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
         sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-        sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
-      End If
-      If String.IsNullOrEmpty(sRelay) Then
-        RaiseError("Login Failed: Relay State value not found.", "EX Login Response", Response, ResponseURI)
-        Return
+        If sRelay.Contains(""" />") Then
+          sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+        Else
+          RaiseError("Login Failed: Relay State value cut off. Please try again.", "EX Login Response")
+          Return
+        End If
       End If
       EX_Authenticate(sURI, sSAMLResponse, sRelay)
     ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
@@ -1133,7 +1144,8 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
     MakeSocket(True)
-    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse)) & "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
+    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse))
+    If Not String.IsNullOrEmpty(RelayState) Then sSend &= "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
