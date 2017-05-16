@@ -1136,6 +1136,12 @@ Public Class localRestrictionTracker
       Else
         RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
       End If
+    ElseIf Response.Contains("<div class=""msgerror"">") Then
+      If Response.ToLower.Contains("invalid user name or password") Then
+        RaiseError("Login Failed: Incorrect Password")
+      Else
+        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+      End If
     ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
       RaiseError("Login Failed: Server encountered an unexpected error.")
     Else
