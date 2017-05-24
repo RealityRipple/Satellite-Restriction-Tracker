@@ -226,7 +226,7 @@
   End Sub
   Private Sub lblMore_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblMore.LinkClicked
     Try
-      Process.Start("http://srt.realityripple.com/Alert_Styles/")
+      Process.Start("http://srt.realityripple.com/Alert-Styles/")
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
