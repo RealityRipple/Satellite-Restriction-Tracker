@@ -53,7 +53,7 @@
       Return Nothing
     End If
   End Function
-  Private Shared Function ReportBug(Token As String, Project_ID As Integer, Category As Mantis_Category, Reproducable As Mantis_Reproducibility, Severity As Mantis_Severity, Priority As Mantis_Priority, Platform As String, OS As String, OS_Build As String, Summary As String, Description As String, Steps As String, Info As String, [Public] As Boolean) As String
+  Private Shared Function ReportBug(Token As String, Project_ID As Integer, Category As Mantis_Category, Reproducable As Mantis_Reproducibility, Severity As Mantis_Severity, Priority As Mantis_Priority, Platform As String, OS As String, OS_Build As String, Product_Version As String, Summary As String, Description As String, Steps As String, Info As String, [Public] As Boolean) As String
     Dim pData As New Collections.Specialized.NameValueCollection
     pData.Add("bug_report_token", Token)
     pData.Add("m_id", "0")
@@ -65,6 +65,7 @@
     pData.Add("platform", Platform)
     pData.Add("os", OS)
     pData.Add("os_build", OS_Build)
+    pData.Add("product_version", Product_Version)
     pData.Add("summary", Summary)
     pData.Add("description", Description)
     pData.Add("steps_to_reproduce", Steps)
@@ -89,8 +90,11 @@
     Dim sTok As String = GetToken(2)
     If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
     Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
-    Dim sSum As String = "[v" & Application.ProductVersion & "] " & e.Message
+    Dim sSum As String = e.Message
     If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."
-    Return ReportBug(sTok, 2, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sSum, e.ToString, String.Empty, String.Empty, True)
+    Dim sVer As String = Application.ProductVersion
+    Dim iParts As Integer = (sVer.Split("."c)).Length
+    If iParts > 3 Then sVer = sVer.Substring(0, sVer.LastIndexOf("."c))
+    Return ReportBug(sTok, 2, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sVer, sSum, e.ToString, String.Empty, String.Empty, True)
   End Function
 End Class
