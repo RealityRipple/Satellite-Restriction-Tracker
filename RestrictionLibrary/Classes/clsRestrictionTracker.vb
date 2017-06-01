@@ -964,15 +964,18 @@ Public Class localRestrictionTracker
     End If
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
-      Return
-    End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
-      RaiseError("Login Failed: Could not understand response.", "EX Login Prepare Response", Response, ResponseURI)
+      RaiseError("Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
     If Response.ToLower.Contains("unable to process request") Then
       RaiseError("Prepare Failed: The server may be down.")
+      Return
+    End If
+    If Response.ToLower.Contains(" down for maintenance") Then
+      RaiseError("Prepare Failed: Server Down for Maintenance.")
+    End If
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
+      RaiseError("Prepare Failed: Could not understand response.", "EX Login Prepare Response", Response, ResponseURI)
       Return
     End If
     If Not Response.Contains("<form") Or Not Response.Contains("name=""Login""") Then
@@ -1297,7 +1300,7 @@ Public Class localRestrictionTracker
       RaiseError("AJAX Load Failed: Server Down for Maintenance.")
     ElseIf Response.Contains("window.location.href") Then
       RaiseError("AJAX Load Failed: Sent back to login page.")
-    ElseIf Response.Contains("An internal server error ") Or Response.Contains("Something went wrong.") Then
+    ElseIf Response.Contains("Something went wrong.") Then
       RaiseError("AJAX Load Failed: Server Error - Exede may be having trouble.")
     Else
       RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response", Response, ResponseURI)
@@ -2150,6 +2153,10 @@ Public Class localRestrictionTracker
     End If
     If response.StartsWith("Could not resolve host: ") Then
       RaiseError("The server is unavailable. Please try again later.")
+      Return True
+    End If
+    If response.ToLower.Contains("internal server error") Then
+      RaiseError("The server ran into an internal error. Please try again later.")
       Return True
     End If
     If responseURI Is Nothing Then
