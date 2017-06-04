@@ -2155,7 +2155,7 @@ Public Class localRestrictionTracker
       RaiseError("The server is unavailable. Please try again later.")
       Return True
     End If
-    If response.ToLower.Contains("internal server error") Then
+    If response.ToLower.Contains("internal server error") Or (response.ToLower.Contains("internal error") And response.Contains("500")) Then
       RaiseError("The server ran into an internal error. Please try again later.")
       Return True
     End If
