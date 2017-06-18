@@ -1037,6 +1037,15 @@ Public Class localRestrictionTracker
     If ClosingTime Then Return
     EX_Login_Response(responseData, responseURI, TryCount)
   End Sub
+  Private Sub EX_Login2(sURI As String, TryCount As Integer)
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendGET(New Uri(sURI), responseURI, responseData)
+    If ClosingTime Then Return
+    EX_Login_Response(responseData, responseURI, TryCount)
+  End Sub
   Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
@@ -1118,6 +1127,11 @@ Public Class localRestrictionTracker
           RaiseError("Login Failed: Relay State value cut off. Please try again.", "EX Login Response")
           Return
         End If
+      End If
+      If String.IsNullOrEmpty(sRelay) Then
+        TryCount += 1
+        EX_Login2(sURI, TryCount)
+        Return
       End If
       EX_Authenticate(sURI, sSAMLResponse, sRelay)
     ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
