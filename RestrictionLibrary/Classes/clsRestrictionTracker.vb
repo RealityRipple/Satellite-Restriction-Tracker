@@ -1546,22 +1546,34 @@ Public Class localRestrictionTracker
         RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_EXEDE))
         Return
       End If
+      Dim sBuyMore As String = "0"
+      Dim sBuyMoreT As String = "0"
       If Table.Contains("Within Normal Usage") Then
         imSlowed = False
       ElseIf Table.Contains("Approaching Package Threshold") Or Table.Contains("Exceeded DAP Threshold") Then
         imSlowed = True
+      ElseIf Table.Contains("Using Buy More") Then
+        sBuyMore = ""
+        sBuyMoreT = ""
       Else
-        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Unknown usage state message. Requesting page source code for assistance improving the next version...", Table))
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Unknown usage state message. Requesting page source code for assistance improving the next version...", "Issue at RP Read Table: ""Unknown usage state message.""" & vbNewLine & "Data: " & vbNewLine & Table))
       End If
       Dim sRows As String() = Split(Table, vbLf)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
       For Each row In sRows
         If Not String.IsNullOrEmpty(row) Then
           If row.Contains(" GB of ") And row.Contains(" GB (") And row.Contains("%)") Then
-            sDown = row.Substring(0, row.IndexOf(" of ")).Trim
-            sDownT = row.Substring(row.IndexOf(" of ") + 4)
-            sDownT = sDownT.Substring(0, sDownT.IndexOf(" ("))
-            If Not Table.Contains("Breach:") Then Exit For
+            If String.IsNullOrEmpty(sDown) And String.IsNullOrEmpty(sDownT) Then
+              sDown = row.Substring(0, row.IndexOf(" of ")).Trim
+              sDownT = row.Substring(row.IndexOf(" of ") + 4)
+              sDownT = sDownT.Substring(0, sDownT.IndexOf(" ("))
+              If Not Table.Contains("Breach:") Then Exit For
+            ElseIf String.IsNullOrEmpty(sBuyMore) And String.IsNullOrEmpty(sBuyMoreT) Then
+              sBuyMore = row.Substring(0, row.IndexOf(" of ")).Trim
+              sBuyMoreT = row.Substring(row.IndexOf(" of ") + 4)
+              sBuyMoreT = sBuyMoreT.Substring(0, sBuyMoreT.IndexOf(" ("))
+              Exit For
+            End If
           ElseIf row.Contains("<td class=""red"" colspan=""2"">") Then
             sOverhead = row.Substring(row.IndexOf(">") + 1)
             If sOverhead.Contains("<") Then
@@ -1576,7 +1588,7 @@ Public Class localRestrictionTracker
       If String.IsNullOrEmpty(sDownT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
       Else
-        RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
+        RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB) + StrToVal(sBuyMore, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sBuyMoreT, MBPerGB), Now, imSlowed, imFree))
       End If
     Else
       RaiseError("Usage Read Failed: Unable to locate data table!", "RP Read Table", Table)
