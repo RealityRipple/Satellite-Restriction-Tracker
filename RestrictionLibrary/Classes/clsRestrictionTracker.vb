@@ -1488,11 +1488,11 @@ Public Class localRestrictionTracker
       RaiseError("Usage Failed: Data temporarily unavailable.")
       Return
     End If
-    If Not Response.Contains("<!-- usage bar -->") Then
+    If Not Response.Contains("<!-- Start Usage Bar -->") Then
       RaiseError("Usage Failed: Could not find usage meter.", "RP Usage Response", Response, ResponseURI)
       Return
     End If
-    Dim sFind As String = Response.Substring(Response.IndexOf("<!-- usage bar -->"))
+    Dim sFind As String = Response.Substring(Response.IndexOf("<!-- Start Usage Bar -->"))
     If Not sFind.Contains("<table") Then
       RaiseError("Usage Failed: Could not find usage meter table.", "RP Usage Response", Response, ResponseURI)
       Return
@@ -1509,6 +1509,25 @@ Public Class localRestrictionTracker
     End If
   End Sub
   Private Sub RP_Read_Table(Table As String)
+    Table = Replace(Table, vbCr, "")
+    Table = Replace(Table, vbLf, "")
+    Table = Replace(Table, vbTab, " ")
+    Do While Table.Contains("  ")
+      Table = Replace(Table, "  ", " ")
+    Loop
+    Dim CTag As Boolean = False
+    For I As Integer = 0 To Table.Length - 1
+      If Table(I) = "<" Then
+        CTag = False
+      ElseIf Table(I) = "/" Then
+        CTag = True
+      ElseIf Table(I) = ">" And CTag Then
+        Table = Table.Insert(I + 1, vbLf)
+        CTag = False
+      End If
+    Next
+    Table = Replace(Table, "><", ">" & vbLf & "<")
+    Table = Replace(Table, "> <", ">" & vbLf & "<")
     If Table.Contains("MB)") Then
       If justATest Then
         RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_LEGACY))
@@ -1565,11 +1584,13 @@ Public Class localRestrictionTracker
           If row.Contains(" GB of ") And row.Contains(" GB (") And row.Contains("%)") Then
             If String.IsNullOrEmpty(sDown) And String.IsNullOrEmpty(sDownT) Then
               sDown = row.Substring(0, row.IndexOf(" of ")).Trim
+              If sDown.Contains(">") Then sDown = sDown.Substring(sDown.LastIndexOf(">") + 1)
               sDownT = row.Substring(row.IndexOf(" of ") + 4)
               sDownT = sDownT.Substring(0, sDownT.IndexOf(" ("))
               If Not Table.Contains("Breach:") Then Exit For
             ElseIf String.IsNullOrEmpty(sBuyMore) And String.IsNullOrEmpty(sBuyMoreT) Then
               sBuyMore = row.Substring(0, row.IndexOf(" of ")).Trim
+              If sBuyMore.Contains(">") Then sBuyMore = sBuyMore.Substring(sBuyMore.LastIndexOf(">") + 1)
               sBuyMoreT = row.Substring(row.IndexOf(" of ") + 4)
               sBuyMoreT = sBuyMoreT.Substring(0, sBuyMoreT.IndexOf(" ("))
               Exit For
