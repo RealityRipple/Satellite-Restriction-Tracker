@@ -7,7 +7,8 @@ Class SvcSettings
   Private m_Interval As Integer
   Private m_Timeout As Integer
   Private m_ProxySetting As String
-  Public Sub Save()
+  Public Function Save() As Boolean
+    Dim sConfigPath As String = IO.Path.Combine(CommonAppDataDirectory, "user.config")
     Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
@@ -17,16 +18,11 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
-    If srlFunctions.InUseChecker(CommonAppDataDirectory & "\user.config", IO.FileAccess.Write) Then
-      Try
-        xConfig.Save(CommonAppDataDirectory & "\user.config")
-      Catch ex As Exception
-        MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-      End Try
-    Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & CommonAppDataDirectory & "\user.config"" may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-    End If
-  End Sub
+    Dim saveRet As String = SettingsFunctions.SafeSave(sConfigPath, xConfig)
+    If saveRet = "SAVED" Then Return True
+    SettingsFunctions.SaveErrDlg(saveRet, True)
+    Return False
+  End Function
   Public Sub New()
     m_Account = Nothing
     m_AccountType = SatHostTypes.Other
@@ -206,14 +202,8 @@ Class AppSettings
       Return LocalAppDataDirectory & "user.config"
     End Get
   End Property
-  Private ReadOnly Property ConfigFileBackup As String
-    Get
-      Return LocalAppDataDirectory & "backup.config"
-    End Get
-  End Property
   Public Sub New()
     Loaded = False
-    BackupCheckup()
     If My.Computer.FileSystem.FileExists(ConfigFile) Then
       Dim xConfig As XElement
       Try
@@ -1072,7 +1062,7 @@ Class AppSettings
     Colors.HistoryLightGrid = Color.Transparent
     Colors.HistoryDarkGrid = Color.Transparent
   End Sub
-  Public Sub Save()
+  Public Function Save() As Boolean
     Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim sUpdateType As String = "Ask"
     Select Case m_UpdateType
@@ -1165,17 +1155,11 @@ Class AppSettings
                                                           New XElement("section", New XAttribute("name", "Grid"),
                                                                        New XElement("setting", New XAttribute("name", "Light"), New XElement("value", ColorToStr(Colors.HistoryLightGrid))),
                                                                        New XElement("setting", New XAttribute("name", "Dark"), New XElement("value", ColorToStr(Colors.HistoryDarkGrid)))))))
-    If srlFunctions.InUseChecker(ConfigFile, IO.FileAccess.Write) Then
-      MakeBackup()
-      Try
-        xConfig.Save(ConfigFile)
-      Catch ex As Exception
-        MsgDlg(Nothing, "There was an error saving the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-      End Try
-    Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the settings file.", "Settings were not saved.", "Program Settings Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & ConfigFile & """ may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
-    End If
-  End Sub
+    Dim saveRet As String = SettingsFunctions.SafeSave(ConfigFile, xConfig)
+    If saveRet = "SAVED" Then Return True
+    SettingsFunctions.SaveErrDlg(saveRet, False)
+    Return False
+  End Function
   Private Function ColorToStr(c As Color) As String
     Dim sA As String
     If c = Color.Transparent Then
@@ -1236,32 +1220,6 @@ Class AppSettings
       Return Color.Transparent
     End If
   End Function
-  Public Sub MakeBackup()
-    If My.Computer.FileSystem.FileExists(ConfigFile) Then
-      My.Computer.FileSystem.CopyFile(ConfigFile, ConfigFileBackup, True)
-    End If
-  End Sub
-  Public Sub BackupCheckup()
-    If My.Computer.FileSystem.FileExists(ConfigFile) Then
-      If My.Computer.FileSystem.FileExists(ConfigFileBackup) Then
-        Dim xConfig As XElement
-        Try
-          xConfig = XElement.Load(ConfigFile)
-          Dim xuserSettings As XElement = xConfig.Element("userSettings")
-        Catch ex As Exception
-          My.Computer.FileSystem.CopyFile(ConfigFileBackup, ConfigFile, True)
-        Finally
-          My.Computer.FileSystem.DeleteFile(ConfigFileBackup)
-        End Try
-        xConfig = Nothing
-      End If
-    Else
-      If My.Computer.FileSystem.FileExists(ConfigFileBackup) Then
-        My.Computer.FileSystem.CopyFile(ConfigFileBackup, ConfigFile, True)
-        My.Computer.FileSystem.DeleteFile(ConfigFileBackup)
-      End If
-    End If
-  End Sub
   Public Property Account As String
     Get
       Return m_Account
@@ -1858,4 +1816,78 @@ Class AppSettings
       End Set
     End Property
   End Class
+End Class
+Class SettingsFunctions
+  Public Shared Function SafeSave(sPath As String, xConfig As XElement) As String
+    If Not IO.File.Exists(sPath) Then
+      Try
+        xConfig.Save(sPath)
+      Catch ex As Exception
+        Return "PERMISSION: was unable to write to settings file """ & sPath & """. " & ex.Message
+      End Try
+      Return "SAVED"
+    End If
+    Dim sNew As String = sPath & ".out"
+    Dim sOld As String = sPath & ".bak"
+    Try
+      If IO.File.Exists(sOld) Then IO.File.Decrypt(sOld)
+    Catch ex As Exception
+      Return "WRITE: failed to erase backup file """ & sOld & """. " & ex.Message
+    End Try
+    Try
+      If IO.File.Exists(sNew) Then IO.File.Delete(sNew)
+    Catch ex As Exception
+      Return "WRITE: failed to erase temp file """ & sNew & """. " & ex.Message
+    End Try
+    Try
+      xConfig.Save(sNew)
+    Catch ex As Exception
+      Return "PERMISSION: was unable to write to settings file """ & sNew & """. " & ex.Message
+    End Try
+    Try
+      IO.File.Replace(sNew, sPath, sOld, True)
+    Catch ex As Exception
+      Return "PERMISSION: was unable to move new settings file """ & sNew & """ to settings location """ & sPath & """. " & ex.Message
+    End Try
+    Try
+      IO.File.Delete(sOld)
+    Catch ex As Exception
+      'I really don't care
+    End Try
+    Return "SAVED"
+  End Function
+  Public Shared Sub SaveErrDlg(saveRet As String, ForService As Boolean)
+    If Not saveRet.Contains(": ") Then Return
+    Dim sErrType As String = saveRet.Substring(0, saveRet.IndexOf(": "))
+    Dim sErrMsg As String = saveRet.Substring(saveRet.IndexOf(": ") + 2)
+    Dim sRealErr As String = Nothing
+    If sErrMsg.Contains(". ") Then
+      sRealErr = sErrMsg.Substring(sErrMsg.IndexOf(". ") + 2)
+      sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf(". ") + 1)
+    End If
+    sErrMsg = My.Application.Info.ProductName & " " & sErrMsg
+    Dim sCaption As String = "Your settings were not saved."
+    Dim sHeader As String = "Error"
+
+    If ForService Then
+      sHeader = "Logger Service Error"
+      Select Case sErrType
+        Case "WRITE" : sCaption = "Your Service settings were not saved."
+        Case "PERMISSION" : sCaption = "Your Service settings could not be saved."
+        Case Else : sCaption = "There was an error saving your Service settings."
+      End Select
+    Else
+      sHeader = "Program Settings Error"
+      Select Case sErrType
+        Case "WRITE" : sCaption = "Your Program settings were not saved."
+        Case "PERMISSION" : sCaption = "Your Program settings could not be saved."
+        Case Else : sCaption = "There was an error saving your Program settings."
+      End Select
+    End If
+    If String.IsNullOrEmpty(sRealErr) Then
+      MsgDlg(Nothing, sErrMsg, sCaption, sHeader, MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning)
+    Else
+      MsgDlg(Nothing, sErrMsg, sCaption, sHeader, MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , sRealErr, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+    End If
+  End Sub
 End Class

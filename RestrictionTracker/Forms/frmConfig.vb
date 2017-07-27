@@ -1662,7 +1662,8 @@
       mySettings.HistoryDir = txtHistoryDir.Text
       bAccount = True
     End If
-    mySettings.Save()
+    Dim saveFail As Boolean = False
+    If Not mySettings.Save() Then saveFail = True
     If mySettings.Service Then
       Dim cSave As New SvcSettings
       cSave.Account = mySettings.Account
@@ -1673,11 +1674,13 @@
       End If
       cSave.Proxy = mySettings.Proxy
       cSave.Timeout = mySettings.Timeout
-      cSave.Save()
+      If Not cSave.Save() Then saveFail = True
     End If
-    bHardChange = False
-    bSaved = True
-    cmdSave.Enabled = False
+    If Not saveFail Then
+      bHardChange = False
+      bSaved = True
+      cmdSave.Enabled = False
+    End If
   End Sub
   Private Sub cmdClose_Click(sender As System.Object, e As System.EventArgs) Handles cmdClose.Click
     Me.Close()
