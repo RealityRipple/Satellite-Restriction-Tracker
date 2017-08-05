@@ -1849,7 +1849,7 @@ Class SettingsFunctions
     Dim sNew As String = sPath & ".out"
     Dim sOld As String = sBackup
     Try
-      If IO.File.Exists(sOld) Then IO.File.Decrypt(sOld)
+      If IO.File.Exists(sOld) Then IO.File.Delete(sOld)
     Catch ex As Exception
       Return "WRITE: failed to erase backup file """ & sOld & """. " & ex.Message
     End Try
