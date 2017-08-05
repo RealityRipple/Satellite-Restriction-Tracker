@@ -722,7 +722,7 @@ Public Class localRestrictionTracker
   Private Sub LoginDN()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://www.mydish.com/auth/login.ashx"
-    MakeSocket(False, False)
+    MakeSocket(False)
     Dim bpf As String = "U"
     bpf &= TimeZone.CurrentTimeZone.GetUtcOffset(New Date(2010, 12, 30)).TotalMinutes
     bpf &= My.Computer.Info.InstalledUICulture.Name.Substring(My.Computer.Info.InstalledUICulture.Name.Length - 2)
@@ -1636,7 +1636,7 @@ Public Class localRestrictionTracker
     DN_Login_Continue("https://www.mydish.com/auth/saml/login.aspx?relaystate=" & srlFunctions.PercentEncode("/usermanagement/processMyDishResponse.do"))
   End Sub
   Private Sub DN_Login_Continue(sURI As String)
-    MakeSocket(False, False)
+    MakeSocket(False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -1683,7 +1683,7 @@ Public Class localRestrictionTracker
     End If
   End Sub
   Private Sub DN_Login_Verify(SAMLResponse As String, RelayState As String)
-    MakeSocket(False, False)
+    MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode(RelayState)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, uriString)
@@ -1710,7 +1710,7 @@ Public Class localRestrictionTracker
     DN_Download_Home()
   End Sub
   Private Sub DN_Download_Home()
-    MakeSocket(False, False)
+    MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, uriString)
@@ -1726,6 +1726,10 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
+    If Response.Contains("The requested URL was rejected.") Then
+      RaiseError("Login Failed: The server rejected the request.")
+      Return
+    End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("accountsummary") Then
       RaiseError("Home Read Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
       Return
@@ -1733,7 +1737,7 @@ Public Class localRestrictionTracker
     DN_Download_Table()
   End Sub
   Private Sub DN_Download_Table()
-    MakeSocket(False, False)
+    MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
     Dim responseData As String = Nothing
