@@ -203,788 +203,798 @@ Class AppSettings
     End Get
   End Property
   Public Sub New()
+    Load()
+  End Sub
+  Private Sub Load()
     Loaded = False
-    If My.Computer.FileSystem.FileExists(ConfigFile) Then
-      Dim xConfig As XElement
+    If Not My.Computer.FileSystem.FileExists(ConfigFile) Then
+      Reset()
+      Loaded = True
+      Return
+    End If
+    Dim xConfig As XElement
+    Try
+      xConfig = XElement.Load(ConfigFile)
+    Catch ex As Exception
+      If IO.File.Exists(ConfigFileBackup) Then
+        IO.File.Delete(ConfigFile)
+        IO.File.Move(ConfigFileBackup, ConfigFile)
+        Load()
+        If Loaded Then Return
+      End If
+      Reset()
+      Loaded = True
+      Return
+    End Try
+    Dim xuserSettings As XElement = xConfig.Element("userSettings")
+    If xuserSettings Is Nothing Then
+      Reset()
+      Loaded = True
+      Return
+    End If
+    Dim xMySettings As XElement
+    If xuserSettings.Element("WildBlueUsage.My.MySettings") IsNot Nothing Then
+      xMySettings = xuserSettings.Element("WildBlueUsage.My.MySettings")
+    ElseIf xuserSettings.Element("RestrictionTracker.My.MySettings") IsNot Nothing Then
+      xMySettings = xuserSettings.Element("RestrictionTracker.My.MySettings")
+    Else
+      Reset()
+      Loaded = True
+      Return
+    End If
+    Dim xAccount As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
+    If xAccount Is Nothing Then
+      m_Account = String.Empty
+      m_AccountType = SatHostTypes.Other
+    Else
       Try
-        xConfig = XElement.Load(ConfigFile)
+        m_Account = xAccount.Element("value").Value
       Catch ex As Exception
-        Reset()
-        Loaded = True
-        Return
-      End Try
-      Dim xuserSettings As XElement = xConfig.Element("userSettings")
-      If xuserSettings Is Nothing Then
-        Reset()
-        Loaded = True
-        Return
-      End If
-      Dim xMySettings As XElement
-      If xuserSettings.Element("WildBlueUsage.My.MySettings") IsNot Nothing Then
-        xMySettings = xuserSettings.Element("WildBlueUsage.My.MySettings")
-      ElseIf xuserSettings.Element("RestrictionTracker.My.MySettings") IsNot Nothing Then
-        xMySettings = xuserSettings.Element("RestrictionTracker.My.MySettings")
-      Else
-        Reset()
-        Loaded = True
-        Return
-      End If
-      Dim xAccount As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
-      If xAccount Is Nothing Then
         m_Account = String.Empty
-        m_AccountType = SatHostTypes.Other
-      Else
-        Try
-          m_Account = xAccount.Element("value").Value
-        Catch ex As Exception
-          m_Account = String.Empty
-        End Try
-        Try
-          Dim xAccountType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "type")
-          If xAccountType Is Nothing Then
-            m_AccountType = SatHostTypes.Other
-          Else
-            m_AccountType = srlFunctions.StringToHostType(xAccountType.Value)
-          End If
-        Catch ex As Exception
+      End Try
+      Try
+        Dim xAccountType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "type")
+        If xAccountType Is Nothing Then
           m_AccountType = SatHostTypes.Other
-        End Try
-        Try
-          Dim xAccountTypeF As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "forceType")
-          If xAccountTypeF Is Nothing Then
-            m_AccountTypeF = False
-          Else
-            m_AccountTypeF = xAccountTypeF.Value = "True"
-          End If
-        Catch ex As Exception
-          m_AccountTypeF = False
-        End Try
-      End If
-      Dim xStartWait As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "StartWait")
-      If xStartWait Is Nothing Then
-        m_StartWait = 5
-      Else
-        Try
-          m_StartWait = xStartWait.Element("value").Value
-        Catch ex As Exception
-          m_StartWait = 5
-        End Try
-      End If
-      Dim xInterval As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Interval")
-      If xInterval Is Nothing Then
-        m_Interval = 15
-      Else
-        Try
-          m_Interval = xInterval.Element("value").Value
-        Catch ex As Exception
-          m_Interval = 15
-        End Try
-      End If
-      Dim xGr As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Gr")
-      If xGr Is Nothing Then
-        m_Gr = "aph"
-      Else
-        Try
-          m_Gr = xGr.Element("value").Value
-        Catch ex As Exception
-          m_Gr = "aph"
-        End Try
-      End If
-      Dim xLastUpdate As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastUpdate")
-      If xLastUpdate Is Nothing Then
-        m_LastUpdate = New Date(2000, 1, 1)
-      Else
-        Try
-          m_LastUpdate = Date.FromBinary(xLastUpdate.Element("value").Value)
-        Catch ex As Exception
-          m_LastUpdate = New Date(2000, 1, 1)
-        End Try
-      End If
-      Dim xLastSyncTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastSyncTime")
-      If xLastSyncTime Is Nothing Then
-        m_LastSyncTime = New Date(2000, 1, 1)
-      Else
-        Try
-          m_LastSyncTime = Date.FromBinary(xLastSyncTime.Element("value").Value)
-        Catch ex As Exception
-          m_LastSyncTime = New Date(2000, 1, 1)
-        End Try
-      End If
-      Dim xAccuracy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Accuracy")
-      If xAccuracy Is Nothing Then
-        m_Accuracy = 0
-      Else
-        Try
-          m_Accuracy = xAccuracy.Element("value").Value
-        Catch ex As Exception
-          m_Accuracy = 0
-        End Try
-      End If
-      Dim xAgo As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Ago")
-      If xAgo Is Nothing Then
-        m_Ago = 30
-      Else
-        Try
-          m_Ago = xAgo.Element("value").Value
-        Catch ex As Exception
-          m_Ago = 30
-        End Try
-      End If
-      Dim xService As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Service")
-      If xService Is Nothing Then
-        m_Service = False
-      Else
-        Try
-          m_Service = xService.Element("value").Value = "True"
-        Catch ex As Exception
-          m_Service = False
-        End Try
-      End If
-      Dim xHistoryDir As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "HistoryDir")
-      If xHistoryDir Is Nothing Then
-        m_HistoryDir = Nothing
-      Else
-        Try
-          m_HistoryDir = xHistoryDir.Element("value").Value
-        Catch ex As Exception
-          m_HistoryDir = Nothing
-        End Try
-      End If
-      Dim xUpdateBETA As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateBETA")
-      If xUpdateBETA Is Nothing Then
-        Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
-        If xBetaCheck Is Nothing Then
-          m_UpdateBETA = False
         Else
-          Try
-            m_UpdateBETA = xBetaCheck.Element("value").Value = "True"
-          Catch ex As Exception
-            m_UpdateBETA = False
-          End Try
+          m_AccountType = srlFunctions.StringToHostType(xAccountType.Value)
         End If
+      Catch ex As Exception
+        m_AccountType = SatHostTypes.Other
+      End Try
+      Try
+        Dim xAccountTypeF As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "forceType")
+        If xAccountTypeF Is Nothing Then
+          m_AccountTypeF = False
+        Else
+          m_AccountTypeF = xAccountTypeF.Value = "True"
+        End If
+      Catch ex As Exception
+        m_AccountTypeF = False
+      End Try
+    End If
+    Dim xStartWait As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "StartWait")
+    If xStartWait Is Nothing Then
+      m_StartWait = 5
+    Else
+      Try
+        m_StartWait = xStartWait.Element("value").Value
+      Catch ex As Exception
+        m_StartWait = 5
+      End Try
+    End If
+    Dim xInterval As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Interval")
+    If xInterval Is Nothing Then
+      m_Interval = 15
+    Else
+      Try
+        m_Interval = xInterval.Element("value").Value
+      Catch ex As Exception
+        m_Interval = 15
+      End Try
+    End If
+    Dim xGr As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Gr")
+    If xGr Is Nothing Then
+      m_Gr = "aph"
+    Else
+      Try
+        m_Gr = xGr.Element("value").Value
+      Catch ex As Exception
+        m_Gr = "aph"
+      End Try
+    End If
+    Dim xLastUpdate As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastUpdate")
+    If xLastUpdate Is Nothing Then
+      m_LastUpdate = New Date(2000, 1, 1)
+    Else
+      Try
+        m_LastUpdate = Date.FromBinary(xLastUpdate.Element("value").Value)
+      Catch ex As Exception
+        m_LastUpdate = New Date(2000, 1, 1)
+      End Try
+    End If
+    Dim xLastSyncTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastSyncTime")
+    If xLastSyncTime Is Nothing Then
+      m_LastSyncTime = New Date(2000, 1, 1)
+    Else
+      Try
+        m_LastSyncTime = Date.FromBinary(xLastSyncTime.Element("value").Value)
+      Catch ex As Exception
+        m_LastSyncTime = New Date(2000, 1, 1)
+      End Try
+    End If
+    Dim xAccuracy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Accuracy")
+    If xAccuracy Is Nothing Then
+      m_Accuracy = 0
+    Else
+      Try
+        m_Accuracy = xAccuracy.Element("value").Value
+      Catch ex As Exception
+        m_Accuracy = 0
+      End Try
+    End If
+    Dim xAgo As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Ago")
+    If xAgo Is Nothing Then
+      m_Ago = 30
+    Else
+      Try
+        m_Ago = xAgo.Element("value").Value
+      Catch ex As Exception
+        m_Ago = 30
+      End Try
+    End If
+    Dim xService As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Service")
+    If xService Is Nothing Then
+      m_Service = False
+    Else
+      Try
+        m_Service = xService.Element("value").Value = "True"
+      Catch ex As Exception
+        m_Service = False
+      End Try
+    End If
+    Dim xHistoryDir As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "HistoryDir")
+    If xHistoryDir Is Nothing Then
+      m_HistoryDir = Nothing
+    Else
+      Try
+        m_HistoryDir = xHistoryDir.Element("value").Value
+      Catch ex As Exception
+        m_HistoryDir = Nothing
+      End Try
+    End If
+    Dim xUpdateBETA As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateBETA")
+    If xUpdateBETA Is Nothing Then
+      Dim xBetaCheck As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "BetaCheck")
+      If xBetaCheck Is Nothing Then
+        m_UpdateBETA = False
       Else
         Try
-          m_UpdateBETA = xUpdateBETA.Element("value").Value = "True"
+          m_UpdateBETA = xBetaCheck.Element("value").Value = "True"
         Catch ex As Exception
           m_UpdateBETA = False
         End Try
       End If
-      Dim xUpdateType As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateType")
-      If xUpdateType Is Nothing Then
-        m_UpdateType = UpdateTypes.Ask
-      Else
-        Try
-          Dim sUpdateType As String = xUpdateType.Element("value").Value
-          If sUpdateType = "BETA" Then
-            m_UpdateBETA = True
-            m_UpdateType = UpdateTypes.Ask
-          ElseIf sUpdateType = "Auto" Then
-            m_UpdateType = UpdateTypes.Auto
-          ElseIf sUpdateType = "None" Then
-            m_UpdateType = UpdateTypes.None
-          Else
-            m_UpdateType = UpdateTypes.Ask
-          End If
-        Catch ex As Exception
+    Else
+      Try
+        m_UpdateBETA = xUpdateBETA.Element("value").Value = "True"
+      Catch ex As Exception
+        m_UpdateBETA = False
+      End Try
+    End If
+    Dim xUpdateType As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateType")
+    If xUpdateType Is Nothing Then
+      m_UpdateType = UpdateTypes.Ask
+    Else
+      Try
+        Dim sUpdateType As String = xUpdateType.Element("value").Value
+        If sUpdateType = "BETA" Then
+          m_UpdateBETA = True
           m_UpdateType = UpdateTypes.Ask
-        End Try
-      End If
-      Dim xUpdateTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateTime")
-      If xUpdateTime Is Nothing Then
+        ElseIf sUpdateType = "Auto" Then
+          m_UpdateType = UpdateTypes.Auto
+        ElseIf sUpdateType = "None" Then
+          m_UpdateType = UpdateTypes.None
+        Else
+          m_UpdateType = UpdateTypes.Ask
+        End If
+      Catch ex As Exception
+        m_UpdateType = UpdateTypes.Ask
+      End Try
+    End If
+    Dim xUpdateTime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "UpdateTime")
+    If xUpdateTime Is Nothing Then
+      m_UpdateTime = 15
+    Else
+      Try
+        m_UpdateTime = xUpdateTime.Element("value").Value
+      Catch ex As Exception
         m_UpdateTime = 15
-      Else
-        Try
-          m_UpdateTime = xUpdateTime.Element("value").Value
-        Catch ex As Exception
-          m_UpdateTime = 15
-        End Try
-      End If
-      Dim xScaleScreen As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "ScaleScreen")
-      If xScaleScreen Is Nothing Then
+      End Try
+    End If
+    Dim xScaleScreen As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "ScaleScreen")
+    If xScaleScreen Is Nothing Then
+      m_ScaleScreen = False
+    Else
+      Try
+        m_ScaleScreen = xScaleScreen.Element("value").Value = "True"
+      Catch ex As Exception
         m_ScaleScreen = False
-      Else
-        Try
-          m_ScaleScreen = xScaleScreen.Element("value").Value = "True"
-        Catch ex As Exception
-          m_ScaleScreen = False
-        End Try
-      End If
-      Dim xMainSize As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "MainSize")
-      If xMainSize Is Nothing Then
+      End Try
+    End If
+    Dim xMainSize As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "MainSize")
+    If xMainSize Is Nothing Then
+      m_MainSize = New Size(450, 200)
+    Else
+      Try
+        Dim sSizes() As String = Split(xMainSize.Element("value").Value, ",", 2)
+        m_MainSize = New Size(sSizes(0), sSizes(1))
+      Catch ex As Exception
         m_MainSize = New Size(450, 200)
-      Else
-        Try
-          Dim sSizes() As String = Split(xMainSize.Element("value").Value, ",", 2)
-          m_MainSize = New Size(sSizes(0), sSizes(1))
-        Catch ex As Exception
-          m_MainSize = New Size(450, 200)
-        End Try
-      End If
-      Dim xRemoteKey As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "RemoteKey")
-      If xRemoteKey Is Nothing Then
+      End Try
+    End If
+    Dim xRemoteKey As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "RemoteKey")
+    If xRemoteKey Is Nothing Then
+      m_RemoteKey = Nothing
+    Else
+      Try
+        m_RemoteKey = xRemoteKey.Element("value").Value
+      Catch ex As Exception
         m_RemoteKey = Nothing
-      Else
-        Try
-          m_RemoteKey = xRemoteKey.Element("value").Value
-        Catch ex As Exception
-          m_RemoteKey = Nothing
-        End Try
-      End If
-      Dim xPassCrypt As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
-      If xPassCrypt Is Nothing Then
+      End Try
+    End If
+    Dim xPassCrypt As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
+    If xPassCrypt Is Nothing Then
+      m_PassCrypt = Nothing
+    Else
+      Try
+        m_PassCrypt = xPassCrypt.Element("value").Value
+      Catch ex As Exception
         m_PassCrypt = Nothing
-      Else
-        Try
-          m_PassCrypt = xPassCrypt.Element("value").Value
-        Catch ex As Exception
-          m_PassCrypt = Nothing
-        End Try
-      End If
-      Dim xTopMost As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TopMost")
-      If xTopMost Is Nothing Then
+      End Try
+    End If
+    Dim xTopMost As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TopMost")
+    If xTopMost Is Nothing Then
+      m_TopMost = False
+    Else
+      Try
+        m_TopMost = xTopMost.Element("value").Value = "True"
+      Catch ex As Exception
         m_TopMost = False
-      Else
-        Try
-          m_TopMost = xTopMost.Element("value").Value = "True"
-        Catch ex As Exception
-          m_TopMost = False
-        End Try
-      End If
-      Dim xTimeout As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Timeout")
-      If xTimeout Is Nothing Then
+      End Try
+    End If
+    Dim xTimeout As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Timeout")
+    If xTimeout Is Nothing Then
+      m_Timeout = 120
+    Else
+      Try
+        m_Timeout = xTimeout.Element("value").Value
+      Catch ex As Exception
         m_Timeout = 120
-      Else
-        Try
-          m_Timeout = xTimeout.Element("value").Value
-        Catch ex As Exception
-          m_Timeout = 120
-        End Try
-      End If
-      Dim xOveruse As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overuse")
-      If xOveruse Is Nothing Then
+      End Try
+    End If
+    Dim xOveruse As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overuse")
+    If xOveruse Is Nothing Then
+      m_Overuse = 0
+    Else
+      Try
+        m_Overuse = xOveruse.Element("value").Value
+      Catch ex As Exception
         m_Overuse = 0
-      Else
-        Try
-          m_Overuse = xOveruse.Element("value").Value
-        Catch ex As Exception
-          m_Overuse = 0
-        End Try
-      End If
-      Dim xOvertime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overtime")
-      If xOvertime Is Nothing Then
+      End Try
+    End If
+    Dim xOvertime As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overtime")
+    If xOvertime Is Nothing Then
+      m_Overtime = 60
+    Else
+      Try
+        m_Overtime = xOvertime.Element("value").Value
+      Catch ex As Exception
         m_Overtime = 60
-      Else
-        Try
-          m_Overtime = xOvertime.Element("value").Value
-        Catch ex As Exception
-          m_Overtime = 60
-        End Try
-      End If
-      Dim xAlertStyle As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AlertStyle")
-      If xAlertStyle Is Nothing Then
+      End Try
+    End If
+    Dim xAlertStyle As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AlertStyle")
+    If xAlertStyle Is Nothing Then
+      m_AlertStyle = "Default"
+    Else
+      Try
+        m_AlertStyle = xAlertStyle.Element("value").Value
+      Catch ex As Exception
         m_AlertStyle = "Default"
-      Else
-        Try
-          m_AlertStyle = xAlertStyle.Element("value").Value
-        Catch ex As Exception
-          m_AlertStyle = "Default"
-        End Try
-      End If
-      Dim xTrayIcon As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TrayIcon")
-      If xTrayIcon Is Nothing Then
-        m_TrayIcon = TrayStyles.Always
-      Else
-        Try
-          Dim xTrayStyle As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Style")
-          If xTrayStyle Is Nothing Then
-            Try
-              Select Case xTrayIcon.Element("value").Value
-                Case "Never" : m_TrayIcon = TrayStyles.Never
-                Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
-                Case Else : m_TrayIcon = TrayStyles.Always
-              End Select
-            Catch ex As Exception
-              m_TrayIcon = TrayStyles.Always
-            End Try
-          Else
-            Select Case xTrayStyle.Element("value").Value
-              Case "Never" : m_TrayIcon = TrayStyles.Never
-              Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
-              Case Else : m_TrayIcon = TrayStyles.Always
-            End Select
-          End If
-          Dim xTrayAnim As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Animation")
-          If xTrayAnim Is Nothing Then
-            m_TrayAnim = True
-          Else
-            m_TrayAnim = xTrayAnim.Element("value").Value = "True"
-          End If
-          Dim xTrayClose As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "OnClose")
-          If xTrayClose Is Nothing Then
-            m_TrayClose = False
-          Else
-            m_TrayClose = xTrayClose.Element("value").Value = "True"
-          End If
-        Catch ex As Exception
+      End Try
+    End If
+    Dim xTrayIcon As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TrayIcon")
+    If xTrayIcon Is Nothing Then
+      m_TrayIcon = TrayStyles.Always
+    Else
+      Try
+        Dim xTrayStyle As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Style")
+        If xTrayStyle Is Nothing Then
           Try
             Select Case xTrayIcon.Element("value").Value
               Case "Never" : m_TrayIcon = TrayStyles.Never
               Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
               Case Else : m_TrayIcon = TrayStyles.Always
             End Select
-          Catch ex2 As Exception
+          Catch ex As Exception
             m_TrayIcon = TrayStyles.Always
           End Try
-          m_TrayAnim = True
-          m_TrayClose = False
-        End Try
-      End If
-      Dim xAutoHide As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AutoHide")
-      If xAutoHide Is Nothing Then
-        m_AutoHide = True
-      Else
-        Try
-          m_AutoHide = xAutoHide.Element("value").Value = "True"
-        Catch ex As Exception
-          m_AutoHide = True
-        End Try
-      End If
-      Dim xTLSProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TLSProxy")
-      If xTLSProxy Is Nothing Then
-        m_TLSProxy = False
-      Else
-        Try
-          m_TLSProxy = xTLSProxy.Element("value").Value = "True"
-        Catch ex As Exception
-          m_TLSProxy = False
-        End Try
-      End If
-
-      Dim xProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
-      If xProxy Is Nothing Then
-        m_ProxySetting = "None"
-      Else
-        Try
-          m_ProxySetting = xProxy.Element("value").Value
-        Catch ex As Exception
-          m_ProxySetting = "None"
-        End Try
-      End If
-      Dim xLastNag As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastNag")
-      If xLastNag Is Nothing Then
-        m_LastNag = New Date(2000, 1, 1)
-      Else
-        Try
-          m_LastNag = Date.FromBinary(xLastNag.Element("value").Value)
-        Catch ex As Exception
-          m_LastNag = New Date(2000, 1, 1)
-        End Try
-      End If
-      Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
-      If xProtocol Is Nothing Then
-        m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
-      Else
-        Try
-          m_Protocol = SecurityProtocolTypeEx.None
-          If xProtocol.Element("value").Value.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
-          If xProtocol.Element("value").Value.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
-          If xProtocol.Element("value").Value.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
-          If xProtocol.Element("value").Value.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
-          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
-        Catch ex As Exception
-          m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
-        End Try
-      End If
-      Dim xNetTest As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "NetTestURL")
-      If xNetTest Is Nothing Then
-        m_NetTest = Nothing
-      Else
-        Try
-          m_NetTest = xNetTest.Element("value").Value
-        Catch ex As Exception
-          m_NetTest = Nothing
-        End Try
-      End If
-      Colors = New AppColors
-      Dim xcolorSettings As XElement = xConfig.Element("colorSettings")
-      If xcolorSettings Is Nothing Then
-        ResetColors()
-      Else
-        Dim xMain As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Main")
-        If xMain Is Nothing Then
-          ResetMain()
         Else
-          Dim xMainDown As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
-          If xMainDown Is Nothing Then
+          Select Case xTrayStyle.Element("value").Value
+            Case "Never" : m_TrayIcon = TrayStyles.Never
+            Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+            Case Else : m_TrayIcon = TrayStyles.Always
+          End Select
+        End If
+        Dim xTrayAnim As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Animation")
+        If xTrayAnim Is Nothing Then
+          m_TrayAnim = True
+        Else
+          m_TrayAnim = xTrayAnim.Element("value").Value = "True"
+        End If
+        Dim xTrayClose As XElement = Array.Find(xTrayIcon.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "OnClose")
+        If xTrayClose Is Nothing Then
+          m_TrayClose = False
+        Else
+          m_TrayClose = xTrayClose.Element("value").Value = "True"
+        End If
+      Catch ex As Exception
+        Try
+          Select Case xTrayIcon.Element("value").Value
+            Case "Never" : m_TrayIcon = TrayStyles.Never
+            Case "Minimized" : m_TrayIcon = TrayStyles.Minimized
+            Case Else : m_TrayIcon = TrayStyles.Always
+          End Select
+        Catch ex2 As Exception
+          m_TrayIcon = TrayStyles.Always
+        End Try
+        m_TrayAnim = True
+        m_TrayClose = False
+      End Try
+    End If
+    Dim xAutoHide As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AutoHide")
+    If xAutoHide Is Nothing Then
+      m_AutoHide = True
+    Else
+      Try
+        m_AutoHide = xAutoHide.Element("value").Value = "True"
+      Catch ex As Exception
+        m_AutoHide = True
+      End Try
+    End If
+    Dim xTLSProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TLSProxy")
+    If xTLSProxy Is Nothing Then
+      m_TLSProxy = False
+    Else
+      Try
+        m_TLSProxy = xTLSProxy.Element("value").Value = "True"
+      Catch ex As Exception
+        m_TLSProxy = False
+      End Try
+    End If
+
+    Dim xProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
+    If xProxy Is Nothing Then
+      m_ProxySetting = "None"
+    Else
+      Try
+        m_ProxySetting = xProxy.Element("value").Value
+      Catch ex As Exception
+        m_ProxySetting = "None"
+      End Try
+    End If
+    Dim xLastNag As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastNag")
+    If xLastNag Is Nothing Then
+      m_LastNag = New Date(2000, 1, 1)
+    Else
+      Try
+        m_LastNag = Date.FromBinary(xLastNag.Element("value").Value)
+      Catch ex As Exception
+        m_LastNag = New Date(2000, 1, 1)
+      End Try
+    End If
+    Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
+    If xProtocol Is Nothing Then
+      m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    Else
+      Try
+        m_Protocol = SecurityProtocolTypeEx.None
+        If xProtocol.Element("value").Value.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
+        If xProtocol.Element("value").Value.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
+        If xProtocol.Element("value").Value.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
+        If xProtocol.Element("value").Value.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
+        If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+      Catch ex As Exception
+        m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+      End Try
+    End If
+    Dim xNetTest As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "NetTestURL")
+    If xNetTest Is Nothing Then
+      m_NetTest = Nothing
+    Else
+      Try
+        m_NetTest = xNetTest.Element("value").Value
+      Catch ex As Exception
+        m_NetTest = Nothing
+      End Try
+    End If
+    Colors = New AppColors
+    Dim xcolorSettings As XElement = xConfig.Element("colorSettings")
+    If xcolorSettings Is Nothing Then
+      ResetColors()
+    Else
+      Dim xMain As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Main")
+      If xMain Is Nothing Then
+        ResetMain()
+      Else
+        Dim xMainDown As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
+        If xMainDown Is Nothing Then
+          Colors.MainDownA = Color.Transparent
+          Colors.MainDownB = Color.Transparent
+          Colors.MainDownC = Color.Transparent
+        Else
+          Dim xMainDA As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xMainDA Is Nothing Then
             Colors.MainDownA = Color.Transparent
+          Else
+            Try
+              Colors.MainDownA = StrToColor(xMainDA.Element("value").Value)
+            Catch ex As Exception
+              Colors.MainDownA = Color.Transparent
+            End Try
+          End If
+          Dim xMainDB As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xMainDB Is Nothing Then
             Colors.MainDownB = Color.Transparent
+          Else
+            Try
+              If xMainDB.Element("value").Value = "No" Then
+                Colors.MainDownB = Color.Transparent
+              Else
+                Colors.MainDownB = StrToColor(xMainDB.Element("value").Value)
+              End If
+            Catch ex As Exception
+              Colors.MainDownB = Color.Transparent
+            End Try
+          End If
+          Dim xMainDC As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xMainDC Is Nothing Then
             Colors.MainDownC = Color.Transparent
           Else
-            Dim xMainDA As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xMainDA Is Nothing Then
-              Colors.MainDownA = Color.Transparent
-            Else
-              Try
-                Colors.MainDownA = StrToColor(xMainDA.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainDownA = Color.Transparent
-              End Try
-            End If
-            Dim xMainDB As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xMainDB Is Nothing Then
-              Colors.MainDownB = Color.Transparent
-            Else
-              Try
-                If xMainDB.Element("value").Value = "No" Then
-                  Colors.MainDownB = Color.Transparent
-                Else
-                  Colors.MainDownB = StrToColor(xMainDB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.MainDownB = Color.Transparent
-              End Try
-            End If
-            Dim xMainDC As XElement = Array.Find(xMainDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xMainDC Is Nothing Then
+            Try
+              Colors.MainDownC = StrToColor(xMainDC.Element("value").Value)
+            Catch ex As Exception
               Colors.MainDownC = Color.Transparent
-            Else
-              Try
-                Colors.MainDownC = StrToColor(xMainDC.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainDownC = Color.Transparent
-              End Try
-            End If
+            End Try
           End If
-          Dim xMainUp As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xMainUp Is Nothing Then
+        End If
+        Dim xMainUp As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
+        If xMainUp Is Nothing Then
+          Colors.MainUpA = Color.Transparent
+          Colors.MainUpB = Color.Transparent
+          Colors.MainUpC = Color.Transparent
+        Else
+          Dim xMainUA As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xMainUA Is Nothing Then
             Colors.MainUpA = Color.Transparent
+          Else
+            Try
+              Colors.MainUpA = StrToColor(xMainUA.Element("value").Value)
+            Catch ex As Exception
+              Colors.MainUpA = Color.Transparent
+            End Try
+          End If
+          Dim xMainUB As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xMainUB Is Nothing Then
             Colors.MainUpB = Color.Transparent
+          Else
+            Try
+              If xMainUB.Element("value").Value = "No" Then
+                Colors.MainUpB = Color.Transparent
+              Else
+                Colors.MainUpB = StrToColor(xMainUB.Element("value").Value)
+              End If
+            Catch ex As Exception
+              Colors.MainUpB = Color.Transparent
+            End Try
+          End If
+          Dim xMainUC As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xMainUC Is Nothing Then
             Colors.MainUpC = Color.Transparent
           Else
-            Dim xMainUA As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xMainUA Is Nothing Then
-              Colors.MainUpA = Color.Transparent
-            Else
-              Try
-                Colors.MainUpA = StrToColor(xMainUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainUpA = Color.Transparent
-              End Try
-            End If
-            Dim xMainUB As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xMainUB Is Nothing Then
-              Colors.MainUpB = Color.Transparent
-            Else
-              Try
-                If xMainUB.Element("value").Value = "No" Then
-                  Colors.MainUpB = Color.Transparent
-                Else
-                  Colors.MainUpB = StrToColor(xMainUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.MainUpB = Color.Transparent
-              End Try
-            End If
-            Dim xMainUC As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xMainUC Is Nothing Then
+            Try
+              Colors.MainUpC = StrToColor(xMainUC.Element("value").Value)
+            Catch ex As Exception
               Colors.MainUpC = Color.Transparent
-            Else
-              Try
-                Colors.MainUpC = StrToColor(xMainUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainUpC = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xMainText As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
-          If xMainText Is Nothing Then
-            Colors.MainText = Color.Transparent
-          Else
-            Try
-              Colors.MainText = StrToColor(xMainText.Element("value").Value)
-            Catch ex As Exception
-              Colors.MainText = Color.Transparent
-            End Try
-          End If
-          Dim xMainBG As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Background")
-          If xMainBG Is Nothing Then
-            Colors.MainBackground = Color.Transparent
-          Else
-            Try
-              Colors.MainBackground = StrToColor(xMainBG.Element("value").Value)
-            Catch ex As Exception
-              Colors.MainBackground = Color.Transparent
             End Try
           End If
         End If
-        Dim xTray As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Tray")
-        If xTray Is Nothing Then
-          ResetTray()
+        Dim xMainText As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
+        If xMainText Is Nothing Then
+          Colors.MainText = Color.Transparent
         Else
-          Dim xTrayDown As XElement = Array.Find(xTray.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
-          If xTrayDown Is Nothing Then
+          Try
+            Colors.MainText = StrToColor(xMainText.Element("value").Value)
+          Catch ex As Exception
+            Colors.MainText = Color.Transparent
+          End Try
+        End If
+        Dim xMainBG As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Background")
+        If xMainBG Is Nothing Then
+          Colors.MainBackground = Color.Transparent
+        Else
+          Try
+            Colors.MainBackground = StrToColor(xMainBG.Element("value").Value)
+          Catch ex As Exception
+            Colors.MainBackground = Color.Transparent
+          End Try
+        End If
+      End If
+      Dim xTray As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Tray")
+      If xTray Is Nothing Then
+        ResetTray()
+      Else
+        Dim xTrayDown As XElement = Array.Find(xTray.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
+        If xTrayDown Is Nothing Then
+          Colors.TrayDownA = Color.Transparent
+          Colors.TrayDownB = Color.Transparent
+          Colors.TrayDownC = Color.Transparent
+        Else
+          Dim xTrayDA As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xTrayDA Is Nothing Then
             Colors.TrayDownA = Color.Transparent
+          Else
+            Try
+              Colors.TrayDownA = StrToColor(xTrayDA.Element("value").Value)
+            Catch ex As Exception
+              Colors.TrayDownA = Color.Transparent
+            End Try
+          End If
+          Dim xTrayDB As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xTrayDB Is Nothing Then
             Colors.TrayDownB = Color.Transparent
+          Else
+            Try
+              If xTrayDB.Element("value").Value = "No" Then
+                Colors.TrayDownB = Color.Transparent
+              Else
+                Colors.TrayDownB = StrToColor(xTrayDB.Element("value").Value)
+              End If
+            Catch ex As Exception
+              Colors.TrayDownB = Color.Transparent
+            End Try
+          End If
+          Dim xTrayDC As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xTrayDC Is Nothing Then
             Colors.TrayDownC = Color.Transparent
           Else
-            Dim xTrayDA As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xTrayDA Is Nothing Then
-              Colors.TrayDownA = Color.Transparent
-            Else
-              Try
-                Colors.TrayDownA = StrToColor(xTrayDA.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayDownA = Color.Transparent
-              End Try
-            End If
-            Dim xTrayDB As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xTrayDB Is Nothing Then
-              Colors.TrayDownB = Color.Transparent
-            Else
-              Try
-                If xTrayDB.Element("value").Value = "No" Then
-                  Colors.TrayDownB = Color.Transparent
-                Else
-                  Colors.TrayDownB = StrToColor(xTrayDB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.TrayDownB = Color.Transparent
-              End Try
-            End If
-            Dim xTrayDC As XElement = Array.Find(xTrayDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xTrayDC Is Nothing Then
+            Try
+              Colors.TrayDownC = StrToColor(xTrayDC.Element("value").Value)
+            Catch ex As Exception
               Colors.TrayDownC = Color.Transparent
-            Else
-              Try
-                Colors.TrayDownC = StrToColor(xTrayDC.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayDownC = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xTrayUp As XElement = Array.Find(xTray.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xTrayUp Is Nothing Then
-            Colors.TrayUpA = Color.Transparent
-            Colors.TrayUpB = Color.Transparent
-            Colors.TrayUpC = Color.Transparent
-          Else
-            Dim xTrayUA As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xTrayUA Is Nothing Then
-              Colors.TrayUpA = Color.Transparent
-            Else
-              Try
-                Colors.TrayUpA = StrToColor(xTrayUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayUpA = Color.Transparent
-              End Try
-            End If
-            Dim xTrayUB As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xTrayUB Is Nothing Then
-              Colors.TrayUpB = Color.Transparent
-            Else
-              Try
-                If xTrayUB.Element("value").Value = "No" Then
-                  Colors.TrayUpB = Color.Transparent
-                Else
-                  Colors.TrayUpB = StrToColor(xTrayUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.TrayUpB = Color.Transparent
-              End Try
-            End If
-            Dim xTrayUC As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xTrayUC Is Nothing Then
-              Colors.TrayUpC = Color.Transparent
-            Else
-              Try
-                Colors.TrayUpC = StrToColor(xTrayUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayUpC = Color.Transparent
-              End Try
-            End If
+            End Try
           End If
         End If
-        Dim xHistory As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "History")
-        If xHistory Is Nothing Then
-          ResetHistory()
+        Dim xTrayUp As XElement = Array.Find(xTray.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
+        If xTrayUp Is Nothing Then
+          Colors.TrayUpA = Color.Transparent
+          Colors.TrayUpB = Color.Transparent
+          Colors.TrayUpC = Color.Transparent
         Else
-          Dim xHistoryDown As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
-          If xHistoryDown Is Nothing Then
-            Colors.HistoryDownA = Color.Transparent
-            Colors.HistoryDownB = Color.Transparent
-            Colors.HistoryDownC = Color.Transparent
-            Colors.HistoryDownMax = Color.Transparent
-            Colors.HistoryDownLine = Color.Transparent
-          Else
-            Dim xHistoryDA As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xHistoryDA Is Nothing Then
-              Colors.HistoryDownA = Color.Transparent
-            Else
-              Try
-                Colors.HistoryDownA = StrToColor(xHistoryDA.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryDownA = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryDB As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xHistoryDB Is Nothing Then
-              Colors.HistoryDownB = Color.Transparent
-            Else
-              Try
-                If xHistoryDB.Element("value").Value = "No" Then
-                  Colors.HistoryDownB = Color.Transparent
-                Else
-                  Colors.HistoryDownB = StrToColor(xHistoryDB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.HistoryDownB = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryDC As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xHistoryDC Is Nothing Then
-              Colors.HistoryDownC = Color.Transparent
-            Else
-              Try
-                Colors.HistoryDownC = StrToColor(xHistoryDC.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryDownC = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryDM As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Maximum")
-            If xHistoryDM Is Nothing Then
-              Colors.HistoryDownMax = Color.Transparent
-            Else
-              Try
-                Colors.HistoryDownMax = StrToColor(xHistoryDM.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryDownMax = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryDLine As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
-            If xHistoryDLine Is Nothing Then
-              Colors.HistoryDownLine = Color.Transparent
-            Else
-              Try
-                Colors.HistoryDownLine = StrToColor(xHistoryDLine.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryDownLine = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xHistoryUp As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xHistoryUp Is Nothing Then
-            Colors.HistoryUpA = Color.Transparent
-            Colors.HistoryUpB = Color.Transparent
-            Colors.HistoryUpC = Color.Transparent
-            Colors.HistoryUpLine = Color.Transparent
-          Else
-            Dim xHistoryUA As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xHistoryUA Is Nothing Then
-              Colors.HistoryUpA = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpA = StrToColor(xHistoryUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpA = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUB As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xHistoryUB Is Nothing Then
-              Colors.HistoryUpB = Color.Transparent
-            Else
-              Try
-                If xHistoryUB.Element("value").Value = "No" Then
-                  Colors.HistoryUpB = Color.Transparent
-                Else
-                  Colors.HistoryUpB = StrToColor(xHistoryUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.HistoryUpB = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUC As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xHistoryUC Is Nothing Then
-              Colors.HistoryUpC = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpC = StrToColor(xHistoryUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpC = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUM As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Maximum")
-            If xHistoryUM Is Nothing Then
-              Colors.HistoryUpMax = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpMax = StrToColor(xHistoryUM.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpMax = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryULine As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
-            If xHistoryULine Is Nothing Then
-              Colors.HistoryUpLine = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpLine = StrToColor(xHistoryULine.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpLine = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xHistoryText As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
-          If xHistoryText Is Nothing Then
-            Colors.HistoryText = Color.Transparent
+          Dim xTrayUA As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xTrayUA Is Nothing Then
+            Colors.TrayUpA = Color.Transparent
           Else
             Try
-              Colors.HistoryText = StrToColor(xHistoryText.Element("value").Value)
+              Colors.TrayUpA = StrToColor(xTrayUA.Element("value").Value)
             Catch ex As Exception
-              Colors.HistoryText = Color.Transparent
+              Colors.TrayUpA = Color.Transparent
             End Try
           End If
-          Dim xHistoryBG As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Background")
-          If xHistoryBG Is Nothing Then
-            Colors.HistoryBackground = Color.Transparent
+          Dim xTrayUB As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xTrayUB Is Nothing Then
+            Colors.TrayUpB = Color.Transparent
           Else
             Try
-              Colors.HistoryBackground = StrToColor(xHistoryBG.Element("value").Value)
+              If xTrayUB.Element("value").Value = "No" Then
+                Colors.TrayUpB = Color.Transparent
+              Else
+                Colors.TrayUpB = StrToColor(xTrayUB.Element("value").Value)
+              End If
             Catch ex As Exception
-              Colors.HistoryBackground = Color.Transparent
+              Colors.TrayUpB = Color.Transparent
             End Try
           End If
-          Dim xHistoryGrid As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Grid")
-          If xHistoryGrid Is Nothing Then
-            Colors.HistoryLightGrid = Color.Transparent
-            Colors.HistoryDarkGrid = Color.Transparent
+          Dim xTrayUC As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xTrayUC Is Nothing Then
+            Colors.TrayUpC = Color.Transparent
           Else
-            Dim xHistoryLight As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Light")
-            If xHistoryLight Is Nothing Then
-              Colors.HistoryLightGrid = Color.Transparent
-            Else
-              Try
-                Colors.HistoryLightGrid = StrToColor(xHistoryLight.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryLightGrid = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUDark As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Dark")
-            If xHistoryUDark Is Nothing Then
-              Colors.HistoryDarkGrid = Color.Transparent
-            Else
-              Try
-                Colors.HistoryDarkGrid = StrToColor(xHistoryUDark.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryDarkGrid = Color.Transparent
-              End Try
-            End If
+            Try
+              Colors.TrayUpC = StrToColor(xTrayUC.Element("value").Value)
+            Catch ex As Exception
+              Colors.TrayUpC = Color.Transparent
+            End Try
           End If
         End If
       End If
-      Loaded = True
-    Else
-      Reset()
+      Dim xHistory As XElement = Array.Find(xcolorSettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "History")
+      If xHistory Is Nothing Then
+        ResetHistory()
+      Else
+        Dim xHistoryDown As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Download")
+        If xHistoryDown Is Nothing Then
+          Colors.HistoryDownA = Color.Transparent
+          Colors.HistoryDownB = Color.Transparent
+          Colors.HistoryDownC = Color.Transparent
+          Colors.HistoryDownMax = Color.Transparent
+          Colors.HistoryDownLine = Color.Transparent
+        Else
+          Dim xHistoryDA As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xHistoryDA Is Nothing Then
+            Colors.HistoryDownA = Color.Transparent
+          Else
+            Try
+              Colors.HistoryDownA = StrToColor(xHistoryDA.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryDownA = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryDB As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xHistoryDB Is Nothing Then
+            Colors.HistoryDownB = Color.Transparent
+          Else
+            Try
+              If xHistoryDB.Element("value").Value = "No" Then
+                Colors.HistoryDownB = Color.Transparent
+              Else
+                Colors.HistoryDownB = StrToColor(xHistoryDB.Element("value").Value)
+              End If
+            Catch ex As Exception
+              Colors.HistoryDownB = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryDC As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xHistoryDC Is Nothing Then
+            Colors.HistoryDownC = Color.Transparent
+          Else
+            Try
+              Colors.HistoryDownC = StrToColor(xHistoryDC.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryDownC = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryDM As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Maximum")
+          If xHistoryDM Is Nothing Then
+            Colors.HistoryDownMax = Color.Transparent
+          Else
+            Try
+              Colors.HistoryDownMax = StrToColor(xHistoryDM.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryDownMax = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryDLine As XElement = Array.Find(xHistoryDown.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
+          If xHistoryDLine Is Nothing Then
+            Colors.HistoryDownLine = Color.Transparent
+          Else
+            Try
+              Colors.HistoryDownLine = StrToColor(xHistoryDLine.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryDownLine = Color.Transparent
+            End Try
+          End If
+        End If
+        Dim xHistoryUp As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
+        If xHistoryUp Is Nothing Then
+          Colors.HistoryUpA = Color.Transparent
+          Colors.HistoryUpB = Color.Transparent
+          Colors.HistoryUpC = Color.Transparent
+          Colors.HistoryUpLine = Color.Transparent
+        Else
+          Dim xHistoryUA As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
+          If xHistoryUA Is Nothing Then
+            Colors.HistoryUpA = Color.Transparent
+          Else
+            Try
+              Colors.HistoryUpA = StrToColor(xHistoryUA.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryUpA = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryUB As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
+          If xHistoryUB Is Nothing Then
+            Colors.HistoryUpB = Color.Transparent
+          Else
+            Try
+              If xHistoryUB.Element("value").Value = "No" Then
+                Colors.HistoryUpB = Color.Transparent
+              Else
+                Colors.HistoryUpB = StrToColor(xHistoryUB.Element("value").Value)
+              End If
+            Catch ex As Exception
+              Colors.HistoryUpB = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryUC As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
+          If xHistoryUC Is Nothing Then
+            Colors.HistoryUpC = Color.Transparent
+          Else
+            Try
+              Colors.HistoryUpC = StrToColor(xHistoryUC.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryUpC = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryUM As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Maximum")
+          If xHistoryUM Is Nothing Then
+            Colors.HistoryUpMax = Color.Transparent
+          Else
+            Try
+              Colors.HistoryUpMax = StrToColor(xHistoryUM.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryUpMax = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryULine As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
+          If xHistoryULine Is Nothing Then
+            Colors.HistoryUpLine = Color.Transparent
+          Else
+            Try
+              Colors.HistoryUpLine = StrToColor(xHistoryULine.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryUpLine = Color.Transparent
+            End Try
+          End If
+        End If
+        Dim xHistoryText As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
+        If xHistoryText Is Nothing Then
+          Colors.HistoryText = Color.Transparent
+        Else
+          Try
+            Colors.HistoryText = StrToColor(xHistoryText.Element("value").Value)
+          Catch ex As Exception
+            Colors.HistoryText = Color.Transparent
+          End Try
+        End If
+        Dim xHistoryBG As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Background")
+        If xHistoryBG Is Nothing Then
+          Colors.HistoryBackground = Color.Transparent
+        Else
+          Try
+            Colors.HistoryBackground = StrToColor(xHistoryBG.Element("value").Value)
+          Catch ex As Exception
+            Colors.HistoryBackground = Color.Transparent
+          End Try
+        End If
+        Dim xHistoryGrid As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Grid")
+        If xHistoryGrid Is Nothing Then
+          Colors.HistoryLightGrid = Color.Transparent
+          Colors.HistoryDarkGrid = Color.Transparent
+        Else
+          Dim xHistoryLight As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Light")
+          If xHistoryLight Is Nothing Then
+            Colors.HistoryLightGrid = Color.Transparent
+          Else
+            Try
+              Colors.HistoryLightGrid = StrToColor(xHistoryLight.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryLightGrid = Color.Transparent
+            End Try
+          End If
+          Dim xHistoryUDark As XElement = Array.Find(xHistoryGrid.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Dark")
+          If xHistoryUDark Is Nothing Then
+            Colors.HistoryDarkGrid = Color.Transparent
+          Else
+            Try
+              Colors.HistoryDarkGrid = StrToColor(xHistoryUDark.Element("value").Value)
+            Catch ex As Exception
+              Colors.HistoryDarkGrid = Color.Transparent
+            End Try
+          End If
+        End If
+      End If
     End If
+    Loaded = True
   End Sub
   Private Sub Reset()
     m_Account = Nothing
