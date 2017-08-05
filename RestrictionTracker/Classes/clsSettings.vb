@@ -9,6 +9,7 @@ Class SvcSettings
   Private m_ProxySetting As String
   Public Function Save() As Boolean
     Dim sConfigPath As String = IO.Path.Combine(CommonAppDataDirectory, "user.config")
+    Dim sBackupPath As String = IO.Path.Combine(CommonAppDataDirectory, "user.config")
     Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
@@ -18,7 +19,7 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
-    Dim saveRet As String = SettingsFunctions.SafeSave(sConfigPath, xConfig)
+    Dim saveRet As String = SettingsFunctions.SafeSave(sConfigPath, sBackupPath, xConfig)
     If saveRet = "SAVED" Then Return True
     SettingsFunctions.SaveErrDlg(saveRet, True)
     Return False
@@ -200,6 +201,11 @@ Class AppSettings
   Private ReadOnly Property ConfigFile As String
     Get
       Return LocalAppDataDirectory & "user.config"
+    End Get
+  End Property
+  Private ReadOnly Property ConfigFileBackup As String
+    Get
+      Return LocalAppDataDirectory & "backup.config"
     End Get
   End Property
   Public Sub New()
@@ -1165,7 +1171,7 @@ Class AppSettings
                                                           New XElement("section", New XAttribute("name", "Grid"),
                                                                        New XElement("setting", New XAttribute("name", "Light"), New XElement("value", ColorToStr(Colors.HistoryLightGrid))),
                                                                        New XElement("setting", New XAttribute("name", "Dark"), New XElement("value", ColorToStr(Colors.HistoryDarkGrid)))))))
-    Dim saveRet As String = SettingsFunctions.SafeSave(ConfigFile, xConfig)
+    Dim saveRet As String = SettingsFunctions.SafeSave(ConfigFile, ConfigFileBackup, xConfig)
     If saveRet = "SAVED" Then Return True
     SettingsFunctions.SaveErrDlg(saveRet, False)
     Return False
@@ -1828,17 +1834,20 @@ Class AppSettings
   End Class
 End Class
 Class SettingsFunctions
-  Public Shared Function SafeSave(sPath As String, xConfig As XElement) As String
+  Public Shared Function SafeSave(sPath As String, sBackup As String, xConfig As XElement) As String
     If Not IO.File.Exists(sPath) Then
       Try
         xConfig.Save(sPath)
       Catch ex As Exception
         Return "PERMISSION: was unable to write to settings file """ & sPath & """. " & ex.Message
       End Try
-      Return "SAVED"
+      Dim FirstFileStr As String = IO.File.ReadAllText(sPath, System.Text.Encoding.UTF8)
+      Dim FirstConfStr As String = "<?xml version=""1.0"" encoding=""utf-8""?>" & vbNewLine & xConfig.ToString
+      If FirstFileStr = FirstConfStr Then Return "SAVED"
+      Return "WRITE: could not verify the settings file """ & sPath & """."
     End If
     Dim sNew As String = sPath & ".out"
-    Dim sOld As String = sPath & ".bak"
+    Dim sOld As String = sBackup
     Try
       If IO.File.Exists(sOld) Then IO.File.Decrypt(sOld)
     Catch ex As Exception
@@ -1859,6 +1868,13 @@ Class SettingsFunctions
     Catch ex As Exception
       Return "PERMISSION: was unable to move new settings file """ & sNew & """ to settings location """ & sPath & """. " & ex.Message
     End Try
+    Dim fileStr As String = IO.File.ReadAllText(sPath, System.Text.Encoding.UTF8)
+    Dim confStr As String = "<?xml version=""1.0"" encoding=""utf-8""?>" & vbNewLine & xConfig.ToString
+    If Not fileStr = confStr Then
+      IO.File.Delete(sPath)
+      IO.File.Move(sOld, sPath)
+      Return "WRITE: could not verify the settings file """ & sPath & """."
+    End If
     Try
       IO.File.Delete(sOld)
     Catch ex As Exception
