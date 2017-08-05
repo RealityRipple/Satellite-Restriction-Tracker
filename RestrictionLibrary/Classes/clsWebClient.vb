@@ -47,6 +47,14 @@
       [Error] = Err
     End Sub
   End Class
+  ''' <summary>
+  ''' This constant replaces any commas in the values of cookies received, and will be replaced by commas on any cookies being sent.
+  ''' </summary>
+  Public Const REPLACE_COMMA As String = "[COMMA]"
+  ''' <summary>
+  ''' This constant replaces any semicolons in the values of cookies received, and will be replaced by semicolons on any cookies being sent.
+  ''' </summary>
+  Public Const REPLACE_SEMIC As String = "[SEMICOLON]"
   Private c_CookieJar As Net.CookieContainer
   ''' <summary>
   ''' Acts as the container for a collection of <see cref="System.Net.CookieCollection" /> objects for use with an instance of the <see cref="WebClientCore" /> class.
@@ -190,7 +198,15 @@
         CType(request, Net.HttpWebRequest).UserAgent = WebClientCore.UserAgent
         CType(request, Net.HttpWebRequest).ReadWriteTimeout = c_RWTimeout * 1000
         CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
-        CType(request, Net.HttpWebRequest).CookieContainer = c_CookieJar
+        CType(request, Net.HttpWebRequest).CookieContainer = Nothing
+        Dim sCookieHeader As String = c_CookieJar.GetCookieHeader(address)
+        If Not String.IsNullOrEmpty(sCookieHeader) Then
+          If sCookieHeader.Contains(REPLACE_COMMA) Or sCookieHeader.Contains(REPLACE_SEMIC) Then
+            sCookieHeader = sCookieHeader.Replace(REPLACE_COMMA, ",")
+            sCookieHeader = sCookieHeader.Replace(REPLACE_SEMIC, ";")
+          End If
+          CType(request, Net.HttpWebRequest).Headers.Add(Net.HttpRequestHeader.Cookie, sCookieHeader)
+        End If
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
         CType(request, Net.HttpWebRequest).KeepAlive = c_KeepAlive
         CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
@@ -210,36 +226,9 @@
   End Function
   Protected Overrides Function GetWebResponse(request As System.Net.WebRequest) As System.Net.WebResponse
     Try
-      Dim response As Net.WebResponse = MyBase.GetWebResponse(request)
-      m_Result = response
-      c_ResponseURI = response.ResponseUri
-      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
-        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
-      ElseIf response.ContentType.ToLower.Contains("charset=") Then
-        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
-        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
-        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
-      End If
-      Return response
+      Return HandleWebResponse(request, MyBase.GetWebResponse(request))
     Catch ex As Net.WebException
-      If c_ErrorBypass Then
-        Dim response As Net.WebResponse = ex.Response
-        m_Result = response
-        If response IsNot Nothing Then
-          c_ResponseURI = response.ResponseUri
-          Return response
-        End If
-      End If
+      If c_ErrorBypass Then Return HandleWebResponse(request, ex.Response)
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       If c_Events Then
@@ -252,36 +241,9 @@
   End Function
   Protected Overrides Function GetWebResponse(request As System.Net.WebRequest, result As System.IAsyncResult) As System.Net.WebResponse
     Try
-      Dim response As Net.WebResponse = MyBase.GetWebResponse(request, result)
-      m_Result = response
-      c_ResponseURI = response.ResponseUri
-      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
-        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
-      ElseIf response.ContentType.ToLower.Contains("charset=") Then
-        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
-        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
-        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
-      End If
-      Return response
+      Return HandleWebResponse(request, MyBase.GetWebResponse(request, result))
     Catch ex As Net.WebException
-      If c_ErrorBypass Then
-        Dim response As Net.WebResponse = ex.Response
-        m_Result = response
-        If response IsNot Nothing Then
-          c_ResponseURI = response.ResponseUri
-          Return response
-        End If
-      End If
+      Return HandleWebResponse(request, ex.Response)
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       If c_Events Then
@@ -302,6 +264,194 @@
       m_Result = Nothing
     End If
   End Sub
+#Region "Helper Functions"
+  Private Function HandleWebResponse(request As Net.WebRequest, response As Net.WebResponse) As Net.WebResponse
+    Try
+      If response Is Nothing Then Return Nothing
+      AppendCookies(c_CookieJar, response.Headers, response.ResponseUri.Host)
+      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
+        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
+        End Try
+      ElseIf response.ContentType.ToLower.Contains("charset=") Then
+        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
+        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
+        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
+        Try
+          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
+        Catch ex As Exception
+          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
+        End Try
+      End If
+      m_Result = response
+      c_ResponseURI = response.ResponseUri
+      Return response
+    Catch ex As Net.WebException
+      Return HandleWebResponse(request, ex.Response)
+    End Try
+  End Function
+  Private Function CleanCookie(sCookieData As String) As String
+    Dim sReconstruction As String = Nothing
+    Do While Not String.IsNullOrEmpty(sCookieData)
+      Dim cName As String = Nothing
+      Dim cVal As String = Nothing
+      Dim cExtra As String = Nothing
+
+      If sCookieData.Contains("=") Then
+        cName = sCookieData.Substring(0, sCookieData.IndexOf("="))
+        sCookieData = sCookieData.Substring(sCookieData.IndexOf("=") + 1).TrimStart
+      End If
+
+      If Not String.IsNullOrEmpty(sCookieData) Then
+        If sCookieData.Contains(";") Then
+          cVal = sCookieData.Substring(0, sCookieData.IndexOf(";"))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(";") + 1).TrimStart
+        ElseIf sCookieData.Contains(",") Then
+          cVal = sCookieData.Substring(0, sCookieData.IndexOf(","))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+        Else
+          cVal = sCookieData
+          sCookieData = Nothing
+        End If
+      End If
+
+      Do While Not String.IsNullOrEmpty(sCookieData) AndAlso sCookieData.Contains(";")
+        Dim sSegment As String = sCookieData.Substring(0, sCookieData.IndexOf(";") + 1)
+        If (sSegment.Contains("=") And sSegment.Contains(",")) AndAlso (sSegment.IndexOf(",") < sSegment.IndexOf("=")) Then Exit Do
+        cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(";") + 1) & " "
+        sCookieData = sCookieData.Substring(sCookieData.IndexOf(";") + 1).TrimStart
+      Loop
+      If Not String.IsNullOrEmpty(sCookieData) Then
+        If (sCookieData.Contains("=") And sCookieData.Contains(",")) AndAlso (sCookieData.IndexOf(",") < sCookieData.IndexOf("=")) Then
+          cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+        Else
+          cExtra &= sCookieData
+          sCookieData = Nothing
+        End If
+      End If
+
+      If Not String.IsNullOrEmpty(sReconstruction) Then sReconstruction &= ","
+      If String.IsNullOrEmpty(cExtra) Then
+        sReconstruction &= cName & "=" & cVal.Replace(",", REPLACE_COMMA).Replace(";", REPLACE_SEMIC)
+      Else
+        sReconstruction &= cName & "=" & cVal.Replace(",", REPLACE_COMMA).Replace(";", REPLACE_SEMIC) & "; " & cExtra
+      End If
+    Loop
+    Return sReconstruction
+  End Function
+  Private Function CookieStrToCookies(sCookieData As String, DefaultDomain As String) As Net.Cookie()
+    Dim cookieList As New List(Of Net.Cookie)
+    Do While Not String.IsNullOrEmpty(sCookieData)
+      Dim cName As String = Nothing
+      Dim cVal As String = Nothing
+      Dim cExtra As String = Nothing
+      If sCookieData.Contains("=") Then
+        cName = sCookieData.Substring(0, sCookieData.IndexOf("="))
+        sCookieData = sCookieData.Substring(sCookieData.IndexOf("=") + 1).TrimStart
+      End If
+      If Not String.IsNullOrEmpty(sCookieData) Then
+        If sCookieData.Contains(";") Then
+          cVal = sCookieData.Substring(0, sCookieData.IndexOf(";"))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(";") + 1).TrimStart
+        ElseIf sCookieData.Contains(",") Then
+          cVal = sCookieData.Substring(0, sCookieData.IndexOf(","))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+        Else
+          cVal = sCookieData
+          sCookieData = Nothing
+        End If
+      End If
+      Do While Not String.IsNullOrEmpty(sCookieData) AndAlso sCookieData.Contains(";")
+        Dim sSegment As String = sCookieData.Substring(0, sCookieData.IndexOf(";") + 1)
+        If (sSegment.Contains("=") And sSegment.Contains(",")) AndAlso (sSegment.IndexOf(",") < sSegment.IndexOf("=")) Then Exit Do
+        cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(";") + 1) & " "
+        sCookieData = sCookieData.Substring(sCookieData.IndexOf(";") + 1).TrimStart
+      Loop
+      If Not String.IsNullOrEmpty(sCookieData) Then
+        If (sCookieData.Contains("=") And sCookieData.Contains(",")) AndAlso (sCookieData.IndexOf(",") < sCookieData.IndexOf("=")) Then
+          cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
+          sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+        Else
+          cExtra &= sCookieData
+          sCookieData = Nothing
+        End If
+      End If
+      If String.IsNullOrEmpty(cExtra) Then
+        cookieList.Add(New Net.Cookie(cName, cVal, "/", DefaultDomain))
+      Else
+        Dim sDomain As String = Nothing
+        Dim sPath As String = Nothing
+        Dim bHTTP As Boolean = True
+        Dim bSecure As Boolean = False
+        Dim sExpires As String = Nothing
+        Dim sMaxAge As String = Nothing
+        Dim iVersion As Integer = Integer.MinValue
+        Dim Extras() As String = Split(cExtra, ";")
+        For Each sExtra In Extras
+          If sExtra.Contains("=") Then
+            Dim sExtraKV() As String = Split(sExtra.Trim, "=", 2)
+            Select Case sExtraKV(0).ToLower
+              Case "path"
+                sPath = sExtraKV(1)
+              Case "domain"
+                sDomain = sExtraKV(1)
+              Case "expires"
+                sExpires = sExtraKV(1)
+              Case "max-age"
+                sMaxAge = sExtraKV(1)
+              Case "version"
+                iVersion = Val(sExtraKV(1))
+              Case Else
+                Debug.Print("Unknown Cookie Key: " & sExtraKV(0))
+            End Select
+          Else
+            Select Case sExtra.ToLower
+              Case "http"
+                bHTTP = True
+              Case "secure"
+                bSecure = True
+            End Select
+          End If
+        Next
+        If String.IsNullOrEmpty(sDomain) Then sDomain = DefaultDomain
+        If String.IsNullOrEmpty(sPath) Then sPath = "/"
+        Dim nC As New Net.Cookie(cName, cVal, sPath, sDomain)
+        nC.HttpOnly = bHTTP
+        nC.Secure = bSecure
+        If Not String.IsNullOrEmpty(sExpires) Then If Not Date.TryParse(sExpires, nC.Expires) Then nC.Expires = Now.AddDays(1)
+        If Not String.IsNullOrEmpty(sMaxAge) Then
+          Dim dMaxAge As Double = Val(sMaxAge)
+          If dMaxAge < 0 Then
+            nC.Expires = Now.AddDays(1)
+          ElseIf dMaxAge = 0 Then
+            nC.Expires = Now
+          Else
+            nC.Expires = Now.AddSeconds(dMaxAge)
+          End If
+        End If
+        If Not iVersion = Integer.MinValue Then nC.Version = iVersion
+        cookieList.Add(nC)
+      End If
+    Loop
+    Return cookieList.ToArray
+  End Function
+  Private Sub AppendCookies(ByRef CookieJar As Net.CookieContainer, ResponseHeaders As Net.WebHeaderCollection, DefaultDomain As String)
+    For Each sHead In ResponseHeaders.AllKeys
+      If sHead = "Set-Cookie" Then
+        Dim sCookieData As String = ResponseHeaders(sHead)
+        Dim sReconstruction As String = CleanCookie(sCookieData)
+        Dim newCookies() As Net.Cookie = CookieStrToCookies(sReconstruction, DefaultDomain)
+        For Each newCookie In newCookies
+          CookieJar.Add(newCookie)
+        Next
+      End If
+    Next
+  End Sub
+#End Region
 End Class
 
 Public Class WebClientEx
@@ -531,9 +681,11 @@ Public Class WebClientEx
         Dim sRet As String = Nothing
         Try
           sRet = wsDownload.DownloadString(uriAddr)
+          c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+          c_Jar = wsDownload.CookieJar
           If sNetErr.Contains("Please try again.") And iteration < 5 Then
             AsyncDownloadString({RunName, address, iteration + 1})
           Else
@@ -617,9 +769,11 @@ Public Class WebClientEx
         Dim sRet As String = Nothing
         Try
           sRet = wsDownload.DownloadString(address)
+          c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+          c_Jar = wsDownload.CookieJar
           If sNetErr.Contains("Please try again.") And iteration < 5 Then
             AsyncDownloadStringWithCallback({callback, aState, address, iteration + 1})
           Else
@@ -700,9 +854,11 @@ Public Class WebClientEx
           End Try
           Try
             sRet = wsUpload.UploadString(uriAddr, method, data)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
@@ -722,10 +878,12 @@ Public Class WebClientEx
           Try
             'TODO: Make this asynchronous, maybe?
             sRet = wsUpload.DownloadString(uriAddr)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             '
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
@@ -814,9 +972,11 @@ Public Class WebClientEx
           wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
           Try
             sRet = wsUpload.UploadString(address, method, data)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -828,9 +988,11 @@ Public Class WebClientEx
         Else
           Try
             sRet = wsUpload.DownloadString(address)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -896,9 +1058,11 @@ Public Class WebClientEx
           Dim bRet() As Byte = Nothing
           Try
             bRet = wsUpload.UploadValues(uriAddr, method, data)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
@@ -918,9 +1082,11 @@ Public Class WebClientEx
           End Try
           Try
             sRet = wsUpload.DownloadString(uriAddr)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
@@ -1009,9 +1175,11 @@ Public Class WebClientEx
           Dim bRet() As Byte = Nothing
           Try
             bRet = wsUpload.UploadValues(address, method, data)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
@@ -1024,9 +1192,11 @@ Public Class WebClientEx
         Else
           Try
             sRet = wsUpload.DownloadString(address)
+            c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
+            c_Jar = wsUpload.CookieJar
             If sNetErr.Contains("Please try again.") And iteration < 5 Then
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
