@@ -367,14 +367,36 @@
       End If
       Do While Not String.IsNullOrEmpty(sCookieData) AndAlso sCookieData.Contains(";")
         Dim sSegment As String = sCookieData.Substring(0, sCookieData.IndexOf(";") + 1)
-        If (sSegment.Contains("=") And sSegment.Contains(",")) AndAlso (sSegment.IndexOf(",") < sSegment.IndexOf("=")) Then Exit Do
+        If sSegment.Contains("=") And sSegment.Contains(",") Then
+          Dim sSegID As String = sSegment.Substring(0, sSegment.IndexOf("="))
+          If sSegID.ToLower = "expires" Then
+            If sSegment.IndexOf(",") < sSegment.IndexOf("=") Then Exit Do
+            If sSegment.Substring(sSegment.IndexOf(",") + 1).Contains(",") Then Exit Do
+          Else
+            Exit Do
+          End If
+        End If
         cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(";") + 1) & " "
         sCookieData = sCookieData.Substring(sCookieData.IndexOf(";") + 1).TrimStart
       Loop
       If Not String.IsNullOrEmpty(sCookieData) Then
-        If (sCookieData.Contains("=") And sCookieData.Contains(",")) AndAlso (sCookieData.IndexOf(",") < sCookieData.IndexOf("=")) Then
-          cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
-          sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+        If sCookieData.Contains("=") And sCookieData.Contains(",") Then
+          Dim sSegID As String = sCookieData.Substring(0, sCookieData.IndexOf("="))
+          If sSegID.ToLower = "expires" Then
+            If sCookieData.IndexOf(",") < sCookieData.IndexOf("=") Then
+              cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
+              sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+            ElseIf sCookieData.Substring(sCookieData.IndexOf(",") + 1).Contains(",") And sCookieData.IndexOf(",", sCookieData.IndexOf(",") + 1) > sCookieData.IndexOf("=") Then
+              cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(",", sCookieData.IndexOf(",") + 1))
+              sCookieData = sCookieData.Substring(sCookieData.IndexOf(",", sCookieData.IndexOf(",") + 1) + 1).TrimStart
+            Else
+              cExtra &= sCookieData
+              sCookieData = Nothing
+            End If
+          Else
+            cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
+            sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
+          End If
         Else
           cExtra &= sCookieData
           sCookieData = Nothing
@@ -385,7 +407,7 @@
       Else
         Dim sDomain As String = Nothing
         Dim sPath As String = Nothing
-        Dim bHTTP As Boolean = True
+        Dim bHTTP As Boolean = False
         Dim bSecure As Boolean = False
         Dim sExpires As String = Nothing
         Dim sMaxAge As String = Nothing
@@ -409,7 +431,7 @@
                 Debug.Print("Unknown Cookie Key: " & sExtraKV(0))
             End Select
           Else
-            Select Case sExtra.ToLower
+            Select Case sExtra.Trim.ToLower
               Case "http"
                 bHTTP = True
               Case "secure"
@@ -419,6 +441,7 @@
         Next
         If String.IsNullOrEmpty(sDomain) Then sDomain = DefaultDomain
         If String.IsNullOrEmpty(sPath) Then sPath = "/"
+        If iVersion = 1 Then If cVal.StartsWith("""") And cVal.EndsWith("""") Then cVal = cVal.Substring(1, cVal.Length - 2)
         Dim nC As New Net.Cookie(cName, cVal, sPath, sDomain)
         nC.HttpOnly = bHTTP
         nC.Secure = bSecure
@@ -428,12 +451,12 @@
           If dMaxAge < 0 Then
             nC.Expires = Now.AddDays(1)
           ElseIf dMaxAge = 0 Then
-            nC.Expires = Now
+            If nC.Expires.Year = 1 Then nC.Expires = Now.AddDays(1)
           Else
             nC.Expires = Now.AddSeconds(dMaxAge)
           End If
         End If
-        If Not iVersion = Integer.MinValue Then nC.Version = iVersion
+        'If Not iVersion = Integer.MinValue Then nC.Version = iVersion
         cookieList.Add(nC)
       End If
     Loop
