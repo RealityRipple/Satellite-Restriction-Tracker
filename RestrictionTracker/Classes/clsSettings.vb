@@ -9,7 +9,7 @@ Class SvcSettings
   Private m_ProxySetting As String
   Public Function Save() As Boolean
     Dim sConfigPath As String = IO.Path.Combine(CommonAppDataDirectory, "user.config")
-    Dim sBackupPath As String = IO.Path.Combine(CommonAppDataDirectory, "user.config")
+    Dim sBackupPath As String = IO.Path.Combine(CommonAppDataDirectory, "backup.config")
     Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
