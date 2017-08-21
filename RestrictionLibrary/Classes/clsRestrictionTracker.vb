@@ -1928,7 +1928,7 @@ Public Class localRestrictionTracker
         If htmlParts.Length >= 6 Then
           ReDim Preserve htmlParts(htmlParts.Length - 2)
           For I As Integer = 0 To htmlParts.Length - 1
-            htmlParts(I) = htmlParts(I).Substring(htmlParts(I).LastIndexOf(">") + 1)
+            htmlParts(I) = htmlParts(I).Substring(htmlParts(I).LastIndexOf(""">") + 2)
             CleanupResult(htmlParts(I))
           Next
           If Not String.IsNullOrEmpty(htmlParts(0)) Then
@@ -1940,6 +1940,7 @@ Public Class localRestrictionTracker
                 opM = htmlParts(0)
               End If
             End If
+            If opM.Contains("ATTRIBUTE ERROR E11") Then opM = Nothing
           End If
           If Not String.IsNullOrEmpty(htmlParts(1)) Then
             If String.IsNullOrEmpty(atM) Then
@@ -1950,6 +1951,7 @@ Public Class localRestrictionTracker
                 atM = htmlParts(1)
               End If
             End If
+            If atM.Contains("ATTRIBUTE ERROR E11") Then atM = Nothing
           End If
           If Not String.IsNullOrEmpty(htmlParts(2)) Then
             If String.IsNullOrEmpty(opV) Then
@@ -1960,6 +1962,7 @@ Public Class localRestrictionTracker
                 opV = htmlParts(2)
               End If
             End If
+            If opV.Contains("ATTRIBUTE ERROR E11") Then opV = Nothing
           End If
           If Not String.IsNullOrEmpty(htmlParts(3)) Then
             If String.IsNullOrEmpty(atV) Then
@@ -1970,6 +1973,7 @@ Public Class localRestrictionTracker
                 atV = htmlParts(3)
               End If
             End If
+            If atV.Contains("ATTRIBUTE ERROR E11") Then atV = Nothing
           End If
           If Not String.IsNullOrEmpty(htmlParts(4)) Then
             If String.IsNullOrEmpty(atxV) Then
@@ -1980,40 +1984,35 @@ Public Class localRestrictionTracker
                 atxV = htmlParts(4)
               End If
             End If
+            If atxV.Contains("ATTRIBUTE ERROR E11") Then atxV = Nothing
           End If
         End If
       End If
     End If
-    Dim lDown, lDownT, lUp, lUpT As Long
-    If Not String.IsNullOrEmpty(atM) Then lDownT = StrToVal(atM, MBPerGB)
-    If Not String.IsNullOrEmpty(atV) Then
-      If lDownT > 0 Then
-        lDown = lDownT - StrToVal(atV, MBPerGB)
-      Else
-        lDown = StrToVal(atV, MBPerGB)
-      End If
-    End If
-    If Not String.IsNullOrEmpty(opM) Then lUpT = StrToVal(opM, MBPerGB)
-    If Not String.IsNullOrEmpty(opV) Then
-      If lUpT > 0 Then
-        lUp = lUpT - StrToVal(opV, MBPerGB)
-      Else
-        lUp = StrToVal(opV, MBPerGB)
-      End If
-    End If
-    If lDownT = 0 And lUpT = 0 Then
-      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
-    ElseIf lDownT > 0 Then
-      If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
-        If StrToFloat(atxV) > 0.0 Then
-          lDown += StrToVal(atxV, MBPerGB)
-          lDownT += StrToVal(atxM, MBPerGB)
-        End If
-      End If
-      RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
-    Else
+    If String.IsNullOrEmpty(atM) And String.IsNullOrEmpty(atV) And String.IsNullOrEmpty(opM) And String.IsNullOrEmpty(opV) Then
       RaiseError("Usage Read Failed: Unable to locate data table!", "DN Read Table", Table)
+      Return
     End If
+    If String.IsNullOrEmpty(atM) Or String.IsNullOrEmpty(atV) Or String.IsNullOrEmpty(opM) Or String.IsNullOrEmpty(opV) Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
+      Return
+    End If
+    Dim lDown, lDownT, lUp, lUpT As Long
+    lDownT = StrToVal(atM, MBPerGB)
+    lUpT = StrToVal(opM, MBPerGB)
+    If lDownT = 0 Or lUpT = 0 Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
+      Return
+    End If
+    lDown = lDownT - StrToVal(atV, MBPerGB)
+    lUp = lUpT - StrToVal(opV, MBPerGB)
+    If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
+      If StrToFloat(atxV) > 0.0 Then
+        lDown += StrToVal(atxV, MBPerGB)
+        lDownT += StrToVal(atxM, MBPerGB)
+      End If
+    End If
+    RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
   End Sub
 #End Region
 #End Region
