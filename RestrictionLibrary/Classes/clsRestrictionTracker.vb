@@ -690,7 +690,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginExede()
     If sProvider = "exede.net" Then
-      AJAXOrder = {4, 5, 10}
+      AJAXOrder = {4, 5, 8, 10, 11}
     ElseIf sProvider = "satelliteinternetco.com" Then
       AJAXOrder = {2, 4}
     Else
