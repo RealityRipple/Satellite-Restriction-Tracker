@@ -596,7 +596,14 @@ Public Class localRestrictionTracker
       Net.ServicePointManager.SecurityProtocol = useProtocol
     Catch ex As Exception
     End Try
-    Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
+    Dim iWait As Integer = Net.ServicePointManager.MaxServicePointIdleTime
+    Net.ServicePointManager.MaxServicePointIdleTime = 1
+    If mySettings.securityEnforced Then
+      Net.ServicePointManager.ServerCertificateValidationCallback = Nothing
+    Else
+      Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
+    End If
+    Net.ServicePointManager.MaxServicePointIdleTime = iWait
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       sPassword = StoredPassword.DecryptApp(mySettings.PassCrypt)

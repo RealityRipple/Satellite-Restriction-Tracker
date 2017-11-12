@@ -203,6 +203,7 @@
       chkTLSProxy.Checked = False
       chkTLSProxy.Visible = False
     End If
+    chkNetworkSecurityEnforce.Checked = mySettings.SecurityEnforced
     RunNetworkProtocolTest()
     If String.IsNullOrEmpty(mySettings.NetTestURL) Then
       optNetTestNone.Checked = True
@@ -293,6 +294,9 @@
   End Sub
   Private Sub RunNetworkProtocolTest()
     If pctKeyState.Tag = 1 Then
+      chkNetworkSecurityEnforce.Checked = False
+      chkNetworkSecurityEnforce.Enabled = False
+      ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The Remote Usage Service uses its own security and verification methods.")
       chkTLSProxy.Checked = False
       chkTLSProxy.Enabled = False
       ttConfig.SetToolTip(chkTLSProxy, "The TLS Proxy is disabled when using the Remote Usage Service.")
@@ -310,6 +314,8 @@
       ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
       Return
     End If
+    chkNetworkSecurityEnforce.Enabled = True
+    ttConfig.SetToolTip(chkNetworkSecurityEnforce, "Enforce network certificate validation. If the server's certificate is not valid, your connection may fail." & vbNewLine & "Turning this feature off may potentially expose your computer or transmitted information to third parties.")
     chkTLSProxy.Enabled = True
     ttConfig.SetToolTip(chkTLSProxy, "If your Operating System does not support the Security Protocol required for your provider, you can use this Proxy to connect through the RealityRipple.com server.")
     If chkTLSProxy.Checked Then
@@ -719,6 +725,10 @@
         lblProxyDomain.Enabled = False
         txtProxyDomain.Enabled = False
     End Select
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+  Private Sub chkNetworkSecurityEnforce_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkNetworkSecurityEnforce.CheckedChanged
+    RunNetworkProtocolTest()
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub chkTLSProxy_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTLSProxy.CheckedChanged
@@ -1445,6 +1455,7 @@
     If chkNetworkProtocolTLS10.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls10
     If chkNetworkProtocolTLS11.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls11
     If chkNetworkProtocolTLS12.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls12
+    mySettings.SecurityEnforced = chkNetworkSecurityEnforce.Checked
     Dim sNetTestIco As String = IO.Path.Combine(LocalAppDataDirectory, "netTest.png")
     Try
       If IO.File.Exists(sNetTestIco) Then IO.File.Delete(sNetTestIco)
@@ -1772,6 +1783,7 @@
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10) = (Not chkNetworkProtocolTLS10.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11) = (Not chkNetworkProtocolTLS11.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12) = (Not chkNetworkProtocolTLS12.Checked) Then Return True
+    If Not mySettings.SecurityEnforced = chkNetworkSecurityEnforce.Checked Then Return True
     If optNetTestNone.Checked Then
       If Not String.IsNullOrEmpty(mySettings.NetTestURL) Then Return True
     ElseIf optNetTestTestMyNet.Checked Then

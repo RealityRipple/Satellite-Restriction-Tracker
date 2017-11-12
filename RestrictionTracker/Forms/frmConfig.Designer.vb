@@ -23,6 +23,7 @@ Partial Class frmConfig
   <System.Diagnostics.DebuggerStepThrough()> _
   Private Sub InitializeComponent()
     Me.components = New System.ComponentModel.Container()
+    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConfig))
     Me.tbsConfig = New System.Windows.Forms.TabControl()
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
@@ -229,6 +230,7 @@ Partial Class frmConfig
     Me.mnuKeySpacer = New System.Windows.Forms.MenuItem()
     Me.mnuKeyDelete = New System.Windows.Forms.MenuItem()
     Me.mnuKeyClear = New System.Windows.Forms.MenuItem()
+    Me.chkNetworkSecurityEnforce = New System.Windows.Forms.CheckBox()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -744,7 +746,7 @@ Partial Class frmConfig
     Me.optAccountTypeDNX.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.optAccountTypeDNX.Location = New System.Drawing.Point(3, 54)
     Me.optAccountTypeDNX.Name = "optAccountTypeDNX"
-    Me.optAccountTypeDNX.Size = New System.Drawing.Size(69, 18)
+    Me.optAccountTypeDNX.Size = New System.Drawing.Size(52, 18)
     Me.optAccountTypeDNX.TabIndex = 2
     Me.optAccountTypeDNX.Text = "Dish"
     Me.ttConfig.SetToolTip(Me.optAccountTypeDNX, "Exede package through Dish.")
@@ -940,7 +942,7 @@ Partial Class frmConfig
     Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblPurchaseKey.AutoSize = True
     Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
     Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
     Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 59)
     Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
@@ -1833,9 +1835,10 @@ Partial Class frmConfig
     Me.pnlNetworkProtocol.Controls.Add(Me.pctNetworkProtocolIcon, 0, 0)
     Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolSSL3, 3, 1)
     Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS10, 4, 1)
-    Me.pnlNetworkProtocol.Controls.Add(Me.chkTLSProxy, 1, 1)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkTLSProxy, 1, 2)
     Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS11, 3, 2)
     Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkProtocolTLS12, 4, 2)
+    Me.pnlNetworkProtocol.Controls.Add(Me.chkNetworkSecurityEnforce, 1, 1)
     Me.pnlNetworkProtocol.Location = New System.Drawing.Point(3, 296)
     Me.pnlNetworkProtocol.Name = "pnlNetworkProtocol"
     Me.pnlNetworkProtocol.RowCount = 3
@@ -1878,7 +1881,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolSSL3.Location = New System.Drawing.Point(174, 35)
     Me.chkNetworkProtocolSSL3.Name = "chkNetworkProtocolSSL3"
     Me.chkNetworkProtocolSSL3.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolSSL3.TabIndex = 2
+    Me.chkNetworkProtocolSSL3.TabIndex = 3
     Me.chkNetworkProtocolSSL3.Text = "SS&L 3.0"
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to" & _
         " attacks.")
@@ -1891,7 +1894,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(250, 35)
     Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
     Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS10.TabIndex = 3
+    Me.chkNetworkProtocolTLS10.TabIndex = 4
     Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
         "e to attacks.")
@@ -1902,11 +1905,10 @@ Partial Class frmConfig
     Me.chkTLSProxy.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.chkTLSProxy.AutoSize = True
     Me.chkTLSProxy.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkTLSProxy.Location = New System.Drawing.Point(59, 47)
+    Me.chkTLSProxy.Location = New System.Drawing.Point(59, 59)
     Me.chkTLSProxy.Name = "chkTLSProxy"
-    Me.pnlNetworkProtocol.SetRowSpan(Me.chkTLSProxy, 2)
     Me.chkTLSProxy.Size = New System.Drawing.Size(81, 18)
-    Me.chkTLSProxy.TabIndex = 1
+    Me.chkTLSProxy.TabIndex = 2
     Me.chkTLSProxy.Text = "TLS Proxy"
     Me.ttConfig.SetToolTip(Me.chkTLSProxy, "If your Operating System does not support the Security Protocol required for your" & _
         " provider, you can use this Proxy to connect through the RealityRipple.com serve" & _
@@ -1920,7 +1922,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(174, 59)
     Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
     Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS11.TabIndex = 4
+    Me.chkNetworkProtocolTLS11.TabIndex = 5
     Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
     Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
@@ -1932,7 +1934,7 @@ Partial Class frmConfig
     Me.chkNetworkProtocolTLS12.Location = New System.Drawing.Point(250, 59)
     Me.chkNetworkProtocolTLS12.Name = "chkNetworkProtocolTLS12"
     Me.chkNetworkProtocolTLS12.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS12.TabIndex = 5
+    Me.chkNetworkProtocolTLS12.TabIndex = 6
     Me.chkNetworkProtocolTLS12.Text = "TLS 1.2"
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
     Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
@@ -3195,6 +3197,19 @@ Partial Class frmConfig
     Me.mnuKeyClear.Index = 5
     Me.mnuKeyClear.Text = "C&lear"
     '
+    'chkNetworkSecurityEnforce
+    '
+    Me.chkNetworkSecurityEnforce.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.chkNetworkSecurityEnforce.AutoSize = True
+    Me.chkNetworkSecurityEnforce.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkSecurityEnforce.Location = New System.Drawing.Point(59, 35)
+    Me.chkNetworkSecurityEnforce.Name = "chkNetworkSecurityEnforce"
+    Me.chkNetworkSecurityEnforce.Size = New System.Drawing.Size(69, 18)
+    Me.chkNetworkSecurityEnforce.TabIndex = 1
+    Me.chkNetworkSecurityEnforce.Text = "Enforce"
+    Me.ttConfig.SetToolTip(Me.chkNetworkSecurityEnforce, resources.GetString("chkNetworkSecurityEnforce.ToolTip"))
+    Me.chkNetworkSecurityEnforce.UseVisualStyleBackColor = True
+    '
     'frmConfig
     '
     Me.AcceptButton = Me.cmdSave
@@ -3542,5 +3557,6 @@ Partial Class frmConfig
   Friend WithEvents mnuKeySpacer As System.Windows.Forms.MenuItem
   Friend WithEvents mnuKeyDelete As System.Windows.Forms.MenuItem
   Friend WithEvents mnuKeyClear As System.Windows.Forms.MenuItem
+  Friend WithEvents chkNetworkSecurityEnforce As System.Windows.Forms.CheckBox
 
 End Class

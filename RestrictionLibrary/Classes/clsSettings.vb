@@ -10,7 +10,8 @@ Class AppSettings
   Private m_Timeout As Integer
   Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
-  Private m_Protocol As Net.SecurityProtocolType
+  Private m_SecurProtocol As Net.SecurityProtocolType
+  Private m_SecurEnforced As Boolean
   Public Loaded As Boolean
   Private Property ConfigFile As String
     Get
@@ -61,12 +62,14 @@ Class AppSettings
                   ElseIf xName.CompareTo("Proxy") = 0 Then
                     m_ProxySetting = xValue
                   ElseIf xName.CompareTo("Protocol") = 0 Then
-                    m_Protocol = SecurityProtocolTypeEx.None
-                    If xValue.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
-                    If xValue.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
-                    If xValue.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
-                    If xValue.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
-                    If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+                    m_SecurProtocol = SecurityProtocolTypeEx.None
+                    If xValue.Contains("SSL") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Ssl3
+                    If xValue.Contains("TLS10") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls10
+                    If xValue.Contains("TLS11") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11
+                    If xValue.Contains("TLS12") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls12
+                    If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+                  ElseIf xName.CompareTo("EnforcedSecurity") = 0 Then
+                    m_SecurEnforced = (xValue = "True")
                   End If
                 Next
                 Loaded = True
@@ -104,7 +107,8 @@ Class AppSettings
     m_Timeout = 120
     m_TLSProxy = False
     m_ProxySetting = "None"
-    m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurEnforced = False
   End Sub
   Public Property Account As String
     Get
@@ -253,10 +257,18 @@ Class AppSettings
   End Property
   Public Property SecurityProtocol As Net.SecurityProtocolType
     Get
-      Return m_Protocol
+      Return m_SecurProtocol
     End Get
     Set(value As Net.SecurityProtocolType)
-      m_Protocol = value
+      m_SecurProtocol = value
+    End Set
+  End Property
+  Public Property SecurityEnforced As Boolean
+    Get
+      Return m_SecurEnforced
+    End Get
+    Set(value As Boolean)
+      m_SecurEnforced = value
     End Set
   End Property
 End Class

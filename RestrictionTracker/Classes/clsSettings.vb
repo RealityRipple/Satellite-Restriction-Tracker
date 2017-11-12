@@ -190,7 +190,8 @@ Class AppSettings
   Private m_ProxySetting As String
   Private m_LastNag As Date
   Private m_NetTest As String
-  Private m_Protocol As Net.SecurityProtocolType
+  Private m_SecurProtocol As Net.SecurityProtocolType
+  Private m_SecurEnforced As Boolean
   Public Loaded As Boolean
   Public Colors As AppColors
   Public Enum UpdateTypes
@@ -594,17 +595,27 @@ Class AppSettings
       End If
       Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
       If xProtocol Is Nothing Then
-        m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+        m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
       Else
         Try
-          m_Protocol = SecurityProtocolTypeEx.None
-          If xProtocol.Element("value").Value.Contains("SSL") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Ssl3
-          If xProtocol.Element("value").Value.Contains("TLS10") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls10
-          If xProtocol.Element("value").Value.Contains("TLS11") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11
-          If xProtocol.Element("value").Value.Contains("TLS12") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls12
-          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_Protocol = m_Protocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+          m_SecurProtocol = SecurityProtocolTypeEx.None
+          If xProtocol.Element("value").Value.Contains("SSL") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Ssl3
+          If xProtocol.Element("value").Value.Contains("TLS10") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls10
+          If xProtocol.Element("value").Value.Contains("TLS11") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11
+          If xProtocol.Element("value").Value.Contains("TLS12") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls12
+          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         Catch ex As Exception
-          m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+          m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+        End Try
+      End If
+      Dim xEnforce As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "EnforcedSecurity")
+      If xEnforce Is Nothing Then
+        m_SecurEnforced = False
+      Else
+        Try
+          m_SecurEnforced = xEnforce.Element("value").Value = "True"
+        Catch ex As Exception
+          m_SecurEnforced = False
         End Try
       End If
       Dim xNetTest As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "NetTestURL")
@@ -1030,7 +1041,8 @@ Class AppSettings
     m_TLSProxy = False
     m_ProxySetting = "None"
     m_LastNag = New Date(2000, 1, 1)
-    m_Protocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurEnforced = False
     m_NetTest = Nothing
     Colors = New AppColors
     ResetColors()
@@ -1088,7 +1100,7 @@ Class AppSettings
     End Select
     Dim sProtocol As String = ""
     For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
-      If (m_Protocol And protocolTest) = protocolTest Then
+      If (m_SecurProtocol And protocolTest) = protocolTest Then
         sProtocol &= [Enum].GetName(GetType(SecurityProtocolTypeEx), protocolTest).ToUpper & ", "
       End If
     Next
@@ -1127,6 +1139,7 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
+                                                          New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),
@@ -1594,10 +1607,18 @@ Class AppSettings
   End Property
   Public Property SecurityProtocol As Net.SecurityProtocolType
     Get
-      Return m_Protocol
+      Return m_SecurProtocol
     End Get
     Set(value As Net.SecurityProtocolType)
-      m_Protocol = value
+      m_SecurProtocol = value
+    End Set
+  End Property
+  Public Property SecurityEnforced As Boolean
+    Get
+      Return m_SecurEnforced
+    End Get
+    Set(value As Boolean)
+      m_SecurEnforced = value
     End Set
   End Property
   Public Property NetTestURL As String
