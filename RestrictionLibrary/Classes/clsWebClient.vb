@@ -206,6 +206,9 @@
             sCookieHeader = sCookieHeader.Replace(REPLACE_SEMIC, ";")
           End If
           CType(request, Net.HttpWebRequest).Headers.Add(Net.HttpRequestHeader.Cookie, sCookieHeader)
+          Dim cNewJar As New Net.CookieContainer
+          AppendCookies(cNewJar, "Cookie", CType(request, Net.HttpWebRequest).Headers, address.Host)
+          CType(request, Net.HttpWebRequest).CookieContainer = cNewJar
         End If
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
         CType(request, Net.HttpWebRequest).KeepAlive = c_KeepAlive
@@ -268,7 +271,7 @@
   Private Function HandleWebResponse(request As Net.WebRequest, response As Net.WebResponse) As Net.WebResponse
     Try
       If response Is Nothing Then Return Nothing
-      AppendCookies(c_CookieJar, response.Headers, response.ResponseUri.Host)
+      AppendCookies(c_CookieJar, "Set-Cookie", response.Headers, response.ResponseUri.Host)
       If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
         Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
         Try
@@ -462,10 +465,10 @@
     Loop
     Return cookieList.ToArray
   End Function
-  Private Sub AppendCookies(ByRef CookieJar As Net.CookieContainer, ResponseHeaders As Net.WebHeaderCollection, DefaultDomain As String)
-    For Each sHead In ResponseHeaders.AllKeys
-      If sHead = "Set-Cookie" Then
-        Dim sCookieData As String = ResponseHeaders(sHead)
+  Private Sub AppendCookies(ByRef CookieJar As Net.CookieContainer, HeaderName As String, Headers As Net.WebHeaderCollection, DefaultDomain As String)
+    For Each sHead In Headers.AllKeys
+      If sHead = HeaderName Then
+        Dim sCookieData As String = Headers(sHead)
         Dim sReconstruction As String = CleanCookie(sCookieData)
         Dim newCookies() As Net.Cookie = CookieStrToCookies(sReconstruction, DefaultDomain)
         For Each newCookie In newCookies
