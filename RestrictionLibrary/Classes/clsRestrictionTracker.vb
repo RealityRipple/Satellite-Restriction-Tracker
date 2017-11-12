@@ -1052,6 +1052,28 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
+    If Response.Contains("login-error-alert") Then
+      If Response.ToLower.Contains("your username and/or password are incorrect.") Then
+        RaiseError("Login Failed: Incorrect Password")
+      ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
+        RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
+      ElseIf Response.ToLower.Contains("your session has timed out.") Then
+        RaiseError("Login Failed: Session timed out. Please try again.")
+      Else
+        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+      End If
+      Return
+    ElseIf Response.Contains("<div class=""msgerror"">") Then
+      If Response.ToLower.Contains("invalid user name or password") Then
+        RaiseError("Login Failed: Incorrect Password")
+      Else
+        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+      End If
+      Return
+    ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
+      RaiseError("Login Failed: Server encountered an unexpected error.")
+      Return
+    End If
     If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
       If Response.Contains("window.location.href") Then
         TryCount += 1
@@ -1143,24 +1165,6 @@ Public Class localRestrictionTracker
         Return
       End If
       EX_Login_Prepare_Response(Response, ResponseURI, TryCount)
-    ElseIf Response.Contains("login-error-alert") Then
-      If Response.ToLower.Contains("your username and/or password are incorrect.") Then
-        RaiseError("Login Failed: Incorrect Password")
-      ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
-        RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
-      ElseIf Response.ToLower.Contains("your session has timed out.") Then
-        RaiseError("Login Failed: Session timed out. Please try again.")
-      Else
-        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
-      End If
-    ElseIf Response.Contains("<div class=""msgerror"">") Then
-      If Response.ToLower.Contains("invalid user name or password") Then
-        RaiseError("Login Failed: Incorrect Password")
-      Else
-        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
-      End If
-    ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
-      RaiseError("Login Failed: Server encountered an unexpected error.")
     Else
       RaiseError("Could not log in.", "EX Login Response", Response, ResponseURI)
     End If
