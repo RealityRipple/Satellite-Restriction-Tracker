@@ -685,7 +685,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), "servLogin", sProvider)
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider), "servLogin", IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider))
     MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, uriString)
@@ -817,7 +817,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub WB_Usage(File As String)
     MakeSocket(False)
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), File, sProvider)
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider), File, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -827,7 +827,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myaccount." & IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider.ToLower) Then
+    If Not ResponseURI.Host.ToLower = "myaccount." & IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider.ToLower) Then
       RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
       Return
     End If
