@@ -556,6 +556,7 @@ Public Class localRestrictionTracker
   Private c_Timeout As Integer
   Private c_Proxy As Net.IWebProxy
   Private c_Jar As Net.CookieContainer
+  Private c_SendJar As Boolean
   Private c_TLSProxy As Boolean
   Private c_Protocol As Net.SecurityProtocolType
   Private c_TLSProxyAddr As String
@@ -627,6 +628,29 @@ Public Class localRestrictionTracker
     End If
     c_Timeout = mySettings.Timeout
     c_Proxy = mySettings.Proxy
+    Dim sFramework As String = srlFunctions.GetCLRCleanVersion
+    If sFramework.Contains("MONO") Then
+      Dim sFWVer As String = sFramework.Substring(5)
+      Dim fwMajor As Integer = sFWVer.Substring(0, sFWVer.IndexOf("."))
+      sFWVer = sFWVer.Substring(sFWVer.IndexOf(".") + 1)
+      Dim fwMinor As Integer = 0
+      If sFWVer.Contains(".") Then
+        fwMinor = sFWVer.Substring(0, sFWVer.IndexOf("."))
+      Else
+        fwMinor = sFWVer
+      End If
+      If fwMajor > 4 Then
+        c_SendJar = False
+      Else
+        If fwMinor >= 8 Then
+          c_SendJar = False
+        Else
+          c_SendJar = True
+        End If
+      End If
+    Else
+      c_SendJar = False
+    End If
     tConnect = New Threading.Thread(AddressOf Connect)
     tConnect.Start()
   End Sub
@@ -2040,6 +2064,7 @@ Public Class localRestrictionTracker
     wsSocket.Timeout = c_Timeout
     wsSocket.Proxy = c_Proxy
     wsSocket.CookieJar = c_Jar
+    wsSocket.SendCookieJar = c_SendJar
     wsSocket.Encoding = oldEncoding
     If Not ManualRedirect Then wsSocket.ManualRedirect = False
   End Sub
