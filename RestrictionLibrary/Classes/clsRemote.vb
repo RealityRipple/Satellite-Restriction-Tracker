@@ -473,7 +473,7 @@ Public Class remoteRestrictionTracker
     End If
     If responseURI IsNot Nothing Then
       If Not responseURI.Host = "wb.realityripple.com" Then
-        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Connection redirected to """ & responseURI.OriginalString & """, check your Internet connection."))
+        RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Connection redirected to """ & srlFunctions.TruncateURL(responseURI.OriginalString) & """, check your Internet connection."))
         Return True
       End If
     End If

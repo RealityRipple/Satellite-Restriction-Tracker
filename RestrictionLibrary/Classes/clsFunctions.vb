@@ -671,6 +671,28 @@ Public Class srlFunctions
     End If
   End Sub
   ''' <summary>
+  ''' Clip down the length of a URL to arround 125 characters.
+  ''' </summary>
+  ''' <param name="url">The address you'd like to cut down.</param>
+  ''' <returns>A smaller version of the address.</returns>
+  Public Shared Function TruncateURL(url As String) As String
+    Const maxLen As Integer = 125
+    If url.Length < maxLen Then Return url
+    If url.Contains("?") Then
+      If url.Substring(url.IndexOf("?") + 1).Contains("=") Then
+        url = url.Substring(0, url.IndexOf("=", url.IndexOf("?") + 1) + ((maxLen - 4) - url.IndexOf("=", url.IndexOf("?") + 1))) & "..."
+      Else
+        url = url.Substring(0, url.IndexOf("?") + ((maxLen - 4) - url.IndexOf("?"))) & "..."
+      End If
+    End If
+    If url.Length < maxLen Then Return url
+    If url.Contains("/") Then
+      Dim endingBit As String = url.Substring(url.LastIndexOf("/"))
+      url = url.Substring(0, url.Substring(0, maxLen - endingBit.Length).LastIndexOf("/") + 1) & "..." & endingBit
+    End If
+    Return url
+  End Function
+  ''' <summary>
   ''' Converts a <see cref="localRestrictionTracker.SatHostTypes" /> value to a simple string.
   ''' </summary>
   ''' <param name="hostType">A Satellite Internet host type enumeration.</param>

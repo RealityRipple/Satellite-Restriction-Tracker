@@ -828,7 +828,7 @@ Public Class localRestrictionTracker
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myaccount." & IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider.ToLower) Then
-      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.Contains("Usage Meter") Then
@@ -971,7 +971,7 @@ Public Class localRestrictionTracker
     End If
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
-      RaiseError("Prepare Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Prepare Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.ToLower.Contains("unable to process request") Then
@@ -1056,7 +1056,7 @@ Public Class localRestrictionTracker
   Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.Contains("login-error-alert") Then
@@ -1190,7 +1190,7 @@ Public Class localRestrictionTracker
   Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
-      RaiseError("Authentication Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Authentication Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If ResponseURI.AbsolutePath.ToLower.Contains("/identity/saml/samlerror") Or ResponseURI.AbsolutePath.ToLower.Contains("/ssoerror") Then
@@ -1264,7 +1264,7 @@ Public Class localRestrictionTracker
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
-      RaiseError("AJAX Load Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("AJAX Load Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" And Not ResponseURI.AbsolutePath.ToLower = "/subscriber_dashboard" Then
@@ -1434,7 +1434,7 @@ Public Class localRestrictionTracker
   Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If ResponseURI.AbsolutePath.ToLower.StartsWith("/us/home.do") Then
@@ -1488,7 +1488,7 @@ Public Class localRestrictionTracker
   Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
-      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Not Response.Contains("Current Usage") Then
@@ -1631,7 +1631,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("login.ashx") Then
@@ -1658,7 +1658,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Login_Continue_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("login.aspx") Then
@@ -1707,7 +1707,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri, ExpectedURI As String)
     If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Not ResponseURI.OriginalString.ToLower.Contains(ExpectedURI.ToLower) Then
@@ -1734,7 +1734,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI, True) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
-      RaiseError("Login Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.Contains("The requested URL was rejected.") Then
@@ -1742,7 +1742,7 @@ Public Class localRestrictionTracker
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("accountsummary") Then
-      RaiseError("Home Read Failed: Could not load home page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Home Response", Response, ResponseURI)
+      RaiseError("Home Read Failed: Could not load home page. Redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """.", "DN Download Home Response", Response, ResponseURI)
       Return
     End If
     DN_Download_Table()
@@ -1760,7 +1760,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Not ResponseURI.Host.ToLower = "my.dish.com" Then
-      RaiseError("Usage Failed: Connection redirected to """ & ResponseURI.OriginalString & """, check your Internet connection.")
+      RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.Contains("The requested URL was rejected.") Then
@@ -1768,7 +1768,7 @@ Public Class localRestrictionTracker
       Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower.Contains("internet") Then
-      RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & ResponseURI.OriginalString & """.", "DN Download Table Response", Response, ResponseURI)
+      RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """.", "DN Download Table Response", Response, ResponseURI)
       Return
     End If
     If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
