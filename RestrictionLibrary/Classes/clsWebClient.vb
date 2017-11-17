@@ -8,6 +8,7 @@
     MyBase.New()
     c_Events = useEvents
     c_CookieJar = New Net.CookieContainer
+    c_SendCookieJar = False
     c_Timeout = 120
     c_RWTimeout = 300
     c_HTVer = Net.HttpVersion.Version11
@@ -24,6 +25,7 @@
     MyBase.New()
     c_Events = False
     c_CookieJar = New Net.CookieContainer
+    c_SendCookieJar = False
     c_Timeout = 120
     c_RWTimeout = 300
     c_HTVer = Net.HttpVersion.Version11
@@ -67,6 +69,20 @@
     End Get
     Set(value As Net.CookieContainer)
       c_CookieJar = value
+    End Set
+  End Property
+  Private c_SendCookieJar As Boolean
+  ''' <summary>
+  ''' The way cookies are sent can be modified using this property.
+  ''' </summary>
+  ''' <value>Cookies will be sent by text if this value is <c>False</c>, and by both text and cookie jar if <c>True</c>.</value>
+  ''' <returns>See the value entry for details on the return values.</returns>
+  Public Property SendCookieJar As Boolean
+    Get
+      Return c_SendCookieJar
+    End Get
+    Set(value As Boolean)
+      c_SendCookieJar = value
     End Set
   End Property
   Private c_ResponseURI As Uri
@@ -206,9 +222,11 @@
             sCookieHeader = sCookieHeader.Replace(REPLACE_SEMIC, ";")
           End If
           CType(request, Net.HttpWebRequest).Headers.Add(Net.HttpRequestHeader.Cookie, sCookieHeader)
-          Dim cNewJar As New Net.CookieContainer
-          AppendCookies(cNewJar, "Cookie", CType(request, Net.HttpWebRequest).Headers, address.Host)
-          CType(request, Net.HttpWebRequest).CookieContainer = cNewJar
+          If c_SendCookieJar Then
+            Dim cNewJar As New Net.CookieContainer
+            AppendCookies(cNewJar, "Cookie", CType(request, Net.HttpWebRequest).Headers, address.Host)
+            CType(request, Net.HttpWebRequest).CookieContainer = cNewJar
+          End If
         End If
         CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
         CType(request, Net.HttpWebRequest).KeepAlive = c_KeepAlive
@@ -537,6 +555,15 @@ Public Class WebClientEx
       c_Jar = value
     End Set
   End Property
+  Private c_SendJar As Boolean
+  Public Property SendCookieJar As Boolean
+    Get
+      Return c_SendJar
+    End Get
+    Set(value As Boolean)
+      c_SendJar = value
+    End Set
+  End Property
   Private c_Encoding As System.Text.Encoding
   ''' <summary>
   ''' Gets and sets the System.Text.Encoding used to upload and download strings.
@@ -636,6 +663,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
+    c_SendJar = False
     c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = DataPath
     c_Busy = False
@@ -649,6 +677,7 @@ Public Class WebClientEx
     c_RWTimeout = 2 * 60 * 60
     c_Proxy = New Net.WebProxy
     c_Jar = New Net.CookieContainer
+    c_SendJar = False
     c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = Nothing
     c_Busy = False
@@ -688,6 +717,7 @@ Public Class WebClientEx
         wsDownload.ReadWriteTimeout = c_RWTimeout
         wsDownload.Proxy = c_Proxy
         wsDownload.CookieJar = c_Jar
+        wsDownload.SendCookieJar = c_SendJar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.KeepAlive = c_KeepAlive
@@ -783,6 +813,7 @@ Public Class WebClientEx
         wsDownload.ReadWriteTimeout = c_RWTimeout
         wsDownload.Proxy = c_Proxy
         wsDownload.CookieJar = c_Jar
+        wsDownload.SendCookieJar = c_SendJar
         wsDownload.Encoding = c_Encoding
         wsDownload.ErrorBypass = c_ErrorBypass
         wsDownload.KeepAlive = c_KeepAlive
@@ -859,6 +890,7 @@ Public Class WebClientEx
         wsUpload.ReadWriteTimeout = c_RWTimeout
         wsUpload.Proxy = c_Proxy
         wsUpload.CookieJar = c_Jar
+        wsUpload.SendCookieJar = c_SendJar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.KeepAlive = c_KeepAlive
@@ -984,6 +1016,7 @@ Public Class WebClientEx
         wsUpload.ReadWriteTimeout = c_RWTimeout
         wsUpload.Proxy = c_Proxy
         wsUpload.CookieJar = c_Jar
+        wsUpload.SendCookieJar = c_SendJar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.KeepAlive = c_KeepAlive
@@ -1063,6 +1096,7 @@ Public Class WebClientEx
         wsUpload.ReadWriteTimeout = c_RWTimeout
         wsUpload.Proxy = c_Proxy
         wsUpload.CookieJar = c_Jar
+        wsUpload.SendCookieJar = c_SendJar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.KeepAlive = c_KeepAlive
@@ -1187,6 +1221,7 @@ Public Class WebClientEx
         wsUpload.ReadWriteTimeout = c_RWTimeout
         wsUpload.Proxy = c_Proxy
         wsUpload.CookieJar = c_Jar
+        wsUpload.SendCookieJar = c_SendJar
         wsUpload.Encoding = c_Encoding
         wsUpload.ErrorBypass = c_ErrorBypass
         wsUpload.KeepAlive = c_KeepAlive
