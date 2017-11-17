@@ -314,11 +314,11 @@
       ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
       Return
     End If
-    chkNetworkSecurityEnforce.Enabled = True
-    ttConfig.SetToolTip(chkNetworkSecurityEnforce, "Enforce network certificate validation. If the server's certificate is not valid, your connection may fail." & vbNewLine & "Turning this feature off may potentially expose your computer or transmitted information to third parties.")
     chkTLSProxy.Enabled = True
     ttConfig.SetToolTip(chkTLSProxy, "If your Operating System does not support the Security Protocol required for your provider, you can use this Proxy to connect through the RealityRipple.com server.")
     If chkTLSProxy.Checked Then
+      chkNetworkSecurityEnforce.Enabled = False
+      ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The server's certificate will be validated by the TLS Proxy.")
       chkNetworkProtocolSSL3.Enabled = True
       ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
       chkNetworkProtocolTLS10.Enabled = True
@@ -329,6 +329,8 @@
       ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
       Return
     End If
+    chkNetworkSecurityEnforce.Enabled = True
+    ttConfig.SetToolTip(chkNetworkSecurityEnforce, "Enforce network certificate validation. If the server's certificate is not valid, your connection may fail." & vbNewLine & "Turning this feature off may potentially expose your computer or transmitted information to third parties.")
     Dim canSSL3 As Boolean = True
     Dim canTLS10 As Boolean = True
     Dim canTLS11 As Boolean = True
