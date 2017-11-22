@@ -721,9 +721,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginExede()
     If sProvider = "exede.net" Then
-      AJAXOrder = {4, 5, 8, 10, 11}
+      AJAXFullOrder = {15, 16, 17, 18, 19, 20, 21, 22}
+      AJAXOrder = {15, 16, 19, 21, 22}
     ElseIf sProvider = "satelliteinternetco.com" Then
-      AJAXOrder = {2, 4}
+      AJAXFullOrder = {2, 3, 4, 5}
+      AJAXOrder = {2, 4, 5}
     Else
       RaiseError("Prepare Failed: Unknown Provider - Can't determine AJAX order.")
     End If
@@ -1265,6 +1267,7 @@ Public Class localRestrictionTracker
       Iteration = bI
     End Sub
   End Structure
+  Private AJAXFullOrder() As Byte
   Private AJAXOrder() As Byte
   Public ReadOnly Property ExedeAJAXFirstTryRequests As Integer
     Get
@@ -1273,7 +1276,7 @@ Public Class localRestrictionTracker
   End Property
   Public ReadOnly Property ExedeAJAXSecondTryRequests As Integer
     Get
-      Return 12 - 1
+      Return AJAXFullOrder.Length - 1
     End Get
   End Property
   Private Sub EX_Download_Homepage(sURI As String)
@@ -1359,33 +1362,41 @@ Public Class localRestrictionTracker
     MakeSocket(True)
     Dim newID As Byte = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
-    If AjaxID.ID > ExedeAJAXSecondTryRequests Then
+    If (AjaxID.Iteration = 1 And AjaxID.ID = AJAXOrder(ExedeAJAXFirstTryRequests)) Or (AjaxID.Iteration > 1 And AjaxID.ID = AJAXFullOrder(ExedeAJAXSecondTryRequests)) Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
-      newID = 1
+      newID = AJAXFullOrder(0)
       newType += 1
     ElseIf AjaxID.Iteration = 1 Then
       Dim bShown As Boolean = False
       For I As Integer = 0 To AJAXOrder.Length - 1
         If AjaxID.ID = AJAXOrder(I) Then
-          If I >= AJAXOrder.Length - 1 Then
-            BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
-            newID = 1
-            newType += 1
-          Else
-            BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, sURI)
-            newID = AJAXOrder(I + 1)
-          End If
+          BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, sURI)
+          newID = AJAXOrder(I + 1)
           bShown = True
           Exit For
         End If
       Next
       If Not bShown Then
-        BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, AjaxID.ID, sURI)
-        newID += 1
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unknown AJAX ID: " & AjaxID.ID & "."))
+        Return
+      End If
+    ElseIf AjaxID.Iteration < 4 Then
+      Dim bShown As Boolean = False
+      For I As Integer = 0 To AJAXFullOrder.Length - 1
+        If AjaxID.ID = AJAXFullOrder(I) Then
+          BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, I + 1, sURI)
+          newID = AJAXFullOrder(I + 1)
+          bShown = True
+          Exit For
+        End If
+      Next
+      If Not bShown Then
+        RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Unknown AJAX ID: " & AjaxID.ID & "."))
+        Return
       End If
     Else
-      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, AjaxID.ID, sURI)
-      newID += 1
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "AJAX failed to yield data table."))
+      Return
     End If
     Dim sSend As String = "AJAXREQUEST=_viewRoot" &
              "&j_id0%3AidForm=j_id0%3AidForm" &
