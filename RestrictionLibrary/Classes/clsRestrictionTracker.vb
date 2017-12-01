@@ -721,8 +721,8 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginExede()
     If sProvider = "exede.net" Then
-      AJAXFullOrder = {15, 16, 17, 18, 19, 20, 21, 22}
-      AJAXOrder = {15, 16, 19, 21, 22}
+      AJAXFullOrder = {16, 17, 18, 19, 20, 21, 22, 23}
+      AJAXOrder = {16, 17, 20, 22, 23}
     ElseIf sProvider = "satelliteinternetco.com" Then
       AJAXFullOrder = {2, 3, 4, 5}
       AJAXOrder = {2, 4, 5}
@@ -1215,7 +1215,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider And Not ResponseURI.Host.ToLower = "account.viasat.com" Then
       RaiseError("Authentication Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -1290,7 +1290,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider And Not ResponseURI.Host.ToLower = "account.viasat.com" Then
       RaiseError("AJAX Load Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
