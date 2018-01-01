@@ -2395,6 +2395,8 @@ Public Class frmMain
     End If
   End Sub
 #Region "Failure Reports"
+  Private PreviousFail As Integer = 0
+  Private PreviousFailS As String = Nothing
   Public Sub FailResponse(sRet As String)
     If Me.InvokeRequired Then
       Try
@@ -2416,6 +2418,12 @@ Public Class frmMain
   End Sub
   Private Sub FailFile(sFail As String, Optional bJustFeedback As Boolean = False)
     If clsUpdate.QuickCheckVersion = clsUpdate.CheckEventArgs.ResultType.NoUpdate Then
+      If PreviousFailS = sFail And PreviousFail = Now.DayOfYear Then Return
+      If PreviousFailS = sFail And PreviousFail > 0 Then
+        Dim nextDay As Integer = PreviousFail + 1
+        If nextDay = 366 Then nextDay = 1
+        If Now.DayOfYear = nextDay And Now.Hour < 9 Then Return
+      End If
       sFailTray = sFail
       MakeNotifier(taskNotifier, True)
       If taskNotifier IsNot Nothing Then
@@ -2424,6 +2432,8 @@ Public Class frmMain
         Else
           taskNotifier.Show("Error Reading Page Data", My.Application.Info.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
         End If
+        PreviousFail = Now.DayOfYear
+        PreviousFailS = sFail
       End If
     End If
   End Sub
