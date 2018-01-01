@@ -1138,6 +1138,8 @@ Public Class localRestrictionTracker
         RaiseError("Login Failed: Server Down for Maintenance.")
       ElseIf Response.Contains("https://DOMAIN.my.salesforce.com") Then
         RaiseError("Login Failed: Server Down for Maintenance.")
+      ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
+        RaiseError("Login Failed: Please check your account information and try again.")
       Else
         RaiseError("Login Failed: Could not understand response.", True, "EX Login Response", Response, ResponseURI)
       End If
@@ -1527,7 +1529,16 @@ Public Class localRestrictionTracker
       Return
     End If
     If Not Response.Contains("Current Usage") Then
-      RaiseError("Usage Failed: Failed to log in.", True, "RP Usage Response", Response, ResponseURI)
+      If Response.Contains("<table width=""100%"" class=""tabpane"" id=""infoTable"" style=""display:"" >") Then
+        Dim sResponseTable As String = Response.Substring(Response.IndexOf("<table width=""100%"" class=""tabpane"" id=""infoTable"" style=""display:"" >") + 69).Trim
+        If String.IsNullOrEmpty(sResponseTable) OrElse sResponseTable.StartsWith("</form>") Then
+          RaiseError("Usage Failed: Data temporarily unavailable.")
+        Else
+          RaiseError("Usage Failed: Could not find usage meter", True, "RP Usage Response", Response, ResponseURI)
+        End If
+      Else
+        RaiseError("Usage Failed: Failed to log in.", True, "RP Usage Response", Response, ResponseURI)
+      End If
       Return
     End If
     If Response.Contains("Usage data is not available.") Then
@@ -2254,6 +2265,25 @@ Public Class localRestrictionTracker
     End If
     If response.ToLower.Contains("internal server error") Or (response.ToLower.Contains("internal error") And response.Contains("500")) Then
       RaiseError("The server ran into an internal error. Please try again later.")
+      Return True
+    End If
+    If response.Contains("Apache Tomcat") And response.Contains("Error report") Then
+      Dim sError As String = Nothing
+      If response.Contains("<b>description</b>") Then
+        sError = response.Substring(response.IndexOf("<b>description</b>"))
+        If sError.Contains("<u>") Then
+          sError = sError.Substring(sError.IndexOf("<u>") + 3)
+          sError = sError.Substring(0, sError.IndexOf("</u>"))
+        Else
+          sError = Nothing
+        End If
+      End If
+      If String.IsNullOrEmpty(sError) Then
+        RaiseError("The server ran into an unknown error (Tomcat). Please try again later.", "Check For Errors", "Unknown Tomcat Error: " & response, responseURI)
+      Else
+        If Not sError.EndsWith(".") Then sError &= "."
+        RaiseError("The server ran into an error (Tomcat): " & sError & " Please try again later.")
+      End If
       Return True
     End If
     If responseURI Is Nothing Then
