@@ -184,6 +184,8 @@ Public Class srlFunctions
           Return ERRLIST("TLS")
         ElseIf ex.Message.Contains("The request was canceled") Then
           Return ERRLIST("ABORTED")
+        ElseIf ex.Message.Contains("The operation has timed out") Then
+          Return ERRLIST("TIMEOUT")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
           Return AppendErrorDetails(ERRLIST("ABORTED"), ex, ":"c)
@@ -296,6 +298,18 @@ Public Class srlFunctions
             Return ERRLIST("SECURITY")
           End If
         ElseIf ex.InnerException.Message.StartsWith("The read operation failed, see inner exception") Then
+          If ex.InnerException.InnerException IsNot Nothing Then
+            If ex.InnerException.InnerException.Message.StartsWith("Thread was being aborted") Then
+              Return ERRLIST("ABORTED")
+            Else
+              If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+              Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException.InnerException)
+            End If
+          Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return ERRLIST("UNKNOWN")
+          End If
+        ElseIf ex.InnerException.Message.StartsWith("The write operation failed, see inner exception") Then
           If ex.InnerException.InnerException IsNot Nothing Then
             If ex.InnerException.InnerException.Message.StartsWith("Thread was being aborted") Then
               Return ERRLIST("ABORTED")
@@ -527,8 +541,10 @@ Public Class srlFunctions
             End If
           ElseIf ex.InnerException.Message.Contains("Unsupported security protocol type") Then
             Return ERRLIST("TLS")
-          ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed.") Then
+          ElseIf ex.InnerException.Message.Contains("The authentication or decryption has failed") Then
             Return ERRLIST("TLS")
+          ElseIf ex.InnerException.Message.Contains("Cannot access a disposed object") Then
+            Return ERRLIST("ABORTED")
           Else
             If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
             Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
@@ -560,6 +576,18 @@ Public Class srlFunctions
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
           Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex.InnerException)
+        End If
+      ElseIf ex.Message.StartsWith("System.Net.WebException:") Then
+        If ex.Message.Contains("An exception occurred during a WebClient request") Then
+          If ex.Message.Contains("The object was used after being disposed") Then
+            Return ERRLIST("ABORTED")
+          Else
+            If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+            Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex, ":"c)
+          End If
+        Else
+          If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
+          Return AppendErrorDetails(ERRLIST("UNKNOWN"), ex, ":"c)
         End If
       Else
         If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
