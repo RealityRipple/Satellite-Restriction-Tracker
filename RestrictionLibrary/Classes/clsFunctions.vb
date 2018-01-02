@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Public Class srlFunctions
+  Private Shared lastSocketErrSend As Integer = 0
   ''' <summary>
   ''' ISO-8859-1 Latin-1 Encoding
   ''' </summary>
@@ -664,6 +665,7 @@ Public Class srlFunctions
   ''' <param name="dataPath">The folder where socket errors will be loaded from.</param>
   ''' <remarks>See Also: <seealso cref="ReportSocketError" /></remarks>
   Public Shared Sub SendSocketErrors(dataPath As String)
+    If lastSocketErrSend > 0 AndAlso Environment.TickCount - lastSocketErrSend < 10 * 60 * 1000 Then Return
     Dim ReportList As String = dataPath & "\sckerrs.log"
     If IO.File.Exists(ReportList) Then
       Dim reports As New Collections.Generic.List(Of String)(Split(My.Computer.FileSystem.ReadAllText(ReportList), vbNewLine & vbNewLine))
@@ -676,6 +678,7 @@ Public Class srlFunctions
             sckUpload.KeepAlive = False
             Dim params As New Collections.Specialized.NameValueCollection
             params.Add("e", e)
+            lastSocketErrSend = Environment.TickCount
             Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
             If sRet = "e exists" Or sRet = "e added" Then reports.RemoveAt(I)
           Catch
