@@ -722,7 +722,7 @@ Public Class localRestrictionTracker
   Private Sub LoginExede()
     If sProvider = "exede.net" Then
       AJAXFullOrder = {16, 17, 18, 19, 20, 21, 22, 23}
-      AJAXOrder = {16, 17, 20, 22, 23}
+      AJAXOrder = {16, 17, 18, 20, 22, 23}
     ElseIf sProvider = "satelliteinternetco.com" Then
       AJAXFullOrder = {2, 3, 4, 5}
       AJAXOrder = {2, 4, 5}
