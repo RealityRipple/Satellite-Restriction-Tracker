@@ -1,4 +1,5 @@
 ﻿Friend Class MantisReporter
+  Public Const ProjectID As Integer = 2
   Friend Enum Mantis_Category
     [Select] = 0
     General = 1
@@ -87,7 +88,7 @@
     End If
   End Function
   Friend Shared Function ReportIssue(e As Exception) As String
-    Dim sTok As String = GetToken(2)
+    Dim sTok As String = GetToken(ProjectID)
     If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
     Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
     Dim sSum As String = e.Message
@@ -95,6 +96,6 @@
     Dim sVer As String = Application.ProductVersion
     Dim iParts As Integer = (sVer.Split("."c)).Length
     If iParts > 3 Then sVer = sVer.Substring(0, sVer.LastIndexOf("."c))
-    Return ReportBug(sTok, 2, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sVer, sSum, e.ToString, String.Empty, String.Empty, True)
+    Return ReportBug(sTok, ProjectID, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sVer, sSum, e.ToString, String.Empty, String.Empty, True)
   End Function
 End Class
