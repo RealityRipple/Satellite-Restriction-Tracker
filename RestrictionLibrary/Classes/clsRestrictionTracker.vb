@@ -1860,7 +1860,7 @@ Public Class localRestrictionTracker
         Dim widgetLines() As String = Split(widget, findCRLF)
         Dim isMeter As Boolean = False
         For Each wLine In widgetLines
-          If wLine.Contains("'/customercare/widgets/loadMeter.do'") Then
+          If wLine.Contains("'/customercare/widgets/loadMeter.do?'") Then
             isMeter = True
           End If
         Next
@@ -1982,8 +1982,8 @@ Public Class localRestrictionTracker
       End If
       If htmlSegment.Contains(" GB") Then
         Dim htmlParts() As String = Split(htmlSegment, " GB")
-        If htmlParts.Length >= 6 Then
-          ReDim Preserve htmlParts(htmlParts.Length - 2)
+        If htmlParts.Length >= 5 Then
+          ReDim Preserve htmlParts(4)
           For I As Integer = 0 To htmlParts.Length - 1
             htmlParts(I) = htmlParts(I).Substring(htmlParts(I).LastIndexOf(""">") + 2)
             CleanupResult(htmlParts(I))
