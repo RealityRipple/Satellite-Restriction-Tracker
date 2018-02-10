@@ -2288,6 +2288,20 @@ Module modFunctions
       Case "cmdRetry" : CType(sender.HostingDialog, TaskDialog).Close(TaskDialogResult.Retry)
     End Select
   End Sub
+  Private Sub SelectionDialogHyperlink_Click(sender As Object, e As TaskDialogHyperlinkClickedEventArgs)
+    Try
+      If String.IsNullOrEmpty(e.LinkText) Then Return
+      If e.LinkText.Contains(" ") Then
+        ShellEx(e.LinkText.Substring(0, e.LinkText.IndexOf(" ")), e.LinkText.Substring(e.LinkText.IndexOf(" ") + 1))
+      Else
+        Process.Start(e.LinkText)
+      End If
+    Catch ex As Exception
+      Dim taskNotifier As TaskbarNotifier = Nothing
+      MakeNotifier(taskNotifier, False)
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+    End Try
+  End Sub
   Private Sub RefreshDlg(sender As Object, e As EventArgs)
     Dim dlg As TaskDialog = sender
     dlg.Icon = dlg.Icon
@@ -2368,18 +2382,4 @@ Module modFunctions
     Return PathStr
   End Function
 #End Region
-  Private Sub SelectionDialogHyperlink_Click(sender As Object, e As TaskDialogHyperlinkClickedEventArgs)
-    Try
-      If String.IsNullOrEmpty(e.LinkText) Then Return
-      If e.LinkText.Contains(" ") Then
-        ShellEx(e.LinkText.Substring(0, e.LinkText.IndexOf(" ")), e.LinkText.Substring(e.LinkText.IndexOf(" ") + 1))
-      Else
-        Process.Start(e.LinkText)
-      End If
-    Catch ex As Exception
-      Dim taskNotifier As TaskbarNotifier = Nothing
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
-  End Sub
 End Module
