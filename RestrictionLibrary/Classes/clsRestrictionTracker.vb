@@ -1006,6 +1006,7 @@ Public Class localRestrictionTracker
     End If
     If Response.ToLower.Contains(" down for maintenance") Then
       RaiseError("Prepare Failed: Server Down for Maintenance.")
+      Return
     End If
     If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
       RaiseError("Prepare Failed: Could not understand response.", "EX Login Prepare Response", Response, ResponseURI)
