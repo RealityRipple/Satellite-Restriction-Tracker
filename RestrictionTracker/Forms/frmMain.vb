@@ -38,6 +38,8 @@ Public Class frmMain
   Private imFree As Boolean
   Private FullCheck As Boolean = True
   Private NextGrabTick As Long
+  Private GrabAttempt As Integer
+  Private GrabAttempts As Integer = 5
   Private ClosingTime As Boolean
   Private sFailTray As String
   Private bAlert As TriState
@@ -966,14 +968,27 @@ Public Class frmMain
     End If
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.LoginIssue
+        GrabAttempt = 0
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail, True)
         DisplayUsage(False, False)
         Return
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
+        If GrabAttempt < GrabAttempts Then
+          GrabAttempt += 1
+          Dim sMessage As String = "Connection Timed Out! Retry " & GrabAttempt & " of " & GrabAttempts & "..."
+          SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+          If localData IsNot Nothing Then
+            localData.Dispose()
+            localData = Nothing
+          End If
+          localData = New localRestrictionTracker(LocalAppDataDirectory)
+          Return
+        End If
         SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.TLSTooOld
+        GrabAttempt = 0
         If mySettings.TLSProxy Then
           SetStatusText(LOG_GetLast.ToString("g"), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
           DisplayUsage(False, False)
@@ -995,15 +1010,28 @@ Public Class frmMain
           End If
         End If
       Case ConnectionFailureEventArgs.FailureType.LoginFailure
-        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
+        If e.Message.EndsWith("Please try again.") And GrabAttempt < GrabAttempts Then
+          GrabAttempt += 1
+          Dim sMessage As String = e.Message.Substring(0, e.Message.IndexOf("Please try again.")) & "Retry " & GrabAttempt & " of " & GrabAttempts & "..."
+          SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+          If localData IsNot Nothing Then
+            localData.Dispose()
+            localData = Nothing
+          End If
+          localData = New localRestrictionTracker(LocalAppDataDirectory)
+          Return
+        End If
+        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         DisplayUsage(False, True)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
+        GrabAttempt = 0
         If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.Other
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+        GrabAttempt = 0
         SetStatusText(LOG_GetLast.ToString("g"), "Please enter your account details in the Config window.", True)
         DisplayUsage(False, False)
         If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
@@ -1026,6 +1054,7 @@ Public Class frmMain
         cmdConfig.Focus()
         MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
+        GrabAttempt = 0
         If mySettings.AccountTypeForced Then
           SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
         Else
@@ -1046,6 +1075,7 @@ Public Class frmMain
       End Try
       Return
     End If
+    GrabAttempt = 0
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
@@ -1071,6 +1101,7 @@ Public Class frmMain
       End Try
       Return
     End If
+    GrabAttempt = 0
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
@@ -1096,6 +1127,7 @@ Public Class frmMain
       End Try
       Return
     End If
+    GrabAttempt = 0
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
@@ -1121,6 +1153,7 @@ Public Class frmMain
       End Try
       Return
     End If
+    GrabAttempt = 0
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
@@ -1146,6 +1179,7 @@ Public Class frmMain
       End Try
       Return
     End If
+    GrabAttempt = 0
     SetStatusText(e.Update.ToString("g"), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
