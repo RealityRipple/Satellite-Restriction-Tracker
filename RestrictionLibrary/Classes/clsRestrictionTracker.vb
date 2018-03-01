@@ -1093,6 +1093,8 @@ Public Class localRestrictionTracker
         RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
       ElseIf Response.ToLower.Contains("your session has timed out.") Then
         RaiseError("Login Failed: Session timed out. Please try again.")
+      ElseIf Response.ToLower.Contains("this user is not active.") Then
+        RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
       Else
         RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
       End If
@@ -2246,8 +2248,8 @@ Public Class localRestrictionTracker
   End Function
   Private Function CheckForErrors(response As String, responseURI As Uri, Optional IgnoreResponseData As Boolean = False) As Boolean
     If Not IgnoreResponseData Then
-      If String.IsNullOrEmpty(response) OrElse response = "Error: Empty Response" Then
-        RaiseError("Empty Response")
+      If String.IsNullOrEmpty(response) OrElse response = "Error: The server sent an empty response. Please try again." Then
+        RaiseError("The server sent an empty response. Please try again.")
         Return True
       End If
       If response.StartsWith("Error: ") Then

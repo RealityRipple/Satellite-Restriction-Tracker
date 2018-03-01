@@ -756,7 +756,7 @@ Public Class WebClientEx
             AsyncDownloadString({RunName, sNewPath, 0})
             Return
           End If
-          DownloadResults(RunName) = "Error: Empty Response"
+          DownloadResults(RunName) = "Error: The server sent an empty response. Please try again."
         Else
           DownloadResults(RunName) = sRet
         End If
@@ -845,7 +845,7 @@ Public Class WebClientEx
             AsyncDownloadStringWithCallback({callback, aState, sNewPath, 0})
             Return
           End If
-          callback(aState, "Error: Empty Response")
+          callback(aState, "Error: The server sent an empty response. Please try again.")
         Else
           callback(aState, sRet)
         End If
@@ -957,7 +957,7 @@ Public Class WebClientEx
             AsyncUploadString({RunName, sNewPath, "GET", Nothing, 0})
             Return
           End If
-          UploadResults(RunName) = "Error: Empty Response"
+          UploadResults(RunName) = "Error: The server sent an empty response. Please try again."
         Else
           UploadResults(RunName) = sRet
         End If
@@ -1067,7 +1067,7 @@ Public Class WebClientEx
             AsyncUploadStringWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
             Return
           End If
-          callback(aState, "Error: Empty Response")
+          callback(aState, "Error: The server sent an empty response. Please try again.")
         Else
           callback(aState, sRet)
         End If
@@ -1162,7 +1162,7 @@ Public Class WebClientEx
             AsyncUploadValues({RunName, sNewPath, "GET", Nothing, 0})
             Return
           End If
-          UploadResults(RunName) = "Error: Empty Response"
+          UploadResults(RunName) = "Error: The server sent an empty response. Please try again."
         Else
           UploadResults(RunName) = sRet
         End If
@@ -1273,7 +1273,7 @@ Public Class WebClientEx
             AsyncUploadValuesWithCallback({callback, aState, sNewPath, "GET", Nothing, 0})
             Return
           End If
-          callback(aState, "Error: Empty Response")
+          callback(aState, "Error: The server sent an empty response. Please try again.")
         Else
           callback(aState, sRet)
         End If

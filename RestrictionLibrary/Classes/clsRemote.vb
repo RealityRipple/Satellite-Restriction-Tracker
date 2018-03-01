@@ -484,7 +484,7 @@ Public Class remoteRestrictionTracker
   End Sub
   Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
     If String.IsNullOrEmpty(response) Then
-      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "Empty Response"))
+      RaiseEvent Failure(Me, New FailureEventArgs(FailureEventArgs.FailType.Network, "The server sent an empty response. Please try again."))
       Return True
     End If
     If response.StartsWith("Error: ") Then
