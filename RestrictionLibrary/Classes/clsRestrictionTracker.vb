@@ -721,11 +721,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginExede()
     If sProvider = "exede.net" Then
-      AJAXFullOrder = {16, 17, 18, 19, 20, 21, 22, 23}
-      AJAXOrder = {16, 17, 18, 20, 22, 23}
+      AJAXFullOrder = {"j_id0:j_id280:j_id281", "j_id0:j_id280:j_id282", "j_id0:j_id1:j_id88:j_id89:j_id205:j_id206:j_id208:j_id218", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id228", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id229", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id230", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id232", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id231", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id234", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id233"}
+      AJAXOrder = {"j_id0:j_id280:j_id281", "j_id0:j_id280:j_id282", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id228", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id230", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id233"}
     ElseIf sProvider = "satelliteinternetco.com" Then
-      AJAXFullOrder = {2, 3, 4, 5}
-      AJAXOrder = {2, 4, 5}
+      AJAXFullOrder = {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
+      AJAXOrder = {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
     Else
       RaiseError("Prepare Failed: Unknown Provider - Can't determine AJAX order.")
     End If
@@ -1265,15 +1265,15 @@ Public Class localRestrictionTracker
     End If
   End Sub
   Private Structure AjaxEntry
-    Public ID As Byte
+    Public ID As String
     Public Iteration As Byte
-    Public Sub New(bID As Byte, bI As Byte)
-      ID = bID
+    Public Sub New(sID As String, bI As Byte)
+      ID = sID
       Iteration = bI
     End Sub
   End Structure
-  Private AJAXFullOrder() As Byte
-  Private AJAXOrder() As Byte
+  Private AJAXFullOrder() As String
+  Private AJAXOrder() As String
   Public ReadOnly Property ExedeAJAXFirstTryRequests As Integer
     Get
       Return AJAXOrder.Length - 1
@@ -1318,7 +1318,12 @@ Public Class localRestrictionTracker
       End If
       Return
     End If
-    If Response.Contains("amount-used") Then
+    If Response.Contains("<div class=""usage""") Or Response.Contains("<div class=""usage ") Then
+      Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""usage"))
+      If sTable.Contains("at-usage-limit") Then imSlowed = True
+      sTable = sTable.Substring(0, sTable.IndexOf("</div>") + 6)
+      ReadUsage(sTable)
+    ElseIf Response.Contains("amount-used") Then
       If Response.Contains("green red") Then imSlowed = True
       Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
       sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
@@ -1365,7 +1370,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket(True)
-    Dim newID As Byte = AjaxID.ID
+    Dim newID As String = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
     If (AjaxID.Iteration = 1 And AjaxID.ID = AJAXOrder(ExedeAJAXFirstTryRequests)) Or (AjaxID.Iteration > 1 And AjaxID.ID = AJAXFullOrder(ExedeAJAXSecondTryRequests)) Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
@@ -1403,13 +1408,15 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "AJAX failed to yield data table."))
       Return
     End If
-    Dim sSend As String = "AJAXREQUEST=_viewRoot" &
-             "&j_id0%3AidForm=j_id0%3AidForm" &
-             "&com.salesforce.visualforce.ViewState=" & srlFunctions.PercentEncode(sViewState) &
-             "&com.salesforce.visualforce.ViewStateVersion=" & srlFunctions.PercentEncode(sVSVersion) &
-             "&com.salesforce.visualforce.ViewStateMAC=" & srlFunctions.PercentEncode(sVSMAC) &
-             "&com.salesforce.visualforce.ViewStateCSRF=" & srlFunctions.PercentEncode(sVSCSRF) &
-             "&j_id0%3AidForm%3Aj_id" & AjaxID.ID & "=j_id0%3AidForm%3Aj_id" & AjaxID.ID
+    Dim AJTable As String = AjaxID.ID.Substring(0, AjaxID.ID.LastIndexOf(":"))
+    Dim sSend As String =
+      "AJAXREQUEST=_viewRoot" &
+      "&" & srlFunctions.PercentEncode(AJTable) & "=" & srlFunctions.PercentEncode(AJTable) &
+      "&com.salesforce.visualforce.ViewState=" & srlFunctions.PercentEncode(sViewState) &
+      "&com.salesforce.visualforce.ViewStateVersion=" & srlFunctions.PercentEncode(sVSVersion) &
+      "&com.salesforce.visualforce.ViewStateMAC=" & srlFunctions.PercentEncode(sVSMAC) &
+      "&com.salesforce.visualforce.ViewStateCSRF=" & srlFunctions.PercentEncode(sVSCSRF) &
+      "&" & srlFunctions.PercentEncode(AjaxID.ID) & "=" & srlFunctions.PercentEncode(AjaxID.ID)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
@@ -1417,34 +1424,56 @@ Public Class localRestrictionTracker
     EX_Ajax_Response(responseData, responseURI, New AjaxEntry(newID, newType))
   End Sub
   Private Sub EX_Read_Table(Table As String)
-    If Not Table.Contains("amount-used") Then
+    Dim Used As String = Nothing
+    Dim Total As String = Nothing
+    If Table.Contains("amount-used") Then
+      Used = Table.Substring(Table.IndexOf("amount-used"))
+      Used = Used.Substring(Used.IndexOf(""">") + 2)
+      Used = Used.Substring(0, Used.IndexOf("</"))
+      Total = Nothing
+      If sProvider = "exede.net" Then
+        If Table.Contains("<strong>") Then
+          Total = Table.Substring(Table.IndexOf("<strong>") + 8)
+          If Total.Contains("</") Then
+            Total = Total.Substring(0, Total.IndexOf("</"))
+          Else
+            RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+            Return
+          End If
+        End If
+      ElseIf sProvider = "mysatelliteinternetco.com" Then
+        If Table.Contains("</strong> used of ") Then
+          Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
+          If Total.Contains(" GB allowance") Then
+            Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
+          ElseIf Total.Contains("</") Then
+            Total = Total.Substring(0, Total.IndexOf("</"))
+          Else
+            RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+            Return
+          End If
+        End If
+      End If
+    ElseIf Table.Contains("<div class=""usage") Then
+      Dim sData As String = StripXMLTags(Table)
+      If Not sData.Contains("GB") Then
+        RaiseError("Usage Read Failed: Unable to parse data!", "EX Read Table", Table)
+        Return
+      End If
+      Used = sData.Substring(0, sData.IndexOf("GB"))
+      If Not sData.Contains(" of ") Then
+        RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+        Return
+      End If
+      Total = sData.Substring(sData.IndexOf(" of ") + 4)
+      If Not Total.Contains("GB") Then
+        RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+        Return
+      End If
+      Total = Total.Substring(0, Total.IndexOf("GB"))
+    Else
       RaiseError("Usage Read Failed: Unable to locate data table", "EX Read Table", Table)
       Return
-    End If
-    Dim Used As String = Table.Substring(Table.IndexOf("amount-used"))
-    Used = Used.Substring(Used.IndexOf(""">") + 2)
-    Used = Used.Substring(0, Used.IndexOf("</"))
-    Dim Total As String = Nothing
-    If sProvider = "exede.net" Then
-      If Table.Contains("<strong>") Then
-        Total = Table.Substring(Table.IndexOf("<strong>") + 8)
-        If Total.Contains("</") Then
-          Total = Total.Substring(0, Total.IndexOf("</"))
-        Else
-          RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-        End If
-      End If
-    ElseIf sProvider = "mysatelliteinternetco.com" Then
-      If Table.Contains("</strong> used of ") Then
-        Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
-        If Total.Contains(" GB allowance") Then
-          Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
-        ElseIf Total.Contains("</") Then
-          Total = Total.Substring(0, Total.IndexOf("</"))
-        Else
-          RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-        End If
-      End If
     End If
     Dim lUsed As Long = StrToVal(Used, MBPerGB)
     Dim lTotal As Long = StrToVal(Total, MBPerGB)
@@ -2348,6 +2377,19 @@ Public Class localRestrictionTracker
     If String.IsNullOrEmpty(str) Then Return 0.0#
     If Not str.Contains(" ") Then Return Val(str.Replace(",", ""))
     Return Val(str.Substring(0, str.IndexOf(" ")).Replace(",", ""))
+  End Function
+  Private Function StripXMLTags(text As String) As String
+    Dim sText As String = text
+    Do While sText.Contains("<")
+      Dim sPre As String = sText.Substring(0, sText.IndexOf("<"))
+      Dim sPost As String = Nothing
+      If sText.Substring(sText.IndexOf("<")).Contains(">") Then
+        sPost = sText.Substring(sText.IndexOf("<"))
+        sPost = sPost.Substring(sPost.IndexOf(">") + 1)
+      End If
+      sText = sPre & sPost
+    Loop
+    Return sText
   End Function
   Private Sub CleanupResult(ByRef result As String)
     If Not String.IsNullOrEmpty(result) Then
