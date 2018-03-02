@@ -136,6 +136,7 @@ Partial Class frmConfig
     Me.chkTLSProxy = New System.Windows.Forms.CheckBox()
     Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
     Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkSecurityEnforce = New System.Windows.Forms.CheckBox()
     Me.pnlNetworkProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolTitle = New System.Windows.Forms.Label()
     Me.lnNetworkProtocolTitle = New RestrictionTracker.LineBreak()
@@ -230,7 +231,9 @@ Partial Class frmConfig
     Me.mnuKeySpacer = New System.Windows.Forms.MenuItem()
     Me.mnuKeyDelete = New System.Windows.Forms.MenuItem()
     Me.mnuKeyClear = New System.Windows.Forms.MenuItem()
-    Me.chkNetworkSecurityEnforce = New System.Windows.Forms.CheckBox()
+    Me.lblRetries1 = New System.Windows.Forms.Label()
+    Me.txtRetries = New RestrictionTracker.NumericUpDownIncrementable()
+    Me.lblRetries2 = New System.Windows.Forms.Label()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -307,6 +310,7 @@ Partial Class frmConfig
     Me.pnlConfig.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'tbsConfig
@@ -1939,6 +1943,19 @@ Partial Class frmConfig
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
     Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
     '
+    'chkNetworkSecurityEnforce
+    '
+    Me.chkNetworkSecurityEnforce.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.chkNetworkSecurityEnforce.AutoSize = True
+    Me.chkNetworkSecurityEnforce.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkSecurityEnforce.Location = New System.Drawing.Point(59, 35)
+    Me.chkNetworkSecurityEnforce.Name = "chkNetworkSecurityEnforce"
+    Me.chkNetworkSecurityEnforce.Size = New System.Drawing.Size(69, 18)
+    Me.chkNetworkSecurityEnforce.TabIndex = 1
+    Me.chkNetworkSecurityEnforce.Text = "Enforce"
+    Me.ttConfig.SetToolTip(Me.chkNetworkSecurityEnforce, resources.GetString("chkNetworkSecurityEnforce.ToolTip"))
+    Me.chkNetworkSecurityEnforce.UseVisualStyleBackColor = True
+    '
     'pnlNetworkProtocolTitle
     '
     Me.pnlNetworkProtocolTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -2375,22 +2392,28 @@ Partial Class frmConfig
     '
     Me.pnlNetworkTimeout.AutoSize = True
     Me.pnlNetworkTimeout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlNetworkTimeout.ColumnCount = 4
+    Me.pnlNetworkTimeout.ColumnCount = 8
+    Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlNetworkTimeout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlNetworkTimeout.Controls.Add(Me.pctNetworkTimeoutIcon, 0, 0)
     Me.pnlNetworkTimeout.Controls.Add(Me.txtTimeout, 2, 1)
     Me.pnlNetworkTimeout.Controls.Add(Me.lblTimeout2, 3, 1)
     Me.pnlNetworkTimeout.Controls.Add(Me.lblTimeout1, 1, 1)
     Me.pnlNetworkTimeout.Controls.Add(Me.lblNetworkTimeoutDescription, 1, 0)
+    Me.pnlNetworkTimeout.Controls.Add(Me.lblRetries1, 5, 1)
+    Me.pnlNetworkTimeout.Controls.Add(Me.txtRetries, 6, 1)
+    Me.pnlNetworkTimeout.Controls.Add(Me.lblRetries2, 7, 1)
     Me.pnlNetworkTimeout.Location = New System.Drawing.Point(3, 31)
     Me.pnlNetworkTimeout.Name = "pnlNetworkTimeout"
     Me.pnlNetworkTimeout.RowCount = 2
     Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlNetworkTimeout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlNetworkTimeout.Size = New System.Drawing.Size(379, 58)
     Me.pnlNetworkTimeout.TabIndex = 2
     '
@@ -2415,7 +2438,7 @@ Partial Class frmConfig
     Me.txtTimeout.Maximum = New Decimal(New Integer() {600, 0, 0, 0})
     Me.txtTimeout.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
     Me.txtTimeout.Name = "txtTimeout"
-    Me.txtTimeout.Size = New System.Drawing.Size(70, 20)
+    Me.txtTimeout.Size = New System.Drawing.Size(50, 20)
     Me.txtTimeout.TabIndex = 2
     Me.txtTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
     Me.ttConfig.SetToolTip(Me.txtTimeout, "Number of seconds to wait between network communications.")
@@ -2425,7 +2448,7 @@ Partial Class frmConfig
     '
     Me.lblTimeout2.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblTimeout2.AutoSize = True
-    Me.lblTimeout2.Location = New System.Drawing.Point(189, 38)
+    Me.lblTimeout2.Location = New System.Drawing.Point(169, 38)
     Me.lblTimeout2.Name = "lblTimeout2"
     Me.lblTimeout2.Size = New System.Drawing.Size(47, 13)
     Me.lblTimeout2.TabIndex = 3
@@ -2446,7 +2469,7 @@ Partial Class frmConfig
     Me.lblNetworkTimeoutDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblNetworkTimeoutDescription.AutoSize = True
-    Me.pnlNetworkTimeout.SetColumnSpan(Me.lblNetworkTimeoutDescription, 3)
+    Me.pnlNetworkTimeout.SetColumnSpan(Me.lblNetworkTimeoutDescription, 7)
     Me.lblNetworkTimeoutDescription.Location = New System.Drawing.Point(59, 3)
     Me.lblNetworkTimeoutDescription.Margin = New System.Windows.Forms.Padding(3)
     Me.lblNetworkTimeoutDescription.Name = "lblNetworkTimeoutDescription"
@@ -3197,18 +3220,38 @@ Partial Class frmConfig
     Me.mnuKeyClear.Index = 5
     Me.mnuKeyClear.Text = "C&lear"
     '
-    'chkNetworkSecurityEnforce
+    'lblRetries1
     '
-    Me.chkNetworkSecurityEnforce.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.chkNetworkSecurityEnforce.AutoSize = True
-    Me.chkNetworkSecurityEnforce.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkSecurityEnforce.Location = New System.Drawing.Point(59, 35)
-    Me.chkNetworkSecurityEnforce.Name = "chkNetworkSecurityEnforce"
-    Me.chkNetworkSecurityEnforce.Size = New System.Drawing.Size(69, 18)
-    Me.chkNetworkSecurityEnforce.TabIndex = 1
-    Me.chkNetworkSecurityEnforce.Text = "Enforce"
-    Me.ttConfig.SetToolTip(Me.chkNetworkSecurityEnforce, resources.GetString("chkNetworkSecurityEnforce.ToolTip"))
-    Me.chkNetworkSecurityEnforce.UseVisualStyleBackColor = True
+    Me.lblRetries1.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblRetries1.AutoSize = True
+    Me.lblRetries1.Location = New System.Drawing.Point(248, 38)
+    Me.lblRetries1.Name = "lblRetries1"
+    Me.lblRetries1.Size = New System.Drawing.Size(35, 13)
+    Me.lblRetries1.TabIndex = 4
+    Me.lblRetries1.Text = "&Retry:"
+    '
+    'txtRetries
+    '
+    Me.txtRetries.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.txtRetries.LargeIncrement = CType(3UI, UInteger)
+    Me.txtRetries.Location = New System.Drawing.Point(289, 35)
+    Me.txtRetries.Maximum = New Decimal(New Integer() {9, 0, 0, 0})
+    Me.txtRetries.Name = "txtRetries"
+    Me.txtRetries.Size = New System.Drawing.Size(50, 20)
+    Me.txtRetries.TabIndex = 5
+    Me.txtRetries.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetToolTip(Me.txtRetries, resources.GetString("txtRetries.ToolTip"))
+    Me.txtRetries.Value = New Decimal(New Integer() {2, 0, 0, 0})
+    '
+    'lblRetries2
+    '
+    Me.lblRetries2.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblRetries2.AutoSize = True
+    Me.lblRetries2.Location = New System.Drawing.Point(345, 38)
+    Me.lblRetries2.Name = "lblRetries2"
+    Me.lblRetries2.Size = New System.Drawing.Size(31, 13)
+    Me.lblRetries2.TabIndex = 6
+    Me.lblRetries2.Text = "times"
     '
     'frmConfig
     '
@@ -3348,6 +3391,7 @@ Partial Class frmConfig
     Me.pnlConfig.PerformLayout()
     Me.pnlButtons.ResumeLayout(False)
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -3558,5 +3602,8 @@ Partial Class frmConfig
   Friend WithEvents mnuKeyDelete As System.Windows.Forms.MenuItem
   Friend WithEvents mnuKeyClear As System.Windows.Forms.MenuItem
   Friend WithEvents chkNetworkSecurityEnforce As System.Windows.Forms.CheckBox
+  Friend WithEvents lblRetries1 As System.Windows.Forms.Label
+  Friend WithEvents txtRetries As RestrictionTracker.NumericUpDownIncrementable
+  Friend WithEvents lblRetries2 As System.Windows.Forms.Label
 
 End Class

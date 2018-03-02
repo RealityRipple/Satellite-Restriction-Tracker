@@ -97,6 +97,10 @@
     If mySettings.Timeout < txtTimeout.Minimum Then mySettings.Timeout = txtTimeout.Minimum
     txtTimeout.Value = mySettings.Timeout
     txtTimeout.LargeIncrement = 15
+    If mySettings.Retries > txtRetries.Maximum Then mySettings.Retries = txtRetries.Maximum
+    If mySettings.Retries < txtRetries.Minimum Then mySettings.Retries = txtRetries.Minimum
+    txtRetries.Value = mySettings.Retries
+    txtRetries.LargeIncrement = 1
     If mySettings.Overuse = 0 Then
       chkOverAlert.Checked = False
       txtOverSize.Value = 100
@@ -498,6 +502,7 @@
                                                                              txtInterval.KeyPress, txtInterval.KeyUp, txtInterval.Scroll, txtInterval.ValueChanged,
                                                                              txtAccuracy.KeyPress, txtAccuracy.KeyUp, txtAccuracy.Scroll, txtAccuracy.ValueChanged,
                                                                              txtTimeout.KeyPress, txtTimeout.KeyUp, txtTimeout.Scroll, txtTimeout.ValueChanged,
+                                                                             txtRetries.KeyPress, txtRetries.KeyUp, txtRetries.Scroll, txtRetries.ValueChanged,
                                                                              chkStartUp.CheckedChanged, chkAutoHide.CheckedChanged,
                                                                              txtOverSize.KeyPress, txtOverSize.KeyUp, txtOverSize.Scroll, txtOverSize.ValueChanged,
                                                                              txtOverTime.KeyPress, txtOverTime.KeyUp, txtOverTime.Scroll, txtOverTime.ValueChanged,
@@ -1417,6 +1422,7 @@
     mySettings.TrayIconAnimation = chkTrayAnim.Checked
     mySettings.TrayIconOnClose = chkTrayClose.Checked
     mySettings.Timeout = txtTimeout.Value
+    mySettings.Retries = txtRetries.Value
     Select Case cmbProxyType.SelectedIndex
       Case 0 : mySettings.Proxy = Nothing
       Case 1 : mySettings.Proxy = Net.WebRequest.DefaultWebProxy
@@ -1722,6 +1728,7 @@
     If Not mySettings.Interval = txtInterval.Value Then Return True
     If Not mySettings.Accuracy = txtAccuracy.Value Then Return True
     If Not mySettings.Timeout = txtTimeout.Value Then Return True
+    If Not mySettings.Retries = txtRetries.Value Then Return True
     If chkStartUp.Checked Xor My.Computer.FileSystem.FileExists(StartupPath) Then Return True
     If Not mySettings.Service = chkService.Checked Then Return True
     If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
