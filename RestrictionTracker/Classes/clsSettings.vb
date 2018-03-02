@@ -179,6 +179,7 @@ Class AppSettings
   Private m_PassCrypt As String
   Private m_TopMost As Boolean
   Private m_Timeout As Integer
+  Private m_Retries As Integer
   Private m_Overuse As Integer
   Private m_Overtime As Integer
   Private m_AlertStyle As String
@@ -471,6 +472,16 @@ Class AppSettings
           m_Timeout = xTimeout.Element("value").Value
         Catch ex As Exception
           m_Timeout = 120
+        End Try
+      End If
+      Dim xRetries As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Retries")
+      If xRetries Is Nothing Then
+        m_Retries = 2
+      Else
+        Try
+          m_Retries = xRetries.Element("value").Value
+        Catch ex As Exception
+          m_Retries = 2
         End Try
       End If
       Dim xOveruse As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Overuse")
@@ -1031,6 +1042,7 @@ Class AppSettings
     m_PassCrypt = Nothing
     m_TopMost = False
     m_Timeout = 120
+    m_Retries = 2
     m_Overuse = 0
     m_Overtime = 60
     m_AlertStyle = "Default"
@@ -1127,6 +1139,7 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "RemoteKey"), New XElement("value", m_RemoteKey)),
                                                           New XElement("setting", New XAttribute("name", "TopMost"), New XElement("value", IIf(m_TopMost, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
+                                                          New XElement("setting", New XAttribute("name", "Retries"), New XElement("value", m_Retries)),
                                                           New XElement("setting", New XAttribute("name", "Overuse"), New XElement("value", m_Overuse)),
                                                           New XElement("setting", New XAttribute("name", "Overtime"), New XElement("value", m_Overtime)),
                                                           New XElement("setting", New XAttribute("name", "AlertStyle"), New XElement("value", m_AlertStyle)),
@@ -1445,6 +1458,14 @@ Class AppSettings
     End Get
     Set(value As Integer)
       m_Timeout = value
+    End Set
+  End Property
+  Public Property Retries As Integer
+    Get
+      Return m_Retries
+    End Get
+    Set(value As Integer)
+      m_Retries = value
     End Set
   End Property
   Public Property Overuse As Integer
