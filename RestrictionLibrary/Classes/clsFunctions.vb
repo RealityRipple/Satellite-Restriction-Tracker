@@ -953,12 +953,23 @@ Public Class srlFunctions
       Return String.Format(".NET 4.5.2 ({0})", clrID)
     End If
     If clrID = 42000 Then
-      If clrID2 = 393295 Or clrID2 = 393297 Then Return ".NET 4.6"
-      If clrID2 = 394254 Or clrID2 = 394271 Then Return ".NET 4.6.1"
-      If clrID2 = 394802 Or clrID2 = 394806 Then Return ".NET 4.6.2"
-      If clrID2 >= 460798 Then Return ".NET 4.7"
-      If clrID2 > 0 Then Return String.Format(".NET 4.6 ({0})", clrID2)
-      Return ".NET 4.6"
+      If clrID2 = 0 Then Return ".NET 4.6"
+      If clrID2 = 393295 Or clrID2 = 393297 Then Return ".NET 4.6" '  6004F 60051
+      If clrID2 = 394254 Or clrID2 = 394271 Then Return ".NET 4.6.1" '6040E 6041F
+      If clrID2 = 394802 Or clrID2 = 394806 Then Return ".NET 4.6.2" '60632 60636
+      If clrID2 = 460798 Or clrID2 = 460805 Then Return ".NET 4.7" '  707FE 70805
+      If clrID2 = 461308 Or clrID2 = 461310 Then Return ".NET 4.7.1" '709FC 709FE
+
+      If clrID2 < 393297 Then Return String.Format(".NET 4.6 ({0})", clrID2)
+      If clrID2 < 394271 Then Return String.Format(".NET 4.6.1 ({0})", clrID2)
+      If clrID2 < 394806 Then Return String.Format(".NET 4.6.2 ({0})", clrID2)
+      If clrID2 < 460805 Then Return String.Format(".NET 4.7 ({0})", clrID2)
+      If clrID2 < 461310 Then Return String.Format(".NET 4.7.1 ({0})", clrID2)
+
+      Dim clrAttempt As String = Hex(clrID2)
+      clrAttempt = clrAttempt.Substring(0, clrAttempt.Length - 4)
+      Dim iAVer As Integer = Integer.Parse(clrAttempt, Globalization.NumberStyles.HexNumber)
+      Return (String.Format(".NET 4.{1} ({0})", clrID2, iAVer))
     End If
     If clrID2 > 0 Then Return String.Format(".NET Future Version ({0}.{1})", clrID, clrID2)
     Return String.Format(".NET Future Version ({0})", clrID)
