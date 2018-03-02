@@ -39,7 +39,6 @@ Public Class frmMain
   Private FullCheck As Boolean = True
   Private NextGrabTick As Long
   Private GrabAttempt As Integer
-  Private GrabAttempts As Integer = 5
   Private ClosingTime As Boolean
   Private sFailTray As String
   Private bAlert As TriState
@@ -169,6 +168,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      GrabAttempt = 0
       localData = New localRestrictionTracker(LocalAppDataDirectory)
     End If
   End Sub
@@ -194,6 +194,7 @@ Public Class frmMain
         localData.Dispose()
         localData = Nothing
       End If
+      GrabAttempt = 0
       localData = New localRestrictionTracker(LocalAppDataDirectory)
     End If
   End Sub
@@ -838,6 +839,7 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
+          GrabAttempt = 0
           localData = New localRestrictionTracker(LocalAppDataDirectory)
         End If
       Else
@@ -974,9 +976,9 @@ Public Class frmMain
         DisplayUsage(False, False)
         Return
       Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout
-        If GrabAttempt < GrabAttempts Then
+        If GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
-          Dim sMessage As String = "Connection Timed Out! Retry " & GrabAttempt & " of " & GrabAttempts & "..."
+          Dim sMessage As String = "Connection Timed Out! Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
           SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
           If localData IsNot Nothing Then
             localData.Dispose()
@@ -1011,9 +1013,9 @@ Public Class frmMain
         End If
       Case ConnectionFailureEventArgs.FailureType.LoginFailure
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
-        If e.Message.EndsWith("Please try again.") And GrabAttempt < GrabAttempts Then
+        If e.Message.EndsWith("Please try again.") And GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
-          Dim sMessage As String = e.Message.Substring(0, e.Message.IndexOf("Please try again.")) & "Retry " & GrabAttempt & " of " & GrabAttempts & "..."
+          Dim sMessage As String = e.Message.Substring(0, e.Message.IndexOf("Please try again.")) & "Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
           SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
           If localData IsNot Nothing Then
             localData.Dispose()
