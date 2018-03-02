@@ -1808,22 +1808,22 @@
     If pctKeyState.Tag = 0 Then
       If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
         ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
-        txtInterval.Minimum = 15
+        'txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
       ElseIf My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
-        txtInterval.Minimum = 15
+        'txtInterval.Minimum = 15
         chkService.Enabled = True
         chkService.Checked = mySettings.Service
         ttConfig.SetToolTip(chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracker is closed." & vbNewLine & "This service will continue running on the system so that logging may continue on any (or no) account." & vbNewLine & "Requires admin privilege prompt when the Restriction Tracker is run or closed, and the Data Directory may not be customized.")
       Else
-        txtInterval.Minimum = 15
+        'txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
         ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & My.Application.Info.ProductName & " if you wish to use this feature.")
       End If
     Else
-      txtInterval.Minimum = 30
+      'txtInterval.Minimum = 30
       chkService.Enabled = False
       chkService.Checked = False
       ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not needed when using the Remote Service!")
