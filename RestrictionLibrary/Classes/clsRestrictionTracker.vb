@@ -1466,11 +1466,14 @@ Public Class localRestrictionTracker
         Return
       End If
       Total = sData.Substring(sData.IndexOf(" of ") + 4)
-      If Not Total.Contains("GB") Then
+      If Total.Contains("Unlimited Data") Then
+        Total = 150
+      ElseIf Not Total.Contains("GB") Then
         RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
         Return
+      Else
+        Total = Total.Substring(0, Total.IndexOf("GB"))
       End If
-      Total = Total.Substring(0, Total.IndexOf("GB"))
     Else
       RaiseError("Usage Read Failed: Unable to locate data table", "EX Read Table", Table)
       Return
