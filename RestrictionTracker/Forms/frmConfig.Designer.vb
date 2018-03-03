@@ -175,6 +175,9 @@ Partial Class frmConfig
     Me.lblTimeout2 = New System.Windows.Forms.Label()
     Me.lblTimeout1 = New System.Windows.Forms.Label()
     Me.lblNetworkTimeoutDescription = New System.Windows.Forms.Label()
+    Me.lblRetries1 = New System.Windows.Forms.Label()
+    Me.txtRetries = New RestrictionTracker.NumericUpDownIncrementable()
+    Me.lblRetries2 = New System.Windows.Forms.Label()
     Me.pnlNetworkUpdateTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkUpdateTitle = New System.Windows.Forms.Label()
     Me.lnNetworkUpdateTitle = New RestrictionTracker.LineBreak()
@@ -231,9 +234,6 @@ Partial Class frmConfig
     Me.mnuKeySpacer = New System.Windows.Forms.MenuItem()
     Me.mnuKeyDelete = New System.Windows.Forms.MenuItem()
     Me.mnuKeyClear = New System.Windows.Forms.MenuItem()
-    Me.lblRetries1 = New System.Windows.Forms.Label()
-    Me.txtRetries = New RestrictionTracker.NumericUpDownIncrementable()
-    Me.lblRetries2 = New System.Windows.Forms.Label()
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
@@ -291,6 +291,7 @@ Partial Class frmConfig
     Me.pnlNetworkTimeout.SuspendLayout()
     CType(Me.pctNetworkTimeoutIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlNetworkUpdateTitle.SuspendLayout()
     Me.tabAdvanced.SuspendLayout()
     Me.pnlAdvanced.SuspendLayout()
@@ -310,7 +311,6 @@ Partial Class frmConfig
     Me.pnlConfig.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'tbsConfig
@@ -2478,6 +2478,39 @@ Partial Class frmConfig
     Me.lblNetworkTimeoutDescription.Text = "The connection to the server is closed if no response is received in a set amount" & _
     " of time."
     '
+    'lblRetries1
+    '
+    Me.lblRetries1.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblRetries1.AutoSize = True
+    Me.lblRetries1.Location = New System.Drawing.Point(248, 38)
+    Me.lblRetries1.Name = "lblRetries1"
+    Me.lblRetries1.Size = New System.Drawing.Size(35, 13)
+    Me.lblRetries1.TabIndex = 4
+    Me.lblRetries1.Text = "&Retry:"
+    '
+    'txtRetries
+    '
+    Me.txtRetries.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.txtRetries.LargeIncrement = CType(3UI, UInteger)
+    Me.txtRetries.Location = New System.Drawing.Point(289, 35)
+    Me.txtRetries.Maximum = New Decimal(New Integer() {9, 0, 0, 0})
+    Me.txtRetries.Name = "txtRetries"
+    Me.txtRetries.Size = New System.Drawing.Size(50, 20)
+    Me.txtRetries.TabIndex = 5
+    Me.txtRetries.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+    Me.ttConfig.SetToolTip(Me.txtRetries, resources.GetString("txtRetries.ToolTip"))
+    Me.txtRetries.Value = New Decimal(New Integer() {2, 0, 0, 0})
+    '
+    'lblRetries2
+    '
+    Me.lblRetries2.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblRetries2.AutoSize = True
+    Me.lblRetries2.Location = New System.Drawing.Point(345, 38)
+    Me.lblRetries2.Name = "lblRetries2"
+    Me.lblRetries2.Size = New System.Drawing.Size(31, 13)
+    Me.lblRetries2.TabIndex = 6
+    Me.lblRetries2.Text = "times"
+    '
     'pnlNetworkUpdateTitle
     '
     Me.pnlNetworkUpdateTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -3220,39 +3253,6 @@ Partial Class frmConfig
     Me.mnuKeyClear.Index = 5
     Me.mnuKeyClear.Text = "C&lear"
     '
-    'lblRetries1
-    '
-    Me.lblRetries1.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRetries1.AutoSize = True
-    Me.lblRetries1.Location = New System.Drawing.Point(248, 38)
-    Me.lblRetries1.Name = "lblRetries1"
-    Me.lblRetries1.Size = New System.Drawing.Size(35, 13)
-    Me.lblRetries1.TabIndex = 4
-    Me.lblRetries1.Text = "&Retry:"
-    '
-    'txtRetries
-    '
-    Me.txtRetries.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.txtRetries.LargeIncrement = CType(3UI, UInteger)
-    Me.txtRetries.Location = New System.Drawing.Point(289, 35)
-    Me.txtRetries.Maximum = New Decimal(New Integer() {9, 0, 0, 0})
-    Me.txtRetries.Name = "txtRetries"
-    Me.txtRetries.Size = New System.Drawing.Size(50, 20)
-    Me.txtRetries.TabIndex = 5
-    Me.txtRetries.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-    Me.ttConfig.SetToolTip(Me.txtRetries, resources.GetString("txtRetries.ToolTip"))
-    Me.txtRetries.Value = New Decimal(New Integer() {2, 0, 0, 0})
-    '
-    'lblRetries2
-    '
-    Me.lblRetries2.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRetries2.AutoSize = True
-    Me.lblRetries2.Location = New System.Drawing.Point(345, 38)
-    Me.lblRetries2.Name = "lblRetries2"
-    Me.lblRetries2.Size = New System.Drawing.Size(31, 13)
-    Me.lblRetries2.TabIndex = 6
-    Me.lblRetries2.Text = "times"
-    '
     'frmConfig
     '
     Me.AcceptButton = Me.cmdSave
@@ -3359,6 +3359,7 @@ Partial Class frmConfig
     Me.pnlNetworkTimeout.PerformLayout()
     CType(Me.pctNetworkTimeoutIcon, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.txtTimeout, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlNetworkUpdateTitle.ResumeLayout(False)
     Me.pnlNetworkUpdateTitle.PerformLayout()
     Me.tabAdvanced.ResumeLayout(False)
@@ -3391,7 +3392,6 @@ Partial Class frmConfig
     Me.pnlConfig.PerformLayout()
     Me.pnlButtons.ResumeLayout(False)
     CType(Me.fswController, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.txtRetries, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
