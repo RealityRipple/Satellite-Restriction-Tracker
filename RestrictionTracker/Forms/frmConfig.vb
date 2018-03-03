@@ -316,8 +316,16 @@
       chkNetworkProtocolTLS12.Checked = False
       chkNetworkProtocolTLS12.Enabled = False
       ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
+      lblRetries1.Enabled = False
+      txtRetries.Enabled = False
+      lblRetries2.Enabled = False
+      ttConfig.SetToolTip(txtRetries, "Automatic Retry is not implemented for the Remote Usage Service at this time.")
       Return
     End If
+    lblRetries1.Enabled = True
+    txtRetries.Enabled = True
+    lblRetries2.Enabled = True
+    ttConfig.SetToolTip(txtRetries, "Number of times to retry a connection that times out or fails before giving up." & vbNewLine & "If you run into errors that say ""Please try again"", you can increase this number to improve the chances of a good connection.")
     chkTLSProxy.Enabled = True
     ttConfig.SetToolTip(chkTLSProxy, "If your Operating System does not support the Security Protocol required for your provider, you can use this Proxy to connect through the RealityRipple.com server.")
     If chkTLSProxy.Checked Then
