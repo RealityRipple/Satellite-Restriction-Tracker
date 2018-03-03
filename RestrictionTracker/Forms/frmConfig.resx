@@ -120,15 +120,13 @@
   <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>141, 17</value>
   </metadata>
-  <data name="txtRetries.ToolTip" xml:space="preserve">
-    <value>Number of times to retry a connection that times out or fails before giving up. If you run into errors that say "Please try again", you can increase this number to improve the chances of a good connection.</value>
-  </data>
-  <metadata name="ttConfig.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>141, 17</value>
-  </metadata>
   <data name="chkNetworkSecurityEnforce.ToolTip" xml:space="preserve">
     <value>Enforce network certificate validation. If the server's certificate is not valid, your connection may fail.
 Turning this feature off may potentially expose your computer or transmitted information to third parties.</value>
+  </data>
+  <data name="txtRetries.ToolTip" xml:space="preserve">
+    <value>Number of times to retry a connection that times out or fails before giving up.
+If you run into errors that say "Please try again", you can increase this number to improve the chances of a good connection.</value>
   </data>
   <metadata name="fswController.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
