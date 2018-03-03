@@ -330,7 +330,7 @@
     ttConfig.SetToolTip(chkTLSProxy, "If your Operating System does not support the Security Protocol required for your provider, you can use this Proxy to connect through the RealityRipple.com server.")
     If chkTLSProxy.Checked Then
       chkNetworkSecurityEnforce.Enabled = False
-      ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The server's certificate will be validated by the TLS Proxy.")
+      ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The server's certificate will be validated at the discretion of the TLS Proxy.")
       chkNetworkProtocolSSL3.Enabled = True
       ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
       chkNetworkProtocolTLS10.Enabled = True
