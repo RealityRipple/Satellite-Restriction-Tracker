@@ -1467,7 +1467,7 @@ Public Class localRestrictionTracker
       End If
       Total = sData.Substring(sData.IndexOf(" of ") + 4)
       If Total.Contains("Unlimited Data") Then
-        Total = 150
+        Total = "150"
       ElseIf Not Total.Contains("GB") Then
         RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
         Return
