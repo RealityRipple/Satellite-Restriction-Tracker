@@ -17,13 +17,7 @@
     lblCLR.Text = String.Format("on {0}", srlFunctions.GetCLRCleanVersion)
     lblCompany.Text = My.Application.Info.CompanyName
     txtDescription.Text = My.Application.Info.Description
-    lblUpdate.Visible = False
-    pnlAbout.Controls.Remove(lblUpdate)
-    pnlAbout.Controls.Add(cmdUpdate, 1, 2)
-    pnlAbout.SetColumnSpan(cmdUpdate, 3)
-    cmdUpdate.Visible = True
-    cmdUpdate.Text = "Check for &Updates"
-    ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
+    ResetUpdateButton()
   End Sub
   Private Sub frmAbout_FormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
     If tReset IsNot Nothing Then
@@ -52,6 +46,7 @@
       updateChecker.Dispose()
       updateChecker = Nothing
     End If
+    ResetUpdateButton()
     Me.Hide()
   End Sub
   Private Sub LogoPictureBox_MouseDoubleClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles LogoPictureBox.MouseDoubleClick
@@ -194,6 +189,16 @@
     If tReset Is Nothing Then Return
     tReset.Dispose()
     tReset = Nothing
+    ResetUpdateButton()
+  End Sub
+  Private Sub ResetUpdateButton()
+    If Me.InvokeRequired Then
+      Try
+        Me.Invoke(New MethodInvoker(AddressOf ResetUpdateButton))
+      Catch ex As Exception
+      End Try
+      Return
+    End If
     lblUpdate.Visible = False
     pnlAbout.Controls.Remove(lblUpdate)
     pnlAbout.Controls.Add(cmdUpdate, 1, 2)
