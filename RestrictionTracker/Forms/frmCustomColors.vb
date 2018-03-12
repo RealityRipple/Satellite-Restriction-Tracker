@@ -605,7 +605,7 @@ Public Class frmCustomColors
         Dim FakeMRect As New Rectangle(0, 0, iWidth, iHeight * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Dim fakeI As New Bitmap(iWidth, iHeight)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
@@ -623,7 +623,7 @@ Public Class frmCustomColors
         Dim FakeMRect As New Rectangle(0, 0, iWidth, iHeight * 2)
         Dim FakeD As Image = DisplayProgress(FakeMRect.Size, lDown, lDownLim, mySettings.Accuracy, pctMainDownA.BackColor, pctMainDownB.BackColor, pctMainDownC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
         Dim FakeU As Image = DisplayProgress(FakeMRect.Size, lUp, lUpLim, mySettings.Accuracy, pctMainUpA.BackColor, pctMainUpB.BackColor, pctMainUpC.BackColor, pctMainText.BackColor, pctMainBG.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Dim fakeI As New Bitmap(iWidth, iHeight)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
@@ -679,6 +679,10 @@ Public Class frmCustomColors
     End Using
     pctTray.Image = imgTray
 
+    iWidth = pctHistory.Width
+    iHalfW = Math.Floor(iWidth / 2)
+    iHeight = pctHistory.Height
+    iHalfH = Math.Floor(iHeight / 2)
     If pctHistory.Image IsNot Nothing Then
       pctHistory.Image.Dispose()
       pctHistory.Image = Nothing
@@ -689,7 +693,7 @@ Public Class frmCustomColors
       Case SatHostTypes.WildBlue_LEGACY
         Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Dim fakeI As New Bitmap(iWidth, iHeight)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
@@ -703,7 +707,7 @@ Public Class frmCustomColors
         pctHistory.Image = fakeI
       Case SatHostTypes.RuralPortal_EXEDE
         Dim FakeR As Image = DrawRGraph(FakeData.ToArray, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Dim fakeI As New Bitmap(iWidth, iHeight)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
@@ -721,7 +725,7 @@ Public Class frmCustomColors
       Case SatHostTypes.Dish_EXEDE
         Dim FakeD As Image = DrawLineGraph(FakeData.ToArray, True, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryDownA.BackColor, pctHistoryDownB.BackColor, pctHistoryDownC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryDownMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
         Dim FakeU As Image = DrawLineGraph(FakeData.ToArray, False, FakeHRect.Size, pctHistoryDownLine.BackColor, pctHistoryUpA.BackColor, pctHistoryUpB.BackColor, pctHistoryUpC.BackColor, pctHistoryText.BackColor, pctHistoryBG.BackColor, pctHistoryUpMax.BackColor, pctHistoryGridL.BackColor, pctHistoryGridD.BackColor)
-        Dim fakeI As New Bitmap(pctHistory.Width, pctHistory.Height)
+        Dim fakeI As New Bitmap(iWidth, iHeight)
         Using g As Graphics = Graphics.FromImage(fakeI)
           g.Clear(Color.Black)
           g.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
