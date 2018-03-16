@@ -1024,6 +1024,16 @@ Public Class frmMain
           localData = New localRestrictionTracker(LocalAppDataDirectory)
           Return
         End If
+        If e.Message = "AJAX failed to yield data table." And GrabAttempt < 1 Then
+          GrabAttempt += 1
+          If localData IsNot Nothing Then
+            localData.Dispose()
+            localData = Nothing
+          End If
+          Dim sMessage As String = e.Message & " Attempting to Update AJAX Lists..."
+          Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, GrabAttempt, AddressOf UpdateAJAXLists_ListUpdated)
+          Return
+        End If
         SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
         DisplayUsage(False, True)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
@@ -2608,4 +2618,27 @@ Public Class frmMain
     Return True
   End Function
 #End Region
+
+  Private Sub UpdateAJAXLists_ListUpdated(asyncState As Object, shortList As String, fullList As String)
+    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
+      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists.", True)
+      DisplayUsage(False, True)
+      Return
+    End If
+    If mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
+      SetStatusText(LOG_GetLast.ToString("g"), "AJAX failed to yield data table. A fix should be available soon.", True)
+      DisplayUsage(False, True)
+      Return
+    End If
+    mySettings.AJAXOrderShort = shortList
+    mySettings.AJAXOrderFull = fullList
+    mySettings.Save()
+    SetStatusText(LOG_GetLast.ToString("g"), "Updated AJAX Lists. Reconnecting...", True)
+    If localData IsNot Nothing Then
+      localData.Dispose()
+      localData = Nothing
+    End If
+    localData = New localRestrictionTracker(LocalAppDataDirectory)
+  End Sub
+
 End Class

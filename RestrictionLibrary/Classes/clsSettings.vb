@@ -11,6 +11,8 @@ Class AppSettings
   Private m_ProxySetting As String
   Private m_SecurProtocol As Net.SecurityProtocolType
   Private m_SecurEnforced As Boolean
+  Private m_AJAXShort As String
+  Private m_AJAXFull As String
   Public Loaded As Boolean
   Private Property ConfigFile As String
     Get
@@ -67,6 +69,16 @@ Class AppSettings
                     If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
                   ElseIf xName.CompareTo("EnforcedSecurity") = 0 Then
                     m_SecurEnforced = (xValue = "True")
+                  ElseIf xName.CompareTo("AJAXOrder") = 0 Then
+                    For Each m_child As XmlNode In m_node.ChildNodes
+                      Dim xMName = m_child.Attributes(0).InnerText
+                      Dim xMValue = m_child.FirstChild.InnerText
+                      If xMName.CompareTo("Short") = 0 Then
+                        m_AJAXShort = xMValue
+                      ElseIf xMName.CompareTo("Full") = 0 Then
+                        m_AJAXFull = xMValue
+                      End If
+                    Next
                   End If
                 Next
                 Loaded = True
@@ -105,6 +117,8 @@ Class AppSettings
     m_ProxySetting = "None"
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     m_SecurEnforced = False
+    m_AJAXFull = Nothing
+    m_AJAXShort = Nothing
   End Sub
   Public ReadOnly Property Account As String
     Get
@@ -201,6 +215,60 @@ Class AppSettings
   Public ReadOnly Property SecurityEnforced As Boolean
     Get
       Return m_SecurEnforced
+    End Get
+  End Property
+  Public ReadOnly Property AJAXFullOrder As String()
+    Get
+      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then Return Nothing
+      If String.IsNullOrEmpty(m_AJAXFull) Then
+        If String.IsNullOrEmpty(m_Account) Then Return Nothing
+        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
+        If sHost = "exede.net" Then
+          Return {"j_id0:j_id301:j_id302", "j_id0:j_id301:j_id303", "j_id0:j_id301:j_id304", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id248", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id249", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id250", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id252", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id251", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id255", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id253", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id254"}
+        ElseIf sHost = "satelliteinternetco.com" Then
+          Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
+        Else
+          Return Nothing
+        End If
+      End If
+      If Not m_AJAXFull.Contains(",") Then
+        If m_AJAXFull.StartsWith("""") Or m_AJAXFull.StartsWith("'") Then m_AJAXFull = m_AJAXFull.Substring(1)
+        If m_AJAXFull.EndsWith("""") Or m_AJAXFull.EndsWith("'") Then m_AJAXFull = m_AJAXFull.Substring(0, m_AJAXFull.Length - 1)
+        Return {m_AJAXFull}
+      End If
+      Dim sParts() As String = Split(m_AJAXFull, ",")
+      Dim sCleanParts As New List(Of String)
+      For Each sPart In sParts
+        If sPart.StartsWith("""") Or sPart.StartsWith("'") Then sPart = sPart.Substring(1)
+        If sPart.EndsWith("""") Or sPart.EndsWith("'") Then sPart = sPart.Substring(0, sPart.Length - 1)
+        sCleanParts.Add(sPart)
+      Next
+      Return sCleanParts.ToArray
+    End Get
+  End Property
+  Public ReadOnly Property AJAXShortOrder As String()
+    Get
+      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then Return Nothing
+      If String.IsNullOrEmpty(m_AJAXFull) Then
+        If String.IsNullOrEmpty(m_Account) Then Return Nothing
+        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
+        If sHost = "exede.net" Then
+          Return {"j_id0:j_id301:j_id302", "j_id0:j_id301:j_id303", "j_id0:j_id301:j_id304", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id248", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id250", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id254"}
+        ElseIf sHost = "satelliteinternetco.com" Then
+          Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
+        Else
+          Return Nothing
+        End If
+      End If
+      If Not m_AJAXShort.Contains(", ") Then
+        Return {m_AJAXShort}
+      End If
+      Dim sParts() As String = Split(m_AJAXShort, ", ")
+      Dim sCleanParts As New List(Of String)
+      For Each sPart In sParts
+        sCleanParts.Add(sPart)
+      Next
+      Return sCleanParts.ToArray
     End Get
   End Property
 End Class

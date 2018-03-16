@@ -193,6 +193,8 @@ Class AppSettings
   Private m_NetTest As String
   Private m_SecurProtocol As Net.SecurityProtocolType
   Private m_SecurEnforced As Boolean
+  Private m_AJAXShort As String
+  Private m_AJAXFull As String
   Public Loaded As Boolean
   Public Colors As AppColors
   Public Enum UpdateTypes
@@ -639,6 +641,24 @@ Class AppSettings
           m_NetTest = Nothing
         End Try
       End If
+      Dim xAJAXOrder As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AJAXOrder")
+      If xAJAXOrder Is Nothing Then
+        m_AJAXShort = Nothing
+        m_AJAXFull = Nothing
+      Else
+        Try
+          Dim xAJAXOrderShort As XElement = Array.Find(xAJAXOrder.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Short")
+          m_AJAXShort = xAJAXOrderShort.Element("value").Value
+        Catch ex As Exception
+          m_AJAXShort = Nothing
+        End Try
+        Try
+          Dim xAJAXOrderFull As XElement = Array.Find(xAJAXOrder.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Full")
+          m_AJAXFull = xAJAXOrderFull.Element("value").Value
+        Catch ex As Exception
+          m_AJAXFull = Nothing
+        End Try
+      End If
       Colors = New AppColors
       Dim xcolorSettings As XElement = xConfig.Element("colorSettings")
       If xcolorSettings Is Nothing Then
@@ -1056,6 +1076,8 @@ Class AppSettings
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     m_SecurEnforced = False
     m_NetTest = Nothing
+    m_AJAXShort = Nothing
+    m_AJAXFull = Nothing
     Colors = New AppColors
     ResetColors()
   End Sub
@@ -1153,7 +1175,10 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
                                                           New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))),
-                                                          New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)))),
+                                                          New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)),
+                                                          New XElement("setting", New XAttribute("name", "AJAXOrder"),
+                                                                       New XElement("setting", New XAttribute("name", "Short"), New XElement("value", m_AJAXShort)),
+                                                                       New XElement("setting", New XAttribute("name", "Full"), New XElement("value", m_AJAXFull))))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),
                                                           New XElement("section", New XAttribute("name", "Download"),
@@ -1648,6 +1673,22 @@ Class AppSettings
     End Get
     Set(value As String)
       m_NetTest = value
+    End Set
+  End Property
+  Public Property AJAXOrderFull As String
+    Get
+      Return m_AJAXFull
+    End Get
+    Set(value As String)
+      m_AJAXFull = value
+    End Set
+  End Property
+  Public Property AJAXOrderShort As String
+    Get
+      Return m_AJAXShort
+    End Get
+    Set(value As String)
+      m_AJAXShort = value
     End Set
   End Property
   Class AppColors

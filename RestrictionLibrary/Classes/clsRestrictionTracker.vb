@@ -720,14 +720,11 @@ Public Class localRestrictionTracker
     WB_Login_Response(responseData, responseURI)
   End Sub
   Private Sub LoginExede()
-    If sProvider = "exede.net" Then
-      AJAXFullOrder = {"j_id0:j_id280:j_id281", "j_id0:j_id280:j_id282", "j_id0:j_id1:j_id88:j_id89:j_id205:j_id206:j_id208:j_id218", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id228", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id229", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id230", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id232", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id231", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id234", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id233"}
-      AJAXOrder = {"j_id0:j_id280:j_id281", "j_id0:j_id280:j_id282", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id228", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id230", "j_id0:j_id1:j_id88:j_id89:j_id227:j_id233"}
-    ElseIf sProvider = "satelliteinternetco.com" Then
-      AJAXFullOrder = {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
-      AJAXOrder = {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
-    Else
+    AJAXOrder = mySettings.AJAXShortOrder
+    AJAXFullOrder = mySettings.AJAXFullOrder
+    If AJAXOrder Is Nothing Or AJAXFullOrder Is Nothing Then
       RaiseError("Prepare Failed: Unknown Provider - Can't determine AJAX order.")
+      Return
     End If
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim uriString As String = "https://my." & sProvider & "/login"

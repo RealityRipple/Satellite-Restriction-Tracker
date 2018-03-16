@@ -137,3 +137,70 @@ Public Class DetermineType
     End Select
   End Sub
 End Class
+
+''' <summary>
+''' Class for grabbing Exede AJAX Lists
+''' </summary>
+Public Class UpdateAJAXLists
+  ''' <summary>
+  ''' Callback subroutine to be triggered when a type has been determined in the <see cref="UpdateAJAXLists" /> class.
+  ''' </summary>
+  Public Delegate Sub UpdateCallback(asyncState As Object, shortList As String, fullList As String)
+  Private c_callback As UpdateCallback
+  Private wRequest As Net.WebRequest
+  Private sAddr As String
+  ''' <summary>
+  ''' Constructor for <see cref="UpdateAJAXLists" /> class, which also begins the update procedure.
+  ''' </summary>
+  ''' <param name="HostAddress">Host to determine the AJAX Lists of.</param>
+  ''' <param name="iTimeout">Number of milliseconds to wait for a response from the server while testing the connection.</param>
+  ''' <param name="pProxy">Proxy settings for testing the servers.</param>
+  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
+  Public Sub New(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object, callback As UpdateCallback)
+    wRequest = Nothing
+    sAddr = String.Empty
+    c_callback = callback
+    Dim beginInvoker As New BeginCheckInvoker(AddressOf BeginCheck)
+    beginInvoker.BeginInvoke(HostAddress, iTimeout, pProxy, asyncState, Nothing, Nothing)
+  End Sub
+  Private Delegate Sub BeginCheckInvoker(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
+  Private Sub BeginCheck(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
+    wRequest = System.Net.WebRequest.Create("http://wb.realityripple.com/hosts/exAJAX.php?h=" & Host)
+    wRequest.Timeout = Timeout
+    wRequest.Proxy = Proxy
+    Try
+      wRequest.BeginGetResponse(New AsyncCallback(AddressOf AJAXCheckResponse), state)
+    Catch ex As Exception
+      c_callback.Invoke(state, Nothing, Nothing)
+    End Try
+  End Sub
+  Private Sub AJAXCheckResponse(ar As IAsyncResult)
+    Try
+      Dim wResponse As Net.WebResponse = wRequest.EndGetResponse(ar)
+      If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
+        Dim sData As String = Nothing
+        Using wData As IO.Stream = wResponse.GetResponseStream
+          Using readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
+            sData = readStream.ReadToEnd
+          End Using
+        End Using
+        If String.IsNullOrEmpty(sData) Then
+          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+        ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
+          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+        ElseIf Not sData.ToLower.Contains(vbLf) Then
+          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+        Else
+          Dim minAndFull() As String = Split(sData, vbLf, 2)
+          c_callback.Invoke(ar.AsyncState, minAndFull(0), minAndFull(1))
+        End If
+      Else
+        c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+      End If
+      wResponse.Close()
+      wResponse = Nothing
+    Catch ex As Exception
+      c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+    End Try
+  End Sub
+End Class
