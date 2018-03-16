@@ -106,13 +106,10 @@ Class AppSettings
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     m_SecurEnforced = False
   End Sub
-  Public Property Account As String
+  Public ReadOnly Property Account As String
     Get
       Return m_Account
     End Get
-    Set(value As String)
-      m_Account = value
-    End Set
   End Property
   Public Property AccountType As localRestrictionTracker.SatHostTypes
     Get
@@ -122,47 +119,32 @@ Class AppSettings
       m_AccountType = value
     End Set
   End Property
-  Public Property PassCrypt As String
+  Public ReadOnly Property PassCrypt As String
     Get
       Return m_PassCrypt
     End Get
-    Set(value As String)
-      m_PassCrypt = value
-    End Set
   End Property
-  Public Property Interval As Integer
+  Public ReadOnly Property Interval As Integer
     Get
       Return m_Interval
     End Get
-    Set(value As Integer)
-      m_Interval = value
-    End Set
   End Property
-  Public Property HistoryDir As String
+  Public ReadOnly Property HistoryDir As String
     Get
       Return m_HistoryDir
     End Get
-    Set(value As String)
-      m_HistoryDir = value
-    End Set
   End Property
-  Public Property Timeout As Integer
+  Public ReadOnly Property Timeout As Integer
     Get
       Return m_Timeout
     End Get
-    Set(value As Integer)
-      m_Timeout = value
-    End Set
   End Property
-  Public Property TLSProxy As Boolean
+  Public ReadOnly Property TLSProxy As Boolean
     Get
       Return m_TLSProxy
     End Get
-    Set(value As Boolean)
-      m_TLSProxy = value
-    End Set
   End Property
-  Public Property Proxy As Net.IWebProxy
+  Public ReadOnly Property Proxy As Net.IWebProxy
     Get
       If m_ProxySetting.Contains("http://") Then m_ProxySetting = Replace(m_ProxySetting, "http://", String.Empty)
       If m_ProxySetting.Contains(":"c) Then
@@ -210,53 +192,15 @@ Class AppSettings
         End Select
       End If
     End Get
-    Set(value As Net.IWebProxy)
-      If value Is Nothing Then
-        m_ProxySetting = "None"
-      ElseIf value.Equals(Net.WebRequest.DefaultWebProxy) Then
-        m_ProxySetting = "System"
-      Else
-        Dim wValue As Net.WebProxy = value
-        If IsNumeric(Replace(wValue.Address.Host, ".", String.Empty)) Then
-          If value.Credentials IsNot Nothing Then
-            Dim mCreds As Net.NetworkCredential = value.Credentials.GetCredential(Nothing, String.Empty)
-            If String.IsNullOrEmpty(mCreds.Domain) Then
-              m_ProxySetting = "IP:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password
-            Else
-              m_ProxySetting = "IP:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password & ":" & mCreds.Domain
-            End If
-          Else
-            m_ProxySetting = "IP:" & wValue.Address.ToString
-          End If
-        Else
-          If value.Credentials IsNot Nothing Then
-            Dim mCreds As Net.NetworkCredential = value.Credentials.GetCredential(Nothing, String.Empty)
-            If String.IsNullOrEmpty(mCreds.Domain) Then
-              m_ProxySetting = "URL:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password
-            Else
-              m_ProxySetting = "URL:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password & ":" & mCreds.Domain
-            End If
-          Else
-            m_ProxySetting = "URL:" & wValue.Address.ToString
-          End If
-        End If
-      End If
-    End Set
   End Property
-  Public Property SecurityProtocol As Net.SecurityProtocolType
+  Public ReadOnly Property SecurityProtocol As Net.SecurityProtocolType
     Get
       Return m_SecurProtocol
     End Get
-    Set(value As Net.SecurityProtocolType)
-      m_SecurProtocol = value
-    End Set
   End Property
-  Public Property SecurityEnforced As Boolean
+  Public ReadOnly Property SecurityEnforced As Boolean
     Get
       Return m_SecurEnforced
     End Get
-    Set(value As Boolean)
-      m_SecurEnforced = value
-    End Set
   End Property
 End Class

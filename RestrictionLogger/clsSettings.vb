@@ -105,15 +105,12 @@
       Return m_Interval
     End Get
   End Property
-  Public Property Timeout As Integer
+  Public ReadOnly Property Timeout As Integer
     Get
       Return m_Timeout
     End Get
-    Set(value As Integer)
-      m_Timeout = value
-    End Set
   End Property
-  Public Property Proxy As Net.IWebProxy
+  Public ReadOnly Property Proxy As Net.IWebProxy
     Get
       If m_ProxySetting.Contains(":"c) Then
         Dim myProxySettings() As String = Split(m_ProxySetting, ":")
@@ -159,38 +156,6 @@
         End Select
       End If
     End Get
-    Set(value As Net.IWebProxy)
-      If value Is Nothing Then
-        m_ProxySetting = "None"
-      ElseIf value.Equals(Net.WebRequest.DefaultWebProxy) Then
-        m_ProxySetting = "System"
-      Else
-        Dim wValue As Net.WebProxy = value
-        If IsNumeric(Replace(wValue.Address.Host, ".", String.Empty)) Then
-          If value.Credentials IsNot Nothing Then
-            Dim mCreds As Net.NetworkCredential = value.Credentials.GetCredential(Nothing, String.Empty)
-            If String.IsNullOrEmpty(mCreds.Domain) Then
-              m_ProxySetting = "IP:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password
-            Else
-              m_ProxySetting = "IP:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password & ":" & mCreds.Domain
-            End If
-          Else
-            m_ProxySetting = "IP:" & wValue.Address.ToString
-          End If
-        Else
-          If value.Credentials IsNot Nothing Then
-            Dim mCreds As Net.NetworkCredential = value.Credentials.GetCredential(Nothing, String.Empty)
-            If String.IsNullOrEmpty(mCreds.Domain) Then
-              m_ProxySetting = "URL:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password
-            Else
-              m_ProxySetting = "URL:" & wValue.Address.ToString & ":" & ":" & mCreds.UserName & ":" & mCreds.Password & ":" & mCreds.Domain
-            End If
-          Else
-            m_ProxySetting = "URL:" & wValue.Address.ToString
-          End If
-        End If
-      End If
-    End Set
   End Property
   Private Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
     Select Case st.ToUpper
