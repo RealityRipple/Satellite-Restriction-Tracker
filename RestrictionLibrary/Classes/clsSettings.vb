@@ -4,7 +4,6 @@ Class AppSettings
   Private m_Account As String
   Private m_AccountType As localRestrictionTracker.SatHostTypes
   Private m_Interval As Integer
-  Private m_LastSyncTime As Date
   Private m_HistoryDir As String
   Private m_PassCrypt As String
   Private m_Timeout As Integer
@@ -49,8 +48,6 @@ Class AppSettings
                     End If
                   ElseIf xName.CompareTo("Interval") = 0 Then
                     If Not Integer.TryParse(xValue, m_Interval) Then m_Interval = 15
-                  ElseIf xName.CompareTo("LastSyncTime") = 0 Then
-                    m_LastSyncTime = Date.FromBinary(xValue)
                   ElseIf xName.CompareTo("HistoryDir") = 0 Then
                     m_HistoryDir = xValue
                   ElseIf xName.CompareTo("PassCrypt") = 0 Then
@@ -101,7 +98,6 @@ Class AppSettings
     m_Account = Nothing
     m_AccountType = localRestrictionTracker.SatHostTypes.Other
     m_Interval = 15
-    m_LastSyncTime = New Date(2000, 1, 1)
     m_HistoryDir = Nothing
     m_PassCrypt = Nothing
     m_Timeout = 120
@@ -140,14 +136,6 @@ Class AppSettings
     End Get
     Set(value As Integer)
       m_Interval = value
-    End Set
-  End Property
-  Public Property LastSyncTime As Date
-    Get
-      Return m_LastSyncTime
-    End Get
-    Set(value As Date)
-      m_LastSyncTime = value
     End Set
   End Property
   Public Property HistoryDir As String
