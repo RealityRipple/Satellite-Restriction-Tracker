@@ -1031,6 +1031,7 @@ Public Class frmMain
             localData = Nothing
           End If
           Dim sMessage As String = e.Message & " Attempting to Update AJAX Lists..."
+          SetStatusText(LOG_GetLast.ToString("g"), sMessage, False)
           Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, GrabAttempt, AddressOf UpdateAJAXLists_ListUpdated)
           Return
         End If
