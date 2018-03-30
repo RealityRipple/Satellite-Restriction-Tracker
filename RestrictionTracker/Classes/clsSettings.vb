@@ -189,7 +189,6 @@ Class AppSettings
   Private m_AutoHide As Boolean
   Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
-  Private m_LastNag As Date
   Private m_NetTest As String
   Private m_SecurProtocol As Net.SecurityProtocolType
   Private m_SecurEnforced As Boolean
@@ -594,16 +593,6 @@ Class AppSettings
           m_ProxySetting = xProxy.Element("value").Value
         Catch ex As Exception
           m_ProxySetting = "None"
-        End Try
-      End If
-      Dim xLastNag As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "LastNag")
-      If xLastNag Is Nothing Then
-        m_LastNag = New Date(2000, 1, 1)
-      Else
-        Try
-          m_LastNag = Date.FromBinary(xLastNag.Element("value").Value)
-        Catch ex As Exception
-          m_LastNag = New Date(2000, 1, 1)
         End Try
       End If
       Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
@@ -1072,7 +1061,6 @@ Class AppSettings
     m_AutoHide = True
     m_TLSProxy = False
     m_ProxySetting = "None"
-    m_LastNag = New Date(2000, 1, 1)
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
     m_SecurEnforced = False
     m_NetTest = Nothing
@@ -1172,7 +1160,6 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "AutoHide"), New XElement("value", IIf(m_AutoHide, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "TLSProxy"), New XElement("value", IIf(m_TLSProxy, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
-                                                          New XElement("setting", New XAttribute("name", "LastNag"), New XElement("value", m_LastNag.ToBinary)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
                                                           New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)),
@@ -1641,14 +1628,6 @@ Class AppSettings
           End If
         End If
       End If
-    End Set
-  End Property
-  Public Property LastNag As Date
-    Get
-      Return m_LastNag
-    End Get
-    Set(value As Date)
-      m_LastNag = value
     End Set
   End Property
   Public Property SecurityProtocol As Net.SecurityProtocolType

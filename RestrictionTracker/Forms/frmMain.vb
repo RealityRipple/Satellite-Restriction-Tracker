@@ -1387,10 +1387,6 @@ Public Class frmMain
           DoChange(lblTypeAUldLimitVal, lULim)
         End If
         ResizePanels()
-        If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then
-          AskForDonations()
-          Return
-        End If
       Case "TYPEB"
         Dim lUsed As Long = typeB_used
         Dim lLim As Long = typeB_lim
@@ -1401,10 +1397,6 @@ Public Class frmMain
           DoChange(lblTypeBLimitVal, lLim)
         End If
         ResizePanels()
-        If lUsed = 0 And lLim = 0 And lFree = 0 Then
-          AskForDonations()
-          Return
-        End If
     End Select
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
@@ -2447,32 +2439,6 @@ Public Class frmMain
   End Sub
 #End Region
 #Region "Useful Functions"
-  Private Sub AskForDonations()
-    Try
-      If String.IsNullOrEmpty(mySettings.RemoteKey) Then
-        If Math.Abs(DateDiff(DateInterval.Minute, Process.GetCurrentProcess.StartTime, Now)) > 30 Then
-          If Now.Month = 5 Or Now.Month = 9 Or Now.Month = 12 Then
-            If Now.DayOfWeek = DayOfWeek.Saturday Or Now.DayOfWeek = DayOfWeek.Sunday Then
-              Dim lastAsk As Long = DateDiff(DateInterval.Month, mySettings.LastNag, Now)
-              If lastAsk > 6 Or lastAsk < -24 Then
-                mySettings.LastNag = Today
-                mySettings.Save()
-                frmDonate.Show()
-              End If
-            End If
-          End If
-        End If
-      End If
-    Catch
-    End Try
-  End Sub
-  Public Sub ClickedDonate()
-    Try
-      mySettings.LastNag = DateAdd(DateInterval.Month, 24, Today)
-      mySettings.Save()
-    Catch ex As Exception
-    End Try
-  End Sub
   Private Sub PowerModeChanged(sender As Object, e As Microsoft.Win32.PowerModeChangedEventArgs)
     If e.Mode = Microsoft.Win32.PowerModes.Suspend Then
       If localData IsNot Nothing Then
