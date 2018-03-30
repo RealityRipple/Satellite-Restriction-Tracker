@@ -1176,7 +1176,7 @@ Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
                                                           New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)),
-                                                          New XElement("setting", New XAttribute("name", "AJAXOrder"),
+                                                          New XElement("section", New XAttribute("name", "AJAXOrder"),
                                                                        New XElement("setting", New XAttribute("name", "Short"), New XElement("value", m_AJAXShort)),
                                                                        New XElement("setting", New XAttribute("name", "Full"), New XElement("value", m_AJAXFull))))),
                                 New XElement("colorSettings",
