@@ -48,6 +48,7 @@ Public Class frmMain
   Private c_PauseActivity As String
   Private iconItem As Integer
   Private iconStop As Boolean
+  Private CheckedAJAX As Boolean
   Private iconBefore As Icon
   Public Property PauseActivity As String
     Get
@@ -202,6 +203,7 @@ Public Class frmMain
 #Region "Form Events"
   Private Sub frmMain_Load(sender As Object, e As System.EventArgs) Handles Me.Load
     AddHandler Microsoft.Win32.SystemEvents.PowerModeChanged, AddressOf PowerModeChanged
+    CheckedAJAX = False
     If mySettings Is Nothing Then ReLoadSettings()
     NextGrabTick = Long.MinValue
     Me.Opacity = 0
@@ -791,9 +793,14 @@ Public Class frmMain
                 NextGrabTick = Long.MaxValue
                 PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
-                SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
-                Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-                UsageInvoker.BeginInvoke(Nothing, Nothing)
+                If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Then
+                  SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
+                  Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
+                Else
+                  SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+                  Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
+                  UsageInvoker.BeginInvoke(Nothing, Nothing)
+                End If
                 Return
               End If
             End If
@@ -1783,9 +1790,14 @@ Public Class frmMain
         If ClosingTime Then Return
         cmdRefresh.Enabled = True
       End If
-      SetStatusText(LOG_GetLast.ToString("g"), "Beginning Usage Request...", False)
-      Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-      UsageInvoker.BeginInvoke(Nothing, Nothing)
+      If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Then
+        SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
+        Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
+      Else
+        SetStatusText(LOG_GetLast.ToString("g"), "Beginning Usage Request...", False)
+        Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
+        UsageInvoker.BeginInvoke(Nothing, Nothing)
+      End If
     Else
       If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
         If Me.WindowState = FormWindowState.Minimized Then
@@ -2395,6 +2407,44 @@ Public Class frmMain
     End If
     SetStatusText("Downloading Update " & sProgress, sStatus, False)
   End Sub
+  Private Sub UpdateAJAXLists_ListUpdated(asyncState As Object, shortList As String, fullList As String)
+    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
+      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists.", True)
+      DisplayUsage(False, True)
+      Return
+    End If
+    If mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
+      SetStatusText(LOG_GetLast.ToString("g"), "AJAX failed to yield data table. A fix should be available soon.", True)
+      DisplayUsage(False, True)
+      Return
+    End If
+    mySettings.AJAXOrderShort = shortList
+    mySettings.AJAXOrderFull = fullList
+    mySettings.Save()
+    SetStatusText(LOG_GetLast.ToString("g"), "Updated AJAX Lists. Reconnecting...", True)
+    If localData IsNot Nothing Then
+      localData.Dispose()
+      localData = Nothing
+    End If
+    localData = New localRestrictionTracker(LocalAppDataDirectory)
+  End Sub
+  Private Sub UpdateAJAXLists_UpdateChecked(asyncState As Object, shortList As String, fullList As String)
+    CheckedAJAX = True
+    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
+      'Error
+      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
+    ElseIf mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
+      'No Change
+      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+    Else
+      mySettings.AJAXOrderShort = shortList
+      mySettings.AJAXOrderFull = fullList
+      mySettings.Save()
+      SetStatusText(LOG_GetLast.ToString("g"), "AJAX Lists Updated. Preparing Connection...", False)
+    End If
+    Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
+    UsageInvoker.BeginInvoke(Nothing, Nothing)
+  End Sub
 #End Region
 #Region "Useful Functions"
   Private Sub AskForDonations()
@@ -2619,27 +2669,4 @@ Public Class frmMain
     Return True
   End Function
 #End Region
-
-  Private Sub UpdateAJAXLists_ListUpdated(asyncState As Object, shortList As String, fullList As String)
-    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
-      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists.", True)
-      DisplayUsage(False, True)
-      Return
-    End If
-    If mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
-      SetStatusText(LOG_GetLast.ToString("g"), "AJAX failed to yield data table. A fix should be available soon.", True)
-      DisplayUsage(False, True)
-      Return
-    End If
-    mySettings.AJAXOrderShort = shortList
-    mySettings.AJAXOrderFull = fullList
-    mySettings.Save()
-    SetStatusText(LOG_GetLast.ToString("g"), "Updated AJAX Lists. Reconnecting...", True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    localData = New localRestrictionTracker(LocalAppDataDirectory)
-  End Sub
-
 End Class
