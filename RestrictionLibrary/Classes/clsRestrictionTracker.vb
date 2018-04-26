@@ -1264,7 +1264,9 @@ Public Class localRestrictionTracker
   Private Structure AjaxEntry
     Public ID As String
     Public Iteration As Byte
-    Public Sub New(sID As String, bI As Byte)
+    Public Index As Integer
+    Public Sub New(iIdx As Integer, sID As String, bI As Byte)
+      Index = iIdx
       ID = sID
       Iteration = bI
     End Sub
@@ -1288,7 +1290,7 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(AJAXOrder(0), 1))
+    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(0, AJAXOrder(0), 1))
   End Sub
   Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
@@ -1367,10 +1369,12 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket(True)
+    Dim newIDX As Integer = AjaxID.Index
     Dim newID As String = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
-    If (AjaxID.Iteration = 1 And AjaxID.ID = AJAXOrder(ExedeAJAXFirstTryRequests)) Or (AjaxID.Iteration > 1 And AjaxID.ID = AJAXFullOrder(ExedeAJAXSecondTryRequests)) Then
+    If (AjaxID.Iteration = 1 And AjaxID.Index = ExedeAJAXFirstTryRequests) Or (AjaxID.Iteration > 1 And AjaxID.Index = ExedeAJAXSecondTryRequests) Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
+      newIDX = 0
       newID = AJAXFullOrder(0)
       newType += 1
     ElseIf AjaxID.Iteration = 1 Then
@@ -1378,6 +1382,7 @@ Public Class localRestrictionTracker
       For I As Integer = 0 To AJAXOrder.Length - 1
         If AjaxID.ID = AJAXOrder(I) Then
           BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, sURI)
+          newIDX = I + 1
           newID = AJAXOrder(I + 1)
           bShown = True
           Exit For
@@ -1392,6 +1397,7 @@ Public Class localRestrictionTracker
       For I As Integer = 0 To AJAXFullOrder.Length - 1
         If AjaxID.ID = AJAXFullOrder(I) Then
           BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAXRetry, I + 1, sURI)
+          newIDX = I + 1
           newID = AJAXFullOrder(I + 1)
           bShown = True
           Exit For
@@ -1418,7 +1424,7 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(newID, newType))
+    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(newIDX, newID, newType))
   End Sub
   Private Sub EX_Read_Table(Table As String)
     Dim Used As String = Nothing
