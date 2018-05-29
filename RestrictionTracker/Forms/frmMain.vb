@@ -1370,6 +1370,7 @@ Public Class frmMain
     Else
       Return
     End If
+    Dim hadChange As Boolean = True
     Select Case state
       Case "TYPEA"
         Dim lDown As Long = typeA_down
@@ -1385,6 +1386,7 @@ Public Class frmMain
           DoChange(lblTypeAUldUsedVal, lUp)
           DoChange(lblTypeAUldFreeVal, lUFree)
           DoChange(lblTypeAUldLimitVal, lULim)
+          If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then hadChange = False
         End If
         ResizePanels()
       Case "TYPEB"
@@ -1395,6 +1397,7 @@ Public Class frmMain
           DoChange(lblTypeBUsedVal, lUsed)
           DoChange(lblTypeBFreeVal, lFree)
           DoChange(lblTypeBLimitVal, lLim)
+          If lUsed = 0 And lFree = 0 And lLim = 0 Then hadChange = False
         End If
         ResizePanels()
     End Select
@@ -1402,7 +1405,7 @@ Public Class frmMain
       tmrChanges.Dispose()
       tmrChanges = Nothing
     End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), state, 25, System.Threading.Timeout.Infinite)
+    If hadChange Then tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), state, 25, System.Threading.Timeout.Infinite)
   End Sub
   Private Sub DoChange(ByRef lblTemp As Label, ByRef toVal As Long)
     Dim tmpVal As Long = 0
