@@ -499,7 +499,11 @@
 #Region "Inputs"
   Private Sub txtVal_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtAccount.KeyDown, txtPassword.KeyDown, cmbProvider.KeyDown
     If e.Control And e.KeyCode = Keys.V Then
-      CType(sender, TextBox).SelectedText = Clipboard.GetText.Trim
+      If sender.name = "cmbProvider" Then
+        CType(sender, ComboBox).SelectedText = Clipboard.GetText.Trim
+      Else
+        CType(sender, TextBox).SelectedText = Clipboard.GetText.Trim
+      End If
       e.SuppressKeyPress = True
       e.Handled = True
     End If
