@@ -620,11 +620,7 @@ Public Class localRestrictionTracker
     c_TLSProxy = mySettings.TLSProxy
     If c_TLSProxy Then
       c_Protocol = mySettings.SecurityProtocol
-      If Int(Rnd() * 2) = 0 Then
-        c_TLSProxyAddr = "http://wb.realityripple.com/tls.php"
-      Else
-        c_TLSProxyAddr = "http://losberros.org/tls.php"
-      End If
+      c_TLSProxyAddr = "http://wb.realityripple.com/tls.php"
     End If
     c_Timeout = mySettings.Timeout
     c_Proxy = mySettings.Proxy
