@@ -113,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Classes\clsAuthenticode.vb" />
     <Compile Include="Classes\clsBugReport.vb" />
     <Compile Include="Classes\clsFavicon.vb" />
     <Compile Include="Classes\clsGlass.vb" />

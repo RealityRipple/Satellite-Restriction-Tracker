@@ -135,6 +135,10 @@ Public Class svcRL
     End Function
   End Class
   Protected Overrides Sub OnStart(ByVal args() As String)
+    If Not Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location) Then
+      Me.Stop()
+      Return
+    End If
     Try
       If Not EventLog.SourceExists("Restriction Logger") Then
         EventLog.CreateEventSource("Restriction Logger", "Application")

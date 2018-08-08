@@ -1,5 +1,15 @@
 ﻿Module modRC
   Sub Main()
+    If Not Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location) Then
+      Console.Clear()
+      Console.WriteLine("==Restriction Service Controller==")
+      Console.WriteLine()
+      Console.WriteLine("The Logger Service Executable is not correctly signed.")
+      Console.WriteLine("This file may have been modified or corrupted.")
+      Console.WriteLine("Please re-install Satellite Restriction Tracker.")
+      System.Threading.Thread.Sleep(5000)
+      Return
+    End If
     If Array.Exists(ServiceProcess.ServiceController.GetServices, Function(scService As ServiceProcess.ServiceController) scService.ServiceName = "RestrictionLogger") Then
       Select Case Command()
         Case "/run"

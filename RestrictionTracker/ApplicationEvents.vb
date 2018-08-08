@@ -1,6 +1,22 @@
 ﻿Namespace My
   Partial Friend Class MyApplication
     Private Sub MyApplication_Startup(sender As Object, e As Microsoft.VisualBasic.ApplicationServices.StartupEventArgs) Handles Me.Startup
+      If Not Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location) Then
+        MsgBox("The Executable """ & IO.Path.GetFileName(Reflection.Assembly.GetExecutingAssembly().Location) & """ is not signed and may be corrupted or modified.", MsgBoxStyle.Critical, My.Application.Info.ProductName)
+        e.Cancel = True
+        Return
+      End If
+      Dim sDLLPath As String = IO.Path.Combine(My.Application.Info.DirectoryPath, My.Application.Info.AssemblyName & "Lib.dll")
+      If Not IO.File.Exists(sDLLPath) Then
+        MsgBox("The Function Library """ & IO.Path.GetFileName(sDLLPath) & """ is missing. " & My.Application.Info.ProductName & " requires this library to run.", MsgBoxStyle.Critical, My.Application.Info.ProductName)
+        e.Cancel = True
+        Return
+      End If
+      If Not Authenticode.IsSelfSigned(sDLLPath) Then
+        MsgBox("The Function Library """ & IO.Path.Combine(IO.Path.GetFileName(IO.Path.GetDirectoryName(sDLLPath)), IO.Path.GetFileName(sDLLPath)) & """ is not signed and may be corrupted or modified.", MsgBoxStyle.Critical, My.Application.Info.ProductName)
+        e.Cancel = True
+        Return
+      End If
       If e.CommandLine.Contains("/stop") Then
         e.Cancel = True
         Return
