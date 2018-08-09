@@ -251,12 +251,14 @@ Public Class remoteRestrictionTracker
       End If
       If fwMajor > 4 Then
         c_SendJar = False
-      Else
+      ElseIf fwMajor = 4 Then
         If fwMinor >= 8 Then
           c_SendJar = False
         Else
           c_SendJar = True
         End If
+      Else
+        c_SendJar = True
       End If
     Else
       c_SendJar = False
