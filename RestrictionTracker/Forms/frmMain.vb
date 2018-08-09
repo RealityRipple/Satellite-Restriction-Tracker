@@ -2427,7 +2427,23 @@ Public Class frmMain
     CheckedAJAX = True
     If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
       'Error
-      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
+      If Not String.IsNullOrEmpty(shortList) Then
+        If shortList.StartsWith("ERR_") Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Error Updating AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList.Substring(4), False)
+        ElseIf shortList.StartsWith("URL_") Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirected to " & shortList.Substring(4) & ".", False)
+        ElseIf shortList = "DATA_EMPTY" Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "No Data from Server.", False)
+        ElseIf shortList.StartsWith("DATA_REDIR_") Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirection to new URL." & vbNewLine & shortList.Substring(11), False)
+        ElseIf shortList.StartsWith("DATA_SEP_") Then
+          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Malformed Data from Server." & vbNewLine & shortList.Substring(9), False)
+        Else
+          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList, False)
+        End If
+      Else
+        SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
+      End If
     ElseIf mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
       'No Change
       SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
