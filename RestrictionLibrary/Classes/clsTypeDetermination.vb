@@ -30,7 +30,7 @@ Public Class DetermineType
   Private Class URLChecker
     Public Delegate Sub CheckCallback(asyncState As Object, success As Boolean)
     Private c_callback As CheckCallback
-    Private wRequest As Net.WebRequest
+    Private wRequest As Net.HttpWebRequest
     Private sAddr As String
     Public Sub New(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object, callback As CheckCallback)
       wRequest = Nothing
@@ -43,8 +43,8 @@ Public Class DetermineType
     Private Sub BeginCheck(Addr As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
       sAddr = Addr
       If Addr.IndexOf("://") < 0 Then Addr = "http://" & Addr
-      wRequest = System.Net.WebRequest.Create(Addr)
-      wRequest.Timeout = Timeout
+      wRequest = System.Net.HttpWebRequest.Create(Addr)
+      wRequest.Timeout = Timeout * 1000
       wRequest.Proxy = Proxy
       Try
         wRequest.BeginGetResponse(New AsyncCallback(AddressOf URLCheckResponse), state)
@@ -54,7 +54,7 @@ Public Class DetermineType
     End Sub
     Private Sub URLCheckResponse(ar As IAsyncResult)
       Try
-        Dim wResponse As Net.WebResponse = wRequest.EndGetResponse(ar)
+        Dim wResponse As Net.HttpWebResponse = wRequest.EndGetResponse(ar)
         If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
           Dim sData As String = Nothing
           Using wData As IO.Stream = wResponse.GetResponseStream
@@ -92,11 +92,11 @@ Public Class DetermineType
   ''' Constructor for <see cref="DetermineType" /> class, which also begins the determination procedure.
   ''' </summary>
   ''' <param name="Provider">URL to determine the type of.</param>
-  ''' <param name="Timeout">Number of milliseconds to wait for a response from the server while testing the connection.</param>
+  ''' <param name="Timeout">Number of seconds to wait for a response from the server while testing the connection.</param>
   ''' <param name="Proxy">Proxy settings for testing the servers.</param>
   ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
   Public Sub New(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy, callback As TypeDeterminedCallback)
-    iTimeout = Timeout
+    iTimeout = Timeout * 1000
     pProxy = Proxy
     c_callback = callback
     Dim beginInvoker As New BeginTestInvoker(AddressOf BeginTest)
@@ -147,13 +147,13 @@ Public Class UpdateAJAXLists
   ''' </summary>
   Public Delegate Sub UpdateCallback(asyncState As Object, shortList As String, fullList As String)
   Private c_callback As UpdateCallback
-  Private wRequest As Net.WebRequest
+  Private wRequest As Net.HttpWebRequest
   Private sAddr As String
   ''' <summary>
   ''' Constructor for <see cref="UpdateAJAXLists" /> class, which also begins the update procedure.
   ''' </summary>
   ''' <param name="HostAddress">Host to determine the AJAX Lists of.</param>
-  ''' <param name="iTimeout">Number of milliseconds to wait for a response from the server while testing the connection.</param>
+  ''' <param name="iTimeout">Number of seconds to wait for a response from the server while testing the connection.</param>
   ''' <param name="pProxy">Proxy settings for testing the servers.</param>
   ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
   Public Sub New(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object, callback As UpdateCallback)
@@ -165,8 +165,8 @@ Public Class UpdateAJAXLists
   End Sub
   Private Delegate Sub BeginCheckInvoker(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
   Private Sub BeginCheck(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
-    wRequest = System.Net.WebRequest.Create("http://wb.realityripple.com/hosts/exAJAX.php?h=" & Host)
-    wRequest.Timeout = Timeout
+    wRequest = System.Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/exAJAX.php?h=" & Host)
+    wRequest.Timeout = Timeout * 1000
     wRequest.Proxy = Proxy
     Try
       wRequest.BeginGetResponse(New AsyncCallback(AddressOf AJAXCheckResponse), state)
@@ -176,7 +176,7 @@ Public Class UpdateAJAXLists
   End Sub
   Private Sub AJAXCheckResponse(ar As IAsyncResult)
     Try
-      Dim wResponse As Net.WebResponse = wRequest.EndGetResponse(ar)
+      Dim wResponse As Net.HttpWebResponse = wRequest.EndGetResponse(ar)
       If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
         Dim sData As String = Nothing
         Using wData As IO.Stream = wResponse.GetResponseStream
@@ -185,22 +185,22 @@ Public Class UpdateAJAXLists
           End Using
         End Using
         If String.IsNullOrEmpty(sData) Then
-          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+          c_callback.Invoke(ar.AsyncState, "DATA_EMPTY", Nothing)
         ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
-          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+          c_callback.Invoke(ar.AsyncState, "DATA_REDIR_" & sData, Nothing)
         ElseIf Not sData.ToLower.Contains(vbLf) Then
-          c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+          c_callback.Invoke(ar.AsyncState, "DATA_SEP_" & sData, Nothing)
         Else
           Dim minAndFull() As String = Split(sData, vbLf, 2)
           c_callback.Invoke(ar.AsyncState, minAndFull(0), minAndFull(1))
         End If
       Else
-        c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+        c_callback.Invoke(ar.AsyncState, "URL_" & sAddr, Nothing)
       End If
       wResponse.Close()
       wResponse = Nothing
     Catch ex As Exception
-      c_callback.Invoke(ar.AsyncState, Nothing, Nothing)
+      c_callback.Invoke(ar.AsyncState, "ERR_" & ex.ToString, Nothing)
     End Try
   End Sub
 End Class
