@@ -319,7 +319,7 @@ Public Class frmHistory
       dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
+        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
         pnlGraph.Tag = lItems
         DoResize(True)
       Else
@@ -331,8 +331,7 @@ Public Class frmHistory
       pnlGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
-
+        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
         dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
         ChangeStyle()

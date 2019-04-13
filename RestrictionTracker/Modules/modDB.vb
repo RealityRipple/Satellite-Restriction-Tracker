@@ -40,6 +40,17 @@
     lngUp = dbRow.UPLOAD
     lngUpLim = dbRow.UPLIM
   End Sub
+  Public Function LOG_GetRange(dtStart As Date, dtEnd As Date) As DataBase.DataRow()
+    Dim lRet As New Collections.Generic.List(Of DataBase.DataRow)
+    If Not isLoaded Then Return lRet.ToArray
+    Dim kStart As UInt64 = Math.Floor(dtStart.Ticks / 600000000)
+    Dim kEnd As UInt64 = Math.Floor(dtEnd.Ticks / 600000000)
+    For Each dRow As Collections.Generic.KeyValuePair(Of UInt64, DataBase.DataRow) In usageDB
+      If dRow.Key >= kStart And dRow.Key <= kEnd Then lRet.Add(dRow.Value)
+      If dRow.Key > kEnd Then Exit For
+    Next
+    Return lRet.ToArray
+  End Function
   Public Function LOG_GetCount() As Integer
     If Not isLoaded Then Return 0
     If usageDB Is Nothing Then Return 0
