@@ -18,31 +18,27 @@
   End Property
   Public Sub LOG_Add(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, Optional Save As Boolean = True)
     If Not isLoaded Then Return
-    If Math.Abs(DateDiff(DateInterval.Minute, dTime, LOG_GetLast)) >= HistoryAge Then
-      If lDownLim > 0 Then
-        If usageDB Is Nothing Then
-          usageDB = New DataBase
-          usageDB.StartNew()
-        End If
-        usageDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
-        If Save Then
-          LOG_Sort()
-          Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
-          tX.Start(False)
-        End If
-      End If
+    If lDownLim <= 0 Then Return
+    If usageDB Is Nothing Then
+      usageDB = New DataBase
+      usageDB.StartNew()
+    End If
+    usageDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    If Save Then
+      Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
+      tX.Start(False)
     End If
   End Sub
   Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
     If Not isLoaded Then Return
-    If LOG_GetCount() > lngIndex Then
-      Dim dbRow As DataBase.DataRow = usageDB(lngIndex)
-      dtDate = dbRow.DATETIME
-      lngDown = dbRow.DOWNLOAD
-      lngDownLim = dbRow.DOWNLIM
-      lngUp = dbRow.UPLOAD
-      lngUpLim = dbRow.UPLIM
-    End If
+    If LOG_GetCount() <= lngIndex Then Return
+    Dim dArr() As DataBase.DataRow = usageDB.ToArray()
+    Dim dbRow As DataBase.DataRow = dArr(lngIndex)
+    dtDate = dbRow.DATETIME
+    lngDown = dbRow.DOWNLOAD
+    lngDownLim = dbRow.DOWNLIM
+    lngUp = dbRow.UPLOAD
+    lngUpLim = dbRow.UPLIM
   End Sub
   Public Function LOG_GetCount() As Integer
     If Not isLoaded Then Return 0
@@ -51,11 +47,8 @@
   End Function
   Public Function LOG_GetLast() As Date
     If Not isLoaded Then Return New Date(1970, 1, 1)
-    If LOG_GetCount() > 0 Then
-      Return usageDB(LOG_GetCount() - 1).DATETIME
-    Else
-      Return New Date(1970, 1, 1)
-    End If
+    If LOG_GetCount() < 1 Then Return New Date(1970, 1, 1)
+    Return usageDB.GetLast.DATETIME
   End Function
   Public Sub LOG_Initialize(sAccount As String, withDisplay As Boolean)
     isLoaded = False
@@ -87,15 +80,6 @@
     If usageDB IsNot Nothing Then
       If withSave Then LOG_Save(False)
       usageDB = Nothing
-    End If
-  End Sub
-  Public Sub LOG_Sort()
-    If Not isLoaded Then Return
-    Do While isSaving
-      Application.DoEvents()
-    Loop
-    If usageDB IsNot Nothing Then
-      usageDB.Sort()
     End If
   End Sub
   Friend Sub LOG_Save(withDisplay As Boolean)

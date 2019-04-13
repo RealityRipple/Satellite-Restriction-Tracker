@@ -5,7 +5,7 @@ Imports System.Xml
 ''' </summary>
 ''' <remarks>This class also contains a child <see cref="DataBase.DataRow" /> class which provides access to individual events of this larger list and is used as a Type in some instances.</remarks>
 Public Class DataBase
-  Implements ICollection(Of DataRow)
+  Implements IDictionary(Of UInt64, DataRow)
   ''' <summary>
   ''' Stores information about usage activity at a single date and time.
   ''' </summary>
@@ -130,13 +130,15 @@ Public Class DataBase
       Return (DATETIME.ToBinary = 0 And DOWNLOAD = 0 And UPLOAD = 0 And DOWNLIM = 0 And UPLIM = 0)
     End Function
   End Structure
-  Private data() As DataRow
+  Private data As SortedDictionary(Of UInt64, DataRow)
   ''' <summary>
   ''' Create a new DataBase with no entries.
   ''' </summary>
   ''' <remarks>If this subroutine is called on an existing database, it will be erased.</remarks>
   Public Sub New()
-    Erase data
+    If data Is Nothing Then Return
+    data.Clear()
+    data = Nothing
   End Sub
   ''' <summary>
   ''' Set this value to true to stop loading a databased called from the initialization subroutine.
@@ -196,7 +198,6 @@ Public Class DataBase
   Public Sub StartNew()
     StopNew = False
     If IO.File.Exists(sPath) Then
-      Dim isNew As Boolean = data Is Nothing
       Try
         If LCase(IO.Path.GetExtension(sPath)).CompareTo(".xml") = 0 Then
           Dim m_xmld As New XmlDocument
@@ -204,7 +205,6 @@ Public Class DataBase
           Dim m_nodelist As XmlNodeList = m_xmld.ChildNodes(1).ChildNodes
           Dim I As Integer = 0
           Dim iMax As Integer = m_nodelist.Count
-          If isNew Then ReDim data(m_nodelist.Count - 1)
           For Each m_node As XmlNode In m_nodelist
             I += 1
             If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, iMax))
@@ -223,11 +223,8 @@ Public Class DataBase
             Dim DownLim As Long = Long.Parse(sDL)
             Dim Up As Long = Long.Parse(sU)
             Dim UpLim As Long = Long.Parse(sUL)
-            If isNew Then
-              data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-            Else
-              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-            End If
+            If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+            Add(New DataRow(DT, Down, DownLim, Up, UpLim))
             If StopNew Then Return
           Next
           m_xmld = Nothing
@@ -235,7 +232,6 @@ Public Class DataBase
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Using nIn As New IO.BinaryReader(nRead)
               Dim uRows As UInt64 = LOAD_ReadULong(nIn)
-              If isNew Then ReDim data(uRows - 1)
               For I As UInt64 = 1 To uRows
                 If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
                 Dim DT As Date = LOAD_ReadDate(nIn)
@@ -243,11 +239,8 @@ Public Class DataBase
                 Dim DownLim As Long = LOAD_ReadLong(nIn)
                 Dim Up As Long = LOAD_ReadLong(nIn)
                 Dim UpLim As Long = LOAD_ReadLong(nIn)
-                If isNew Then
-                  data(I - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                Else
-                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-                End If
+                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
                 If StopNew Then Return
               Next
               nIn.Close()
@@ -264,17 +257,8 @@ Public Class DataBase
                 Dim DownLim As Long = firstData(2)
                 Dim Up As Long = firstData(3)
                 Dim UpLim As Long = firstData(4)
-                If isNew Then
-                  If data Is Nothing Then
-                    ReDim data(0)
-                    data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                  Else
-                    ReDim Preserve data(data.Length)
-                    data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                  End If
-                Else
-                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-                End If
+                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
               End If
               Do Until nIn.EndOfStream
                 Dim rowData() As String = Split(nIn.ReadLine, ",")
@@ -283,17 +267,8 @@ Public Class DataBase
                 Dim DownLim As Long = rowData(2)
                 Dim Up As Long = rowData(3)
                 Dim UpLim As Long = rowData(4)
-                If isNew Then
-                  If data Is Nothing Then
-                    ReDim data(0)
-                    data(0) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                  Else
-                    ReDim Preserve data(data.Length)
-                    data(data.Length - 1) = New DataRow(DT, Down, DownLim, Up, UpLim)
-                  End If
-                Else
-                  Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-                End If
+                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
                 If StopNew Then Return
               Loop
               nIn.Close()
@@ -301,39 +276,29 @@ Public Class DataBase
           End Using
         End If
       Catch ex As Exception
-        Erase data
+        If data Is Nothing Then Return
+        data.Clear()
+        data = Nothing
       End Try
     End If
-  End Sub
-  ''' <summary>
-  ''' Organize the entire DataBase by date and time.
-  ''' </summary>
-  Public Sub Sort()
-    Array.Sort(Of DataRow)(data, Function(drA As DataBase.DataRow, drB As DataBase.DataRow) Date.Compare(drA.DATETIME, drB.DATETIME))
   End Sub
   ''' <summary>
   ''' Add a new DataRow entry to the DataBase.
   ''' </summary>
   ''' <param name="item">The new DataRow entry to add.</param>
   ''' <remarks>The entry won't be added if it's less than one minute apart from another DataRow in the DataBase.</remarks>
-  Public Sub Add(item As DataRow) Implements System.Collections.Generic.ICollection(Of DataRow).Add
-    If data IsNot Nothing Then
-      Dim noGood As Boolean = False
-      For I As Integer = 0 To data.Length - 1
-        If Math.Abs(data(I).DATETIME.Subtract(item.DATETIME).TotalMinutes) < 1 Then
-          noGood = True
-          Exit For
-        End If
-      Next
-      If Not noGood Then
-        Dim dLen As Integer = data.Length
-        ReDim Preserve data(dLen)
-        data(data.Length - 1) = item
-      End If
-    Else
-      ReDim data(0)
-      data(0) = item
-    End If
+  Public Sub Add(item As DataRow)
+    Dim key As UInt64 = Math.Floor(item.DATETIME.Ticks / 600000000)
+    Add(key, item)
+  End Sub
+  Public Sub Add(item As KeyValuePair(Of UInt64, DataRow)) Implements System.Collections.Generic.ICollection(Of KeyValuePair(Of UInt64, DataRow)).Add
+    Add(item.Key, item.Value)
+  End Sub
+  Public Sub Add(id As UInt64, item As DataRow) Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Add
+    If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+    If Not id = Math.Floor(item.DATETIME.Ticks / 600000000) Then id = Math.Floor(item.DATETIME.Ticks / 600000000)
+    If data.ContainsKey(id) Then Return
+    data.Add(id, item)
   End Sub
   ''' <summary>
   ''' Add all the entries of another DataBase into this one.
@@ -342,30 +307,37 @@ Public Class DataBase
   ''' <param name="withDisplay">Return the current progress of the merge through the ProgressState event.</param>
   ''' <remarks>The original DataBase will not be modified or erased by this process.</remarks>
   Public Sub Merge(db As DataBase, withDisplay As Boolean)
-    Dim dbCount As Integer = db.Count
-    For I As Integer = 0 To db.Count - 1
-      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1, dbCount))
-      Add(db.data(I))
+    Dim dbVals() As DataRow = db.Values
+    For I As Integer = 0 To dbVals.Length - 1
+      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1, dbVals.Length))
+      Add(dbVals(I))
     Next
   End Sub
   ''' <summary>
   ''' Remove all entries from this DataBase.
   ''' </summary>
   ''' <remarks>This is literally identical to the initialization subroutine without parameters.</remarks>
-  Public Sub Clear() Implements System.Collections.Generic.ICollection(Of DataRow).Clear
-    Erase data
+  Public Sub Clear() Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Clear
+    If data Is Nothing Then Return
+    data.Clear()
+    data = Nothing
   End Sub
   ''' <summary>
   ''' Check for existence of an item by searching for an exact match. 
   ''' </summary>
-  ''' <param name="item">The exact match of the <see cref="DataRow" /> you wish to find.</param>
+  ''' <param name="item">The exact match of the KeyValuePair(Of UInt64, DataRow)) you wish to find.</param>
   ''' <returns><c>True</c> is returned if the DataBase contains at least one copy of the <paramref name="item" />, <c>False</c> otherwise.</returns>
-  Public Function Contains(item As DataRow) As Boolean Implements System.Collections.Generic.ICollection(Of DataRow).Contains
-    If Array.IndexOf(data, item) > -1 Then
-      Return True
-    Else
-      Return False
-    End If
+  Public Function Contains(item As KeyValuePair(Of UInt64, DataRow)) As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Contains
+    If Not data.ContainsKey(item.Key) Then Return False
+    If Not data(item.Key).DATETIME = item.Value.DATETIME Then Return False
+    If Not data(item.Key).DOWNLOAD = item.Value.DOWNLOAD Then Return False
+    If Not data(item.Key).DOWNLIM = item.Value.DOWNLIM Then Return False
+    If Not data(item.Key).UPLOAD = item.Value.UPLOAD Then Return False
+    If Not data(item.Key).UPLIM = item.Value.UPLIM Then Return False
+    Return True
+  End Function
+  Public Function ContainsKey(key As UInt64) As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).ContainsKey
+    Return data.ContainsKey(key)
   End Function
   ''' <summary>
   ''' Copy data from this DataBase into an array of DataRows.
@@ -375,24 +347,36 @@ Public Class DataBase
   ''' <remarks>
   ''' The number of items to be copied will be equal to the space allocated for items in the <paramref name="array" /> from the <paramref name="arrayIndex" /> value to the end.
   ''' </remarks>
-  Public Sub CopyTo(array() As DataRow, arrayIndex As Integer) Implements System.Collections.Generic.ICollection(Of DataRow).CopyTo
-    System.Array.Copy(data, 0, array, arrayIndex, array.Length - arrayIndex)
+  Public Sub CopyTo(array() As KeyValuePair(Of UInt64, DataRow), arrayIndex As Integer) Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).CopyTo
+    Dim aData(data.Count - 1) As KeyValuePair(Of UInt64, DataRow)
+    Dim I As Integer = 0
+    For Each aItem As UInt64 In data.Keys
+      aData(I) = New KeyValuePair(Of UInt64, DataRow)(aItem, data(aItem))
+      I += 1
+    Next
+    System.Array.Copy(aData, 0, array, arrayIndex, array.Length - arrayIndex)
   End Sub
   ''' <summary>
   ''' Convert this DataBase into an array of <see cref="DataRow" /> entries.
   ''' </summary>
   ''' <returns>The full list of entries in this DataBase.</returns>
   Public Function ToArray() As DataRow()
-    Return data
+    Dim aData(data.Count - 1) As DataRow
+    Dim I As Integer = 0
+    For Each aItem As UInt64 In data.Keys
+      aData(I) = data(aItem)
+      I += 1
+    Next
+    Return aData
   End Function
   ''' <summary>
   ''' The total number of entries in this DataBase.
   ''' </summary>
   ''' <remarks>The value will be 0 if the DataBase is not initialized or if it's been erased.</remarks>
-  Public ReadOnly Property Count As Integer Implements System.Collections.Generic.ICollection(Of DataRow).Count
+  Public ReadOnly Property Count As Integer Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Count
     Get
       If data Is Nothing Then Return 0
-      Return data.Length
+      Return data.Count
     End Get
   End Property
   ''' <summary>
@@ -400,44 +384,58 @@ Public Class DataBase
   ''' </summary>
   ''' <value></value>
   ''' <returns>This property is always false because it is always false for all arrays.</returns>
-  Public ReadOnly Property IsReadOnly As Boolean Implements System.Collections.Generic.ICollection(Of DataRow).IsReadOnly
+  Public ReadOnly Property IsReadOnly As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).IsReadOnly
     Get
-      Return data.IsReadOnly
+      Return False
     End Get
   End Property
-  ''' <summary>
-  ''' Remove a DataRow entry from the DataBase.
-  ''' </summary>
-  ''' <param name="item">The DataRow entry to remove.</param>
-  ''' <returns><c>True</c> if the entry was successfully removed from the DataBase, <c>False</c> if the entry could not be found.</returns>
-  ''' <remarks>This function only uses the <see cref="DataRow.DATETIME" /> value to compare against entries in the DataBase.</remarks>
-  Public Function Remove(item As DataRow) As Boolean Implements System.Collections.Generic.ICollection(Of DataRow).Remove
-    For I As Integer = 0 To data.Length - 1
-      If Date.Compare(data(I).DATETIME, item.DATETIME) = 0 Then
-        For J As Integer = I + 1 To data.Length - 1
-          data(J - 1) = data(J)
-        Next
-        Array.Resize(data, data.Length - 1)
-        Return True
-      End If
-    Next
-    Return False
-  End Function
+  Default Public Property Item(key As UInt64) As DataRow Implements IDictionary(Of UInt64, DataRow).Item
+    Get
+      Return data(key)
+    End Get
+    Set(value As DataRow)
+      data(key) = value
+    End Set
+  End Property
+  Public ReadOnly Property Keys As ICollection(Of UInt64) Implements IDictionary(Of UInt64, DataRow).Keys
+    Get
+      Return data.Keys
+    End Get
+  End Property
+  Public ReadOnly Property Values As ICollection(Of DataRow) Implements IDictionary(Of UInt64, DataRow).Values
+    Get
+      Return data.Values
+    End Get
+  End Property
   ''' <summary>
   ''' Remove a DataRow entry from the DataBase.
   ''' </summary>
   ''' <param name="DateTime">The Date and Time of the DataRow entry to remove.</param>
   ''' <returns><c>True</c> if the entry was successfully removed from the DataBase, <c>False</c> if the entry could not be found.</returns>
   Public Function Remove(DateTime As Date) As Boolean
-    Return Remove(New DataRow(DateTime, 0, 0, 0, 0))
+    Dim key As UInt64 = Math.Floor(DateTime.Ticks / 600000000)
+    Return Remove(key)
+  End Function
+  Public Function Remove(item As KeyValuePair(Of UInt64, DataRow)) As Boolean Implements System.Collections.Generic.ICollection(Of KeyValuePair(Of UInt64, DataRow)).Remove
+    Return Remove(item.Key)
+  End Function
+  ''' <summary>
+  ''' Remove a DataRow entry from the DataBase.
+  ''' </summary>
+  ''' <param name="item">The DataRow entry to remove.</param>
+  ''' <returns><c>True</c> if the entry was successfully removed from the DataBase, <c>False</c> if the entry could not be found.</returns>
+  ''' <remarks>This function only uses the <see cref="DataRow.DATETIME" /> value to compare against entries in the DataBase.</remarks>
+  Public Function Remove(item As UInt64) As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Remove
+    If Not data.ContainsKey(item) Then Return False
+    Return data.Remove(item)
   End Function
   ''' <summary>
   ''' Returns an enumerator that iterates through the DataBase.
   ''' </summary>
-  ''' <returns>A <see cref="System.Collections.Generic.IEnumerable(Of DataRow)" /> that can be used to iterate through the DataBase.</returns>
-  Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of DataRow) Implements System.Collections.Generic.IEnumerable(Of DataRow).GetEnumerator
+  ''' <returns>A <see cref="System.Collections.Generic.IEnumerable(Of KeyValuePair(Of UInt64, DataRow))" /> that can be used to iterate through the DataBase.</returns>
+  Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of KeyValuePair(Of UInt64, DataRow)) Implements System.Collections.Generic.IEnumerable(Of KeyValuePair(Of UInt64, DataRow)).GetEnumerator
     If data Is Nothing Then Return Nothing
-    Return DirectCast(data, IEnumerable(Of DataRow)).GetEnumerator
+    Return DirectCast(data, IEnumerable(Of KeyValuePair(Of UInt64, DataRow))).GetEnumerator
   End Function
   ''' <summary>
   ''' Returns an enumerator that iterates through the DataBase.
@@ -445,7 +443,7 @@ Public Class DataBase
   ''' <returns>A <see cref="System.Collections.Generic.IEnumerator" /> that can be used to iterate through the DataBase.</returns>
   Public Function GetEnumerator1() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
     If data Is Nothing Then Return Nothing
-    Return DirectCast(data, IEnumerable(Of DataRow)).GetEnumerator
+    Return DirectCast(data, IEnumerable(Of KeyValuePair(Of UInt64, DataRow))).GetEnumerator
   End Function
   ''' <summary>
   ''' Returns the latest entry in the DataBase.
@@ -453,8 +451,8 @@ Public Class DataBase
   ''' <returns></returns>
   ''' <remarks>This function will sort the DataBase before returning a value.</remarks>
   Public Function GetLast() As DataRow
-    Sort()
-    Return data(data.Length - 1)
+    Dim dbVals() As DataRow = ToArray()
+    Return dbVals(dbVals.Length - 1)
   End Function
   ''' <summary>
   ''' A full XML representation of the DataBase.
@@ -464,15 +462,13 @@ Public Class DataBase
   Public Overrides Function ToString() As String
     Dim sDB As String = "<?xml version=""1.0"" standalone=""yes""?>" & vbNewLine &
                         "<RestrictionTrackerUsage>" & vbNewLine
-    Sort()
-    For I As UInt64 = 0 To data.LongLength - 1
-      Dim dRow As DataRow = data(I)
+    For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
       sDB &= "  <History>" & vbNewLine &
-             "    <DATETIME>" & dRow.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.UPLIM.ToString & "</UPLIM>" & vbNewLine &
+             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
+             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
+             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
+             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
+             "    <UPLIM>" & dRow.Value.UPLIM.ToString & "</UPLIM>" & vbNewLine &
              "  </History>" & vbNewLine
     Next
     sDB &= "</RestrictionTrackerUsage>"
@@ -487,18 +483,18 @@ Public Class DataBase
   Public Overloads Function ToString(withDisplay As Boolean) As String
     Dim sDB As String = "<?xml version=""1.0"" standalone=""yes""?>" & vbNewLine &
                         "<RestrictionTrackerUsage>" & vbNewLine
-    Sort()
-    Dim uLen As ULong = CULng(data.LongLength)
-    For I As UInt64 = 0 To data.LongLength - 1
-      Dim dRow As DataRow = data(I)
+    Dim uLen As UInt64 = CULng(data.Count)
+    Dim I As Integer = 0
+    For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
       If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uLen))
       sDB &= "  <History>" & vbNewLine &
-             "    <DATETIME>" & dRow.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.UPLIM.ToString & "</UPLIM>" & vbNewLine &
+             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
+             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
+             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
+             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
+             "    <UPLIM>" & dRow.Value.UPLIM.ToString & "</UPLIM>" & vbNewLine &
              "  </History>" & vbNewLine
+      I += 1
     Next
     sDB &= "</RestrictionTrackerUsage>"
     Return sDB
@@ -516,11 +512,12 @@ Public Class DataBase
       My.Computer.FileSystem.RenameFile(Path, IO.Path.GetFileName(Path) & ".bak")
       bDelBack = True
     End If
+    Dim dVals() As DataRow = ToArray()
     Dim bFreedom As Boolean = True
-    Dim sample As UInt64 = CULng(data.LongLength) - 1
+    Dim sample As UInt64 = CULng(dVals.Length) - 1
     If sample > 15 Then sample = 15
     For I As UInt64 = 0 To sample
-      Dim dRow As DataRow = data(I)
+      Dim dRow As DataRow = dVals(I)
       If Not (dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then
         bFreedom = False
         Exit For
@@ -532,9 +529,9 @@ Public Class DataBase
           Using nOut As New IO.StreamWriter(nWrite)
             nOut.WriteLine("<?xml version=""1.0"" standalone=""yes""?>")
             nOut.WriteLine("<RestrictionTrackerUsage>")
-            Dim uData As UInt64 = CULng(data.LongLength)
+            Dim uData As UInt64 = CULng(dVals.Length)
             For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = data(I)
+              Dim dRow As DataRow = dVals(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
               If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
               If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
@@ -552,10 +549,10 @@ Public Class DataBase
       ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".wb") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.BinaryWriter(nWrite)
-            Dim uData As UInt64 = CULng(data.LongLength)
+            Dim uData As UInt64 = CULng(dVals.Length)
             SAVE_Write(nOut, uData)
             For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = data(I)
+              Dim dRow As DataRow = dVals(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
               If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
               If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
@@ -571,10 +568,10 @@ Public Class DataBase
       ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".csv") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.OpenOrCreate, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.StreamWriter(nWrite)
-            Dim uData As UInt64 = CULng(data.LongLength)
+            Dim uData As UInt64 = CULng(dVals.Length)
             nOut.WriteLine("Time,Download,Download Limit,Upload,Upload Limit")
             For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = data(I)
+              Dim dRow As DataRow = dVals(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
               If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
               If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
@@ -604,7 +601,7 @@ Public Class DataBase
   Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Long)
     nOut.Write(BitConverter.GetBytes(value), 0, 8)
   End Sub
-  Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As ULong)
+  Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As UInt64)
     nOut.Write(BitConverter.GetBytes(value), 0, 8)
   End Sub
   Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Date)
@@ -616,8 +613,11 @@ Public Class DataBase
   Private Function LOAD_ReadLong(ByRef nIn As IO.BinaryReader) As Long
     Return nIn.ReadInt64
   End Function
-  Private Function LOAD_ReadULong(ByRef nIn As IO.BinaryReader) As ULong
+  Private Function LOAD_ReadULong(ByRef nIn As IO.BinaryReader) As UInt64
     Return nIn.ReadInt64
+  End Function
+  Public Function TryGetValue(key As UInt64, ByRef value As DataRow) As Boolean Implements IDictionary(Of UInt64, DataRow).TryGetValue
+    Return data.TryGetValue(key, value)
   End Function
 #End Region
 End Class
