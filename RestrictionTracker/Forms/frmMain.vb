@@ -1729,7 +1729,7 @@ Public Class frmMain
       If lastBalloon > 0 AndAlso srlFunctions.TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Return
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        Dim lItems() As DataBase.DataRow = LOG_GetRange(Now.AddMinutes(TimeCheck), Now) ' Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
           Select Case Type
             Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
