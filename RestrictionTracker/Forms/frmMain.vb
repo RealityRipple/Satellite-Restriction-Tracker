@@ -991,6 +991,12 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
+          Dim waitThreeSeconds As Long = srlFunctions.TickCount + 3000
+          Do Until srlFunctions.TickCount >= waitThreeSeconds
+            Application.DoEvents()
+            Threading.Thread.Sleep(1)
+            Threading.Thread.Sleep(0)
+          Loop
           localData = New localRestrictionTracker(LocalAppDataDirectory)
           Return
         End If
@@ -1028,6 +1034,12 @@ Public Class frmMain
             localData.Dispose()
             localData = Nothing
           End If
+          Dim waitThreeSeconds As Long = srlFunctions.TickCount + 3000
+          Do Until srlFunctions.TickCount >= waitThreeSeconds
+            Application.DoEvents()
+            Threading.Thread.Sleep(1)
+            Threading.Thread.Sleep(0)
+          Loop
           localData = New localRestrictionTracker(LocalAppDataDirectory)
           Return
         End If
