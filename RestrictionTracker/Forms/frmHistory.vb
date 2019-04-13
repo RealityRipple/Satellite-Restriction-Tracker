@@ -319,7 +319,7 @@ Public Class frmHistory
       dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
+        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
         pnlGraph.Tag = lItems
         DoResize(True)
       Else
@@ -331,8 +331,7 @@ Public Class frmHistory
       pnlGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0)
-
+        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
         dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
         ChangeStyle()
@@ -457,23 +456,24 @@ Public Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing Then
-        If usageDB.Count > 1 Then
+        Dim dbValues() As DataBase.DataRow = usageDB.ToArray()
+        If dbValues.Length > 1 Then
           If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
             fDB.Show(Me)
             bClose = True
           End If
           fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
-          For I As Integer = usageDB.Count - 1 To 1 Step -1
+          For I As Integer = dbValues.Length - 1 To 1 Step -1
             Try
-              fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+              fDB.SetProgress(dbValues.Length - I, dbValues.Length)
             Catch
             End Try
-            Dim thisDB As DataBase.DataRow = usageDB(I)
+            Dim thisDB As DataBase.DataRow = dbValues(I)
             Dim lastDB As DataBase.DataRow = thisDB
-            If I > 0 Then lastDB = usageDB(I - 1)
+            If I > 0 Then lastDB = dbValues(I - 1)
             Dim nextDB As DataBase.DataRow = thisDB
-            If I < usageDB.Count - 1 Then nextDB = usageDB(I + 1)
+            If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
             If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
               ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
               Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
@@ -490,13 +490,13 @@ Public Class frmHistory
               End If
             End If
           Next
-        ElseIf usageDB.Count > 0 Then
-          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+        ElseIf dbValues.Length > 0 Then
+          If dbValues(0).DATETIME > dtpFrom.MaxDate Then
             From30DaysAgo = dtpFrom.MaxDate
-          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+          ElseIf dbValues(0).DATETIME < dtpFrom.MinDate Then
             From30DaysAgo = dtpFrom.MinDate
           Else
-            From30DaysAgo = usageDB(0).DATETIME
+            From30DaysAgo = dbValues(0).DATETIME
           End If
         Else
           From30DaysAgo = dtpFrom.MinDate
@@ -540,7 +540,8 @@ Public Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing Then
-        If usageDB.Count > 1 Then
+        Dim dbValues() As DataBase.DataRow = usageDB.ToArray()
+        If dbValues.Length > 1 Then
           If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
             fDB.Show(Me)
@@ -548,21 +549,21 @@ Public Class frmHistory
           End If
           fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
           Dim Finds As Integer = 0
-          For I As Integer = usageDB.Count - 1 To 1 Step -1
+          For I As Integer = dbValues.Length - 1 To 1 Step -1
             Try
-              fDB.SetProgress(usageDB.Count - I, usageDB.Count)
+              fDB.SetProgress(dbValues.Length - I, dbValues.Length)
             Catch
             End Try
-            Dim thisDB As DataBase.DataRow = usageDB(I)
+            Dim thisDB As DataBase.DataRow = dbValues(I)
             Dim lastDB As DataBase.DataRow = thisDB
-            If I > 0 Then lastDB = usageDB(I - 1)
+            If I > 0 Then lastDB = dbValues(I - 1)
             Dim nextDB As DataBase.DataRow = thisDB
-            If I < usageDB.Count - 1 Then nextDB = usageDB(I + 1)
+            If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
             If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
               ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
               Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
               Not (nextDB.DOWNLOAD = lastDB.DOWNLOAD And nextDB.UPLOAD = lastDB.UPLOAD) Then
-              If DateDiff(DateInterval.Day, usageDB(I).DATETIME, Today) > 0 Then
+              If DateDiff(DateInterval.Day, usageDB(usageDB.Keys(I)).DATETIME, Today) > 0 Then
                 Finds += 1
                 If Finds = 2 Then
                   If thisDB.DATETIME > dtpFrom.MaxDate Then
@@ -578,13 +579,13 @@ Public Class frmHistory
             End If
           Next
           If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
-        ElseIf usageDB.Count > 0 Then
-          If usageDB(0).DATETIME > dtpFrom.MaxDate Then
+        ElseIf dbValues.Length > 0 Then
+          If usageDB.First.Value.DATETIME > dtpFrom.MaxDate Then
             From60DaysAgo = dtpFrom.MaxDate
-          ElseIf usageDB(0).DATETIME < dtpFrom.MinDate Then
+          ElseIf usageDB.First.Value.DATETIME < dtpFrom.MinDate Then
             From60DaysAgo = dtpFrom.MinDate
           Else
-            From60DaysAgo = usageDB(0).DATETIME
+            From60DaysAgo = usageDB.First.Value.DATETIME
           End If
         Else
           From60DaysAgo = dtpFrom.MinDate
@@ -639,8 +640,6 @@ Public Class frmHistory
           fDB.SetAction("Importing DataBase...", "Loading File into DataBase...")
           usageDB = usageTmp
         End If
-        fDB.SetAction("Importing DataBase...", "Sorting DataBase...")
-        LOG_Sort()
         fDB.SetAction("Importing DataBase...", "Saving DataBase...")
         LOG_Save(True)
         If fDB.Visible Then fDB.Close()
@@ -677,7 +676,7 @@ Public Class frmHistory
         Dim dTo As Date = Date.Parse(dtpTo.Value.Date & " 11:59:59 PM")
         usageTmp = New DataBase
         For Each satRow In usageDB
-          If satRow.DATETIME.CompareTo(dFrom) >= 0 And satRow.DATETIME.CompareTo(dTo) <= 0 Then
+          If satRow.Value.DATETIME.CompareTo(dFrom) >= 0 And satRow.Value.DATETIME.CompareTo(dTo) <= 0 Then
             usageTmp.Add(satRow)
           End If
         Next

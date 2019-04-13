@@ -18,24 +18,21 @@
   End Property
   Public Sub LOG_Add(ByVal dTime As Date, ByVal lDown As Long, ByVal lDownLim As Long, ByVal lUp As Long, ByVal lUpLim As Long)
     If Not isLoaded Then Return
-    If Math.Abs(DateDiff("n", dTime, LOG_GetLast)) >= HistoryAge Then
-      If lDownLim > 0 And lUpLim > 0 Then
-        If wbDB Is Nothing Then wbDB = New DataBase
-        wbDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
-        LOG_Save()
-      End If
-    End If
+    If lDownLim <= 0 Then Return
+    If wbDB Is Nothing Then wbDB = New DataBase
+    wbDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    LOG_Save()
   End Sub
   Public Sub LOG_Get(ByVal lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
     If Not isLoaded Then Return
-    If LOG_GetCount() > lngIndex Then
-      Dim dbRow As DataBase.DataRow = wbDB(lngIndex)
-      dtDate = dbRow.DATETIME
-      lngDown = dbRow.DOWNLOAD
-      lngDownLim = dbRow.DOWNLIM
-      lngUp = dbRow.UPLOAD
-      lngUpLim = dbRow.UPLIM
-    End If
+    If LOG_GetCount() <= lngIndex Then Return
+    Dim dArr() As DataBase.DataRow = wbDB.ToArray()
+    Dim dbRow As DataBase.DataRow = dArr(lngIndex)
+    dtDate = dbRow.DATETIME
+    lngDown = dbRow.DOWNLOAD
+    lngDownLim = dbRow.DOWNLIM
+    lngUp = dbRow.UPLOAD
+    lngUpLim = dbRow.UPLIM
   End Sub
   Public Function LOG_GetCount() As Integer
     If Not isLoaded Then Return 0
@@ -44,11 +41,8 @@
   End Function
   Public Function LOG_GetLast() As Date
     If Not isLoaded Then Return New Date(1970, 1, 1)
-    If LOG_GetCount() > 0 Then
-      Return wbDB(LOG_GetCount() - 1).DATETIME
-    Else
-      Return New Date(1970, 1, 1)
-    End If
+    If LOG_GetCount() < 1 Then Return New Date(1970, 1, 1)
+    Return wbDB.GetLast.DATETIME
   End Function
   Public Sub LOG_Initialize(sPath As String)
     isLoaded = False
