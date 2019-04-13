@@ -74,6 +74,7 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\clsCurrentOS.vb" />
     <Compile Include="Classes\clsDB.vb" />
     <Compile Include="Classes\clsFunctions.vb" />
     <Compile Include="Classes\clsHMACSHA.vb" />
