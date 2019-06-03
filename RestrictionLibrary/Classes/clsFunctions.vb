@@ -960,6 +960,7 @@ Public Class srlFunctions
       If clrID2 = 460798 Or clrID2 = 460805 Then Return ".NET 4.7" '  707FE 70805
       If clrID2 = 461308 Or clrID2 = 461310 Then Return ".NET 4.7.1" '709FC 709FE
       If clrID2 = 461808 Or clrID2 = 461814 Then Return ".NET 4.7.2" '70BF0 70BF6
+      If clrID2 = 528040 Or clrID2 = 528049 Then Return ".NET 4.8" '  80EA8 80EB1
 
       If clrID2 < 393297 Then Return String.Format(".NET 4.6 ({0})", clrID2)
       If clrID2 < 394271 Then Return String.Format(".NET 4.6.1 ({0})", clrID2)
@@ -967,6 +968,7 @@ Public Class srlFunctions
       If clrID2 < 460805 Then Return String.Format(".NET 4.7 ({0})", clrID2)
       If clrID2 < 461310 Then Return String.Format(".NET 4.7.1 ({0})", clrID2)
       If clrID2 < 461814 Then Return String.Format(".NET 4.7.2 ({0})", clrID2)
+      If clrID2 < 528049 Then Return String.Format(".NET 4.8 ({0})", clrID2)
 
       Dim clrAttempt As String = Hex(clrID2)
       clrAttempt = clrAttempt.Substring(0, clrAttempt.Length - 4)
