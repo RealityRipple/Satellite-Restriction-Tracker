@@ -179,7 +179,7 @@ Public Class remoteRestrictionTracker
       End Sub
     End Structure
     ''' <summary>
-    ''' List of <see cref="Result" /> values in an array. This contains all the results which fit the range requested in the <paramref name="UpdateFrom" /> param in the <see cref="remoteRestrictionTracker" /> constructor.
+    ''' List of <see cref="Result" /> values in an array. This contains all the results which fit the range requested in the UpdateFrom param in the <see cref="remoteRestrictionTracker" /> constructor.
     ''' </summary>
     Public Results() As Result
     ''' <summary>
