@@ -1440,7 +1440,7 @@ Public Class localRestrictionTracker
             Return
           End If
         End If
-      ElseIf sProvider = "mysatelliteinternetco.com" Then
+      ElseIf sProvider = "satelliteinternetco.com" Then
         If Table.Contains("</strong> used of ") Then
           Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
           If Total.Contains(" GB allowance") Then
