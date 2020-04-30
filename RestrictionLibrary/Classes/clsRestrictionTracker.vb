@@ -1430,8 +1430,8 @@ Public Class localRestrictionTracker
       Used = Used.Substring(Used.IndexOf(""">") + 2)
       Used = Used.Substring(0, Used.IndexOf("</"))
       Total = Nothing
-      If sProvider = "exede.net" Then
-        If Table.Contains("<strong>") Then
+      'If sProvider = "exede.net" Then
+      If Table.Contains("<strong>") Then
           Total = Table.Substring(Table.IndexOf("<strong>") + 8)
           If Total.Contains("</") Then
             Total = Total.Substring(0, Total.IndexOf("</"))
@@ -1440,19 +1440,19 @@ Public Class localRestrictionTracker
             Return
           End If
         End If
-      ElseIf sProvider = "satelliteinternetco.com" Then
-        If Table.Contains("</strong> used of ") Then
-          Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
-          If Total.Contains(" GB allowance") Then
-            Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
-          ElseIf Total.Contains("</") Then
-            Total = Total.Substring(0, Total.IndexOf("</"))
-          Else
-            RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-            Return
-          End If
-        End If
-      End If
+      'ElseIf sProvider = "satelliteinternetco.com" Then
+      '  If Table.Contains("</strong> used of ") Then
+      '    Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
+      '    If Total.Contains(" GB allowance") Then
+      '      Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
+      '    ElseIf Total.Contains("</") Then
+      '      Total = Total.Substring(0, Total.IndexOf("</"))
+      '    Else
+      '      RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
+      '      Return
+      '    End If
+      '  End If
+      'End If
     ElseIf Table.Contains("<div class=""usage") Then
       Dim sData As String = StripXMLTags(Table)
       If Not sData.Contains("GB") Then
