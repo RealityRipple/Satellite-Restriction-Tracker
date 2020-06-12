@@ -71,8 +71,10 @@ Public Class frmMain
     Private Sub BeginTest(Provider As String)
       If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
         c_callback.Invoke(SatHostTypes.Dish_EXEDE)
-      ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then
+      ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
         c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
+      ElseIf Provider.ToLower = "satelliteinternetco.com" Then
+        c_callback.Invoke(SatHostTypes.WildBlue_EXEDE_RESELLER)
       Else
         OfflineCheck()
       End If
@@ -161,6 +163,8 @@ Public Class frmMain
         mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
       ElseIf HostGroup = DetermineType.SatHostGroup.Exede Then
         mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+      ElseIf HostGroup = DetermineType.SatHostGroup.ExedeReseller Then
+        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
       End If
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       mySettings.Save()
@@ -464,7 +468,7 @@ Public Class frmMain
         pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, typeA_up, typeA_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = CreateTypeATrayIcon(typeA_down, typeA_dlim, typeA_up, typeA_ulim)
       End If
-    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Then
+    ElseIf myPanel = SatHostTypes.RuralPortal_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE Or myPanel = SatHostTypes.WildBlue_EXEDE_RESELLER Then
       If typeB_lim = 0 Then
         pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
@@ -793,7 +797,7 @@ Public Class frmMain
                 NextGrabTick = Long.MaxValue
                 PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
-                If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Then
+                If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER Then
                   SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
                   Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
                 Else
@@ -945,21 +949,36 @@ Public Class frmMain
       Case ConnectionStates.Login
         Select Case e.SubState
           Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page...", False)
-          Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
+          Case ConnectionSubStates.Authenticate
+            If e.Stage < 1 Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
+            Else
+              SetStatusText(LOG_GetLast.ToString("g"), "Authenticating (Stage " & (e.Stage + 1) & ")...", False)
+            End If
           Case ConnectionSubStates.AuthenticateRetry
             If e.Stage < 1 Then
               SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating...", False)
             Else
               SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating (Attempt " & e.Stage & ")...", False)
             End If
-          Case ConnectionSubStates.Verify : SetStatusText(LOG_GetLast.ToString("g"), "Verifying Authentication...", False)
+          Case ConnectionSubStates.Verify
+            If e.Stage < 1 Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Verifying Authentication...", False)
+            Else
+              SetStatusText(LOG_GetLast.ToString("g"), "Verifying Access (Stage " & e.Stage & ")...", False)
+            End If
           Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
-          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeAJAXFirstTryRequests & ")...", False)
-          Case ConnectionSubStates.LoadAJAXRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeAJAXSecondTryRequests & ")...", False)
+          Case ConnectionSubStates.LoadHome
+            If e.Stage < 1 Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
+            Else
+              SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page (Stage " & (e.Stage + 1) & ")...", False)
+            End If
+          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
+          Case ConnectionSubStates.LoadAJAXRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
           Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
           Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
           Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
@@ -1043,7 +1062,7 @@ Public Class frmMain
           localData = New localRestrictionTracker(LocalAppDataDirectory)
           Return
         End If
-        If e.Message = "AJAX failed to yield data table." And GrabAttempt < 1 Then
+        If (e.Message = "AJAX failed to yield data table." Or e.Message = "Can't determine AJAX order.") And GrabAttempt < 1 Then
           GrabAttempt += 1
           If localData IsNot Nothing Then
             localData.Dispose()
@@ -1217,6 +1236,32 @@ Public Class frmMain
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.WildBlue_EXEDE
     If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
+    mySettings.Save()
+    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    If e.SlowedDetected Then imSlowed = True
+    imFree = e.FreeDetected
+    DisplayUsage(True, True)
+    If localData IsNot Nothing Then
+      localData.Dispose()
+      localData = Nothing
+    End If
+    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
+    hostInvoker.BeginInvoke(Nothing, Nothing)
+  End Sub
+  Private Sub localData_ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWXRResult
+    If Me.InvokeRequired Then
+      Try
+        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWXRResult), sender, e)
+      Catch ex As Exception
+      End Try
+      Return
+    End If
+    GrabAttempt = 0
+    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
+    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
+    myPanel = SatHostTypes.WildBlue_EXEDE_RESELLER
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1710,7 +1755,7 @@ Public Class frmMain
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
-        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case SatHostTypes.Dish_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case Else : DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
       End Select
@@ -1748,7 +1793,7 @@ Public Class frmMain
                 lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
-            Case SatHostTypes.WildBlue_EXEDE, SatHostTypes.RuralPortal_EXEDE
+            Case SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER, SatHostTypes.RuralPortal_EXEDE
               If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
@@ -1797,7 +1842,7 @@ Public Class frmMain
         If ClosingTime Then Return
         cmdRefresh.Enabled = True
       End If
-      If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE Then
+      If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER Then
         SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
         Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
       Else

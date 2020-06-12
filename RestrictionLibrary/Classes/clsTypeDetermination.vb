@@ -19,9 +19,13 @@ Public Class DetermineType
     ''' </summary>
     WildBlue
     ''' <summary>
-    ''' Provider uses modern Exede login system (exede.net or satelliteinternetco.com, uses AJAX).
+    ''' Provider uses modern Exede login system (exede.net).
     ''' </summary>
     Exede
+    ''' <summary>
+    ''' Provider uses last-gen Exede login system (satelliteinternetco.com, uses AJAX).
+    ''' </summary>
+    ExedeReseller
     ''' <summary>
     ''' The provider is unknown or hasn't been determined yet.
     ''' </summary>
@@ -106,8 +110,10 @@ Public Class DetermineType
   Private Sub BeginTest(Provider As String)
     If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
       c_callback.Invoke(SatHostGroup.Dish)
-    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then
+    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
       c_callback.Invoke(SatHostGroup.Exede)
+    ElseIf Provider.ToLower = "satelliteinternetco.com" Then
+      c_callback.Invoke(SatHostGroup.ExedeReseller)
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       sProvider = Provider
@@ -165,7 +171,7 @@ Public Class UpdateAJAXLists
   End Sub
   Private Delegate Sub BeginCheckInvoker(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
   Private Sub BeginCheck(Host As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
-    wRequest = System.Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/exAJAX.php?h=" & Host)
+    wRequest = System.Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/erAJAX.php?h=" & Host)
     wRequest.Timeout = Timeout * 1000
     wRequest.Proxy = Proxy
     Try

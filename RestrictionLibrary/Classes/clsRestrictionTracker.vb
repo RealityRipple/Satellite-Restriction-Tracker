@@ -1,4 +1,7 @@
-﻿''' <summary>
+﻿Imports System.IO
+Imports System.Runtime.Remoting.Messaging
+Imports RestrictionLibrary.My
+''' <summary>
 ''' Accesses WildBlue, Exede, RuralPortal, and Dish usage pages and handles all communication internally.
 ''' </summary>
 Public Class localRestrictionTracker
@@ -12,9 +15,13 @@ Public Class localRestrictionTracker
     ''' </summary>
     WildBlue_LEGACY    ' Down, Up, DownLim, UpLim     [TYPEA]
     ''' <summary>
-    ''' Exede type meter with <see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through either my.exede.net or my.satelliteinternetco.com, using AJAX.
+    ''' Exede type meter with <see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through my.exede.net.
     ''' </summary>
     WildBlue_EXEDE     ' Used, Limit                  [TYPEB]
+    ''' <summary>
+    ''' Exede type meter with <see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through my.satelliteinternetco.com, using AJAX.
+    ''' </summary>
+    WildBlue_EXEDE_RESELLER
     ''' <summary>
     ''' RuralPortal WildBlue type meter with <see cref="localRestrictionTracker.TYPEAResultEventArgs">Type A</see> usage, including Download, Download Limit, Upload, and Upload Limit values, reading through an address of DOMAIN.ruralportal.net.
     ''' </summary>
@@ -66,7 +73,7 @@ Public Class localRestrictionTracker
     ''' </summary>
     None
     ''' <summary>
-    ''' The login page is being read. Only Exede uses this step.
+    ''' The login page is being read. Only Exede Reseller uses this step.
     ''' </summary>
     ReadLogin
     ''' <summary>
@@ -90,7 +97,7 @@ Public Class localRestrictionTracker
     ''' </summary>
     LoadAJAX
     ''' <summary>
-    ''' The previous attempt to load AJAX data failed, so now the system is loading every page of AJAX data it can in an attempt to find the meter. Only Exede uses this step.
+    ''' The previous attempt to load AJAX data failed, so now the system is loading every page of AJAX data it can in an attempt to find the meter. Only Exede Reseller uses this step.
     ''' </summary>
     LoadAJAXRetry
     ''' <summary>
@@ -373,7 +380,7 @@ Public Class localRestrictionTracker
     Private m_slow As Boolean
     Private m_free As Boolean
     ''' <summary>
-    ''' Constructor for a <see cref="TYPEBResultEventArgs" /> used in <see cref="ConnectionWBXResult" /> and <see cref="ConnectionRPXResult" /> events.
+    ''' Constructor for a <see cref="TYPEBResultEventArgs" /> used in <see cref="ConnectionWBXResult" />, <see cref="ConnectionWXRResult" />, and <see cref="ConnectionRPXResult" /> events.
     ''' </summary>
     ''' <param name="lUsed">Total number of megabytes used.</param>
     ''' <param name="lLimit">Total number of megabytes allowed.</param>
@@ -440,6 +447,12 @@ Public Class localRestrictionTracker
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
   Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
+  ''' <summary>
+  ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE_RESELLER" /> account.
+  ''' </summary>
+  ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
+  ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
+  Public Event ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.Dish_EXEDE" /> account.
   ''' </summary>
@@ -599,7 +612,7 @@ Public Class localRestrictionTracker
     End Try
     Dim iWait As Integer = Net.ServicePointManager.MaxServicePointIdleTime
     Net.ServicePointManager.MaxServicePointIdleTime = 1
-    If mySettings.securityEnforced Then
+    If mySettings.SecurityEnforced Then
       Net.ServicePointManager.ServerCertificateValidationCallback = Nothing
     Else
       Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
@@ -675,6 +688,9 @@ Public Class localRestrictionTracker
       Case DetermineType.SatHostGroup.Exede
         mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
         GetUsage()
+      Case DetermineType.SatHostGroup.ExedeReseller
+        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
+        GetUsage()
       Case DetermineType.SatHostGroup.Other
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
     End Select
@@ -694,11 +710,14 @@ Public Class localRestrictionTracker
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : LoginWB()
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Or sProvider.ToLower = "satelliteinternetco.com" Then
+        If sProvider.ToLower = "exede.net" Then
           LoginExede()
+        ElseIf sProvider.ToLower = "satelliteinternetco.com" Then
+          LoginExedeR()
         Else
           LoginWB()
         End If
+      Case SatHostTypes.WildBlue_EXEDE_RESELLER : LoginExedeR()
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP()
       Case SatHostTypes.Dish_EXEDE : LoginDN()
     End Select
@@ -716,21 +735,27 @@ Public Class localRestrictionTracker
     WB_Login_Response(responseData, responseURI)
   End Sub
   Private Sub LoginExede()
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
+    Dim uriString As String = "https://mysso." & sProvider & "/federation/UI/Login"
+    EX_Login(uriString, 0)
+  End Sub
+  Private Sub LoginExedeR()
+    mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
     AJAXOrder = mySettings.AJAXShortOrder
     AJAXFullOrder = mySettings.AJAXFullOrder
     If AJAXOrder Is Nothing Or AJAXFullOrder Is Nothing Then
-      RaiseError("Prepare Failed: Unknown Provider - Can't determine AJAX order.")
+      RaiseError("Can't determine AJAX order.")
       Return
     End If
-    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://my." & sProvider & "/login"
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Initialize))
+    Dim uriString As String = "https://my." & sProvider & "/"
     MakeSocket(False)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Login_Prepare_Response(responseData, responseURI, 0)
+    ER_Login_Prepare_Response(responseData, responseURI, 0)
   End Sub
   Private Sub LoginRP()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
@@ -789,11 +814,14 @@ Public Class localRestrictionTracker
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Or sProvider.ToLower = "satelliteinternetco.com" Then
+        If sProvider.ToLower = "exede.net" Then
           EX_Read_Table(Table)
+        ElseIf sProvider.ToLower = "satelliteinternetco.com" Then
+          ER_Read_Table(Table)
         Else
           WB_Read_Table(Table)
         End If
+      Case SatHostTypes.WildBlue_EXEDE_RESELLER : ER_Read_Table(Table)
       Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
       Case SatHostTypes.Dish_EXEDE : DN_Read_Table(Table)
     End Select
@@ -975,8 +1003,353 @@ Public Class localRestrictionTracker
   End Sub
 #End Region
 #Region "EX"
-  Private Sub EX_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If Response.Contains("To access this website, update your web browser or upgrade your operating system to support TLS 1.1 or TLS 1.2.") Or Response.Contains("Stronger security is required") Or Response = "Error: The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration." Then
+  Private Sub EX_Login(sURI As String, TryCount As Integer)
+    MakeSocket(True)
+    Dim sSend As String = "realm=" &
+                         "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
+                         "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
+                         "&IDButton=Sign+in" &
+                         "&goto=" &
+                         "&SunQueryParamsString=" &
+                         "&encoded=false" &
+                         "&gx_charset=UTF-8"
+    If TryCount = 0 Then
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
+    Else
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
+    End If
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendPOST(New Uri(sURI), sSend, responseURI, responseData)
+    If ClosingTime Then Return
+    EX_Login_Response(responseData, responseURI, TryCount, 0)
+  End Sub
+  Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer, RedirCount As Integer)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    If Response.ToLower.Contains("login-error-alert") Then
+      If Response.ToLower.Contains("your username and/or password are incorrect.") Then
+        RaiseError("Login Failed: Incorrect Password")
+      ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
+        RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
+      ElseIf Response.ToLower.Contains("your session has timed out.") Then
+        RaiseError("Login Failed: Session timed out. Please try again.")
+      ElseIf Response.ToLower.Contains("this user is not active.") Then
+        RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
+      Else
+        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+      End If
+      Return
+    End If
+    If Response.ToLower.Contains("location.href") Then
+      RedirCount += 1
+      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
+      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
+      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+      If sRedirURI = "/" Then
+        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
+      ElseIf sRedirURI.StartsWith("/") Then
+        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
+      End If
+      Dim response2Data As String = Nothing
+      Dim response2URI As Uri = Nothing
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, RedirCount, sRedirURI)
+      SendGET(New Uri(sRedirURI), response2URI, response2Data)
+      If ClosingTime Then Return
+      EX_Login_Response(response2Data, response2URI, TryCount, RedirCount)
+      Return
+    End If
+    If Response.Contains("<script src=""/static/js/") Then
+      Dim sScripts As String() = Split(Response, "<script src=""/static/js/")
+      If sScripts.Length = 3 Then
+        Dim jsA As String = sScripts(1).Substring(0, sScripts(1).IndexOf(""""))
+        Dim jsB As String = sScripts(2).Substring(0, sScripts(2).IndexOf(""""))
+        If jsA.Contains(".") Then
+          If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/js/" & jsA
+            EX_JS(sURI, TryCount)
+            Return
+          End If
+        End If
+        If jsB.Contains(".") Then
+          If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/js/" & jsB
+            EX_JS(sURI, TryCount)
+            Return
+          End If
+        End If
+      End If
+    End If
+    RaiseError("Login Failed: Could not understand response.", "EX Login Response", Response, ResponseURI)
+  End Sub
+  Private Sub EX_JS(sURI As String, TryCount As Integer)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, sURI)
+    SendGET(New Uri(sURI), responseURI, responseData)
+    If ClosingTime Then Return
+    EX_JS_Response(responseData, responseURI, TryCount)
+  End Sub
+  Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If Not Response.Contains("CLIENT_ID:") Then
+      RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    Dim CliID As String = Response.Substring(Response.IndexOf("CLIENT_ID:"))
+    If Not CliID.Contains("""") Then
+      RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    CliID = CliID.Substring(CliID.IndexOf("""") + 1)
+    If Not CliID.Contains("""") Then
+      RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    CliID = CliID.Substring(0, CliID.IndexOf(""""))
+    EX_SAML(CliID, TryCount)
+  End Sub
+  Private Sub EX_SAML(ClientID As String, TryCount As Integer)
+    Dim nonce As String = Guid.NewGuid().ToString
+    Dim sGOTO As String = "https://account.viasat.com/services/oauth2/authorize?"
+    sGOTO &= "client_id=" & ClientID & "&"
+    sGOTO &= "response_type=token&"
+    sGOTO &= "redirect_uri=https://my.viasat.com/callback&"
+    sGOTO &= "scope=&"
+    sGOTO &= "response_mode=query&"
+    sGOTO &= "nonce=" & nonce & "&"
+    sGOTO &= "state=abcd"
+    Dim sURI As String = "https://mysso." & sProvider & "/federation/UI/Login?goto=" & srlFunctions.PercentEncode(sGOTO)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 1, sURI)
+    SendGET(New Uri(sURI), responseURI, responseData)
+    If ClosingTime Then Return
+    EX_SAML_Response(responseData, responseURI, TryCount, 0)
+  End Sub
+  Private Sub EX_SAML_Response(Response As String, ResponseURI As Uri, TryCount As Integer, RedirCount As Integer)
+    If Response.ToLower.Contains("location.href") Then
+      RedirCount += 1
+      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
+      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
+      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+      If sRedirURI = "/" Then
+        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
+      ElseIf sRedirURI.StartsWith("/") Then
+        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
+      End If
+      Dim response2Data As String = Nothing
+      Dim response2URI As Uri = Nothing
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, RedirCount + 1, sRedirURI)
+      SendGET(New Uri(sRedirURI), response2URI, response2Data)
+      If ClosingTime Then Return
+      EX_SAML_Response(response2Data, response2URI, TryCount, RedirCount)
+      Return
+    End If
+    If Response.Contains("Access rights validated") Then
+      Dim sURI As String = Nothing
+      If Response.Contains("<form method=""post"" action=""") Then
+        sURI = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
+        sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
+        If sURI.Contains(""">") Then
+          sURI = sURI.Substring(0, sURI.IndexOf(""">"))
+        Else
+          RaiseError("Authentication Failed: POST URL value cut off. Please try again.", "EX SAML Response")
+          Return
+        End If
+        sURI = srlFunctions.HexDecode(sURI)
+      End If
+      If String.IsNullOrEmpty(sURI) Then sURI = ResponseURI.AbsoluteUri
+      Dim sSAMLResponse As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
+        sSAMLResponse = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
+        sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
+        If sSAMLResponse.Contains(""" />") Then
+          sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
+        Else
+          RaiseError("Authentication Failed: SAML Response value cut off. Please try again.", "EX SAML Response")
+          Return
+        End If
+      End If
+      If String.IsNullOrEmpty(sSAMLResponse) Then
+        RaiseError("Authentication Failed: SAML Response value not found.", "EX Login Response", Response, ResponseURI)
+        Return
+      End If
+      Dim sRelay As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
+        sRelay = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
+        sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
+        If sRelay.Contains(""" />") Then
+          sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
+        Else
+          RaiseError("Authentication Failed: Relay State value cut off. Please try again.", "EX SAML Response")
+          Return
+        End If
+      End If
+      If String.IsNullOrEmpty(sRelay) Then
+        RaiseError("Authentication Failed: Relay State value not found.", "EX SAML Response", Response, ResponseURI)
+        Return
+      End If
+      EX_Authenticate(sURI, sSAMLResponse, sRelay, TryCount)
+      Return
+    End If
+    RaiseError("Could not log in.", "EX SAML Response", Response, ResponseURI)
+  End Sub
+  Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String, TryCount As Integer)
+    MakeSocket(True)
+    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse))
+    If Not String.IsNullOrEmpty(RelayState) Then sSend &= "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, sURI)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendPOST(New Uri(sURI), sSend, responseURI, responseData)
+    If ClosingTime Then Return
+    EX_Authenticate_Response(responseData, responseURI, TryCount, 0)
+  End Sub
+  Private Sub EX_Authenticate_Response(Response As String, responseURI As Uri, TryCount As Integer, RedirCount As Integer)
+    If Response.ToLower.Contains("location.href") Then
+      RedirCount += 1
+      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
+      If sRedirURI.Contains("""") Then
+        sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("""") + 1)
+        sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf(""""))
+      ElseIf sRedirURI.Contains("'") Then
+        sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
+        sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+      End If
+      If sRedirURI = "/" Then
+        sRedirURI = responseURI.OriginalString.Substring(0, responseURI.OriginalString.IndexOf("/", responseURI.OriginalString.IndexOf("//") + 2))
+      ElseIf sRedirURI.StartsWith("/") Then
+        sRedirURI = "https://" & responseURI.Host & sRedirURI
+      End If
+      Dim response2Data As String = Nothing
+      Dim response2URI As Uri = Nothing
+      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, RedirCount, sRedirURI)
+      SendGET(New Uri(sRedirURI), response2URI, response2Data)
+      If ClosingTime Then Return
+      EX_Authenticate_Response(response2Data, response2URI, TryCount, RedirCount)
+      Return
+    End If
+    Dim sToken As String = responseURI.Fragment
+    If Not sToken.Contains("#access_token=") Then
+      RaiseError("Could not log in.", "EX Authenticate Response", Response, responseURI)
+      Return
+    End If
+    sToken = sToken.Substring(sToken.IndexOf("#access_token=") + 14)
+    If sToken.Contains("&") Then sToken = sToken.Substring(0, sToken.IndexOf("&"))
+    sToken = srlFunctions.PercentDecode(sToken)
+    EX_Downlad_Table(sToken, TryCount)
+  End Sub
+  Private Sub EX_Downlad_Table(sToken As String, TryCount As Integer)
+    Dim tURI As String = "https://my-viasat-server-prod.icat.viasat.io/graphql"
+    Dim sSend As String = "{""operationName"":""getPlanCardInfoUsage"",""variables"":{},""query"":""query getPlanCardInfoUsage {\n" &
+          "  getUsageInfo {\n" &
+          "    currentUsageAmount\n" &
+          "    currentUsageMeasurement\n" &
+          "    isUnlimited\n" &
+          "    planLimitAmount\n" &
+          "    planLimitMeasurement\n" &
+          "    usageStartDate\n" &
+          "    usageResetDate\n" &
+          "    __typename\n" &
+          "  }\n" &
+          "}\n" &
+          """}"
+    Dim hdrs As New Net.WebHeaderCollection
+    hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
+    hdrs.Add("x-auth-token", sToken)
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, tURI)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
+    If ClosingTime Then Return
+    ReadUsage(responseData)
+  End Sub
+  Private Sub EX_Read_Table(Table As String)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
+    Dim exJS As JSONReader
+    Try
+      Using jStream As New MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Table))
+        exJS = New JSONReader(jStream, True)
+      End Using
+    Catch ex As Exception
+      RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+      Return
+    End Try
+    If Not exJS.Serial.Count = 1 Then
+      RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+      Return
+    End If
+    For Each el In exJS.Serial(0).SubElements
+      If Not el.Type = JSONReader.ElementType.Array Then Continue For
+      If el.Key = "errors" Then
+        Dim sMsg As String = ""
+        For Each er In el.Collection
+          If Not er.Type = JSONReader.ElementType.KeyValue Then Continue For
+          If Not er.Key = "message" Then Continue For
+          sMsg &= er.Value & " - "
+        Next
+        If String.IsNullOrEmpty(sMsg) Then
+          RaiseError("Usage Failed: Unknown Error", "EX Usage Response", Table)
+        Else
+          sMsg = sMsg.Substring(0, sMsg.Length - 3)
+          RaiseError("Usage Failed: " & sMsg, "EX Usage Response", Table)
+        End If
+        Return
+      End If
+    Next
+    Dim jUsage As JSONReader.JSElement = Nothing
+    For Each el In exJS.Serial(0).SubElements
+      If Not el.Type = JSONReader.ElementType.Group Then Continue For
+      If el.Key = "data" Then
+        For Each el2 In el.SubElements
+          If Not el2.Type = JSONReader.ElementType.Group Then Continue For
+          If el2.Key = "getUsageInfo" Then
+            jUsage = el2
+            Exit For
+          End If
+        Next
+        If Not jUsage.Type = JSONReader.ElementType.None Then Exit For
+      End If
+    Next
+    If jUsage.Type = JSONReader.ElementType.None Then
+      RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+      Return
+    End If
+    Dim sDown As String = String.Empty, sDownT As String = String.Empty
+    Dim sDownSz As String = "B", sDownSzT As String = "B"
+    For Each el In jUsage.SubElements
+      If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
+      Select Case el.Key
+        Case "currentUsageAmount"
+          sDown = el.Value
+        Case "currentUsageMeasurement"
+          sDownSz = el.Value
+        Case "planLimitAmount"
+          sDownT = el.Value
+        Case "planLimitMeasurement"
+          sDownSzT = el.Value
+      End Select
+    Next
+    Dim iDownSz As ULong = 1024 * 1024 * 1024
+    Dim iDownSzT As ULong = 1024 * 1024 * 1024
+    Select Case sDownSz.ToLower
+      Case "k", "kb" : iDownSz = 1024 * 1024
+      Case "m", "mb" : iDownSz = 1024
+      Case "g", "gb" : iDownSz = 1
+    End Select
+    Select Case sDownSzT.ToLower
+      Case "k", "kb" : iDownSzT = 1024 * 1024
+      Case "m", "mb" : iDownSzT = 1024
+      Case "g", "gb" : iDownSzT = 1
+    End Select
+    sDown = StrToFloat(sDown) / iDownSz
+    sDownT = StrToFloat(sDownT) / iDownSzT
+    RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
+  End Sub
+#End Region
+#Region "ER"
+  Private Sub ER_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If Response.Contains("To access this website, update your web browser Or upgrade your operating system to support TLS 1.1 Or TLS 1.2.") Or Response.Contains("Stronger security Is required") Or Response = "Error: The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration." Then
       If (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Or (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Then
         If c_TLSProxy Then
           RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "TLS Proxy failed to be of any use!"))
@@ -1001,12 +1374,28 @@ Public Class localRestrictionTracker
       RaiseError("Prepare Failed: Server Down for Maintenance.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
-      RaiseError("Prepare Failed: Could not understand response.", "EX Login Prepare Response", Response, ResponseURI)
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
+      If Response.Contains("location.href") Then
+        Dim sRedirURI As String = Response.Substring(Response.IndexOf("location.href"))
+        sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
+        sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+        If sRedirURI = "/" Then
+          sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
+        ElseIf sRedirURI.StartsWith("/") Then
+          sRedirURI = "https://" & ResponseURI.Host & sRedirURI
+        End If
+        Dim response2Data As String = Nothing
+        Dim response2URI As Uri = Nothing
+        SendGET(New Uri(sRedirURI), response2URI, response2Data)
+        If ClosingTime Then Return
+        ER_Login_Prepare_Response(response2Data, response2URI, TryCount)
+      Else
+        RaiseError("Prepare Failed: Could not understand response.", "ER Login Prepare Response", Response, ResponseURI)
+      End If
       Return
     End If
     If Not Response.Contains("<form") Or Not Response.Contains("name=""Login""") Then
-      RaiseError("Prepare Failed: Login form not found.", "EX Login Prepare Response", Response, ResponseURI)
+      RaiseError("Prepare Failed: Login form not found.", "ER Login Prepare Response", Response, ResponseURI)
       Return
     End If
     Dim sURI As String = Response.Substring(Response.IndexOf("name=""Login"""))
@@ -1024,7 +1413,7 @@ Public Class localRestrictionTracker
       End If
     End If
     If String.IsNullOrEmpty(sGOTO) Then
-      RaiseError("Prepare Failed: GOTO value not found.", "EX Login Prepare Response", Response, ResponseURI)
+      RaiseError("Prepare Failed: GOTO value not found.", "ER Login Prepare Response", Response, ResponseURI)
       Return
     End If
     Dim sSQPS As String = Nothing
@@ -1038,14 +1427,14 @@ Public Class localRestrictionTracker
       End If
     End If
     If String.IsNullOrEmpty(sSQPS) Then
-      RaiseError("Prepare Failed: SunQueryParamsString value not found.", "Exede Login Prepare Response", Response, ResponseURI)
+      RaiseError("Prepare Failed: SunQueryParamsString value not found.", "ER Login Prepare Response", Response, ResponseURI)
       Return
     End If
-    EX_Login(sURI, sGOTO, sSQPS, TryCount)
+    ER_Login(sURI, sGOTO, sSQPS, TryCount)
   End Sub
-  Private Sub EX_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
+  Private Sub ER_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
     MakeSocket(True)
-    Dim sSend As String = "realm=" & srlFunctions.PercentEncode("/") &
+    Dim sSend As String = "realm=" & srlFunctions.PercentEncode("wsubscriber") &
                          "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
                          "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
                          "&IDButton=Sign+in" &
@@ -1062,20 +1451,20 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    EX_Login_Response(responseData, responseURI, TryCount)
+    ER_Login_Response(responseData, responseURI, TryCount)
   End Sub
-  Private Sub EX_Login2(sURI As String, TryCount As Integer)
+  Private Sub ER_Login2(sURI As String, TryCount As Integer)
     MakeSocket(True)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.AuthenticateRetry, TryCount, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Login_Response(responseData, responseURI, TryCount)
+    ER_Login_Response(responseData, responseURI, TryCount)
   End Sub
-  Private Sub EX_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+  Private Sub ER_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToLower = "mysso." & sProvider Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -1083,27 +1472,27 @@ Public Class localRestrictionTracker
       If Response.ToLower.Contains("your username and/or password are incorrect.") Then
         RaiseError("Login Failed: Incorrect Password")
       ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
-        RaiseError("Login Failed: Exede Account Locked. Check your username and password.")
+        RaiseError("Login Failed: Exede Reseller Account Locked. Check your username and password.")
       ElseIf Response.ToLower.Contains("your session has timed out.") Then
         RaiseError("Login Failed: Session timed out. Please try again.")
       ElseIf Response.ToLower.Contains("this user is not active.") Then
-        RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
+        RaiseError("Login Failed: Exede Reseller Account Inactive. Check your username and password.")
       Else
-        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+        RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
       End If
       Return
     ElseIf Response.Contains("<div class=""msgerror"">") Then
       If Response.ToLower.Contains("invalid user name or password") Then
         RaiseError("Login Failed: Incorrect Password")
       Else
-        RaiseError("Unknown Login Error.", "EX Login Response", Response, ResponseURI)
+        RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
       End If
       Return
     ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
       RaiseError("Login Failed: Server encountered an unexpected error.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/idp" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" And Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
+    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" Then
       If Response.Contains("window.location.href") Then
         TryCount += 1
         If TryCount > 15 Then
@@ -1129,7 +1518,7 @@ Public Class localRestrictionTracker
         Dim response2URI As Uri = Nothing
         SendGET(New Uri(sRedirURI), response2URI, response2Data)
         If ClosingTime Then Return
-        EX_Login_Response(response2Data, response2URI, TryCount)
+        ER_Login_Response(response2Data, response2URI, TryCount)
       ElseIf Response.Contains("maintenance") Then
         RaiseError("Login Failed: Server Down for Maintenance.")
       ElseIf Response.Contains("https://DOMAIN.my.salesforce.com") Then
@@ -1137,7 +1526,7 @@ Public Class localRestrictionTracker
       ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
         RaiseError("Login Failed: Please check your account information and try again.")
       Else
-        RaiseError("Login Failed: Could not understand response.", True, "EX Login Response", Response, ResponseURI)
+        RaiseError("Login Failed: Could not understand response.", True, "ER Login Response", Response, ResponseURI)
       End If
       Return
     End If
@@ -1149,7 +1538,7 @@ Public Class localRestrictionTracker
         If sURI.Contains(""">") Then
           sURI = sURI.Substring(0, sURI.IndexOf(""">"))
         Else
-          RaiseError("Login Failed: POST URL value cut off. Please try again.", "EX Login Response")
+          RaiseError("Login Failed: POST URL value cut off. Please try again.", "ER Login Response")
           Return
         End If
         sURI = srlFunctions.HexDecode(sURI)
@@ -1162,12 +1551,12 @@ Public Class localRestrictionTracker
         If sSAMLResponse.Contains(""" />") Then
           sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
         Else
-          RaiseError("Login Failed: SAML Response value cut off. Please try again.", "EX Login Response")
+          RaiseError("Login Failed: SAML Response value cut off. Please try again.", "ER Login Response")
           Return
         End If
       End If
       If String.IsNullOrEmpty(sSAMLResponse) Then
-        RaiseError("Login Failed: SAML Response value not found.", "EX Login Response", Response, ResponseURI)
+        RaiseError("Login Failed: SAML Response value not found.", "ER Login Response", Response, ResponseURI)
         Return
       End If
       Dim sRelay As String = Nothing
@@ -1177,16 +1566,16 @@ Public Class localRestrictionTracker
         If sRelay.Contains(""" />") Then
           sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
         Else
-          RaiseError("Login Failed: Relay State value cut off. Please try again.", "EX Login Response")
+          RaiseError("Login Failed: Relay State value cut off. Please try again.", "ER Login Response")
           Return
         End If
       End If
       If String.IsNullOrEmpty(sRelay) Then
         TryCount += 1
-        EX_Login2(sURI, TryCount)
+        ER_Login2(sURI, TryCount)
         Return
       End If
-      EX_Authenticate(sURI, sSAMLResponse, sRelay)
+      ER_Authenticate(sURI, sSAMLResponse, sRelay)
     ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
       RaiseError("Login Failed: Please check your account information and try again.")
     ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
@@ -1195,12 +1584,12 @@ Public Class localRestrictionTracker
         RaiseError("Login Failed: Server redirected too many times.")
         Return
       End If
-      EX_Login_Prepare_Response(Response, ResponseURI, TryCount)
+      ER_Login_Prepare_Response(Response, ResponseURI, TryCount)
     Else
-      RaiseError("Could not log in.", "EX Login Response", Response, ResponseURI)
+      RaiseError("Could not log in.", "ER Login Response", Response, ResponseURI)
     End If
   End Sub
-  Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
+  Private Sub ER_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
     MakeSocket(True)
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse))
     If Not String.IsNullOrEmpty(RelayState) Then sSend &= "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
@@ -1209,11 +1598,11 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    EX_Authenticate_Response(responseData, responseURI)
+    ER_Authenticate_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_Authenticate_Response(Response As String, ResponseURI As Uri)
+  Private Sub ER_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider And Not ResponseURI.Host.ToLower = "account.viasat.com" Then
+    If Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("Authentication Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -1236,25 +1625,23 @@ Public Class localRestrictionTracker
         RaiseError("Authentication Failed. If you get this error, please let me know immediately!")
         Return
       Else
-        If sProvider = "exede.net" Then
-          sURL = "https://" & ResponseURI.Host & "/dashboard"
-        ElseIf sProvider = "satelliteinternetco.com" Then
+        If sProvider = "satelliteinternetco.com" Then
           sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard"
         Else
           RaiseError("Authentication Failed: Unknown Provider - Can't determine Dashboard URL.")
         End If
       End If
       If justATest Then
-        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE))
+        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE_RESELLER))
         Return
       End If
-      EX_Download_Homepage(sURL)
+      ER_Download_Homepage(sURL)
       Return
     End If
     If Response.Contains("maintenance") Then
       RaiseError("Authentication Failed: Server Down for Maintenance.")
     Else
-      RaiseError("Authentication Failed: Could not understand response.", True, "EX Authenticate Response", Response, ResponseURI)
+      RaiseError("Authentication Failed: Could not understand response.", True, "ER Authenticate Response", Response, ResponseURI)
     End If
   End Sub
   Private Structure AjaxEntry
@@ -1269,32 +1656,32 @@ Public Class localRestrictionTracker
   End Structure
   Private AJAXFullOrder() As String
   Private AJAXOrder() As String
-  Public ReadOnly Property ExedeAJAXFirstTryRequests As Integer
+  Public ReadOnly Property ExedeResellerAJAXFirstTryRequests As Integer
     Get
       Return AJAXOrder.Length - 1
     End Get
   End Property
-  Public ReadOnly Property ExedeAJAXSecondTryRequests As Integer
+  Public ReadOnly Property ExedeResellerAJAXSecondTryRequests As Integer
     Get
       Return AJAXFullOrder.Length - 1
     End Get
   End Property
-  Private Sub EX_Download_Homepage(sURI As String)
+  Private Sub ER_Download_Homepage(sURI As String)
     MakeSocket(True)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(0, AJAXOrder(0), 1))
+    ER_Ajax_Response(responseData, responseURI, New AjaxEntry(0, AJAXOrder(0), 1))
   End Sub
-  Private Sub EX_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
+  Private Sub ER_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myexede.force.net" And Not ResponseURI.Host.ToLower = "my." & sProvider And Not ResponseURI.Host.ToLower = "account.viasat.com" Then
+    If Not ResponseURI.Host.ToLower = "my." & sProvider Then
       RaiseError("AJAX Load Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/dashboard" And Not ResponseURI.AbsolutePath.ToLower = "/subscriber_dashboard" Then
+    If Not ResponseURI.AbsolutePath.ToLower = "/subscriber_dashboard" Then
       If Response.Contains("location.href") Then
         Dim sURL As String = Nothing
         sURL = Response.Substring(Response.IndexOf("location.href"))
@@ -1305,20 +1692,15 @@ Public Class localRestrictionTracker
         ElseIf sURL.StartsWith("/") Then
           sURL = "https://" & ResponseURI.Host & sURL
         End If
-        EX_Download_Homepage(sURL)
+        ER_Download_Homepage(sURL)
       ElseIf Response.Contains("maintenance") Then
         RaiseError("AJAX Load Failed: Server Down for Maintenance.")
       Else
-        RaiseError("AJAX Load Failed: Could not understand response.", True, "EX Ajax Response", Response, ResponseURI)
+        RaiseError("AJAX Load Failed: Could not understand response.", True, "ER Ajax Response", Response, ResponseURI)
       End If
       Return
     End If
-    If Response.Contains("<div class=""usage""") Or Response.Contains("<div class=""usage ") Then
-      Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""usage"))
-      If sTable.Contains("at-usage-limit") Then imSlowed = True
-      sTable = sTable.Substring(0, sTable.IndexOf("</div>") + 6)
-      ReadUsage(sTable)
-    ElseIf Response.Contains("amount-used") Then
+    If Response.Contains("amount-used") Then
       If Response.Contains("green red") Then imSlowed = True
       Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
       sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
@@ -1341,14 +1723,12 @@ Public Class localRestrictionTracker
       sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
       sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
       Dim sURL As String = Nothing
-      If sProvider = "exede.net" Then
-        sURL = "https://" & ResponseURI.Host & "/dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fdashboard"
-      ElseIf sProvider = "satelliteinternetco.com" Then
+      If sProvider = "satelliteinternetco.com" Then
         sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fsubscriber_dashboard"
       Else
         RaiseError("AJAX Load Failed: Unknown Provider - Can't determine Dashboard URL.")
       End If
-      EX_Download_Ajax(sURL, NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
+      ER_Download_Ajax(sURL, NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
     ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my." & sProvider & "/atlasPlanInvalid") Then
       RaiseError("AJAX Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
     ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
@@ -1360,15 +1740,15 @@ Public Class localRestrictionTracker
     ElseIf Response.Contains("Something went wrong.") Then
       RaiseError("AJAX Load Failed: Server Error - Exede may be having trouble.")
     Else
-      RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "EX Ajax Response", Response, ResponseURI)
+      RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "ER Ajax Response", Response, ResponseURI)
     End If
   End Sub
-  Private Sub EX_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
+  Private Sub ER_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
     MakeSocket(True)
     Dim newIDX As Integer = AjaxID.Index
     Dim newID As String = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
-    If (AjaxID.Iteration = 1 And AjaxID.Index = ExedeAJAXFirstTryRequests) Or (AjaxID.Iteration > 1 And AjaxID.Index = ExedeAJAXSecondTryRequests) Then
+    If (AjaxID.Iteration = 1 And AjaxID.Index = ExedeResellerAJAXFirstTryRequests) Or (AjaxID.Iteration > 1 And AjaxID.Index = ExedeResellerAJAXSecondTryRequests) Then
       BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, sURI)
       newIDX = 0
       newID = AJAXFullOrder(0)
@@ -1420,9 +1800,9 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
     If ClosingTime Then Return
-    EX_Ajax_Response(responseData, responseURI, New AjaxEntry(newIDX, newID, newType))
+    ER_Ajax_Response(responseData, responseURI, New AjaxEntry(newIDX, newID, newType))
   End Sub
-  Private Sub EX_Read_Table(Table As String)
+  Private Sub ER_Read_Table(Table As String)
     Dim Used As String = Nothing
     Dim Total As String = Nothing
     If Table.Contains("amount-used") Then
@@ -1430,63 +1810,25 @@ Public Class localRestrictionTracker
       Used = Used.Substring(Used.IndexOf(""">") + 2)
       Used = Used.Substring(0, Used.IndexOf("</"))
       Total = Nothing
-      'If sProvider = "exede.net" Then
       If Table.Contains("<strong>") Then
-          Total = Table.Substring(Table.IndexOf("<strong>") + 8)
-          If Total.Contains("</") Then
-            Total = Total.Substring(0, Total.IndexOf("</"))
-          Else
-            RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-            Return
-          End If
+        Total = Table.Substring(Table.IndexOf("<strong>") + 8)
+        If Total.Contains("</") Then
+          Total = Total.Substring(0, Total.IndexOf("</"))
+        Else
+          RaiseError("Usage Read Failed: Unable to parse Total!", "ER Read Table", Table)
+          Return
         End If
-      'ElseIf sProvider = "satelliteinternetco.com" Then
-      '  If Table.Contains("</strong> used of ") Then
-      '    Total = Table.Substring(Table.IndexOf("</strong> used of ") + 18)
-      '    If Total.Contains(" GB allowance") Then
-      '      Total = Total.Substring(0, Total.IndexOf(" GB allowance"))
-      '    ElseIf Total.Contains("</") Then
-      '      Total = Total.Substring(0, Total.IndexOf("</"))
-      '    Else
-      '      RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-      '      Return
-      '    End If
-      '  End If
-      'End If
-    ElseIf Table.Contains("<div class=""usage") Then
-      Dim sData As String = StripXMLTags(Table)
-      If Not sData.Contains("GB") Then
-        RaiseError("Usage Read Failed: Unable to parse data!", "EX Read Table", Table)
-        Return
-      End If
-      Used = sData.Substring(0, sData.IndexOf("GB"))
-      If Not sData.Contains(" of ") Then
-        RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-        Return
-      End If
-      Total = sData.Substring(sData.IndexOf(" of ") + 4)
-      If Total.Contains("Unlimited Data") Then
-        Total = "150"
-      ElseIf Not Total.Contains("GB") Then
-        RaiseError("Usage Read Failed: Unable to parse Total!", "EX Read Table", Table)
-        Return
-      Else
-        Total = Total.Substring(0, Total.IndexOf("GB"))
       End If
     Else
-      RaiseError("Usage Read Failed: Unable to locate data table", "EX Read Table", Table)
+      RaiseError("Usage Read Failed: Unable to locate data table", "ER Read Table", Table)
       Return
     End If
     Dim lUsed As Long = StrToVal(Used, MBPerGB)
     Dim lTotal As Long = StrToVal(Total, MBPerGB)
-    If lUsed = 0 And lTotal = 0 Then
+    If lTotal = 0 Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
     Else
-      If lTotal > 0 Then
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
-      Else
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(lUsed, 150000, Now, imSlowed, imFree))
-      End If
+      RaiseEvent ConnectionWXRResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
     End If
   End Sub
 #End Region
@@ -2247,13 +2589,14 @@ Public Class localRestrictionTracker
       ReturnURL = wsSocket.ResponseURI
     End If
   End Sub
-  Private Sub SendPOST(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String)
+  Private Sub SendPOST(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String, Optional Headers As Net.WebHeaderCollection = Nothing)
     If c_TLSProxy Then
       SendTLSProxy(SendURL, SendData, ReturnURL, ReturnData)
       Return
     End If
     wsSocket.SendHeaders = New Net.WebHeaderCollection
     wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)
+    If Headers IsNot Nothing AndAlso Headers.Count > 0 Then wsSocket.SendHeaders.Add(Headers)
     Dim sRet As String = wsSocket.UploadString(SendURL.OriginalString, "POST", SendData)
     ReturnData = sRet
     If wsSocket Is Nothing Then

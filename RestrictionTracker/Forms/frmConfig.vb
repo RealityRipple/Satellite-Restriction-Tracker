@@ -33,6 +33,7 @@
     Select Case mySettings.AccountType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
+      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : optAccountTypeWBX.Checked = True
       Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : optAccountTypeDNX.Checked = True
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
@@ -1375,7 +1376,11 @@
       If optAccountTypeWBL.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       ElseIf optAccountTypeWBX.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+        If cmbProvider.Text.ToLower = "satelliteinternetco.com" Then
+          mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
+        Else
+          mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+        End If
       ElseIf optAccountTypeDNX.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
       ElseIf optAccountTypeRPL.Checked Then
@@ -1727,6 +1732,7 @@
       Select Case mySettings.AccountType
         Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
+        Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : If Not optAccountTypeWBX.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
         Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True

@@ -11,7 +11,8 @@ Public Class svcRL
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.Dish
-      If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Or Provider.ToLower = "satelliteinternetco.com" Then Return SatHostTypes.Exede
+      If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then Return SatHostTypes.Exede
+      If Provider.ToLower = "satelliteinternetco.com" Then Return SatHostTypes.ExedeReseller
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       Provider = Provider & ".ruralportal.net"
       If CheckURL("wildblue.com", Timeout, Proxy) Then
@@ -257,6 +258,10 @@ Public Class svcRL
   End Sub
   Private Sub tracker_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBXResult
     MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
+  End Sub
+  Private Sub tracker_ConnectionWXRResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWXRResult
+    MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
 End Class

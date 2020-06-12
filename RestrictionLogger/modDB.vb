@@ -2,6 +2,7 @@
   Public Enum SatHostTypes
     WildBlue
     Exede
+    ExedeReseller
     RuralPortal
     Dish
     Other

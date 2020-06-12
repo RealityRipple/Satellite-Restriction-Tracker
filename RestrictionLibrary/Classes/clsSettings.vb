@@ -219,13 +219,11 @@ Class AppSettings
   End Property
   Public ReadOnly Property AJAXFullOrder As String()
     Get
-      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then Return Nothing
+      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
         Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
-        If sHost = "exede.net" Then
-          Return {"j_id0:j_id301:j_id302", "j_id0:j_id301:j_id303", "j_id0:j_id301:j_id304", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id248", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id249", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id250", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id252", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id251", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id255", "j_id0:j_id1:j_id100:j_id101:j_id225:j_id226:j_id228:j_id238", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id253", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id254"}
-        ElseIf sHost = "satelliteinternetco.com" Then
+        If sHost = "satelliteinternetco.com" Then
           Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
         Else
           Return Nothing
@@ -248,13 +246,11 @@ Class AppSettings
   End Property
   Public ReadOnly Property AJAXShortOrder As String()
     Get
-      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Then Return Nothing
+      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
         Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
-        If sHost = "exede.net" Then
-          Return {"j_id0:j_id301:j_id302", "j_id0:j_id301:j_id303", "j_id0:j_id301:j_id304", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id248", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id250", "j_id0:j_id1:j_id100:j_id101:j_id247:j_id254"}
-        ElseIf sHost = "satelliteinternetco.com" Then
+        If sHost = "satelliteinternetco.com" Then
           Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
         Else
           Return Nothing

@@ -161,6 +161,7 @@
     Select Case st.ToUpper
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE

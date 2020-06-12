@@ -755,26 +755,40 @@ Public Class frmWizard
       Case ConnectionStates.Login
         Select Case e.SubState
           Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
-          Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating...")
+          Case ConnectionSubStates.Authenticate
+            If e.Stage < 1 Then
+              DrawStatus(True, "Authenticating...")
+            Else
+              DrawStatus(True, "Authenticating (Stage " & (e.Stage + 1) & ")...")
+            End If
           Case ConnectionSubStates.AuthenticateRetry
             If e.Stage < 1 Then
               DrawStatus(True, "Re-Authenticating...")
             Else
               DrawStatus(True, "Re-Authenticating (Attempt " & e.Stage & ")...")
             End If
-          Case ConnectionSubStates.Verify : DrawStatus(True, "Verifying Authentication...")
+          Case ConnectionSubStates.Verify
+            If e.Stage < 1 Then
+              DrawStatus(True, "Verifying Authentication...")
+            Else
+              DrawStatus(True, "Verifying Access (Stage " & e.Stage & ")...")
+            End If
           Case Else : DrawStatus(True, "Logging In...")
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page...")
-          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeAJAXFirstTryRequests & ")...")
-          Case ConnectionSubStates.LoadAJAXRetry : DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeAJAXSecondTryRequests & ")...")
+          Case ConnectionSubStates.LoadHome
+            If e.Stage < 1 Then
+              DrawStatus(True, "Downloading Home Page...")
+            Else
+              DrawStatus(True, "Downloading Home Page (Stage" & (e.Stage + 1) & ")...")
+            End If
+          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXFirstTryRequests & ")...")
+          Case ConnectionSubStates.LoadAJAXRetry : DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXSecondTryRequests & ")...")
           Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
           Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
           Case Else : DrawStatus(True, "Downloading Usage Table...")
         End Select
-
       Case ConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
   End Sub
@@ -795,6 +809,9 @@ Public Class frmWizard
   End Sub
   Private Sub localTest_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
     LocalComplete(SatHostTypes.WildBlue_EXEDE)
+  End Sub
+  Private Sub localTest_ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWXRResult
+    LocalComplete(SatHostTypes.WildBlue_EXEDE_RESELLER)
   End Sub
 #End Region
 End Class

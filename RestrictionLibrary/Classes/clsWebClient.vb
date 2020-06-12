@@ -902,7 +902,14 @@ Public Class WebClientEx
         End If
         Dim sRet As String = Nothing
         If method.ToLower = "post" And Not String.IsNullOrEmpty(data) Then
-          wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+          Dim hasCT As Boolean = False
+          For Each hdr In wsUpload.Headers.AllKeys
+            If hdr.ToLower = "content-type" Then
+              hasCT = True
+              Exit For
+            End If
+          Next
+          If Not hasCT Then wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
           Dim uriAddr As Uri
           Try
             uriAddr = New Uri(address)
@@ -1028,7 +1035,14 @@ Public Class WebClientEx
         End If
         Dim sRet As String = Nothing
         If method.ToLower = "post" And Not String.IsNullOrEmpty(data) Then
-          wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
+          Dim hasCT As Boolean = False
+          For Each hdr In wsUpload.Headers.AllKeys
+            If hdr.ToLower = "content-type" Then
+              hasCT = True
+              Exit For
+            End If
+          Next
+          If Not hasCT Then wsUpload.Headers.Add(Net.HttpRequestHeader.ContentType, "application/x-www-form-urlencoded")
           Try
             sRet = wsUpload.UploadString(address, method, data)
             c_Jar = wsUpload.CookieJar

@@ -100,7 +100,7 @@ Public Class frmHistory
         dgvUsage.Columns.Add(colDATETIME)
         dgvUsage.Columns.Add(colDOWNLOAD)
         dgvUsage.Columns.Add(colUPLOAD)
-      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
         cmd30Days.Text = "T&his Period"
         ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
         cmd60Days.Text = "&Last Period"
@@ -230,7 +230,7 @@ Public Class frmHistory
                 pctUld.Image = ResizingNote(pctUld.Size)
                 GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
                 bDisplayed = True
-              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds
@@ -367,7 +367,7 @@ Public Class frmHistory
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
-          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE
+          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
 
             For Each lItem As DataBase.DataRow In lItems
               dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)

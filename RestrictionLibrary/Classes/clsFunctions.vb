@@ -1,4 +1,6 @@
 ﻿Imports System.IO
+Imports System.Runtime.Remoting.Metadata.W3cXsd2001
+
 Public Class srlFunctions
   Private Shared lastSocketErrSend As Long = 0
   ''' <summary>
@@ -6,6 +8,12 @@ Public Class srlFunctions
   ''' </summary>
   ''' <remarks>Charset for Latin-1 when using Text Encoding functions.</remarks>
   Public Const LATIN_1 As Integer = 28591
+  Public Const UTF_8 As Integer = 949
+  Public Const UTF_16_LE As Integer = 1200
+  Public Const UTF_16_BE As Integer = 1201
+  Public Const UTF_32_LE As Integer = 12000
+  Public Const UTF_32_BE As Integer = 12001
+
   ''' <summary>
   ''' Encodes a string for use in HTML form submissions.
   ''' </summary>
@@ -26,6 +34,43 @@ Public Class srlFunctions
         Case 32 : sRet = "+" & sRet
         Case Else : sRet = "%" & PadHex(iChar, 2) & sRet
       End Select
+    Next
+    Return sRet
+  End Function
+  ''' <summary>
+  ''' Decodes a string from encoded URL data.
+  ''' </summary>
+  ''' <param name="string">The string you wish to percent-decode.</param>
+  ''' <returns>A string decoded from <paramref name="string" /> where nonalphanumeric characters are returned to their original form.</returns>
+  ''' <remarks>
+  '''  <para>This function percent-decodes all non-alphanumeric characters.</para>
+  ''' </remarks>
+  Public Shared Function PercentDecode([string] As String) As String
+    Dim sRet As String = ""
+    If String.IsNullOrEmpty([string]) Then Return [string]
+    For I As Integer = 0 To [string].Length - 1
+      If Not [string](I) = "%"c Then
+        sRet &= [string](I)
+        Continue For
+      End If
+      If I > [string].Length - 3 Then
+        sRet &= [string](I)
+        Continue For
+      End If
+      Dim iCharA As Integer = Convert.ToInt32([string](I + 1))
+      If Not ((iCharA >= 48 And iCharA <= 57) Or (iCharA >= 65 And iCharA <= 70) Or (iCharA >= 97 And iCharA <= 102)) Then
+        sRet &= [string](I)
+        Continue For
+      End If
+      Dim iCharB As Integer = Convert.ToInt32([string](I + 2))
+      If Not ((iCharB >= 48 And iCharB <= 57) Or (iCharB >= 65 And iCharB <= 70) Or (iCharB >= 97 And iCharB <= 102)) Then
+        sRet &= [string](I)
+        Continue For
+      End If
+      Dim sHex As String = [string](I + 1) & [string](I + 2)
+      Dim iDec As Integer = Convert.ToByte(sHex, 16)
+      sRet &= Convert.ToChar(iDec)
+      I += 2
     Next
     Return sRet
   End Function
@@ -741,6 +786,7 @@ Public Class srlFunctions
     Select Case hostType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
       Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
+      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : Return "WXR"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
       Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
       Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : Return "DNX"
@@ -766,6 +812,7 @@ Public Class srlFunctions
     Select Case host.ToUpper
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
       Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
       Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
       Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
