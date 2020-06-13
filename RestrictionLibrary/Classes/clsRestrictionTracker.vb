@@ -1,7 +1,4 @@
-﻿Imports System.IO
-Imports System.Runtime.Remoting.Messaging
-Imports RestrictionLibrary.My
-''' <summary>
+﻿''' <summary>
 ''' Accesses WildBlue, Exede, RuralPortal, and Dish usage pages and handles all communication internally.
 ''' </summary>
 Public Class localRestrictionTracker
@@ -1268,7 +1265,7 @@ Public Class localRestrictionTracker
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableRead))
     Dim exJS As JSONReader
     Try
-      Using jStream As New MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Table))
+      Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Table))
         exJS = New JSONReader(jStream, True)
       End Using
     Catch ex As Exception

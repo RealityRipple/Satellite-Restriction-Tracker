@@ -1,5 +1,4 @@
 ﻿Imports System.IO
-Imports System.Runtime.Remoting.Metadata.W3cXsd2001
 
 Public Class srlFunctions
   Private Shared lastSocketErrSend As Long = 0
