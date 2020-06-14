@@ -1281,15 +1281,18 @@ Public Class localRestrictionTracker
       If el.Key = "errors" Then
         Dim sMsg As String = ""
         For Each er In el.Collection
-          If Not er.Type = JSONReader.ElementType.KeyValue Then Continue For
-          If Not er.Key = "message" Then Continue For
-          sMsg &= er.Value & " - "
+          If Not er.Type = JSONReader.ElementType.Group Then Continue For
+          For Each eg In er.SubElements
+            If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
+            If Not eg.Key = "message" Then Continue For
+            sMsg &= eg.Value & " - "
+          Next
         Next
         If String.IsNullOrEmpty(sMsg) Then
           RaiseError("Usage Failed: Unknown Error", "EX Usage Response", Table)
         Else
           sMsg = sMsg.Substring(0, sMsg.Length - 3)
-          RaiseError("Usage Failed: " & sMsg, "EX Usage Response", Table)
+          RaiseError("Usage Failed: " & sMsg)
         End If
         Return
       End If
