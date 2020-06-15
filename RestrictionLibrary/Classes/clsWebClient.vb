@@ -766,7 +766,7 @@ Public Class WebClientEx
     End Try
   End Sub
   Public Function DownloadString(address As String) As String
-    Dim RunName As String = "DOWNLOADSTRING_" & address & "_" & Int(Rnd() * &HFFFF)
+    Dim RunName As String = "DOWNLOADSTRING_" & address & "_" & Int(Rnd() * &H10000)
     DownloadResults.Add(RunName, Nothing)
     Dim tDownload As New Threading.Thread(AddressOf AsyncDownloadString)
     c_Busy = True
@@ -974,7 +974,7 @@ Public Class WebClientEx
     End Try
   End Sub
   Public Function UploadString(address As String, method As String, data As String) As String
-    Dim RunName As String = "UPLOADSTRING_" & address & "_" & Int(Rnd() * &HFFFF)
+    Dim RunName As String = "UPLOADSTRING_" & address & "_" & Int(Rnd() * &H10000)
     UploadResults.Add(RunName, Nothing)
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadString)
     c_Busy = True
@@ -1186,7 +1186,7 @@ Public Class WebClientEx
     End Try
   End Sub
   Public Function UploadValues(address As String, method As String, data As Specialized.NameValueCollection) As String
-    Dim RunName As String = "UPLOADVAUES_" & address & "_" & Int(Rnd() * &HFFFF)
+    Dim RunName As String = "UPLOADVAUES_" & address & "_" & Int(Rnd() * &H10000)
     UploadResults.Add(RunName, Nothing)
     Dim tUpload As New Threading.Thread(AddressOf AsyncUploadValues)
     c_Busy = True
