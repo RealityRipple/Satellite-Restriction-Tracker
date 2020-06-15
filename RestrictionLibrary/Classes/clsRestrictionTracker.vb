@@ -1000,16 +1000,28 @@ Public Class localRestrictionTracker
   End Sub
 #End Region
 #Region "EX"
-  Private Sub EX_Login(sURI As String, TryCount As Integer)
+  Private Sub EX_Login(sURI As String, TryCount As Integer, Optional sGOTO As String = Nothing, Optional sSQPS As String = Nothing)
     MakeSocket(True)
-    Dim sSend As String = "realm=" &
-                         "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
-                         "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
-                         "&IDButton=Sign+in" &
-                         "&goto=" &
-                         "&SunQueryParamsString=" &
-                         "&encoded=false" &
-                         "&gx_charset=UTF-8"
+    Dim sSend As String
+    If String.IsNullOrEmpty(sGOTO) Or String.IsNullOrEmpty(sSQPS) Then
+      sSend = "realm=" &
+              "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
+              "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
+              "&IDButton=Sign+in" &
+              "&goto=" &
+              "&SunQueryParamsString=" &
+              "&encoded=false" &
+              "&gx_charset=UTF-8"
+    Else
+      sSend = "realm=" &
+              "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
+              "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
+              "&IDButton=Sign+in" &
+              "&goto=" & srlFunctions.PercentEncode(sGOTO) &
+              "&SunQueryParamsString=" & srlFunctions.PercentEncode(sSQPS) &
+              "&encoded=false" &
+              "&gx_charset=UTF-8"
+    End If
     If TryCount = 0 Then
       BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, sURI)
     Else
@@ -1074,6 +1086,49 @@ Public Class localRestrictionTracker
             Return
           End If
         End If
+      End If
+    End If
+    If Response.Contains("action=""/federation/UI/Login""") Then
+      Dim sGOTO As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
+        sGOTO = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""goto"" value="""))
+        sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
+        If sGOTO.Contains(""" />") Then
+          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+        ElseIf sGOTO.Contains("""") Then
+          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
+        End If
+      End If
+      Dim uriString As String = "https://mysso." & sProvider & "/federation/UI/Login"
+      If String.IsNullOrEmpty(sGOTO) Then
+        If TryCount < 2 Then
+          EX_Login(uriString, TryCount + 1)
+          Return
+        End If
+        RaiseError("Prepare Failed: GOTO value not found.", "EX Login Response", Response, ResponseURI)
+        Return
+      End If
+      Dim sSQPS As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
+        sSQPS = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
+        sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
+        If sSQPS.Contains(""" />") Then
+          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+        ElseIf sSQPS.Contains("""") Then
+          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
+        End If
+      End If
+      If String.IsNullOrEmpty(sGOTO) Then
+        If TryCount < 2 Then
+          EX_Login(uriString, TryCount + 1)
+          Return
+        End If
+        RaiseError("Prepare Failed: SQPS value not found.", "EX Login Response", Response, ResponseURI)
+        Return
+      End If
+      If TryCount < 2 Then
+        EX_Login(uriString, TryCount + 1, sGOTO, sSQPS)
+        Return
       End If
     End If
     RaiseError("Login Failed: Could not understand response.", "EX Login Response", Response, ResponseURI)
@@ -1188,6 +1243,49 @@ Public Class localRestrictionTracker
       EX_Authenticate(sURI, sSAMLResponse, sRelay, TryCount)
       Return
     End If
+    If Response.Contains("action=""/federation/UI/Login""") Then
+      Dim sGOTO As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
+        sGOTO = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""goto"" value="""))
+        sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
+        If sGOTO.Contains(""" />") Then
+          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
+        ElseIf sGOTO.Contains("""") Then
+          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
+        End If
+      End If
+      Dim uriString As String = "https://mysso." & sProvider & "/federation/UI/Login"
+      If String.IsNullOrEmpty(sGOTO) Then
+        If TryCount < 2 Then
+          EX_Login(uriString, TryCount + 1)
+          Return
+        End If
+        RaiseError("Prepare Failed: GOTO value not found.", "EX SAML Response", Response, ResponseURI)
+        Return
+      End If
+      Dim sSQPS As String = Nothing
+      If Response.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
+        sSQPS = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
+        sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
+        If sSQPS.Contains(""" />") Then
+          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
+        ElseIf sSQPS.Contains("""") Then
+          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
+        End If
+      End If
+      If String.IsNullOrEmpty(sGOTO) Then
+        If TryCount < 2 Then
+          EX_Login(uriString, TryCount + 1)
+          Return
+        End If
+        RaiseError("Prepare Failed: SQPS value not found.", "EX SAML Response", Response, ResponseURI)
+        Return
+      End If
+      If TryCount < 2 Then
+        EX_Login(uriString, TryCount + 1, sGOTO, sSQPS)
+        Return
+      End If
+    End If
     RaiseError("Could not log in.", "EX SAML Response", Response, ResponseURI)
   End Sub
   Private Sub EX_Authenticate(sURI As String, SAMLResponse As String, RelayState As String, TryCount As Integer)
@@ -1237,7 +1335,10 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Downlad_Table(sToken As String, TryCount As Integer)
     Dim tURI As String = "https://my-viasat-server-prod.icat.viasat.io/graphql"
-    Dim sSend As String = "{""operationName"":""getPlanCardInfoUsage"",""variables"":{},""query"":""query getPlanCardInfoUsage {\n" &
+    Dim sSend As String = "{""operationName"":""InitialQuery"",""variables"":{},""query"":""query InitialQuery {\n" &
+          "  getAccountInfo {\n" &
+          "    accountStatus\n" &
+          "  }\n" &
           "  getUsageInfo {\n" &
           "    currentUsageAmount\n" &
           "    currentUsageMeasurement\n" &
@@ -1246,7 +1347,6 @@ Public Class localRestrictionTracker
           "    planLimitMeasurement\n" &
           "    usageStartDate\n" &
           "    usageResetDate\n" &
-          "    __typename\n" &
           "  }\n" &
           "}\n" &
           """}"
@@ -1276,28 +1376,8 @@ Public Class localRestrictionTracker
       RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
       Return
     End If
-    For Each el In exJS.Serial(0).SubElements
-      If Not el.Type = JSONReader.ElementType.Array Then Continue For
-      If el.Key = "errors" Then
-        Dim sMsg As String = ""
-        For Each er In el.Collection
-          If Not er.Type = JSONReader.ElementType.Group Then Continue For
-          For Each eg In er.SubElements
-            If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
-            If Not eg.Key = "message" Then Continue For
-            sMsg &= eg.Value & " - "
-          Next
-        Next
-        If String.IsNullOrEmpty(sMsg) Then
-          RaiseError("Usage Failed: Unknown Error", "EX Usage Response", Table)
-        Else
-          sMsg = sMsg.Substring(0, sMsg.Length - 3)
-          RaiseError("Usage Failed: " & sMsg)
-        End If
-        Return
-      End If
-    Next
     Dim jUsage As JSONReader.JSElement = Nothing
+    Dim jAccount As JSONReader.JSElement = Nothing
     For Each el In exJS.Serial(0).SubElements
       If Not el.Type = JSONReader.ElementType.Group Then Continue For
       If el.Key = "data" Then
@@ -1307,15 +1387,58 @@ Public Class localRestrictionTracker
             jUsage = el2
             Exit For
           End If
+          If el2.Key = "getAccountInfo" Then
+            jAccount = el2
+          End If
         Next
         If Not jUsage.Type = JSONReader.ElementType.None Then Exit For
       End If
     Next
-    If jUsage.Type = JSONReader.ElementType.None Then
-      RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-      Return
-    End If
-    Dim sDown As String = String.Empty, sDownT As String = String.Empty
+    If Not jUsage.Type = JSONReader.ElementType.Group Then
+      If jAccount.Type = JSONReader.ElementType.Group Then
+        For Each el In jAccount.SubElements
+          If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
+          If el.Key = "accountStatus" Then
+            Select Case el.Value.ToUpper
+              Case "DISCONNECTED"
+                RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
+                Return
+              Case Else
+                RaiseError("Login Failed: Exede says your account is " & el.Value.ToUpper & ". Check your username and password.")
+                Return
+            End Select
+            If el.Value = "DISCONNECTED" Then
+
+            Else
+
+            End If
+          End If
+        Next
+      End If
+      For Each el In exJS.Serial(0).SubElements
+          If Not el.Type = JSONReader.ElementType.Array Then Continue For
+          If el.Key = "errors" Then
+            Dim sMsg As String = ""
+            For Each er In el.Collection
+              If Not er.Type = JSONReader.ElementType.Group Then Continue For
+              For Each eg In er.SubElements
+                If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
+                If Not eg.Key = "message" Then Continue For
+                sMsg &= eg.Value & " - "
+              Next
+            Next
+            If Not String.IsNullOrEmpty(sMsg) Then
+              sMsg = sMsg.Substring(0, sMsg.Length - 3)
+              RaiseError("Usage Failed: " & sMsg)
+              Return
+            End If
+            Exit For
+          End If
+        Next
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      Dim sDown As String = String.Empty, sDownT As String = String.Empty
     Dim sDownSz As String = "B", sDownSzT As String = "B"
     For Each el In jUsage.SubElements
       If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
