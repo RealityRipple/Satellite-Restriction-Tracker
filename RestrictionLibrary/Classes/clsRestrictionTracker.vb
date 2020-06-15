@@ -1142,6 +1142,7 @@ Public Class localRestrictionTracker
     EX_JS_Response(responseData, responseURI, TryCount)
   End Sub
   Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Not Response.Contains("CLIENT_ID:") Then
       RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
@@ -1178,6 +1179,7 @@ Public Class localRestrictionTracker
     EX_SAML_Response(responseData, responseURI, TryCount, 0)
   End Sub
   Private Sub EX_SAML_Response(Response As String, ResponseURI As Uri, TryCount As Integer, RedirCount As Integer)
+    If CheckForErrors(Response, ResponseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
       RedirCount += 1
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
@@ -1300,6 +1302,7 @@ Public Class localRestrictionTracker
     EX_Authenticate_Response(responseData, responseURI, TryCount, 0)
   End Sub
   Private Sub EX_Authenticate_Response(Response As String, responseURI As Uri, TryCount As Integer, RedirCount As Integer)
+    If CheckForErrors(Response, responseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
       RedirCount += 1
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
@@ -1359,6 +1362,7 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
     If ClosingTime Then Return
+    If CheckForErrors(responseData, responseURI) Then Return
     ReadUsage(responseData)
   End Sub
   Private Sub EX_Read_Table(Table As String)
