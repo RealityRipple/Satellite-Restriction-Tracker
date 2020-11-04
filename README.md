@@ -1,10 +1,10 @@
 # ![](https://realityripple.com/Software/Applications/Satellite-Restriction-Tracker/favicon-32x32.png) Satellite Restriction Tracker
 ViaSat Satellite Network usage monitoring utility with history graphing.
 
-#### Version 1.5.61
+#### Version 1.5.62
 > Author: Andrew Sachen  
 > Created: December 30, 2010  
-> Updated: June 15, 2020  
+> Updated: November 4, 2020  
 
 Language: Visual Basic.NET  
 Compiler: Visual Studio 2019  
