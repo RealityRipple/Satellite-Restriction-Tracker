@@ -1067,21 +1067,21 @@ Public Class localRestrictionTracker
       EX_Login_Response(response2Data, response2URI, TryCount, RedirCount)
       Return
     End If
-    If Response.Contains("<script src=""/static/js/") Then
-      Dim sScripts As String() = Split(Response, "<script src=""/static/js/")
+    If Response.Contains("<script src=""/static/") Then
+      Dim sScripts As String() = Split(Response, "<script src=""/static/")
       If sScripts.Length = 3 Then
         Dim jsA As String = sScripts(1).Substring(0, sScripts(1).IndexOf(""""))
         Dim jsB As String = sScripts(2).Substring(0, sScripts(2).IndexOf(""""))
         If jsA.Contains(".") Then
           If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/js/" & jsA
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsA
             EX_JS(sURI, TryCount)
             Return
           End If
         End If
         If jsB.Contains(".") Then
           If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/js/" & jsB
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsB
             EX_JS(sURI, TryCount)
             Return
           End If
@@ -1143,11 +1143,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not Response.Contains("CLIENT_ID:") Then
+    If Not Response.Contains("clientIdWeb"":") Then
       RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
     End If
-    Dim CliID As String = Response.Substring(Response.IndexOf("CLIENT_ID:"))
+    Dim CliID As String = Response.Substring(Response.IndexOf("clientIdWeb"":") + 13)
     If Not CliID.Contains("""") Then
       RaiseError("Verification Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
