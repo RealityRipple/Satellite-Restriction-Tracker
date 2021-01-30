@@ -943,47 +943,39 @@ Public Class frmMain
       Return
     End If
     NextGrabTick = srlFunctions.TickCount() + ((mySettings.Timeout + 15) * 1000)
+    Dim sAppend As String = ""
+    If e.Attempt > 0 Then
+      If e.Stage > 0 Then
+        sAppend = " (Stage " & (e.Stage + 1) & ", Redirect #" & e.Attempt & ")"
+      Else
+        sAppend = " (Redirect #" & e.Attempt & ")"
+      End If
+    ElseIf e.Stage > 0 Then
+      sAppend = " (Stage " & (e.Stage + 1) & ")"
+    End If
     Select Case e.Status
-      Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection...", False)
-      Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In...", False)
+      Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection" & sAppend & "...", False)
+      Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In" & sAppend & "...", False)
       Case ConnectionStates.Login
         Select Case e.SubState
-          Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page...", False)
-          Case ConnectionSubStates.Authenticate
-            If e.Stage < 1 Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Authenticating...", False)
-            Else
-              SetStatusText(LOG_GetLast.ToString("g"), "Authenticating (Stage " & (e.Stage + 1) & ")...", False)
-            End If
-          Case ConnectionSubStates.AuthenticateRetry
-            If e.Stage < 1 Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating...", False)
-            Else
-              SetStatusText(LOG_GetLast.ToString("g"), "Re-Authenticating (Attempt " & e.Stage & ")...", False)
-            End If
-          Case ConnectionSubStates.Verify
-            If e.Stage < 1 Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Verifying Authentication...", False)
-            Else
-              SetStatusText(LOG_GetLast.ToString("g"), "Verifying Access (Stage " & e.Stage & ")...", False)
-            End If
-          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In...", False)
+          Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page" & sAppend & "...", False)
+          Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating" & sAppend & "...", False)
+          Case ConnectionSubStates.Verify : SetStatusText(LOG_GetLast.ToString("g"), "Verifying" & sAppend & "...", False)
+          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In" & sAppend & "...", False)
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome
-            If e.Stage < 1 Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page...", False)
+          Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page" & sAppend & "...", False)
+          Case ConnectionSubStates.LoadAJAX
+            If e.Attempt = 0 Then
+              SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
             Else
-              SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page (Stage " & (e.Stage + 1) & ")...", False)
+              SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
             End If
-          Case ConnectionSubStates.LoadAJAX : SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
-          Case ConnectionSubStates.LoadAJAXRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
-          Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
-          Case ConnectionSubStates.LoadTableRetry : SetStatusText(LOG_GetLast.ToString("g"), "Re-Downloading Usage Table...", False)
-          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table...", False)
+          Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table" & sAppend & "...", False)
+          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table" & sAppend & "...", False)
         End Select
-      Case ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table...", False)
+      Case ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table" & sAppend & "...", False)
     End Select
   End Sub
   Private Sub localData_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localData.ConnectionFailure

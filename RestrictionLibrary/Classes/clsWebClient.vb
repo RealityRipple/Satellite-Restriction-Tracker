@@ -901,7 +901,7 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" And Not String.IsNullOrEmpty(data) Then
+        If method.ToLower = "post" Then
           Dim hasCT As Boolean = False
           For Each hdr In wsUpload.Headers.AllKeys
             If hdr.ToLower = "content-type" Then
@@ -1034,7 +1034,7 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" And Not String.IsNullOrEmpty(data) Then
+        If method.ToLower = "post" Then
           Dim hasCT As Boolean = False
           For Each hdr In wsUpload.Headers.AllKeys
             If hdr.ToLower = "content-type" Then

@@ -749,45 +749,37 @@ Public Class frmWizard
     DrawStatus(False)
   End Sub
   Private Sub localTest_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
+    Dim sAppend As String = ""
+    If e.Attempt > 0 Then
+      If e.Stage > 0 Then
+        sAppend = " (Stage " & (e.Stage + 1) & ", Redirect #" & e.Attempt & ")"
+      Else
+        sAppend = " (Redirect #" & e.Attempt & ")"
+      End If
+    ElseIf e.Stage > 0 Then
+      sAppend = " (Stage " & (e.Stage + 1) & ")"
+    End If
     Select Case e.Status
-      Case ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection...")
-      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In...")
+      Case ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection" & sAppend & "...")
+      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In" & sAppend & "...")
       Case ConnectionStates.Login
         Select Case e.SubState
-          Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page...")
-          Case ConnectionSubStates.Authenticate
-            If e.Stage < 1 Then
-              DrawStatus(True, "Authenticating...")
-            Else
-              DrawStatus(True, "Authenticating (Stage " & (e.Stage + 1) & ")...")
-            End If
-          Case ConnectionSubStates.AuthenticateRetry
-            If e.Stage < 1 Then
-              DrawStatus(True, "Re-Authenticating...")
-            Else
-              DrawStatus(True, "Re-Authenticating (Attempt " & e.Stage & ")...")
-            End If
-          Case ConnectionSubStates.Verify
-            If e.Stage < 1 Then
-              DrawStatus(True, "Verifying Authentication...")
-            Else
-              DrawStatus(True, "Verifying Access (Stage " & e.Stage & ")...")
-            End If
-          Case Else : DrawStatus(True, "Logging In...")
+          Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page" & sAppend & "...")
+          Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating" & sAppend & "...")
+          Case ConnectionSubStates.Verify : DrawStatus(True, "Verifying" & sAppend & "...")
+          Case Else : DrawStatus(True, "Logging In" & sAppend & "...")
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome
-            If e.Stage < 1 Then
-              DrawStatus(True, "Downloading Home Page...")
+          Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page" & sAppend & "...")
+          Case ConnectionSubStates.LoadAJAX
+            If e.Attempt = 0 Then
+              DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXFirstTryRequests & ")...")
             Else
-              DrawStatus(True, "Downloading Home Page (Stage" & (e.Stage + 1) & ")...")
+              DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXSecondTryRequests & ")...")
             End If
-          Case ConnectionSubStates.LoadAJAX : DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXFirstTryRequests & ")...")
-          Case ConnectionSubStates.LoadAJAXRetry : DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXSecondTryRequests & ")...")
-          Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table...")
-          Case ConnectionSubStates.LoadTableRetry : DrawStatus(True, "Re-Downloading Usage Table...")
-          Case Else : DrawStatus(True, "Downloading Usage Table...")
+          Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
+          Case Else : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
         End Select
       Case ConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
