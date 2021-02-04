@@ -1252,14 +1252,14 @@ Public Class localRestrictionTracker
         If jsA.Contains(".") Then
           If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
             Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsA
-            EX_JS(sURI)
+            EX_JS(sURI, 0)
             Return
           End If
         End If
         If jsB.Contains(".") Then
           If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
             Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsB
-            EX_JS(sURI)
+            EX_JS(sURI, 0)
             Return
           End If
         End If
@@ -1267,18 +1267,45 @@ Public Class localRestrictionTracker
     End If
     RaiseError("Login Failed: Could not understand response.", "EX Dash Response", Response, ResponseURI)
   End Sub
-  Private Sub EX_JS(sURL As String)
+  Private Sub EX_JS(sURL As String, TryCount As Integer)
     MakeSocket(True)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 1, 0, sURL)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 1, TryCount, sURL)
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
-    EX_JS_Response(responseData, responseURI)
+    EX_JS_Response(responseData, responseURI, TryCount)
   End Sub
-
-  Private Sub EX_JS_Response(Response As String, ResponseURI As Uri)
+  Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
+    If Response.Contains("<script src=""/static/") Then
+      TryCount += 1
+      If TryCount > 4 Then
+        RaiseError("Login Failed: Server redirected too many times.")
+        Return
+      End If
+      Dim sScripts As String() = Split(Response, "<script src=""/static/")
+      If sScripts.Length = 3 Then
+        Dim jsA As String = sScripts(1).Substring(0, sScripts(1).IndexOf(""""))
+        Dim jsB As String = sScripts(2).Substring(0, sScripts(2).IndexOf(""""))
+        If jsA.Contains(".") Then
+          If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsA
+            EX_JS(sURI, TryCount)
+            Return
+          End If
+        End If
+        If jsB.Contains(".") Then
+          If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
+            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsB
+            EX_JS(sURI, TryCount)
+            Return
+          End If
+        End If
+      End If
+      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
     If Not Response.Contains("clientIdWeb"":") Then
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
