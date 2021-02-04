@@ -1060,19 +1060,23 @@ Public Class localRestrictionTracker
     Next
     RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
   End Sub
-  Private Sub EX_AuthN(sURL As String, RedirCount As Integer)
+  Private Sub EX_AuthN(sURL As String, TryCount As Integer)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, RedirCount, sURL)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, TryCount, sURL)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
-    EX_AuthN_Response(responseData, responseURI, RedirCount)
+    EX_AuthN_Response(responseData, responseURI, TryCount)
   End Sub
-  Private Sub EX_AuthN_Response(Response As String, ResponseURI As Uri, RedirCount As Integer)
+  Private Sub EX_AuthN_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
-      RedirCount += 1
+      TryCount += 1
+      If TryCount > 15 Then
+        RaiseError("Login Failed: Server redirected too many times.")
+        Return
+      End If
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
       sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
       sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
@@ -1081,7 +1085,7 @@ Public Class localRestrictionTracker
       ElseIf sRedirURI.StartsWith("/") Then
         sRedirURI = "https://" & ResponseURI.Host & sRedirURI
       End If
-      EX_AuthN(sRedirURI, RedirCount)
+      EX_AuthN(sRedirURI, TryCount)
       Return
     End If
     If Not Response.Contains("<form action=""") Then
@@ -1133,10 +1137,14 @@ Public Class localRestrictionTracker
     If ClosingTime Then Return
     EX_SAML_Response(responseData, responseURI, 0)
   End Sub
-  Private Sub EX_SAML_Response(Response As String, ResponseURI As Uri, RedirCount As Integer)
+  Private Sub EX_SAML_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
-      RedirCount += 1
+      TryCount += 1
+      If TryCount > 15 Then
+        RaiseError("Login Failed: Server redirected too many times.")
+        Return
+      End If
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
       sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
       sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
@@ -1148,10 +1156,10 @@ Public Class localRestrictionTracker
       MakeSocket(True)
       Dim response2Data As String = Nothing
       Dim response2URI As Uri = Nothing
-      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 1, RedirCount, sRedirURI)
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 1, TryCount, sRedirURI)
       SendGET(New Uri(sRedirURI), response2URI, response2Data)
       If ClosingTime Then Return
-      EX_SAML_Response(response2Data, response2URI, RedirCount)
+      EX_SAML_Response(response2Data, response2URI, TryCount)
       Return
     End If
     If Not Response.Contains("<form method=""post"" action=""") Then
@@ -1208,19 +1216,23 @@ Public Class localRestrictionTracker
     Dim sURL As String = "https://account.viasat.com/dashboard"
     EX_Dash(sURL, 0)
   End Sub
-  Private Sub EX_Dash(sURL As String, RedirCount As Integer)
+  Private Sub EX_Dash(sURL As String, TryCount As Integer)
     MakeSocket(True)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 0, RedirCount, sURL)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 0, TryCount, sURL)
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
-    EX_Dash_Response(responseData, responseURI, RedirCount)
+    EX_Dash_Response(responseData, responseURI, TryCount)
   End Sub
-  Private Sub EX_Dash_Response(Response As String, ResponseURI As Uri, RedirCount As Integer)
+  Private Sub EX_Dash_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
-      RedirCount += 1
+      TryCount += 1
+      If TryCount > 15 Then
+        RaiseError("Login Failed: Server redirected too many times.")
+        Return
+      End If
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
       sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
       sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
@@ -1229,7 +1241,7 @@ Public Class localRestrictionTracker
       ElseIf sRedirURI.StartsWith("/") Then
         sRedirURI = "https://" & ResponseURI.Host & sRedirURI
       End If
-      EX_Dash(sRedirURI, RedirCount)
+      EX_Dash(sRedirURI, TryCount)
       Return
     End If
     If Response.Contains("<script src=""/static/") Then
@@ -1285,7 +1297,6 @@ Public Class localRestrictionTracker
     Dim sURL As String = "https://account.viasat.com/services/oauth2/authorize"
     EX_OAuth2(sURL, CliID)
   End Sub
-
   Private Sub EX_OAuth2(sURL As String, sCliID As String)
     MakeSocket(True)
     Dim nonce As String = Guid.NewGuid().ToString
@@ -1303,11 +1314,10 @@ Public Class localRestrictionTracker
     If ClosingTime Then Return
     EX_OAuth2_Response(responseData, responseURI, 0)
   End Sub
-
-  Private Sub EX_OAuth2_Response(Response As String, ResponseURI As Uri, RedirCount As Integer)
+  Private Sub EX_OAuth2_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
     If Response.ToLower.Contains("location.href") Then
-      RedirCount += 1
+      TryCount += 1
       Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
       sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
       sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
@@ -1319,10 +1329,10 @@ Public Class localRestrictionTracker
       MakeSocket(True)
       Dim response2Data As String = Nothing
       Dim response2URI As Uri = Nothing
-      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, RedirCount, sRedirURI)
+      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, TryCount, sRedirURI)
       SendGET(New Uri(sRedirURI), response2URI, response2Data)
       If ClosingTime Then Return
-      EX_OAuth2_Response(response2Data, response2URI, RedirCount)
+      EX_OAuth2_Response(response2Data, response2URI, TryCount)
       Return
     End If
     Dim sToken As String = ResponseURI.Fragment
