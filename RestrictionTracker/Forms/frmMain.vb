@@ -358,18 +358,6 @@ Public Class frmMain
     End Select
     MyBase.WndProc(m)
   End Sub
-  Private Sub HideLater()
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New MethodInvoker(AddressOf HideLater))
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Threading.Thread.Sleep(100)
-    Me.Hide()
-    Me.Opacity = 1
-  End Sub
   Private Sub frmMain_SizeChanged(sender As Object, e As System.EventArgs) Handles Me.SizeChanged
     If Me.InvokeRequired Then
       Try
