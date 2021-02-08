@@ -2,6 +2,11 @@
 Imports Microsoft.WindowsAPICodePack.Dialogs
 
 Module modFunctions
+  Friend Structure WindowAnimationData
+    Public destPoint As Point
+    Public startRect As Rectangle
+    Public backColor As Color
+  End Structure
   Private Class MCIPlayer
     Implements IDisposable
     Private sAlias As String
@@ -808,45 +813,52 @@ Module modFunctions
       MinAnimation = ai.MinAnimate
     End Get
   End Property
-  Public Sub AnimateWindow(window As Form, ToTray As Boolean)
-    If MinAnimation Then
-      Dim screenRect As Rectangle = Screen.GetBounds(window.Bounds.Location)
-      Dim destPoint As Point
-      Select Case TaskBarPosition.GetTaskBarEdge(window.Handle)
-        Case TaskBarPosition.ABEdge.ABE_BOTTOM
-          destPoint = New Point(screenRect.Width - 96, screenRect.Height - 16)
-        Case TaskBarPosition.ABEdge.ABE_TOP
-          destPoint = New Point(screenRect.Width - 96, 16)
-        Case TaskBarPosition.ABEdge.ABE_LEFT
-          destPoint = New Point(16, screenRect.Height - 96)
-        Case TaskBarPosition.ABEdge.ABE_RIGHT
-          destPoint = New Point(screenRect.Width - 16, screenRect.Height - 96)
-      End Select
-      Dim a, b, s As Single
-      If ToTray Then
-        a = 0
-        b = 1
-        s = 0.4
-      Else
-        a = 1
-        b = 0
-        s = -0.4
-      End If
-      Dim curPoint As Point, curSize As Size
-      Dim startPoint As Point = window.Bounds.Location
-      Dim dWidth As Integer = destPoint.X - startPoint.X
-      Dim dHeight As Integer = destPoint.Y - startPoint.Y
-      Dim startWidth As Integer = window.Bounds.Width
-      Dim startHeight As Integer = window.Bounds.Height
-      For I As Single = a To b Step s
-        curPoint = New Point(startPoint.X + I * dWidth, startPoint.Y + I * dHeight)
-        curSize = New Size((1 - I) * startWidth, (1 - I) * startHeight)
-        Dim drawRect As New Rectangle(curPoint, curSize)
-        ControlPaint.DrawReversibleFrame(drawRect, window.BackColor, FrameStyle.Thick)
-        System.Threading.Thread.Sleep(1)
-        ControlPaint.DrawReversibleFrame(drawRect, window.BackColor, FrameStyle.Thick)
-      Next
+  Public Function GetWindowAnimationData(window As Form) As WindowAnimationData
+    If Not MinAnimation Then Return Nothing
+    Dim wad As New WindowAnimationData
+    wad.startRect = window.Bounds
+    Dim screenRect = Screen.GetBounds(wad.startRect.Location)
+    wad.destPoint = New Point(screenRect.Width - 96, screenRect.Height - 16)
+    Select Case TaskBarPosition.GetTaskBarEdge(window.Handle)
+      Case TaskBarPosition.ABEdge.ABE_TOP
+        wad.destPoint = New Point(screenRect.Width - 96, 16)
+      Case TaskBarPosition.ABEdge.ABE_LEFT
+        wad.destPoint = New Point(16, screenRect.Height - 96)
+      Case TaskBarPosition.ABEdge.ABE_RIGHT
+        wad.destPoint = New Point(screenRect.Width - 16, screenRect.Height - 96)
+    End Select
+    wad.backColor = window.BackColor
+    Return wad
+  End Function
+  Public Sub AnimateWindow(wnd As Form, ToTray As Boolean)
+    AnimateWindow(GetWindowAnimationData(wnd), ToTray)
+  End Sub
+  Public Sub AnimateWindow(wad As WindowAnimationData, ToTray As Boolean)
+    If Not MinAnimation Then Return
+    Dim a, b, s As Single
+    If ToTray Then
+      a = 0
+      b = 1
+      s = 0.4
+    Else
+      a = 1
+      b = 0
+      s = -0.4
     End If
+    Dim curPoint As Point, curSize As Size
+    Dim startPoint As Point = wad.startRect.Location
+    Dim dWidth As Integer = wad.destPoint.X - startPoint.X
+    Dim dHeight As Integer = wad.destPoint.Y - startPoint.Y
+    Dim startWidth As Integer = wad.startRect.Width
+    Dim startHeight As Integer = wad.startRect.Height
+    For I As Single = a To b Step s
+      curPoint = New Point(startPoint.X + I * dWidth, startPoint.Y + I * dHeight)
+      curSize = New Size((1 - I) * startWidth, (1 - I) * startHeight)
+      Dim drawRect As New Rectangle(curPoint, curSize)
+      ControlPaint.DrawReversibleFrame(drawRect, wad.backColor, FrameStyle.Thick)
+      System.Threading.Thread.Sleep(1)
+      ControlPaint.DrawReversibleFrame(drawRect, wad.backColor, FrameStyle.Thick)
+    Next
   End Sub
 #Region "Graphs"
 #Region "History"
