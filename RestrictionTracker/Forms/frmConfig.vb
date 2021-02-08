@@ -1392,7 +1392,8 @@
     Else
       mySettings.AccountTypeForced = False
     End If
-    Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+    Dim sKey As String = ""
+    If txtKey1.Text.Length = 6 And txtKey2.Text.Length = 4 And txtKey3.Text.Length = 4 And txtKey4.Text.Length = 4 And txtKey5.Text.Length = 6 Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If String.Compare(mySettings.RemoteKey, sKey, True) <> 0 Then
       If pctKeyState.Tag = 1 Then
         mySettings.RemoteKey = sKey
