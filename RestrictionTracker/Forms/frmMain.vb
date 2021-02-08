@@ -32,6 +32,8 @@ Public Class frmMain
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
   Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
+  Private animData As WindowAnimationData
+  Private restoreMax As Boolean
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
   Private imSlowed As Boolean
@@ -243,9 +245,8 @@ Public Class frmMain
             trayIcon.Visible = True
           ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
             If myState = LoadStates.Loaded Then
-              If Me.WindowState = FormWindowState.Minimized Or Not Me.Visible Then trayIcon.Visible = True
+              trayIcon.Visible = (Me.WindowState = FormWindowState.Minimized) Or (Not Me.Visible)
             Else
-              If mySettings.AutoHide Then trayIcon.Visible = True
               trayIcon.Visible = mySettings.AutoHide
             End If
           End If
@@ -260,10 +261,7 @@ Public Class frmMain
         Me.ShowInTaskbar = True
         Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
         If mySettings.AutoHide Then
-          If (Not mySettings.TrayIconAnimation) And (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
-            Me.Hide()
-            Me.WindowState = FormWindowState.Minimized
-          ElseIf (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
+          If (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
             Me.Hide()
           Else
             Me.Hide()
@@ -296,6 +294,24 @@ Public Class frmMain
       End If
     End If
   End Sub
+  Private Sub RestoreWindow()
+    If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+      If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
+    ElseIf Not Me.Visible Then
+      Me.Opacity = 0
+      Me.Show()
+      If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
+      If restoreMax Then
+        Me.WindowState = FormWindowState.Maximized
+      Else
+        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+      End If
+      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
+      If mySettings.TrayIconAnimation And Not ClosingTime Then AnimateWindow(Me, False)
+      Me.Opacity = 1
+    End If
+    mnuRestore.Text = "&Focus"
+  End Sub
   Protected Overrides Sub OnHandleCreated(e As System.EventArgs)
     MyBase.OnHandleCreated(e)
     If mySettings Is Nothing Then
@@ -316,6 +332,10 @@ Public Class frmMain
     NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, 0, String.Empty)
   End Sub
   Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+    If mySettings Is Nothing Then
+      MyBase.WndProc(m)
+      Return
+    End If
     Select Case m.Msg
       Case NativeMethods.WM_SYSCOMMAND
         Select Case m.WParam.ToInt64
@@ -338,21 +358,13 @@ Public Class frmMain
             Else
               NativeMethods.ModifyMenu(hSysMenu, SCALE_MENU_ID, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED, SCALE_MENU_ID, SCALE_MENU_TEXT)
             End If
-          Case NativeMethods.SC_MINIMIZE
-            If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never And mySettings.TrayIconAnimation Then m.Result = New IntPtr(-1)
         End Select
       Case NativeMethods.WM_WINDOWPOSCHANGING
-        Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
-        If CBool((wndPos.Flags And NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) = NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) And wndPos.X = -32000 And wndPos.Y = -32000 Then
-          If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never And mySettings.TrayIconAnimation Then
-            Me.Opacity = 0
-            If Me.Visible And mySettings.TrayIconAnimation Then AnimateWindow(Me, True)
-            If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
-            mnuRestore.Text = "&Restore"
-            Me.Hide()
-            Me.Opacity = 1
-            wndPos.Flags = NativeMethods.WINDOWPOS_FLAGS.SWP_NOMOVE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSIZE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOACTIVATE Or NativeMethods.WINDOWPOS_FLAGS.SWP_NOSENDCHANGING
-            System.Runtime.InteropServices.Marshal.StructureToPtr(wndPos, m.LParam, True)
+        If Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
+          Dim wndPos As NativeMethods.WINDOWPOS = m.GetLParam(GetType(NativeMethods.WINDOWPOS))
+          If ((wndPos.Flags And NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) = NativeMethods.WINDOWPOS_FLAGS.SWP_STATECHANGED) And (wndPos.X = -32000) And (wndPos.Y = -32000) Then
+            restoreMax = Me.WindowState = FormWindowState.Maximized
+            If mySettings.TrayIconAnimation Then animData = GetWindowAnimationData(Me)
           End If
         End If
     End Select
@@ -366,83 +378,80 @@ Public Class frmMain
       End Try
       Return
     End If
-    If Me.WindowState = FormWindowState.Minimized Then
-      If Not mySettings.TrayIconAnimation Then
-        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
-          Me.Hide()
-        ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
-          trayIcon.Visible = True
-          Me.Hide()
-        End If
-      End If
+    If (Me.WindowState = FormWindowState.Minimized) AndAlso (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
       mnuRestore.Text = "&Restore"
-    Else
-      If mySettings Is Nothing Then
-        ReLoadSettings()
-      End If
-      Static fRatio As Single
-      If fRatio = 0.0! Or Single.IsInfinity(fRatio) Or Single.IsNaN(fRatio) Then
-        Dim icoSize As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMSIZE)
-        fRatio = Me.Font.SizeInPoints / (icoSize * 12.5)
-      End If
-      Static fMin As Single
-      If fMin = 0.0! Or Single.IsInfinity(fMin) Or Single.IsNaN(fMin) Then fMin = Me.Font.SizeInPoints
-      If mySettings.ScaleScreen Then
-        Dim fontSize As Single = fMin
-        If (Me.Width / 2) < Me.Height Then
-          If (Me.Width / 2) * fRatio > fMin Then
-            fontSize = (Me.Width / 2) * fRatio
-          Else
-            fontSize = fMin
-          End If
-        Else
-          If Me.Height * fRatio > fMin Then
-            fontSize = Me.Height * fRatio
-          Else
-            fontSize = fMin
-          End If
-        End If
-        pnlDetails.Font = New Font(Me.Font.FontFamily, fontSize, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
-      Else
-        pnlDetails.Font = Me.Font
-      End If
-      ResizePanels()
-      If myPanel = SatHostTypes.Other Then
-        lblRRS.Font = pnlDetails.Font
-        lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
-      End If
-      If myState = LoadStates.Loaded Then
-        If Me.WindowState = FormWindowState.Normal Then mySettings.MainSize = Me.Size
-      ElseIf Not myPanel = SatHostTypes.Other Then
-        lblRRS.Font = pnlDetails.Font
-        lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
-      End If
-      For i As Integer = 1 To 2
-        If (lblStatus.Height / 2) - (pctNetTest.Height / 2) > 0 Then
-          pctNetTest.Top = (lblStatus.Height / 2) - (pctNetTest.Height / 2)
-        Else
-          pctNetTest.Top = 0
-        End If
-        If pnlTypeA.Visible Then
-          If pctNetTest.Bottom > pnlTypeA.Top - 1 Then
-            pctNetTest.Height = pnlTypeA.Top - 1 - pctNetTest.Top
-            pctNetTest.Width = pctNetTest.Height
-          Else
-            pctNetTest.Height = 16
-            pctNetTest.Width = pctNetTest.Height
-          End If
-        ElseIf pnlTypeB.Visible Then
-          If pctNetTest.Bottom > pnlTypeB.Top - 1 Then
-            pctNetTest.Height = pnlTypeB.Top - 1 - pctNetTest.Top
-            pctNetTest.Width = pctNetTest.Height
-          Else
-            pctNetTest.Height = 16
-            pctNetTest.Width = pctNetTest.Height
-          End If
-        End If
-        pctNetTest.Left = gbUsage.Right - 16 - pctNetTest.Width
-      Next
+      Me.Opacity = 0
+      Me.WindowState = FormWindowState.Normal
+      Me.Hide()
+      If mySettings.TrayIconAnimation Then AnimateWindow(animData, True)
+      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
+      Return
     End If
+    If mySettings Is Nothing Then
+      ReLoadSettings()
+    End If
+    Static fRatio As Single
+    If fRatio = 0.0! Or Single.IsInfinity(fRatio) Or Single.IsNaN(fRatio) Then
+      Dim icoSize As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMSIZE)
+      fRatio = Me.Font.SizeInPoints / (icoSize * 12.5)
+    End If
+    Static fMin As Single
+    If fMin = 0.0! Or Single.IsInfinity(fMin) Or Single.IsNaN(fMin) Then fMin = Me.Font.SizeInPoints
+    If mySettings.ScaleScreen Then
+      Dim fontSize As Single = fMin
+      If (Me.Width / 2) < Me.Height Then
+        If (Me.Width / 2) * fRatio > fMin Then
+          fontSize = (Me.Width / 2) * fRatio
+        Else
+          fontSize = fMin
+        End If
+      Else
+        If Me.Height * fRatio > fMin Then
+          fontSize = Me.Height * fRatio
+        Else
+          fontSize = fMin
+        End If
+      End If
+      pnlDetails.Font = New Font(Me.Font.FontFamily, fontSize, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
+    Else
+      pnlDetails.Font = Me.Font
+    End If
+    ResizePanels()
+    If myPanel = SatHostTypes.Other Then
+      lblRRS.Font = pnlDetails.Font
+      lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
+    End If
+    If myState = LoadStates.Loaded Then
+      If Me.WindowState = FormWindowState.Normal Then mySettings.MainSize = Me.Size
+    ElseIf Not myPanel = SatHostTypes.Other Then
+      lblRRS.Font = pnlDetails.Font
+      lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
+    End If
+    For i As Integer = 1 To 2
+      If (lblStatus.Height / 2) - (pctNetTest.Height / 2) > 0 Then
+        pctNetTest.Top = (lblStatus.Height / 2) - (pctNetTest.Height / 2)
+      Else
+        pctNetTest.Top = 0
+      End If
+      If pnlTypeA.Visible Then
+        If pctNetTest.Bottom > pnlTypeA.Top - 1 Then
+          pctNetTest.Height = pnlTypeA.Top - 1 - pctNetTest.Top
+          pctNetTest.Width = pctNetTest.Height
+        Else
+          pctNetTest.Height = 16
+          pctNetTest.Width = pctNetTest.Height
+        End If
+      ElseIf pnlTypeB.Visible Then
+        If pctNetTest.Bottom > pnlTypeB.Top - 1 Then
+          pctNetTest.Height = pnlTypeB.Top - 1 - pctNetTest.Top
+          pctNetTest.Width = pctNetTest.Height
+        Else
+          pctNetTest.Height = 16
+          pctNetTest.Width = pctNetTest.Height
+        End If
+      End If
+      pctNetTest.Left = gbUsage.Right - 16 - pctNetTest.Width
+    Next
   End Sub
   Private Sub ResizePanels()
     Dim trayIcoVal As Icon = Nothing
@@ -634,7 +643,7 @@ Public Class frmMain
     If mySettings.TrayIconStyle = AppSettings.TrayStyles.Always Then
       trayIcon.Visible = True
     ElseIf mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then
-      trayIcon.Visible = Me.WindowState = FormWindowState.Minimized Or Not Me.Visible
+      trayIcon.Visible = (Me.WindowState = FormWindowState.Minimized) Or (Not Me.Visible)
     Else
       trayIcon.Visible = False
     End If
@@ -811,19 +820,7 @@ Public Class frmMain
       Return
     End If
     If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Or Not sAccount.Contains("@") Then
-      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
-        If Me.WindowState = FormWindowState.Minimized Then
-          Me.WindowState = FormWindowState.Normal
-          mnuRestore.Text = "&Focus"
-        End If
-      Else
-        If Not Me.Visible Then
-          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-          If mySettings.TrayIconAnimation Then AnimateWindow(Me, False)
-          Me.Show()
-          mnuRestore.Text = "&Focus"
-        End If
-      End If
+      RestoreWindow()
       cmdConfig.Focus()
       MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Warning)
     Else
@@ -1065,23 +1062,7 @@ Public Class frmMain
         GrabAttempt = 0
         SetStatusText(LOG_GetLast.ToString("g"), "Please enter your account details in the Config window.", True)
         DisplayUsage(False, False)
-        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
-          If Me.WindowState = FormWindowState.Minimized Then
-            Me.WindowState = FormWindowState.Normal
-            mnuRestore.Text = "&Focus"
-          End If
-        Else
-          If Not Me.Visible Then
-            Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-            If mySettings.TrayIconAnimation Then
-              AnimateWindow(Me, False)
-            Else
-              Me.WindowState = FormWindowState.Normal
-            End If
-            Me.Show()
-            mnuRestore.Text = "&Focus"
-          End If
-        End If
+        RestoreWindow()
         cmdConfig.Focus()
         MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
@@ -1831,19 +1812,7 @@ Public Class frmMain
         UsageInvoker.BeginInvoke(Nothing, Nothing)
       End If
     Else
-      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
-        If Me.WindowState = FormWindowState.Minimized Then
-          Me.WindowState = FormWindowState.Normal
-          mnuRestore.Text = "&Focus"
-        End If
-      Else
-        If Not Me.Visible Then
-          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-          If mySettings.TrayIconAnimation Then AnimateWindow(Me, False)
-          Me.Show()
-          mnuRestore.Text = "&Focus"
-        End If
-      End If
+      RestoreWindow()
       cmdConfig.Focus()
       MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
     End If
@@ -1936,38 +1905,7 @@ Public Class frmMain
 #Region "Menus"
 #Region "Tray"
   Private Sub mnuRestore_Click(sender As System.Object, e As System.EventArgs) Handles mnuRestore.Click
-    If Not Me.Visible Then
-      If mySettings.TrayIconAnimation Then
-        Dim bMax As Boolean = False
-        If Me.WindowState = FormWindowState.Maximized Then
-          bMax = True
-        Else
-          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-        End If
-        If mySettings.TrayIconAnimation Then
-          If Not ClosingTime Then AnimateWindow(Me, False)
-          mnuRestore.Text = "&Focus"
-          If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
-          Me.Show()
-        Else
-          Me.Show()
-          mnuRestore.Text = "&Focus"
-          If Not Me.WindowState = FormWindowState.Maximized Then Me.WindowState = FormWindowState.Normal
-        End If
-        If bMax Then
-          Me.WindowState = FormWindowState.Normal
-          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-          Me.WindowState = FormWindowState.Maximized
-        End If
-        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
-      Else
-        Me.Show()
-        mnuRestore.Text = "&Focus"
-        Me.WindowState = FormWindowState.Normal
-        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
-        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
-      End If
-    End If
+    RestoreWindow()
     Dim myProc As Integer = 0
     Try
       myProc = Process.GetCurrentProcess.Id
