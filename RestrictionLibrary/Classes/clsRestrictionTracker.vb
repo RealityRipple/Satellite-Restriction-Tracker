@@ -506,6 +506,10 @@ Public Class localRestrictionTracker
     ''' The number of retries the current connection is on. Retries are normal during connection, as part of the redirection process.
     ''' </summary>
     Public ReadOnly Property Attempt As Integer
+      Get
+        Return m_attempt
+      End Get
+    End Property
   End Class
   ''' <summary>
   ''' Triggered when new information regarding the current connection status is available.
