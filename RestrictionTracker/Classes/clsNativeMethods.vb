@@ -2,6 +2,7 @@
 Public NotInheritable Class NativeMethods
   Public Const WM_WINDOWPOSCHANGING As Integer = &H46
   Public Const WM_SYSCOMMAND As Integer = &H112
+  Public Const WM_DWMCOMPOSITIONCHANGED As Integer = &H31E
   Public Const SC_MINIMIZE As Integer = &HF020
   Public Const SPI_GETANIMATION As Integer = &H48
   <Flags()> _

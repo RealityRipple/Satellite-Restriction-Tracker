@@ -4,6 +4,7 @@
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
   Private keyPasting As Boolean = False
+  Private dwmComp As Boolean
   Private Const LINK_PURCHASE As String = "Purchase a Remote Usage Service Subscription"
   Private Const LINK_PURCHASE_TT As String = "If you do not have a Product Key for the Remote Usage Service, you can purchase one online for as little as $15.00 a year."
   Private Const LINK_PANEL As String = "Visit the Remote Usage Service User Panel Page"
@@ -124,6 +125,8 @@
         chkTrayMin.Checked = False
     End Select
     chkTrayIcon_CheckedChanged(New Object, New EventArgs)
+    CheckComposition()
+    chkTrayAnim.Enabled = CleanRendering()
     chkTrayAnim.Checked = mySettings.TrayIconAnimation
     chkTrayClose.Checked = mySettings.TrayIconOnClose
     ttConfig.SetToolTip(txtProxyPassword.Button, "Toggle display of the HTTP Proxy Password.")
@@ -421,6 +424,13 @@
         ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your Operating System or version of the .NET Framework does not allow TLS 1.2 connections. Try repairing the .NET Framework.")
       End If
     End If
+  End Sub
+  Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
+    Select Case m.Msg
+      Case NativeMethods.WM_DWMCOMPOSITIONCHANGED
+        CheckComposition()
+    End Select
+    MyBase.WndProc(m)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If pChecker IsNot Nothing Then
@@ -1854,6 +1864,15 @@
     DoCheck()
   End Sub
 #End Region
+  Private Sub CheckComposition()
+    dwmComp = clsGlass.IsCompositionEnabled
+    chkTrayAnim.Enabled = CleanRendering()
+  End Sub
+  Private Function CleanRendering() As Boolean
+    If Environment.OSVersion.Version.Major < 6 Then Return False
+    If Not Application.RenderWithVisualStyles Then Return False
+    Return dwmComp
+  End Function
   Private Sub RepadAllItems(Parent As Object)
     For Each ctl As Control In Parent.Controls
       If ctl.HasChildren And Not ctl.GetType = GetType(PasswordBox) Then

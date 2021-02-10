@@ -33,6 +33,7 @@ Public Class frmMain
   Private sDisp_TT_E As String = ""
   Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
   Private animData As WindowAnimationData
+  Private dwmComp As Boolean
   Private restoreMax As Boolean
   Private mySettings As AppSettings
   Private sAccount, sPassword, sProvider As String
@@ -209,6 +210,7 @@ Public Class frmMain
 #Region "Form Events"
   Private Sub frmMain_Load(sender As Object, e As System.EventArgs) Handles Me.Load
     AddHandler Microsoft.Win32.SystemEvents.PowerModeChanged, AddressOf PowerModeChanged
+    CheckComposition()
     CheckedAJAX = False
     If mySettings Is Nothing Then ReLoadSettings()
     NextGrabTick = Long.MinValue
@@ -298,17 +300,28 @@ Public Class frmMain
     If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
       If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
     ElseIf Not Me.Visible Then
-      Me.Opacity = 0
-      Me.Show()
-      If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
-      If restoreMax Then
-        Me.WindowState = FormWindowState.Maximized
+      If CleanRendering() Then
+        Me.Opacity = 0
+        Me.Show()
+        If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
+        If restoreMax Then
+          Me.WindowState = FormWindowState.Maximized
+        Else
+          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        End If
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
+        If mySettings.TrayIconAnimation And Not ClosingTime Then AnimateWindow(Me, False)
+        Me.Opacity = 1
       Else
-        Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        Me.Show()
+        If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
+        If restoreMax Then
+          Me.WindowState = FormWindowState.Maximized
+        Else
+          Me.Location = New Point((Screen.PrimaryScreen.WorkingArea.Width - Me.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - Me.Height) / 2)
+        End If
+        If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
       End If
-      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = False
-      If mySettings.TrayIconAnimation And Not ClosingTime Then AnimateWindow(Me, False)
-      Me.Opacity = 1
     End If
     mnuRestore.Text = "&Focus"
   End Sub
@@ -367,6 +380,8 @@ Public Class frmMain
             If mySettings.TrayIconAnimation Then animData = GetWindowAnimationData(Me)
           End If
         End If
+      Case NativeMethods.WM_DWMCOMPOSITIONCHANGED
+        CheckComposition()
     End Select
     MyBase.WndProc(m)
   End Sub
@@ -378,12 +393,17 @@ Public Class frmMain
       End Try
       Return
     End If
-    If (Me.WindowState = FormWindowState.Minimized) AndAlso (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
+    If (Me.WindowState = FormWindowState.Minimized And Me.Visible) AndAlso (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
       mnuRestore.Text = "&Restore"
-      Me.Opacity = 0
-      Me.WindowState = FormWindowState.Normal
-      Me.Hide()
-      If mySettings.TrayIconAnimation Then AnimateWindow(animData, True)
+      If CleanRendering() Then
+        Me.Opacity = 0
+        Me.WindowState = FormWindowState.Normal
+        Me.Hide()
+        Me.Opacity = 1
+        If mySettings.TrayIconAnimation Then AnimateWindow(animData, True)
+      Else
+        Me.Hide()
+      End If
       If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
       Return
     End If
@@ -2627,6 +2647,14 @@ Public Class frmMain
       Next
     Next
     Return True
+  End Function
+  Private Sub CheckComposition()
+    dwmComp = clsGlass.IsCompositionEnabled
+  End Sub
+  Private Function CleanRendering() As Boolean
+    If Environment.OSVersion.Version.Major < 6 Then Return False
+    If Not Application.RenderWithVisualStyles Then Return False
+    Return dwmComp
   End Function
 #End Region
 End Class
