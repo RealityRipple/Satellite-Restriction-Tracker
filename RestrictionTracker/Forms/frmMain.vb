@@ -296,6 +296,23 @@ Public Class frmMain
       End If
     End If
   End Sub
+  Private Sub MinimizeWindow()
+    If (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
+      mnuRestore.Text = "&Restore"
+      If CleanRendering() Then
+        Me.Opacity = 0
+        Me.WindowState = FormWindowState.Normal
+        Me.Hide()
+        Me.Opacity = 1
+        If mySettings.TrayIconAnimation Then AnimateWindow(animData, True)
+      Else
+        Me.Hide()
+      End If
+      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
+    Else
+      Me.WindowState = FormWindowState.Minimized
+    End If
+  End Sub
   Private Sub RestoreWindow()
     If mySettings.TrayIconStyle = AppSettings.TrayStyles.Never Then
       If Me.WindowState = FormWindowState.Minimized Then Me.WindowState = FormWindowState.Normal
@@ -393,18 +410,8 @@ Public Class frmMain
       End Try
       Return
     End If
-    If (Me.WindowState = FormWindowState.Minimized And Me.Visible) AndAlso (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
-      mnuRestore.Text = "&Restore"
-      If CleanRendering() Then
-        Me.Opacity = 0
-        Me.WindowState = FormWindowState.Normal
-        Me.Hide()
-        Me.Opacity = 1
-        If mySettings.TrayIconAnimation Then AnimateWindow(animData, True)
-      Else
-        Me.Hide()
-      End If
-      If mySettings.TrayIconStyle = AppSettings.TrayStyles.Minimized Then trayIcon.Visible = True
+    If (Me.WindowState = FormWindowState.Minimized) AndAlso (mySettings IsNot Nothing) AndAlso (Not mySettings.TrayIconStyle = AppSettings.TrayStyles.Never) Then
+      MinimizeWindow()
       Return
     End If
     If mySettings Is Nothing Then
@@ -511,7 +518,8 @@ Public Class frmMain
   Private Sub frmMain_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If e.CloseReason = CloseReason.UserClosing And mySettings.TrayIconOnClose Then
       If Me.Visible And Not Me.WindowState = FormWindowState.Minimized Then
-        Me.WindowState = FormWindowState.Minimized
+        If mySettings.TrayIconAnimation Then animData = GetWindowAnimationData(Me)
+        MinimizeWindow()
         e.Cancel = True
         Return
       End If
