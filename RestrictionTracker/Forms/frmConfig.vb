@@ -113,6 +113,7 @@
     chkOverAlert_CheckedChanged(New Object, New EventArgs)
     txtOverTime.Value = mySettings.Overtime
     chkScaleScreen.Checked = mySettings.ScaleScreen
+    CheckComposition()
     Select Case mySettings.TrayIconStyle
       Case AppSettings.TrayStyles.Always
         chkTrayIcon.Checked = True
@@ -125,8 +126,6 @@
         chkTrayMin.Checked = False
     End Select
     chkTrayIcon_CheckedChanged(New Object, New EventArgs)
-    CheckComposition()
-    chkTrayAnim.Enabled = CleanRendering()
     chkTrayAnim.Checked = mySettings.TrayIconAnimation
     chkTrayClose.Checked = mySettings.TrayIconOnClose
     ttConfig.SetToolTip(txtProxyPassword.Button, "Toggle display of the HTTP Proxy Password.")
@@ -702,9 +701,9 @@
   End Sub
   Private Sub chkTrayIcon_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkTrayIcon.CheckedChanged
     chkTrayMin.Enabled = chkTrayIcon.Checked
-    chkTrayAnim.Enabled = chkTrayIcon.Checked
+    chkTrayAnim.Enabled = chkTrayIcon.Checked And CleanRendering()
     If Not chkTrayMin.Enabled Then chkTrayMin.Checked = False
-    If Not chkTrayAnim.Enabled Then chkTrayAnim.Checked = False
+    If Not chkTrayIcon.Checked Then chkTrayAnim.Checked = False
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub cmbProxyType_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbProxyType.SelectedIndexChanged
@@ -1866,7 +1865,7 @@
 #End Region
   Private Sub CheckComposition()
     dwmComp = clsGlass.IsCompositionEnabled
-    chkTrayAnim.Enabled = CleanRendering()
+    chkTrayAnim.Enabled = chkTrayIcon.Checked And CleanRendering()
   End Sub
   Private Function CleanRendering() As Boolean
     If Environment.OSVersion.Version.Major < 6 Then Return False
