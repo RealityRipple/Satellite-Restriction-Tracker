@@ -971,6 +971,7 @@ Public Class srlFunctions
     End If
     If clrID < 17929 Then
       If clrID = 1 Then Return ".NET 4.0 RTM"
+      If clrID = 225 Then Return ".NET 4.0 SP1"
       If clrID = 269 Then Return ".NET 4.0 + MS12-035 GDR"
       If clrID = 276 Then Return ".NET 4.0.3 Runtime Update"
       If clrID = 296 Then Return ".NET 4.0 + MS12-074 GDR"
