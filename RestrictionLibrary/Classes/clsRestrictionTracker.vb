@@ -2690,7 +2690,7 @@ Public Class localRestrictionTracker
     Dim sPOST As String = Nothing
     sPOST &= "protocol=" & srlFunctions.PercentEncode(ToBase64(sProtocol))
     sPOST &= "&url=" & srlFunctions.PercentEncode(ToBase64(SendURL.OriginalString))
-    If Not String.IsNullOrEmpty(SendData) Then sPOST &= "&post=" & srlFunctions.PercentEncode(ToBase64(SendData))
+    If SendData IsNot Nothing Then sPOST &= "&post=" & srlFunctions.PercentEncode(ToBase64(SendData))
     If Not String.IsNullOrEmpty(sCookieData) Then
       If sCookieData.EndsWith(vbLf) Then sCookieData = sCookieData.Substring(0, sCookieData.Length - 1)
       sPOST &= "&cookies=" & srlFunctions.PercentEncode(ToBase64(sCookieData))
