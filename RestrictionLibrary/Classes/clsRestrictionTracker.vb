@@ -2629,7 +2629,7 @@ Public Class localRestrictionTracker
     wsSocket.Encoding = oldEncoding
     If Not ManualRedirect Then wsSocket.ManualRedirect = False
   End Sub
-  Private Sub SendTLSProxy(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String)
+  Private Sub SendTLSProxy(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String, Optional Headers As Net.WebHeaderCollection = Nothing)
     Dim sProtocol As String = "default"
     If (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Then
       sProtocol = "tls12"
@@ -2695,6 +2695,16 @@ Public Class localRestrictionTracker
       If sCookieData.EndsWith(vbLf) Then sCookieData = sCookieData.Substring(0, sCookieData.Length - 1)
       sPOST &= "&cookies=" & srlFunctions.PercentEncode(ToBase64(sCookieData))
     End If
+    If Headers IsNot Nothing AndAlso Headers.Count > 0 Then
+      Dim sHeaderData As String = ""
+      For I As Integer = 0 To Headers.Count - 1
+        For Each hVal In Headers.GetValues(I)
+          sHeaderData &= Headers.GetKey(I) & ": " & hVal & vbLf
+        Next
+      Next
+      If sHeaderData.EndsWith(vbLf) Then sHeaderData = sHeaderData.Substring(0, sHeaderData.Length - 1)
+      sPOST &= "&headers=" & srlFunctions.PercentEncode(ToBase64(sHeaderData))
+    End If
     wsSocket.SendHeaders = New Net.WebHeaderCollection
     wsSocket.SendHeaders.Add(Net.HttpRequestHeader.UserAgent, WebClientCore.UserAgent)
     Dim sRet As String = wsSocket.UploadString(c_TLSProxyAddr, "POST", sPOST)
@@ -2754,7 +2764,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub SendPOST(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String, Optional Headers As Net.WebHeaderCollection = Nothing)
     If c_TLSProxy Then
-      SendTLSProxy(SendURL, SendData, ReturnURL, ReturnData)
+      SendTLSProxy(SendURL, SendData, ReturnURL, ReturnData, Headers)
       Return
     End If
     wsSocket.SendHeaders = New Net.WebHeaderCollection
