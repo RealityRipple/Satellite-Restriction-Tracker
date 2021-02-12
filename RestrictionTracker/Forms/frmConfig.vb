@@ -68,18 +68,18 @@
       txtKey4.Text = Nothing
       txtKey5.Text = Nothing
     End If
-    If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
-      pctKeyState.Tag = 0
-      pctKeyState.Image = Nothing
-      ttConfig.SetToolTip(pctKeyState, String.Empty)
-      lblPurchaseKey.Text = LINK_PURCHASE
-      ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
-    Else
+    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
       pctKeyState.Tag = 1
       pctKeyState.Image = My.Resources.ico_ok
       ttConfig.SetToolTip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & My.Application.Info.ProductName & "!")
       lblPurchaseKey.Text = LINK_PANEL
       ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
+    Else
+      pctKeyState.Tag = 0
+      pctKeyState.Image = Nothing
+      ttConfig.SetToolTip(pctKeyState, String.Empty)
+      lblPurchaseKey.Text = LINK_PURCHASE
+      ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
     End If
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
@@ -553,10 +553,10 @@
     End If
     lblPurchaseKey.Text = LINK_PURCHASE
     ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
-    If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
-      cmdSave.Enabled = SettingsChanged()
-    Else
+    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
       KeyCheck()
+    Else
+      cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
   Private Sub chkAccountTypeAuto_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkAccountTypeAuto.CheckedChanged
@@ -653,14 +653,14 @@
     End If
     lblPurchaseKey.Text = LINK_PURCHASE
     ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
-    If txtKey1.TextLength < 6 Or txtKey2.TextLength < 4 Or txtKey3.TextLength < 4 Or txtKey4.TextLength < 4 Or txtKey5.TextLength < 6 Then
+    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
+      KeyCheck()
+    Else
       pctKeyState.Tag = 0
       pctKeyState.Image = Nothing
       ttConfig.SetToolTip(pctKeyState, String.Empty)
       cmdSave.Enabled = SettingsChanged()
       DoCheck()
-    Else
-      KeyCheck()
     End If
   End Sub
   Private Sub chkService_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkService.CheckedChanged
@@ -1104,7 +1104,7 @@
   End Sub
 #Region "Remote Service Results"
   Private Sub pctKeyState_Click(sender As System.Object, e As System.EventArgs) Handles pctKeyState.Click
-    If txtKey1.TextLength = 6 And txtKey2.TextLength = 4 And txtKey3.TextLength = 4 And txtKey4.TextLength = 4 And txtKey5.TextLength = 6 Then KeyCheck()
+    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then KeyCheck()
   End Sub
   Private CheckState As Boolean
   Private Sub KeyCheck()
@@ -1402,7 +1402,7 @@
       mySettings.AccountTypeForced = False
     End If
     Dim sKey As String = ""
-    If txtKey1.Text.Length = 6 And txtKey2.Text.Length = 4 And txtKey3.Text.Length = 4 And txtKey4.Text.Length = 4 And txtKey5.Text.Length = 6 Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
+    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If String.Compare(mySettings.RemoteKey, sKey, True) <> 0 Then
       If pctKeyState.Tag = 1 Then
         mySettings.RemoteKey = sKey
