@@ -550,7 +550,14 @@ Public Class DataBase
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.BinaryWriter(nWrite)
             Dim uData As UInt64 = CULng(dVals.Length)
-            SAVE_Write(nOut, uData)
+            Dim truData As UInt64 = 0
+            For I As UInt64 = 0 To uData - 1
+              Dim dRow As DataRow = dVals(I)
+              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+              truData += 1
+            Next
+            SAVE_Write(nOut, truData)
             For I As UInt64 = 0 To uData - 1
               Dim dRow As DataRow = dVals(I)
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
