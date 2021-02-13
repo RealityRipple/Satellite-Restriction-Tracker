@@ -2809,6 +2809,10 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
       Return True
     End If
+    If response.ToLower.Contains("504 gateway time-out") Then
+      RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
+      Return True
+    End If
     If response.StartsWith("Could not resolve host: ") Then
       RaiseError("The server is unavailable. Please try again later.")
       Return True
