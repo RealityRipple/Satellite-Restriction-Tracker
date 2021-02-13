@@ -6,6 +6,8 @@ Class AppSettings
   Private m_Interval As Integer
   Private m_HistoryDir As String
   Private m_PassCrypt As String
+  Private m_PassKey As String
+  Private m_PassSalt As String
   Private m_Timeout As Integer
   Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
@@ -53,6 +55,12 @@ Class AppSettings
                   ElseIf xName.CompareTo("HistoryDir") = 0 Then
                     m_HistoryDir = xValue
                   ElseIf xName.CompareTo("PassCrypt") = 0 Then
+                    If m_node.Attributes.Count > 1 Then
+                      For I As Integer = 0 To m_node.Attributes.Count - 1
+                        If m_node.Attributes(I).Name = "key" Then m_PassKey = m_node.Attributes(I).Value
+                        If m_node.Attributes(I).Name = "salt" Then m_PassSalt = m_node.Attributes(I).Value
+                      Next
+                    End If
                     m_PassCrypt = xValue
                   ElseIf xName.CompareTo("Timeout") = 0 Then
                     If Not Integer.TryParse(xValue, m_Timeout) Then m_Timeout = 120
@@ -112,6 +120,8 @@ Class AppSettings
     m_Interval = 15
     m_HistoryDir = Nothing
     m_PassCrypt = Nothing
+    m_PassKey = ""
+    m_PassSalt = ""
     m_Timeout = 120
     m_TLSProxy = False
     m_ProxySetting = "None"
@@ -136,6 +146,16 @@ Class AppSettings
   Public ReadOnly Property PassCrypt As String
     Get
       Return m_PassCrypt
+    End Get
+  End Property
+  Public ReadOnly Property PassKey As String
+    Get
+      Return m_PassKey
+    End Get
+  End Property
+  Public ReadOnly Property PassSalt As String
+    Get
+      Return m_PassSalt
     End Get
   End Property
   Public ReadOnly Property Interval As Integer

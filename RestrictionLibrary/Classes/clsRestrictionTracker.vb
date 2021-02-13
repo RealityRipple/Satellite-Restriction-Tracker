@@ -617,7 +617,11 @@ Public Class localRestrictionTracker
     Net.ServicePointManager.MaxServicePointIdleTime = iWait
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
-      sPassword = StoredPassword.DecryptApp(mySettings.PassCrypt)
+      If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+        sPassword = StoredPasswordLegacy.DecryptApp(mySettings.PassCrypt)
+      Else
+        sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
+      End If
     End If
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
       sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))

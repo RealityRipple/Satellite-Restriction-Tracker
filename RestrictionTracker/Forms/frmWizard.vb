@@ -141,7 +141,11 @@ Public Class frmWizard
       Dim newSettings As New AppSettings
       newSettings.AccountType = AccountType
       newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
-      newSettings.PassCrypt = StoredPassword.EncryptApp(txtAccountPass.Text)
+      Dim newKey() As Byte = StoredPassword.GenerateKey()
+      Dim newSalt() As Byte = StoredPassword.GenerateSalt()
+      newSettings.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, newKey, newSalt)
+      newSettings.PassKey = Convert.ToBase64String(newKey)
+      newSettings.PassSalt = Convert.ToBase64String(newSalt)
       If optRemote.Checked And pnlKey.Tag = 1 Then
         newSettings.Service = False
         newSettings.RemoteKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
@@ -181,7 +185,11 @@ Public Class frmWizard
         cSave.AccountType = newSettings.AccountType
         cSave.Interval = newSettings.Interval
         If Not String.IsNullOrEmpty(newSettings.PassCrypt) Then
-          cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(newSettings.PassCrypt))
+          Dim svcKey() As Byte = StoredPassword.GenerateKey()
+          Dim svcSalt() As Byte = StoredPassword.GenerateSalt()
+          cSave.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, svcKey, svcSalt)
+          cSave.PassKey = Convert.ToBase64String(svcKey)
+          cSave.PassSalt = Convert.ToBase64String(svcSalt)
         End If
         cSave.Save()
       End If
@@ -663,7 +671,11 @@ Public Class frmWizard
     Dim newSettings As New AppSettings
     newSettings.AccountType = SatHostTypes.Other
     newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
-    newSettings.PassCrypt = StoredPassword.EncryptApp(txtAccountPass.Text)
+    Dim newKey() As Byte = StoredPassword.GenerateKey()
+    Dim newSalt() As Byte = StoredPassword.GenerateSalt()
+    newSettings.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, newKey, newSalt)
+    newSettings.PassKey = Convert.ToBase64String(newKey)
+    newSettings.PassSalt = Convert.ToBase64String(newSalt)
     newSettings.Service = False
     newSettings.RemoteKey = Nothing
     newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12

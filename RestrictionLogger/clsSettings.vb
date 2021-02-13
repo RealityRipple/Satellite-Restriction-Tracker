@@ -2,6 +2,8 @@
   Private m_Account As String
   Private m_AccountType As localRestrictionTracker.SatHostTypes
   Private m_PassCrypt As String
+  Private m_PassKey As String
+  Private m_PassSalt As String
   Private m_Interval As String
   Private m_Timeout As String
   Private m_ProxySetting As String
@@ -13,6 +15,8 @@
       m_Account = String.Empty
       m_AccountType = localRestrictionTracker.SatHostTypes.Other
       m_PassCrypt = String.Empty
+      m_PassKey = ""
+      m_PassSalt = ""
       m_Interval = "15"
       m_Timeout = "60"
       m_ProxySetting = "None"
@@ -43,8 +47,28 @@
     End If
     Dim xPassCrypt As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
     If xPassCrypt Is Nothing Then
+      m_PassKey = ""
+      m_PassSalt = ""
       m_PassCrypt = String.Empty
     Else
+      Try
+        If xPassCrypt.Attribute("key") Is Nothing Then
+          m_PassKey = ""
+        Else
+          m_PassKey = xPassCrypt.Attribute("key").Value
+        End If
+      Catch ex As Exception
+        m_PassKey = ""
+      End Try
+      Try
+        If xPassCrypt.Attribute("salt") Is Nothing Then
+          m_PassSalt = ""
+        Else
+          m_PassSalt = xPassCrypt.Attribute("salt").Value
+        End If
+      Catch ex As Exception
+        m_PassSalt = ""
+      End Try
       Try
         m_PassCrypt = xPassCrypt.Element("value").Value
       Catch ex As Exception
@@ -98,6 +122,16 @@
   Public ReadOnly Property PassCrypt As String
     Get
       Return m_PassCrypt
+    End Get
+  End Property
+  Public ReadOnly Property PassKey As String
+    Get
+      Return m_PassKey
+    End Get
+  End Property
+  Public ReadOnly Property PassSalt As String
+    Get
+      Return m_PassSalt
     End Get
   End Property
   Public ReadOnly Property Interval As String

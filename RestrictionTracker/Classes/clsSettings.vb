@@ -4,6 +4,8 @@ Class SvcSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
   Private m_PassCrypt As String
+  Private m_PassKey As String
+  Private m_PassSalt As String
   Private m_Interval As Integer
   Private m_Timeout As Integer
   Private m_ProxySetting As String
@@ -13,7 +15,7 @@ Class SvcSettings
                                 New XElement("userSettings",
                                              New XElement("RestrictionLogger.My.MySettings",
                                                           New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
-                                                          New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
+                                                          New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
@@ -33,6 +35,8 @@ Class SvcSettings
     m_Account = Nothing
     m_AccountType = SatHostTypes.Other
     m_PassCrypt = Nothing
+    m_PassKey = ""
+    m_PassSalt = ""
     m_Interval = 15
     m_Timeout = 120
     m_ProxySetting = "None"
@@ -59,6 +63,22 @@ Class SvcSettings
     End Get
     Set(value As String)
       m_PassCrypt = value
+    End Set
+  End Property
+  Public Property PassKey As String
+    Get
+      Return m_PassKey
+    End Get
+    Set(value As String)
+      m_PassKey = value
+    End Set
+  End Property
+  Public Property PassSalt As String
+    Get
+      Return m_PassSalt
+    End Get
+    Set(value As String)
+      m_PassSalt = value
     End Set
   End Property
   Public Property Interval As Integer
@@ -177,6 +197,8 @@ Class AppSettings
   Private m_MainSize As Size
   Private m_RemoteKey As String
   Private m_PassCrypt As String
+  Private m_PassKey As String
+  Private m_PassSalt As String
   Private m_TopMost As Boolean
   Private m_Timeout As Integer
   Private m_Retries As Integer
@@ -447,8 +469,28 @@ Class AppSettings
       End If
       Dim xPassCrypt As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
       If xPassCrypt Is Nothing Then
+        m_PassKey = ""
+        m_PassSalt = ""
         m_PassCrypt = Nothing
       Else
+        Try
+          If xPassCrypt.Attribute("key") Is Nothing Then
+            m_PassKey = ""
+          Else
+            m_PassKey = xPassCrypt.Attribute("key").Value
+          End If
+        Catch ex As Exception
+          m_PassKey = ""
+        End Try
+        Try
+          If xPassCrypt.Attribute("salt") Is Nothing Then
+            m_PassSalt = ""
+          Else
+            m_PassSalt = xPassCrypt.Attribute("salt").Value
+          End If
+        Catch ex As Exception
+          m_PassSalt = ""
+        End Try
         Try
           m_PassCrypt = xPassCrypt.Element("value").Value
         Catch ex As Exception
@@ -1049,6 +1091,8 @@ Class AppSettings
     m_MainSize = New Size(450, 200)
     m_RemoteKey = Nothing
     m_PassCrypt = Nothing
+    m_PassKey = ""
+    m_PassSalt = ""
     m_TopMost = False
     m_Timeout = 120
     m_Retries = 2
@@ -1131,7 +1175,7 @@ Class AppSettings
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
                                                           New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XAttribute("forceType", IIf(m_AccountTypeF, "True", "False")), New XElement("value", m_Account)),
-                                                          New XElement("setting", New XAttribute("name", "PassCrypt"), New XElement("value", m_PassCrypt)),
+                                                          New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "StartWait"), New XElement("value", m_StartWait)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Gr"), New XElement("value", m_Gr)),
@@ -1334,6 +1378,22 @@ Class AppSettings
     End Get
     Set(value As String)
       m_PassCrypt = value
+    End Set
+  End Property
+  Public Property PassKey As String
+    Get
+      Return m_PassKey
+    End Get
+    Set(value As String)
+      m_PassKey = value
+    End Set
+  End Property
+  Public Property PassSalt As String
+    Get
+      Return m_PassSalt
+    End Get
+    Set(value As String)
+      m_PassSalt = value
     End Set
   End Property
   Public Property StartWait As Integer

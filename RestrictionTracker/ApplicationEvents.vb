@@ -82,7 +82,15 @@
           cSave.AccountType = cSettings.AccountType
           cSave.Interval = cSettings.Interval
           If Not String.IsNullOrEmpty(cSettings.PassCrypt) Then
-            cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(cSettings.PassCrypt))
+            Dim newKey() As Byte = StoredPassword.GenerateKey()
+            Dim newSalt() As Byte = StoredPassword.GenerateSalt()
+            If String.IsNullOrEmpty(cSettings.PassKey) Or String.IsNullOrEmpty(cSettings.PassSalt) Then
+              cSave.PassCrypt = StoredPassword.Encrypt(StoredPasswordLegacy.DecryptApp(cSettings.PassCrypt), newKey, newSalt)
+            Else
+              cSave.PassCrypt = StoredPassword.Encrypt(StoredPassword.Decrypt(cSettings.PassCrypt, cSettings.PassKey, cSettings.PassSalt), newKey, newSalt)
+            End If
+            cSave.PassKey = Convert.ToBase64String(newKey)
+            cSave.PassSalt = Convert.ToBase64String(newSalt)
           End If
           cSave.Proxy = cSettings.Proxy
           cSave.Timeout = cSettings.Timeout

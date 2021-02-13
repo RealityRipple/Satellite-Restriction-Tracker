@@ -543,7 +543,15 @@ Public Class frmMain
       cSave.Account = mySettings.Account
       cSave.Interval = mySettings.Interval
       If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
-        cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(mySettings.PassCrypt))
+        Dim newKey() As Byte = StoredPassword.GenerateKey()
+        Dim newSalt() As Byte = StoredPassword.GenerateSalt()
+        If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+          cSave.PassCrypt = StoredPassword.Encrypt(StoredPasswordLegacy.DecryptApp(mySettings.PassCrypt), newKey, newSalt)
+        Else
+          cSave.PassCrypt = StoredPassword.Encrypt(StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt), newKey, newSalt)
+        End If
+        cSave.PassKey = Convert.ToBase64String(newKey)
+        cSave.PassSalt = Convert.ToBase64String(newSalt)
       End If
       cSave.Proxy = mySettings.Proxy
       cSave.Timeout = mySettings.Timeout
@@ -782,7 +790,11 @@ Public Class frmMain
   Private Sub InitAccount()
     sAccount = mySettings.Account
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
-      sPassword = StoredPassword.DecryptApp(mySettings.PassCrypt)
+      If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+        sPassword = StoredPasswordLegacy.DecryptApp(mySettings.PassCrypt)
+      Else
+        sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
+      End If
     End If
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
       sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower

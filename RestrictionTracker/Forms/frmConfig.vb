@@ -29,7 +29,11 @@
     cmbProvider.Text = sProvider
     ttConfig.SetToolTip(txtPassword.Button, "Toggle display of the Password.")
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
-      txtPassword.Text = StoredPassword.DecryptApp(mySettings.PassCrypt)
+      If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+        txtPassword.Text = StoredPasswordLegacy.DecryptApp(mySettings.PassCrypt)
+      Else
+        txtPassword.Text = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
+      End If
     End If
     Select Case mySettings.AccountType
       Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
@@ -1377,8 +1381,18 @@
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
     End If
-    If String.Compare(StoredPassword.DecryptApp(mySettings.PassCrypt), txtPassword.Text, False) <> 0 Then
-      mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text)
+    Dim newPass As Boolean = False
+    If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+      newPass = True
+    Else
+      newPass = (String.Compare(StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt), txtPassword.Text, False) <> 0)
+    End If
+    If newPass Then
+      Dim newKey() As Byte = StoredPassword.GenerateKey()
+      Dim newSalt() As Byte = StoredPassword.GenerateSalt()
+      mySettings.PassCrypt = StoredPassword.Encrypt(txtPassword.Text, newKey, newSalt)
+      mySettings.PassKey = Convert.ToBase64String(newKey)
+      mySettings.PassSalt = Convert.ToBase64String(newSalt)
       bAccount = True
     End If
     If Not chkAccountTypeAuto.Checked Then
@@ -1715,8 +1729,18 @@
       cSave.Account = mySettings.Account
       cSave.AccountType = mySettings.AccountType
       cSave.Interval = mySettings.Interval
-      If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
-        cSave.PassCrypt = StoredPassword.EncryptLogger(StoredPassword.DecryptApp(mySettings.PassCrypt))
+      Dim newSvcPass As Boolean = False
+      If String.IsNullOrEmpty(cSave.PassKey) Or String.IsNullOrEmpty(cSave.PassSalt) Then
+        newSvcPass = True
+      Else
+        newSvcPass = (String.Compare(StoredPassword.Decrypt(cSave.PassCrypt, cSave.PassKey, cSave.PassSalt), txtPassword.Text, False) <> 0)
+      End If
+      If newSvcPass Then
+        Dim svcKey() As Byte = StoredPassword.GenerateKey()
+        Dim svcSalt() As Byte = StoredPassword.GenerateSalt()
+        cSave.PassCrypt = StoredPassword.Encrypt(txtPassword.Text, svcKey, svcSalt)
+        cSave.PassKey = Convert.ToBase64String(svcKey)
+        cSave.PassSalt = Convert.ToBase64String(svcSalt)
       End If
       cSave.Proxy = mySettings.Proxy
       cSave.Timeout = mySettings.Timeout
@@ -1736,7 +1760,11 @@
     If mySettings Is Nothing Then Return False
     If bHardChange Then Return True
     If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) = 0 Then Return True
-    If Not mySettings.PassCrypt = StoredPassword.EncryptApp(txtPassword.Text) Then Return True
+    If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
+      Return True
+    Else
+      If Not StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt) = txtPassword.Text Then Return True
+    End If
     If mySettings.AccountTypeForced = chkAccountTypeAuto.Checked Then Return True
     If Not chkAccountTypeAuto.Checked Then
       Select Case mySettings.AccountType

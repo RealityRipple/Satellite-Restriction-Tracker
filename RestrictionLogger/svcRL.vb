@@ -211,7 +211,11 @@ Public Class svcRL
     Try
       MySettings = New Settings(DataPath & "\user.config")
       If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
-        sPassword = StoredPassword.DecryptLogger(MySettings.PassCrypt)
+        If String.IsNullOrEmpty(MySettings.PassKey) Or String.IsNullOrEmpty(MySettings.PassSalt) Then
+          sPassword = StoredPasswordLegacy.DecryptLogger(MySettings.PassCrypt)
+        Else
+          sPassword = StoredPassword.Decrypt(MySettings.PassCrypt, MySettings.PassKey, MySettings.PassSalt)
+        End If
       End If
       If Not sAccount = MySettings.Account Then
         sAccount = MySettings.Account
