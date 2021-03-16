@@ -1285,7 +1285,6 @@ Public Class localRestrictionTracker
     EX_JS_Response(responseData, responseURI, TryCount)
   End Sub
   Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If CheckForErrors(Response, ResponseURI) Then Return
     If Response.Contains("<script src=""/static/") Then
       TryCount += 1
       If TryCount > 4 Then
@@ -1314,38 +1313,45 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
     End If
-    If Not Response.Contains("clientIdWeb"":") Then
+    If Not Response.Contains("webClient:{") Then
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
     End If
-    Dim CliID As String = Response.Substring(Response.IndexOf("clientIdWeb"":") + 13)
-    If Not CliID.Contains("""") Then
+    Dim pt As String = Response.Substring(Response.IndexOf("webClient:{") + 11)
+    If Not pt.Contains("}") Then
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
     End If
-    CliID = CliID.Substring(CliID.IndexOf("""") + 1)
+    If Not pt.Contains("id:""") Then
+      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    Dim CliID As String = pt.Substring(pt.IndexOf("id:""") + 4)
     If Not CliID.Contains("""") Then
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
     End If
     CliID = CliID.Substring(0, CliID.IndexOf(""""))
-    Dim sURL As String = "https://account.viasat.com/services/oauth2/authorize"
-    EX_OAuth2(sURL, CliID)
+
+    If Not pt.Contains("redirectUri:""") Then
+      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    Dim CliURI As String = pt.Substring(pt.IndexOf("redirectUri:""") + 13)
+    If Not CliURI.Contains("""") Then
+      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
+      Return
+    End If
+    CliURI = CliURI.Substring(0, CliURI.IndexOf(""""))
+    Dim sURL As String = "https://mysso.my.viasat.com/federation/oauth2/authorize?client_id=" & srlFunctions.PercentEncode(CliID) & "&response_type=code&redirect_uri=" & srlFunctions.PercentEncode(CliURI) & "&scope=uid"
+    EX_OAuth2(sURL)
   End Sub
-  Private Sub EX_OAuth2(sURL As String, sCliID As String)
+  Private Sub EX_OAuth2(sURL As String)
     MakeSocket(True)
-    Dim nonce As String = Guid.NewGuid().ToString
-    Dim sSend As String = "client_id=" & sCliID & "&"
-    sSend &= "response_type=token&"
-    sSend &= "redirect_uri=https://my.viasat.com/callback&"
-    sSend &= "scope=&"
-    sSend &= "response_mode=query&"
-    sSend &= "nonce=" & nonce & "&"
-    sSend &= "state=abcd"
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, 0, sURL)
-    SendPOST(New Uri(sURL), sSend, responseURI, responseData)
+    SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
     EX_OAuth2_Response(responseData, responseURI, 0)
   End Sub
@@ -1370,14 +1376,53 @@ Public Class localRestrictionTracker
       EX_OAuth2_Response(response2Data, response2URI, TryCount)
       Return
     End If
-    Dim sToken As String = ResponseURI.Fragment
-    If Not sToken.Contains("#access_token=") Then
+    Dim sToken As String = ResponseURI.Query
+    If String.IsNullOrEmpty(sToken) Then
       RaiseError("Could not log in.", "EX OAuth2 Response", Response, ResponseURI)
       Return
     End If
-    sToken = sToken.Substring(sToken.IndexOf("#access_token=") + 14)
+    If Not sToken.Contains("code=") Then
+      RaiseError("Could not log in.", "EX OAuth2 Response", Response, ResponseURI)
+      Return
+    End If
+    sToken = sToken.Substring(sToken.IndexOf("code=") + 5)
     If sToken.Contains("&") Then sToken = sToken.Substring(0, sToken.IndexOf("&"))
-    sToken = srlFunctions.PercentDecode(sToken)
+    'sToken = srlFunctions.PercentDecode(sToken)
+    EX_Token(sToken)
+  End Sub
+  Private Sub EX_Token(sCode As String)
+    Dim tURI As String = "https://my-viasat-server-prod.icat.viasat.io/graphql"
+    Dim sSend As String = "{""operationName"":""getTokenUsingCode"",""variables"":{""code"":""" & sCode & """, ""platform"":""web""},""query"":""mutation getTokenUsingCode($code: String!, $platform: ClientPlatform!) {\n" &
+          "  getTokenUsingCode(code: $code, platform: $platform) {\n" &
+          "    accessToken\n" &
+          "    refreshToken\n" &
+          "    accessTokenExpirationTime\n" &
+          "    __typename\n" &
+          "  }\n" &
+          "}\n" &
+          """}"
+    Dim hdrs As New Net.WebHeaderCollection
+    hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, tURI)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
+    If ClosingTime Then Return
+    EX_Read_Token(responseData, responseURI)
+  End Sub
+  Private Sub EX_Read_Token(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    If Not Response.Contains("""accessToken"":""") Then
+      RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+      Return
+    End If
+    Dim sToken As String = Response.Substring(Response.IndexOf("""accessToken"":""") + 15)
+    If Not sToken.Contains("""") Then
+      RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+      Return
+    End If
+    sToken = sToken.Substring(0, sToken.IndexOf(""""))
     EX_Downlad_Table(sToken)
   End Sub
   Private Sub EX_Downlad_Table(sToken As String)
@@ -1399,9 +1444,10 @@ Public Class localRestrictionTracker
           """}"
     Dim hdrs As New Net.WebHeaderCollection
     hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
+    hdrs.Add("x-auth-type", "MySSO")
     hdrs.Add("x-auth-token", sToken)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, tURI)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 1, 0, tURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
