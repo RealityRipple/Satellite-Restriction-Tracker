@@ -1235,13 +1235,13 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Dash_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("location.href") Then
+    If Response.ToLower.Contains("location.href =") Then
       TryCount += 1
       If TryCount > 15 Then
         RaiseError("Login Failed: Server redirected too many times.")
         Return
       End If
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
+      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href ="))
       sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
       sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
       If sRedirURI = "/" Then
@@ -1285,34 +1285,6 @@ Public Class localRestrictionTracker
     EX_JS_Response(responseData, responseURI, TryCount)
   End Sub
   Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If Response.Contains("<script src=""/static/") Then
-      TryCount += 1
-      If TryCount > 4 Then
-        RaiseError("Login Failed: Server redirected too many times.")
-        Return
-      End If
-      Dim sScripts As String() = Split(Response, "<script src=""/static/")
-      If sScripts.Length = 3 Then
-        Dim jsA As String = sScripts(1).Substring(0, sScripts(1).IndexOf(""""))
-        Dim jsB As String = sScripts(2).Substring(0, sScripts(2).IndexOf(""""))
-        If jsA.Contains(".") Then
-          If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsA
-            EX_JS(sURI, TryCount)
-            Return
-          End If
-        End If
-        If jsB.Contains(".") Then
-          If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsB
-            EX_JS(sURI, TryCount)
-            Return
-          End If
-        End If
-      End If
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
     If Not Response.Contains("webClient:{") Then
       RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
       Return
@@ -1353,29 +1325,10 @@ Public Class localRestrictionTracker
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, 0, sURL)
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
-    EX_OAuth2_Response(responseData, responseURI, 0)
+    EX_OAuth2_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_OAuth2_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+  Private Sub EX_OAuth2_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("location.href") Then
-      TryCount += 1
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
-      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-      If sRedirURI = "/" Then
-        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-      ElseIf sRedirURI.StartsWith("/") Then
-        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-      End If
-      MakeSocket(True)
-      Dim response2Data As String = Nothing
-      Dim response2URI As Uri = Nothing
-      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, TryCount, sRedirURI)
-      SendGET(New Uri(sRedirURI), response2URI, response2Data)
-      If ClosingTime Then Return
-      EX_OAuth2_Response(response2Data, response2URI, TryCount)
-      Return
-    End If
     Dim sToken As String = ResponseURI.Query
     If String.IsNullOrEmpty(sToken) Then
       RaiseError("Could not log in.", "EX OAuth2 Response", Response, ResponseURI)
@@ -1510,29 +1463,29 @@ Public Class localRestrictionTracker
         Next
       End If
       For Each el In exJS.Serial(0).SubElements
-          If Not el.Type = JSONReader.ElementType.Array Then Continue For
-          If el.Key = "errors" Then
-            Dim sMsg As String = ""
-            For Each er In el.Collection
-              If Not er.Type = JSONReader.ElementType.Group Then Continue For
-              For Each eg In er.SubElements
-                If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
-                If Not eg.Key = "message" Then Continue For
-                sMsg &= eg.Value & " - "
-              Next
+        If Not el.Type = JSONReader.ElementType.Array Then Continue For
+        If el.Key = "errors" Then
+          Dim sMsg As String = ""
+          For Each er In el.Collection
+            If Not er.Type = JSONReader.ElementType.Group Then Continue For
+            For Each eg In er.SubElements
+              If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
+              If Not eg.Key = "message" Then Continue For
+              sMsg &= eg.Value & " - "
             Next
-            If Not String.IsNullOrEmpty(sMsg) Then
-              sMsg = sMsg.Substring(0, sMsg.Length - 3)
-              RaiseError("Usage Failed: " & sMsg)
-              Return
-            End If
-            Exit For
+          Next
+          If Not String.IsNullOrEmpty(sMsg) Then
+            sMsg = sMsg.Substring(0, sMsg.Length - 3)
+            RaiseError("Usage Failed: " & sMsg)
+            Return
           End If
-        Next
-        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-        Return
-      End If
-      Dim sDown As String = String.Empty, sDownT As String = String.Empty
+          Exit For
+        End If
+      Next
+      RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+      Return
+    End If
+    Dim sDown As String = String.Empty, sDownT As String = String.Empty
     Dim sDownSz As String = "B", sDownSzT As String = "B"
     For Each el In jUsage.SubElements
       If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
