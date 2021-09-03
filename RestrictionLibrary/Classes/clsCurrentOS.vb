@@ -81,6 +81,7 @@ Public Class CurrentOS
       m_Name = m_Name.Replace("  ", " ")
       m_Name = m_Name.Replace(" )", ")")
       m_Name = m_Name.Trim()
+      m_Name = m_Name.Replace("NT 11.", "11 %bit 11.")
       m_Name = m_Name.Replace("NT 10.", "10 %bit 10.")
       m_Name = m_Name.Replace("NT 6.3", "8.1 %bit 6.3")
       m_Name = m_Name.Replace("NT 6.2", "8 %bit 6.2")
