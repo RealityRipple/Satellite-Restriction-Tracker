@@ -86,7 +86,7 @@ Public Class localRestrictionTracker
     ''' </summary>
     LoadHome
     ''' <summary>
-    ''' AJAX data off the home page is being loaded. Only Exede uses this step.
+    ''' The Code parameter from the home page URL is being loaded. Only Exede uses this step.
     ''' </summary>
     LoadAJAX
     ''' <summary>
@@ -1062,267 +1062,42 @@ Public Class localRestrictionTracker
       If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
       If el.Key = "successUrl" Then
         Dim sURL As String = el.Value
-        EX_AuthN(sURL, 0)
+        EX_AuthN(sURL)
         Return
       End If
     Next
     RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
   End Sub
-  Private Sub EX_AuthN(sURL As String, TryCount As Integer)
+  Private Sub EX_AuthN(sURL As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, TryCount, sURL)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, 0, sURL)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
-    EX_AuthN_Response(responseData, responseURI, TryCount)
+    EX_AuthN_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_AuthN_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
+  Private Sub EX_AuthN_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("location.href") Then
-      TryCount += 1
-      If TryCount > 15 Then
-        RaiseError("Login Failed: Server redirected too many times.")
-        Return
-      End If
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
-      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
+    If Response.ToLower.Contains("window.location.assign(") Then
+      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("window.location.assign("))
+      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("""") + 1)
+      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf(""""))
       If sRedirURI = "/" Then
         sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
       ElseIf sRedirURI.StartsWith("/") Then
         sRedirURI = "https://" & ResponseURI.Host & sRedirURI
       End If
-      EX_AuthN(sRedirURI, TryCount)
+      EX_OAuth2(sRedirURI)
       Return
     End If
-    If Not Response.Contains("<form action=""") Then
-      RaiseError("Login Failed: Could not parse AuthN response.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sURL As String = Response.Substring(Response.IndexOf("<form action="""))
-    sURL = sURL.Substring(sURL.IndexOf("action=""") + 8)
-    If Not sURL.Contains(""" method=""post"">") Then
-      RaiseError("Login Failed: POST URL value cut off. Please try again.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    sURL = sURL.Substring(0, sURL.IndexOf(""" method=""post"">"))
-    sURL = srlFunctions.HexDecode(sURL)
-    If Not Response.Contains("<input type=""hidden"" name=""SAMLRequest"" value=""") Then
-      RaiseError("Login Failed: SAML Request value not found.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sSAMLRequest As String = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLRequest"" value="""))
-    sSAMLRequest = sSAMLRequest.Substring(sSAMLRequest.IndexOf("value=""") + 7)
-    If Not sSAMLRequest.Contains("""/>") Then
-      RaiseError("Login Failed: SAML Request value cut off. Please try again.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    sSAMLRequest = sSAMLRequest.Substring(0, sSAMLRequest.IndexOf("""/>"))
-    sSAMLRequest = srlFunctions.HexDecode(sSAMLRequest)
-    If Not Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
-      RaiseError("Login Failed: Relay State value not found.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sRelay As String = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
-    sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-    If Not sRelay.Contains("""/>") Then
-      RaiseError("Login Failed: Relay State value cut off. Please try again.", "EX AuthN Response", Response, ResponseURI)
-      Return
-    End If
-    sRelay = sRelay.Substring(0, sRelay.IndexOf("""/>"))
-    sRelay = srlFunctions.HexDecode(sRelay)
-    EX_SAML(sURL, sSAMLRequest, sRelay)
-  End Sub
-  Private Sub EX_SAML(sURL As String, sSAMLRequest As String, sRelayState As String)
-    MakeSocket(True)
-    Dim sSend As String = "RelayState=" & srlFunctions.PercentEncode(sRelayState) & "&"
-    sSend &= "SAMLRequest=" & srlFunctions.PercentEncode(sSAMLRequest)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 1, 0, sURL)
-    SendPOST(New Uri(sURL), sSend, responseURI, responseData)
-    If ClosingTime Then Return
-    EX_SAML_Response(responseData, responseURI, 0)
-  End Sub
-  Private Sub EX_SAML_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("location.href") Then
-      TryCount += 1
-      If TryCount > 15 Then
-        RaiseError("Login Failed: Server redirected too many times.")
-        Return
-      End If
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href"))
-      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-      If sRedirURI = "/" Then
-        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-      ElseIf sRedirURI.StartsWith("/") Then
-        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-      End If
-      MakeSocket(True)
-      Dim response2Data As String = Nothing
-      Dim response2URI As Uri = Nothing
-      BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 1, TryCount, sRedirURI)
-      SendGET(New Uri(sRedirURI), response2URI, response2Data)
-      If ClosingTime Then Return
-      EX_SAML_Response(response2Data, response2URI, TryCount)
-      Return
-    End If
-    If Not Response.Contains("<form method=""post"" action=""") Then
-      RaiseError("Login Failed: Could not parse SAML response.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sURL As String = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
-    sURL = sURL.Substring(sURL.IndexOf("action=""") + 8)
-    If Not sURL.Contains(""">") Then
-      RaiseError("Login Failed: POST URL value cut off. Please try again.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    sURL = sURL.Substring(0, sURL.IndexOf(""">"))
-    sURL = srlFunctions.HexDecode(sURL)
-    If Not Response.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
-      RaiseError("Login Failed: SAML Response value not found.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sSAMLResponse As String = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
-    sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
-    If Not sSAMLResponse.Contains(""" />") Then
-      RaiseError("Login Failed: SAML Response value cut off. Please try again.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
-    sSAMLResponse = srlFunctions.HexDecode(sSAMLResponse)
-    If Not Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
-      RaiseError("Login Failed: Relay State value not found.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    Dim sRelay As String = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
-    sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-    If Not sRelay.Contains(""" />") Then
-      RaiseError("Login Failed: Relay State value cut off. Please try again.", "EX SAML Response", Response, ResponseURI)
-      Return
-    End If
-    sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
-    sRelay = srlFunctions.HexDecode(sRelay)
-    EX_Auth(sURL, sSAMLResponse, sRelay)
-  End Sub
-  Private Sub EX_Auth(sURL As String, sSAMLResponse As String, sRelayState As String)
-    MakeSocket(True)
-    Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(sSAMLResponse) & "&"
-    sSend &= "RelayState=" & srlFunctions.PercentEncode(sRelayState)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 2, 0, sURL)
-    SendPOST(New Uri(sURL), sSend, responseURI, responseData)
-    If ClosingTime Then Return
-    EX_Auth_Response(responseData, responseURI)
-  End Sub
-  Private Sub EX_Auth_Response(Response As String, ResponseURI As Uri)
-    'DOES NOT MATTER. MOVE ON TO DASHBOARD
-    Dim sURL As String = "https://account.viasat.com/dashboard"
-    EX_Dash(sURL, 0)
-  End Sub
-  Private Sub EX_Dash(sURL As String, TryCount As Integer)
-    MakeSocket(True)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 0, TryCount, sURL)
-    SendGET(New Uri(sURL), responseURI, responseData)
-    If ClosingTime Then Return
-    EX_Dash_Response(responseData, responseURI, TryCount)
-  End Sub
-  Private Sub EX_Dash_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("location.href =") Then
-      TryCount += 1
-      If TryCount > 15 Then
-        RaiseError("Login Failed: Server redirected too many times.")
-        Return
-      End If
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("location.href ="))
-      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-      If sRedirURI = "/" Then
-        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-      ElseIf sRedirURI.StartsWith("/") Then
-        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-      End If
-      EX_Dash(sRedirURI, TryCount)
-      Return
-    End If
-    If Response.Contains("<script src=""/static/") Then
-      Dim sScripts As String() = Split(Response, "<script src=""/static/")
-      If sScripts.Length = 3 Then
-        Dim jsA As String = sScripts(1).Substring(0, sScripts(1).IndexOf(""""))
-        Dim jsB As String = sScripts(2).Substring(0, sScripts(2).IndexOf(""""))
-        If jsA.Contains(".") Then
-          If jsA.Substring(0, jsA.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsA
-            EX_JS(sURI, 0)
-            Return
-          End If
-        End If
-        If jsB.Contains(".") Then
-          If jsB.Substring(0, jsB.IndexOf(".")) = "main" Then
-            Dim sURI As String = "https://" & ResponseURI.Host & "/static/" & jsB
-            EX_JS(sURI, 0)
-            Return
-          End If
-        End If
-      End If
-    End If
-    RaiseError("Login Failed: Could not understand response.", "EX Dash Response", Response, ResponseURI)
-  End Sub
-  Private Sub EX_JS(sURL As String, TryCount As Integer)
-    MakeSocket(True)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 1, TryCount, sURL)
-    SendGET(New Uri(sURL), responseURI, responseData)
-    If ClosingTime Then Return
-    EX_JS_Response(responseData, responseURI, TryCount)
-  End Sub
-  Private Sub EX_JS_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-    If Not Response.Contains("webClient:{") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    Dim pt As String = Response.Substring(Response.IndexOf("webClient:{") + 11)
-    If Not pt.Contains("}") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    If Not pt.Contains("id:""") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    Dim CliID As String = pt.Substring(pt.IndexOf("id:""") + 4)
-    If Not CliID.Contains("""") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    CliID = CliID.Substring(0, CliID.IndexOf(""""))
-
-    If Not pt.Contains("redirectUri:""") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    Dim CliURI As String = pt.Substring(pt.IndexOf("redirectUri:""") + 13)
-    If Not CliURI.Contains("""") Then
-      RaiseError("Login Failed: Could not understand response.", "EX JS Response", Response, ResponseURI)
-      Return
-    End If
-    CliURI = CliURI.Substring(0, CliURI.IndexOf(""""))
-    Dim sURL As String = "https://mysso.my.viasat.com/federation/oauth2/authorize?client_id=" & srlFunctions.PercentEncode(CliID) & "&response_type=code&redirect_uri=" & srlFunctions.PercentEncode(CliURI) & "&scope=uid"
-    EX_OAuth2(sURL)
+    RaiseError("Login Failed: Could not parse AuthN response.", "EX AuthN Response", Response, ResponseURI)
   End Sub
   Private Sub EX_OAuth2(sURL As String)
     MakeSocket(True)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 2, 0, sURL)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 0, 0, sURL)
     SendGET(New Uri(sURL), responseURI, responseData)
     If ClosingTime Then Return
     EX_OAuth2_Response(responseData, responseURI)
