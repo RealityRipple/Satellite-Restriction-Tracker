@@ -249,7 +249,10 @@
     Try
       Return HandleWebResponse(request, MyBase.GetWebResponse(request))
     Catch ex As Net.WebException
-      If c_ErrorBypass Then Return HandleWebResponse(request, ex.Response)
+      If c_ErrorBypass Then
+        Dim errResponse As System.Net.WebResponse = HandleWebResponse(request, ex.Response)
+        If errResponse IsNot Nothing Then Return errResponse
+      End If
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       If c_Events Then
