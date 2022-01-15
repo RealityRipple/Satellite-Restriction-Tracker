@@ -1325,7 +1325,7 @@ End Class
 ''' <summary>
 ''' Specifies the security protocols that are supported by the Schannel security package.
 ''' </summary>
-''' <remarks>This contains the additional TLS 1.1 and 1.2 standards lacking in <see cref="System.Net.SecurityProtocolType" />, which require newer .NET Framework versions.</remarks>
+''' <remarks>This contains the additional TLS 1.1, 1.2, and 1.3 standards lacking in <see cref="System.Net.SecurityProtocolType" />, which require newer .NET Framework versions.</remarks>
 Public Enum SecurityProtocolTypeEx As Integer
   ''' <summary>
   ''' Specifies no security protocol is to be used.
@@ -1348,4 +1348,8 @@ Public Enum SecurityProtocolTypeEx As Integer
   ''' Specifies the Transport Layer Security (TLS) 1.2 security protocol.
   ''' </summary>
   Tls12 = &HC00
+  ''' <summary>
+  ''' Specifies the Transport Layer Security (TLS) 1.3 security protocol.
+  ''' </summary>
+  Tls13 = &H3000
 End Enum

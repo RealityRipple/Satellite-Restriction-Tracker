@@ -639,7 +639,7 @@ Class AppSettings
       End If
       Dim xProtocol As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Protocol")
       If xProtocol Is Nothing Then
-        m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+        m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
       Else
         Try
           m_SecurProtocol = SecurityProtocolTypeEx.None
@@ -647,7 +647,8 @@ Class AppSettings
           If xProtocol.Element("value").Value.Contains("TLS10") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls10
           If xProtocol.Element("value").Value.Contains("TLS11") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11
           If xProtocol.Element("value").Value.Contains("TLS12") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls12
-          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+          If xProtocol.Element("value").Value.Contains("TLS13") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls13
+          If xProtocol.Element("value").Value.Contains("TLS") And Not xProtocol.Element("value").Value.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
         Catch ex As Exception
           m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
         End Try
@@ -1105,7 +1106,7 @@ Class AppSettings
     m_AutoHide = True
     m_TLSProxy = False
     m_ProxySetting = "None"
-    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     m_SecurEnforced = False
     m_NetTest = Nothing
     m_AJAXShort = Nothing

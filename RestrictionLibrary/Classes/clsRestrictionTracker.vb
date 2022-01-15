@@ -1295,7 +1295,7 @@ Public Class localRestrictionTracker
 #Region "ER"
   Private Sub ER_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If Response.Contains("To access this website, update your web browser Or upgrade your operating system to support TLS 1.1 Or TLS 1.2.") Or Response.Contains("Stronger security Is required") Or Response = "Error: The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration." Then
-      If (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Or (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Then
+      If (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Or (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Or (c_Protocol And SecurityProtocolTypeEx.Tls13) = SecurityProtocolTypeEx.Tls13 Then
         If c_TLSProxy Then
           RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "TLS Proxy failed to be of any use!"))
           Return

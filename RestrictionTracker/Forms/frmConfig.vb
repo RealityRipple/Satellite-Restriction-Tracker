@@ -177,8 +177,10 @@
     chkNetworkProtocolTLS10.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10
     chkNetworkProtocolTLS11.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11
     chkNetworkProtocolTLS12.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12
+    chkNetworkProtocolTLS13.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls13) = SecurityProtocolTypeEx.Tls13
     Dim useTLSProxy As Boolean = False
     Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
+    Dim cRel As UInt32 = srlFunctions.GetCLRRelease()
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
     Catch ex As Exception
@@ -202,6 +204,11 @@
       End Try
       Try
         Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls12
+      Catch ex As Exception
+        useTLSProxy = True
+      End Try
+      Try
+        Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls13
       Catch ex As Exception
         useTLSProxy = True
       End Try
@@ -323,6 +330,9 @@
       chkNetworkProtocolTLS12.Checked = False
       chkNetworkProtocolTLS12.Enabled = False
       ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
+      chkNetworkProtocolTLS13.Checked = False
+      chkNetworkProtocolTLS13.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS13, "TLS 1.3 is disabled when using the Remote Usage Service.")
       lblRetries1.Enabled = False
       txtRetries.Enabled = False
       lblRetries2.Enabled = False
@@ -354,6 +364,7 @@
     Dim canTLS10 As Boolean = True
     Dim canTLS11 As Boolean = True
     Dim canTLS12 As Boolean = True
+    Dim canTLS13 As Boolean = True
     Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
@@ -375,10 +386,18 @@
     Catch ex As Exception
       canTLS12 = False
     End Try
+    Try
+      Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Tls13
+    Catch ex As Exception
+      canTLS13 = False
+    End Try
     If (Environment.OSVersion.Version.Major < 6) OrElse
       (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
       canTLS11 = False
       canTLS12 = False
+    End If
+    If (Environment.OSVersion.Version.Major < 10) Then
+      canTLS13 = False
     End If
     Net.ServicePointManager.SecurityProtocol = myProtocol
     If canSSL3 Then
@@ -414,7 +433,7 @@
     End If
     If canTLS12 Then
       chkNetworkProtocolTLS12.Enabled = True
-      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
+      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the newer, safer TLS 1.2 protocol.")
     Else
       chkNetworkProtocolTLS12.Checked = False
       chkNetworkProtocolTLS12.Enabled = False
@@ -425,6 +444,21 @@
         ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your version of the .NET Framework does not allow TLS 1.2 connections. Please update to .NET 4.5 or newer.")
       Else
         ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Your Operating System or version of the .NET Framework does not allow TLS 1.2 connections. Try repairing the .NET Framework.")
+      End If
+    End If
+    If canTLS13 Then
+      chkNetworkProtocolTLS13.Enabled = True
+      ttConfig.SetToolTip(chkNetworkProtocolTLS13, "Check this box to allow use of the latest TLS 1.3 protocol.")
+    Else
+      chkNetworkProtocolTLS13.Checked = False
+      chkNetworkProtocolTLS13.Enabled = False
+      Dim cRel As UInt32 = srlFunctions.GetCLRRelease()
+      If (Environment.OSVersion.Version.Major < 10) Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS13, "Your Operating System does not allow TLS 1.3 connections. Enable the TLS Proxy if you need TLS 1.3.")
+      ElseIf Environment.Version.Revision = 42000 And cRel < &H80000 Then
+        ttConfig.SetToolTip(chkNetworkProtocolTLS13, "Your version of the .NET Framework does not allow TLS 1.3 connections. Please update to .NET 4.8 or newer.")
+      Else
+        ttConfig.SetToolTip(chkNetworkProtocolTLS13, "Your Operating System or version of the .NET Framework does not allow TLS 1.3 connections.")
       End If
     End If
   End Sub
@@ -532,7 +566,7 @@
                                                                              chkStartUp.CheckedChanged, chkAutoHide.CheckedChanged,
                                                                              txtOverSize.KeyPress, txtOverSize.KeyUp, txtOverSize.Scroll, txtOverSize.ValueChanged,
                                                                              txtOverTime.KeyPress, txtOverTime.KeyUp, txtOverTime.Scroll, txtOverTime.ValueChanged,
-                                                                             chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged,
+                                                                             chkNetworkProtocolSSL3.CheckedChanged, chkNetworkProtocolTLS10.CheckedChanged, chkNetworkProtocolTLS11.CheckedChanged, chkNetworkProtocolTLS12.CheckedChanged, chkNetworkProtocolTLS13.CheckedChanged,
                                                                              txtProxyAddress.TextChanged,
                                                                              txtProxyPort.KeyPress, txtProxyPort.KeyUp, txtProxyPort.Scroll, txtProxyPort.ValueChanged,
                                                                              txtProxyUser.TextChanged,
@@ -1331,9 +1365,11 @@
       cmbProvider.Focus()
       Return
     End If
-    If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked) Then
+    If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked Or chkNetworkProtocolTLS13.Checked) Then
       MsgDlg(Me, "Please select at least one Security Protocol type to connect with before saving the Configuration.", "Please select your Security Protocol.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
-      If chkNetworkProtocolTLS12.CanFocus Then
+      If chkNetworkProtocolTLS13.CanFocus Then
+        chkNetworkProtocolTLS13.Focus()
+      ElseIf chkNetworkProtocolTLS12.CanFocus Then
         chkNetworkProtocolTLS12.Focus()
       ElseIf chkNetworkProtocolTLS11.CanFocus Then
         chkNetworkProtocolTLS11.Focus()
@@ -1504,6 +1540,7 @@
     If chkNetworkProtocolTLS10.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls10
     If chkNetworkProtocolTLS11.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls11
     If chkNetworkProtocolTLS12.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls12
+    If chkNetworkProtocolTLS13.Checked Then mySettings.SecurityProtocol = mySettings.SecurityProtocol Or SecurityProtocolTypeEx.Tls13
     mySettings.SecurityEnforced = chkNetworkSecurityEnforce.Checked
     Dim sNetTestIco As String = IO.Path.Combine(LocalAppDataDirectory, "netTest.png")
     Try
@@ -1848,6 +1885,7 @@
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10) = (Not chkNetworkProtocolTLS10.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11) = (Not chkNetworkProtocolTLS11.Checked) Then Return True
     If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12) = (Not chkNetworkProtocolTLS12.Checked) Then Return True
+    If ((mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls13) = SecurityProtocolTypeEx.Tls13) = (Not chkNetworkProtocolTLS13.Checked) Then Return True
     If Not mySettings.SecurityEnforced = chkNetworkSecurityEnforce.Checked Then Return True
     If optNetTestNone.Checked Then
       If Not String.IsNullOrEmpty(mySettings.NetTestURL) Then Return True

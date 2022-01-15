@@ -176,7 +176,7 @@ Public Class frmWizard
         newSettings.Overuse = 0
         newSettings.Overtime = 15
       End If
-      newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+      newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
       If NeedsTLSProxy Then newSettings.TLSProxy = True
       newSettings.Save()
       If newSettings.Service Then
@@ -678,7 +678,7 @@ Public Class frmWizard
     newSettings.PassSalt = Convert.ToBase64String(newSalt)
     newSettings.Service = False
     newSettings.RemoteKey = Nothing
-    newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     If NeedsTLSProxy Then newSettings.TLSProxy = True
     newSettings.Save()
     newSettings = Nothing

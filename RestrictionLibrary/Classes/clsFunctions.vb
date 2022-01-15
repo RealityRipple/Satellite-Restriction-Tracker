@@ -883,6 +883,22 @@ Public Class srlFunctions
     Return isEqual
   End Function
   ''' <summary>
+  ''' Registry-stored Release number.
+  ''' </summary>
+  Public Shared Function GetCLRRelease() As UInt32
+    Dim CLRRelease As UInt32 = 0
+    Try
+      If My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Full") IsNot Nothing Then
+        CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").GetValue("Release")
+      ElseIf My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Client") IsNot Nothing Then
+        CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client").GetValue("Release")
+      End If
+    Catch ex As Exception
+      CLRRelease = 0
+    End Try
+    Return CLRRelease
+  End Function
+  ''' <summary>
   ''' Common Language Runtime exact version number.
   ''' </summary>
   Public Shared Function GetCLRVersion() As String
@@ -893,19 +909,9 @@ Public Class srlFunctions
     Catch ex As Exception
     End Try
     If tMONO Is Nothing Then
-      Dim CLRRelease As String = "0"
-      Try
-        If My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Full") IsNot Nothing Then
-          CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").GetValue("Release")
-        ElseIf My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Client") IsNot Nothing Then
-          CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client").GetValue("Release")
-        End If
-      Catch ex As Exception
-        CLRRelease = "0"
-      End Try
-      If String.IsNullOrEmpty(CLRRelease) Then CLRRelease = "0"
+      Dim CLRRelease As UInt32 = GetCLRRelease()
       sCLR = Environment.Version.ToString
-      If Not CLRRelease = "0" Then sCLR &= "_" & CLRRelease
+      If Not CLRRelease = 0 Then sCLR &= "_" & Trim(CStr(CLRRelease))
     Else
       Dim myMethods() As Reflection.MethodInfo = tMONO.GetMethods(Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Static)
       For Each mInfo As Reflection.MethodInfo In myMethods

@@ -74,7 +74,8 @@ Class AppSettings
                     If xValue.Contains("TLS10") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls10
                     If xValue.Contains("TLS11") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11
                     If xValue.Contains("TLS12") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls12
-                    If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+                    If xValue.Contains("TLS13") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls13
+                    If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
                   ElseIf xName.CompareTo("EnforcedSecurity") = 0 Then
                     m_SecurEnforced = (xValue = "True")
                   ElseIf xName.CompareTo("AJAXOrder") = 0 Then
@@ -125,7 +126,7 @@ Class AppSettings
     m_Timeout = 120
     m_TLSProxy = False
     m_ProxySetting = "None"
-    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12
+    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     m_SecurEnforced = False
     m_AJAXFull = Nothing
     m_AJAXShort = Nothing
