@@ -191,10 +191,9 @@
     Catch ex As Exception
       useTLSProxy = True
     End Try
-    If (Environment.OSVersion.Version.Major < 6) OrElse
-       (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0) Then
+    If (Environment.OSVersion.Version.Major < 10) Then
       useTLSProxy = True
-    ElseIf Environment.Version.Revision < 17929 Then
+    ElseIf Environment.Version.Revision = 42000 And cRel < &H80000 Then
       useTLSProxy = True
     Else
       Try
