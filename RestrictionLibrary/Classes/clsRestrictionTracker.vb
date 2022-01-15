@@ -2408,16 +2408,6 @@ Public Class localRestrictionTracker
     If Not ManualRedirect Then wsSocket.ManualRedirect = False
   End Sub
   Private Sub SendTLSProxy(SendURL As Uri, SendData As String, ByRef ReturnURL As Uri, ByRef ReturnData As String, Optional Headers As Net.WebHeaderCollection = Nothing)
-    Dim sProtocol As String = "default"
-    If (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Then
-      sProtocol = "tls12"
-    ElseIf (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Then
-      sProtocol = "tls11"
-    ElseIf (c_Protocol And SecurityProtocolTypeEx.Tls10) = SecurityProtocolTypeEx.Tls10 Then
-      sProtocol = "tls10"
-    ElseIf (c_Protocol And SecurityProtocolTypeEx.Ssl3) = SecurityProtocolTypeEx.Ssl3 Then
-      sProtocol = "ssl3"
-    End If
     Dim sFields As String = Nothing
     Dim cl As Net.CookieCollection = Nothing
     For Each cField As Reflection.FieldInfo In c_Jar.GetType().GetFields(Reflection.BindingFlags.Instance Or Reflection.BindingFlags.NonPublic)
@@ -2466,7 +2456,6 @@ Public Class localRestrictionTracker
       Next
     End If
     Dim sPOST As String = Nothing
-    sPOST &= "protocol=" & srlFunctions.PercentEncode(ToBase64(sProtocol))
     sPOST &= "&url=" & srlFunctions.PercentEncode(ToBase64(SendURL.OriginalString))
     If SendData IsNot Nothing Then sPOST &= "&post=" & srlFunctions.PercentEncode(ToBase64(SendData))
     If Not String.IsNullOrEmpty(sCookieData) Then

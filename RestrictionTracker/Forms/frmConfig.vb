@@ -347,14 +347,16 @@
     If chkTLSProxy.Checked Then
       chkNetworkSecurityEnforce.Enabled = False
       ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The server's certificate will be validated at the discretion of the TLS Proxy.")
-      chkNetworkProtocolSSL3.Enabled = True
-      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to attacks.")
-      chkNetworkProtocolTLS10.Enabled = True
-      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerable to attacks.")
-      chkNetworkProtocolTLS11.Enabled = True
-      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
-      chkNetworkProtocolTLS12.Enabled = True
-      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "Check this box to allow use of the latest TLS 1.2 protocol.")
+      chkNetworkProtocolSSL3.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "SSL 3.0 is disabled when using the TLS Proxy.")
+      chkNetworkProtocolTLS10.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "TLS 1.0 is enabled when using the TLS Proxy.")
+      chkNetworkProtocolTLS11.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "TLS 1.1 is enabled when using the TLS Proxy.")
+      chkNetworkProtocolTLS12.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is enabled when using the TLS Proxy.")
+      chkNetworkProtocolTLS13.Enabled = False
+      ttConfig.SetToolTip(chkNetworkProtocolTLS13, "TLS 1.3 is enabled when using the TLS Proxy.")
       Return
     End If
     chkNetworkSecurityEnforce.Enabled = True
