@@ -1061,37 +1061,16 @@ Public Class localRestrictionTracker
     For Each el In exJS.Serial(0).SubElements
       If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
       If el.Key = "successUrl" Then
-        Dim sURL As String = el.Value
-        EX_AuthN(sURL)
+        Dim sURL As String = "https://mysso.my.viasat.com/federation/oauth2/authorize?client_id=my-viasat-web&response_type=code&redirect_uri=" & el.Value & "/callback&scope=uid"
+        EX_OAuth2(sURL)
         Return
       End If
     Next
-    RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
-  End Sub
-  Private Sub EX_AuthN(sURL As String)
-    MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, 0, sURL)
-    Dim responseData As String = Nothing
-    Dim responseURI As Uri = Nothing
-    SendGET(New Uri(sURL), responseURI, responseData)
-    If ClosingTime Then Return
-    EX_AuthN_Response(responseData, responseURI)
-  End Sub
-  Private Sub EX_AuthN_Response(Response As String, ResponseURI As Uri)
-    If CheckForErrors(Response, ResponseURI) Then Return
-    If Response.ToLower.Contains("window.location.assign(") Then
-      Dim sRedirURI As String = Response.Substring(Response.ToLower.IndexOf("window.location.assign("))
-      sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("""") + 1)
-      sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf(""""))
-      If sRedirURI = "/" Then
-        sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-      ElseIf sRedirURI.StartsWith("/") Then
-        sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-      End If
-      EX_OAuth2(sRedirURI)
+    If Response.ToLower.Contains("your username and/or password are incorrect.") Then
+      RaiseError("Login Failed: Incorrect Password")
       Return
     End If
-    RaiseError("Login Failed: Could not parse AuthN response.", "EX AuthN Response", Response, ResponseURI)
+    RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
   End Sub
   Private Sub EX_OAuth2(sURL As String)
     MakeSocket(True)
