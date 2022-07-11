@@ -16,6 +16,7 @@
     c_KeepAlive = True
     c_ManualRedirect = True
     c_ResponseURI = Nothing
+    c_ResponseCode = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   ''' <summary>
@@ -33,6 +34,7 @@
     c_KeepAlive = True
     c_ManualRedirect = True
     c_ResponseURI = Nothing
+    c_ResponseCode = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   ''' <summary>
@@ -94,6 +96,16 @@
   Public ReadOnly Property ResponseURI As Uri
     Get
       Return c_ResponseURI
+    End Get
+  End Property
+  Private c_ResponseCode As Net.HttpStatusCode
+  ''' <summary>
+  ''' The <see cref="Net.HttpStatusCode" /> of the last <see cref="GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="GetWebResponse" /> event occurs.</returns>
+  Public ReadOnly Property ResponseCode As Net.HttpStatusCode
+    Get
+      Return c_ResponseCode
     End Get
   End Property
   Private c_Timeout As Integer
@@ -312,6 +324,7 @@
       End If
       m_Result = response
       c_ResponseURI = response.ResponseUri
+      c_ResponseCode = CType(response, Net.HttpWebResponse).StatusCode
       Return response
     Catch ex As Net.WebException
       Return HandleWebResponse(request, ex.Response)
@@ -592,6 +605,16 @@ Public Class WebClientEx
       Return c_ResponseURI
     End Get
   End Property
+  Private c_ResponseCode As Net.HttpStatusCode
+  ''' <summary>
+  ''' The <see cref="Net.HttpStatusCode" /> of the last <see cref="WebClientCore.GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="WebClientCore.GetWebResponse" /> event occurs.</returns>
+  Public ReadOnly Property ResponseCode As Net.HttpStatusCode
+    Get
+      Return c_ResponseCode
+    End Get
+  End Property
   Private c_ErrorBypass As Boolean
   ''' <summary>
   ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 400 Status Code set of errors.
@@ -742,6 +765,7 @@ Public Class WebClientEx
           sRet = wsDownload.DownloadString(uriAddr)
           c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
+          c_ResponseCode = wsDownload.ResponseCode
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
@@ -749,6 +773,7 @@ Public Class WebClientEx
             AsyncDownloadString({RunName, address, iteration + 1})
           Else
             c_ResponseURI = wsDownload.ResponseURI
+            c_ResponseCode = wsDownload.ResponseCode
             DownloadResults(RunName) = "Error: " & sNetErr
           End If
           Return
@@ -831,6 +856,7 @@ Public Class WebClientEx
           sRet = wsDownload.DownloadString(address)
           c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
+          c_ResponseCode = wsDownload.ResponseCode
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
@@ -838,6 +864,7 @@ Public Class WebClientEx
             AsyncDownloadStringWithCallback({callback, aState, address, iteration + 1})
           Else
             c_ResponseURI = wsDownload.ResponseURI
+            c_ResponseCode = wsDownload.ResponseCode
             callback(aState, "Error: " & sNetErr)
           End If
           Return
@@ -924,6 +951,7 @@ Public Class WebClientEx
             sRet = wsUpload.UploadString(uriAddr, method, data)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -931,6 +959,7 @@ Public Class WebClientEx
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -948,6 +977,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(uriAddr)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
             '
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
@@ -956,6 +986,7 @@ Public Class WebClientEx
               AsyncUploadString({RunName, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1050,6 +1081,7 @@ Public Class WebClientEx
             sRet = wsUpload.UploadString(address, method, data)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1057,6 +1089,7 @@ Public Class WebClientEx
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1066,6 +1099,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(address)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1073,6 +1107,7 @@ Public Class WebClientEx
               AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1137,6 +1172,7 @@ Public Class WebClientEx
             bRet = wsUpload.UploadValues(uriAddr, method, data)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1144,6 +1180,7 @@ Public Class WebClientEx
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1161,6 +1198,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(uriAddr)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1168,6 +1206,7 @@ Public Class WebClientEx
               AsyncUploadValues({RunName, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1255,6 +1294,7 @@ Public Class WebClientEx
             bRet = wsUpload.UploadValues(address, method, data)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1262,6 +1302,7 @@ Public Class WebClientEx
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1272,6 +1313,7 @@ Public Class WebClientEx
             sRet = wsUpload.DownloadString(address)
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1279,6 +1321,7 @@ Public Class WebClientEx
               AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
             Else
               c_ResponseURI = wsUpload.ResponseURI
+              c_ResponseCode = wsUpload.ResponseCode
               callback(aState, "Error: " & sNetErr)
             End If
             Return
