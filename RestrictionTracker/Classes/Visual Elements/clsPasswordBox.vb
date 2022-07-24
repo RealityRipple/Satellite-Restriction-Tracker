@@ -9,6 +9,7 @@
     Active
   End Enum
   Private WithEvents passButton As PictureBox
+  Private c_ShowContents As Boolean
   Private c_PassState As MouseState
   Private PassChar As String
   Public Sub New()
@@ -22,14 +23,32 @@
     Me.Controls.Add(passButton)
     passButton.Width = passButton.Height
   End Sub
-  Public ReadOnly Property Button
+  Public ReadOnly Property Button As PictureBox
     Get
       Return passButton
     End Get
   End Property
+  Public Property ShowContents As Boolean
+    Get
+      Return c_ShowContents
+    End Get
+    Set(value As Boolean)
+      c_ShowContents = value
+      If c_ShowContents Then
+        MyBase.PasswordChar = Nothing
+      Else
+        MyBase.PasswordChar = PassChar
+      End If
+      SetPassImage(MouseState.Normal)
+    End Set
+  End Property
   Protected Overrides Sub OnEnabledChanged(e As System.EventArgs)
     MyBase.OnEnabledChanged(e)
     SetPassImage(c_PassState)
+  End Sub
+  Protected Overrides Sub OnKeyUp(e As KeyEventArgs)
+    If e.Alt And e.KeyCode = Keys.F8 Then ShowContents = Not ShowContents
+    MyBase.OnKeyUp(e)
   End Sub
   Private Sub passButton_MouseEnter(sender As Object, e As System.EventArgs) Handles passButton.MouseEnter
     SetPassImage(MouseState.Hover)
@@ -37,21 +56,30 @@
   Private Sub passButton_MouseLeave(sender As Object, e As System.EventArgs) Handles passButton.MouseLeave
     SetPassImage(MouseState.Normal)
   End Sub
+  Private Sub passButton_MouseMove(sender As Object, e As MouseEventArgs) Handles passButton.MouseMove
+    If e.Button = Windows.Forms.MouseButtons.Left Then
+      If passButton.DisplayRectangle.Contains(e.Location) Then
+        SetPassImage(MouseState.Active)
+      Else
+        SetPassImage(MouseState.Normal)
+      End If
+    End If
+  End Sub
   Private Sub passButton_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles passButton.MouseDown
     If e.Button = Windows.Forms.MouseButtons.Left Then
       SetPassImage(MouseState.Active)
-      MyBase.PasswordChar = Nothing
+      'MyBase.PasswordChar = PassChar
       SetMargin()
     End If
   End Sub
-  Private Sub passButton_MouseCaptureChanged(sender As Object, e As System.EventArgs) Handles passButton.MouseCaptureChanged
-    SetPassImage(MouseState.Normal)
-    MyBase.PasswordChar = PassChar
-    SetMargin()
-  End Sub
   Private Sub passButton_MouseUp(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles passButton.MouseUp
-    If e.Button = Windows.Forms.MouseButtons.Left Then
-      MyBase.PasswordChar = PassChar
+    If e.Button = Windows.Forms.MouseButtons.Left And passButton.DisplayRectangle.Contains(e.Location) Then
+      c_ShowContents = Not c_ShowContents
+      If c_ShowContents Then
+        MyBase.PasswordChar = Nothing
+      Else
+        MyBase.PasswordChar = PassChar
+      End If
       If passButton.DisplayRectangle.Contains(e.Location) Then
         SetPassImage(MouseState.Hover)
       Else
@@ -84,20 +112,37 @@
     Dim FG As Color = Color.Black
     Dim BG As Color = Color.White
     If MyBase.Enabled Then
-      Select Case PassState
-        Case MouseState.Normal
-          FG = SystemColors.WindowText
-          BG = SystemColors.Window
-        Case MouseState.Hover
-          FG = SystemColors.WindowText
-          BG = SystemColors.Control
-        Case MouseState.Active
-          FG = SystemColors.Window
-          BG = SystemColors.WindowText
-        Case Else
-          FG = SystemColors.GrayText
-          BG = SystemColors.ButtonFace
-      End Select
+      If c_ShowContents Then
+        Select Case PassState
+          Case MouseState.Normal
+            FG = SystemColors.Highlight
+            BG = SystemColors.Window
+          Case MouseState.Hover
+            FG = SystemColors.Highlight
+            BG = SystemColors.Control
+          Case MouseState.Active
+            FG = SystemColors.Window
+            BG = SystemColors.HotTrack
+          Case Else
+            FG = SystemColors.GrayText
+            BG = SystemColors.ButtonFace
+        End Select
+      Else
+        Select Case PassState
+          Case MouseState.Normal
+            FG = SystemColors.WindowText
+            BG = SystemColors.Window
+          Case MouseState.Hover
+            FG = SystemColors.WindowText
+            BG = SystemColors.Control
+          Case MouseState.Active
+            FG = SystemColors.Window
+            BG = SystemColors.HotTrack
+          Case Else
+            FG = SystemColors.GrayText
+            BG = SystemColors.ButtonFace
+        End Select
+      End If
     Else
       FG = SystemColors.GrayText
       BG = SystemColors.ButtonFace
@@ -122,7 +167,7 @@
     c_PassState = PassState
   End Sub
   <System.ComponentModel.Browsable(False), System.ComponentModel.EditorBrowsable(False)>
-    Overloads Property UseSystemPasswordChar As Boolean
+  Overloads Property UseSystemPasswordChar As Boolean
     Get
       Return MyBase.UseSystemPasswordChar
     End Get
