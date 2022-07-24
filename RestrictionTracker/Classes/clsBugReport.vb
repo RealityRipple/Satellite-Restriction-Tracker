@@ -1,101 +1,102 @@
-﻿Friend Class MantisReporter
-  Public Const ProjectID As Integer = 2
-  Friend Enum Mantis_Category
-    [Select] = 0
-    General = 1
-    [Interface] = 3
-    Setup = 4
-  End Enum
-  Private Enum Mantis_Reproducibility
-    Always = 10
-    Sometimes = 30
-    Random = 50
-    Have_Not_Tried = 70
-    Unable_to_Reproduce = 90
-    NotApplicable = 100
-  End Enum
-  Private Enum Mantis_Severity
-    Feature = 10
-    Trivial = 20
-    Text = 30
-    Tweak = 40
-    Minor = 50
-    Major = 60
-    Crash = 70
-    Block = 80
-  End Enum
-  Private Enum Mantis_Priority
-    None = 10
-    Low = 20
-    Normal = 30
-    High = 40
-    Urgent = 50
-    Immediate = 60
-  End Enum
-  Private Shared cJar As Net.CookieContainer
-  Private Shared Function GetToken(Project_ID As Integer) As String
-    Dim pD1 As New Collections.Specialized.NameValueCollection
-    pD1.Add("ref", "bug_report_page.php")
-    pD1.Add("project_id", Project_ID.ToString.Trim)
-    pD1.Add("make_default", Nothing)
-    Dim httpToken As New WebClientEx
-    cJar = New Net.CookieContainer
-    httpToken.KeepAlive = False
-    httpToken.CookieJar = cJar
-    httpToken.SendHeaders = New Net.WebHeaderCollection
-    httpToken.SendHeaders.Add(Net.HttpRequestHeader.Referer, "http://bugs.realityripple.com/login_select_proj_page.php?bug_report_page.php")
-    Dim sTok As String = httpToken.UploadValues("http://bugs.realityripple.com/set_project.php", "POST", pD1)
-    If sTok.StartsWith("Error: ") Then Return Nothing
-    If sTok.Contains("bug_report_token") Then
-      sTok = sTok.Substring(sTok.IndexOf("bug_report_token") + 25)
-      sTok = sTok.Substring(0, sTok.IndexOf("""/"))
-      Return sTok
-    Else
-      Return Nothing
-    End If
+﻿Friend Class GitHubReporter
+  Public Const ProjectID As String = "Satellite-Restriction-Tracker"
+  Private Const Token As String = ""
+  Private Shared Function JSONEscape(sInput As String) As String
+    If sInput.Contains("\") Then sInput = sInput.Replace("\", "\\")
+    If sInput.Contains("""") Then sInput = sInput.Replace("""", "\""")
+    If sInput.Contains("/") Then sInput = sInput.Replace("/", "\/")
+    If sInput.Contains(vbLf) Then sInput = sInput.Replace(vbLf, "\n")
+    If sInput.Contains(vbCr) Then sInput = sInput.Replace(vbCr, "\r")
+    For I As Integer = 1 To 31
+      If sInput.Contains(ChrW(I)) Then sInput = sInput.Replace(ChrW(I), "\u" & srlFunctions.PadHex(I, 4))
+    Next
+    For I As Integer = 127 To 65535
+      If sInput.Contains(ChrW(I)) Then sInput = sInput.Replace(ChrW(I), "\u" & srlFunctions.PadHex(I, 4))
+    Next
+    Return sInput
   End Function
-  Private Shared Function ReportBug(Token As String, Project_ID As Integer, Category As Mantis_Category, Reproducable As Mantis_Reproducibility, Severity As Mantis_Severity, Priority As Mantis_Priority, Platform As String, OS As String, OS_Build As String, Product_Version As String, Summary As String, Description As String, Steps As String, Info As String, [Public] As Boolean) As String
-    Dim pData As New Collections.Specialized.NameValueCollection
-    pData.Add("bug_report_token", Token)
-    pData.Add("m_id", "0")
-    pData.Add("project_id", Project_ID)
-    pData.Add("category_id", Category)
-    pData.Add("reproducibility", Reproducable)
-    pData.Add("severity", Severity)
-    pData.Add("priority", Priority)
-    pData.Add("platform", Platform)
-    pData.Add("os", OS)
-    pData.Add("os_build", OS_Build)
-    pData.Add("product_version", Product_Version)
-    pData.Add("summary", Summary)
-    pData.Add("description", Description)
-    pData.Add("steps_to_reproduce", Steps)
-    pData.Add("additional_info", Info)
-    pData.Add("view_state", IIf([Public], "10", "50"))
-    pData.Add("report_stay", Nothing)
-    Dim sRet As String
-    Dim httpReport As New WebClientEx
-    httpReport.KeepAlive = False
-    httpReport.CookieJar = cJar
-    sRet = httpReport.UploadValues("http://bugs.realityripple.com/bug_report.php", "POST", pData)
-    If sRet.StartsWith("Error: ") Then Return "Failed to Send Report - " & sRet.Substring(7)
-    If sRet.Contains("Operation successful.") Then
-      Return "OK"
-    Else
-      sRet = sRet.Substring(sRet.IndexOf("width50") - 14)
-      sRet = sRet.Substring(0, sRet.IndexOf("</table>") + 8)
-      Return sRet
-    End If
-  End Function
-  Friend Shared Function ReportIssue(e As Exception) As String
-    Dim sTok As String = GetToken(ProjectID)
-    If String.IsNullOrEmpty(sTok) Then Return "No token was supplied by the server."
-    Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
+  Friend Shared Function MakeIssueTitle(e As Exception) As String
     Dim sSum As String = e.Message
+    If sSum.Contains(vbNewLine) Then
+      sSum = sSum.Substring(0, sSum.IndexOf(vbNewLine))
+    ElseIf sSum.Contains(vbCr) Then
+      sSum = sSum.Substring(0, sSum.IndexOf(vbCr))
+    ElseIf sSum.Contains(vbLf) Then
+      sSum = sSum.Substring(0, sSum.IndexOf(vbLf))
+    End If
     If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."
+    Return sSum
+  End Function
+  Friend Shared Function MakeIssueBody(e As Exception) As String
+    Dim sPlat As String = IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
     Dim sVer As String = Application.ProductVersion
     Dim iParts As Integer = (sVer.Split("."c)).Length
     If iParts > 3 Then sVer = sVer.Substring(0, sVer.LastIndexOf("."c))
-    Return ReportBug(sTok, ProjectID, Mantis_Category.General, Mantis_Reproducibility.Have_Not_Tried, Mantis_Severity.Minor, Mantis_Priority.Normal, sPlat, My.Computer.Info.OSFullName, My.Computer.Info.OSVersion, sVer, sSum, e.ToString, String.Empty, String.Empty, True)
+    Dim sRet As String = "Error in " & My.Application.Info.ProductName & " v" & sVer & ":" & vbNewLine
+    sRet &= "```" & vbNewLine
+    sRet &= e.ToString & vbNewLine
+    sRet &= "```" & vbNewLine & vbNewLine
+    sRet &= "OS: " & My.Computer.Info.OSFullName & " (" & sPlat & ") v" & My.Computer.Info.OSVersion & vbNewLine
+    sRet &= "CLR: " & srlFunctions.GetCLRCleanVersion
+    Return sRet
+  End Function
+  Private Shared Function ReportBug(Title, Body) As String
+    Dim sSend As String = "{"
+    sSend &= """title"": """ & JSONEscape(Title) & ""","
+    sSend &= """body"": """ & JSONEscape(Body) & """"
+    sSend &= "}"
+    Dim httpReport As New WebClientEx
+    httpReport.KeepAlive = False
+    httpReport.ErrorBypass = True
+    httpReport.SendHeaders = New Net.WebHeaderCollection
+    httpReport.SendHeaders.Add("Accept", "application/vnd.github+json")
+    httpReport.SendHeaders.Add("Authorization", "token " & Token)
+    Dim sRet As String = httpReport.UploadString("https://api.github.com/repos/RealityRipple/" & ProjectID & "/issues", "POST", sSend)
+    If httpReport.ResponseCode = Net.HttpStatusCode.Created Then
+      Try
+        Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
+        For Each jNode In jRet.Serial
+          If Not jNode.Type = JSONReader.ElementType.Group Then Continue For
+          For Each jEl In jNode.SubElements
+            If Not jEl.Type = JSONReader.ElementType.KeyValue Then Continue For
+            If jEl.Key = "html_url" Then Return jEl.Value
+          Next
+        Next
+      Catch ex As Exception
+      End Try
+      Return "https://github.com/RealityRipple/" & ProjectID & "/issues"
+    End If
+    Select Case httpReport.ResponseCode
+      Case Net.HttpStatusCode.Forbidden : Return "HTTP Error 403: Forbidden" & vbNewLine & "You are forbidden from reporting this error."
+      Case Net.HttpStatusCode.NotFound : Return "HTTP Error 404: Not Found" & vbNewLine & "The " & ProjectID & " GitHub repository is not available."
+      Case Net.HttpStatusCode.Gone : Return "HTTP Error 410: Gone" & vbNewLine & "The " & ProjectID & " GitHub repository does not have issues enabled at this time."
+      Case 422 : Return "HTTP Error 422: Validation Failed" & vbNewLine & "The error you attempted to report was invalid."
+      Case Net.HttpStatusCode.ServiceUnavailable : Return "HTTP Error 503: Service Unavailable" & vbNewLine & "The GitHub service is not available at this time."
+    End Select
+    Dim msg As String = "Unknown Error"
+    Try
+      Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
+      For Each jNode In jRet.Serial
+        If Not jNode.Type = JSONReader.ElementType.Group Then Continue For
+        For Each jEl In jNode.SubElements
+          If Not jEl.Type = JSONReader.ElementType.KeyValue Then Continue For
+          If jEl.Key = "message" Then
+            msg = jEl.Value
+            Exit For
+          End If
+        Next
+        If Not msg = "Unknown Error" Then Exit For
+      Next
+    Catch ex As Exception
+      msg = "Unknown Error (Invalid JSON)"
+    End Try
+    If [Enum].IsDefined(httpReport.ResponseCode.GetType, httpReport.ResponseCode) Then Return "HTTP Error " & CInt(httpReport.ResponseCode) & ": " & [Enum].GetName(httpReport.ResponseCode.GetType, httpReport.ResponseCode) & vbNewLine & msg
+    Return "HTTP Error " & CInt(httpReport.ResponseCode) & vbNewLine & msg
+  End Function
+  Friend Shared Function ReportIssue(e As Exception) As String
+    If Token = "" Then Return "Unable to Report: GitHub Account Token Not Provided"
+    Dim sSum As String = MakeIssueTitle(e)
+    Dim sBod As String = MakeIssueBody(e)
+    Return ReportBug(sSum, sBod)
   End Function
 End Class

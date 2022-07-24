@@ -319,32 +319,15 @@
         Select Case frmError.ShowDialog
           Case DialogResult.OK
             e.ExitApplication = False
-            Dim sRet As String = MantisReporter.ReportIssue(e.Exception)
-            If sRet = "OK" Then
-              MsgDlg(Nothing, "Thank you for reporting the error." & vbNewLine & vbNewLine & "<a href=""http://bugs.realityripple.com/set_project.php?project_id=" & MantisReporter.ProjectID & """>View Details about the Error</a>", "The error has been reported.", "Error Report Sent!", MessageBoxButtons.OK, _TaskDialogIcon.MoveToNetwork, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, , , , , True)
-            Else
-              Dim sErrRep As String = "http://bugs.realityripple.com/set_project.php?project_id=" & MantisReporter.ProjectID & "&make_default=no&ref=bug_report_page.php"
-              sErrRep &= "?platform=" & IIf(Environment.Is64BitProcess, "x64", IIf(Environment.Is64BitOperatingSystem, "x86-64", "x86"))
-              sErrRep &= "%2526os=" & DoubleEncode(My.Computer.Info.OSFullName.Trim)
-              sErrRep &= "%2526os_build=" & DoubleEncode(My.Computer.Info.OSVersion.Trim)
-              sErrRep &= "%2526product_version=" & DoubleEncode(Windows.Forms.Application.ProductVersion)
-              Dim sSum As String = e.Exception.Message
-              If sSum.Length > 80 Then sSum = sSum.Substring(0, 77) & "..."
-              sErrRep &= "%2526summary=" & DoubleEncode(sSum)
-              Dim sDesc As String = e.Exception.Message
-              If Not String.IsNullOrEmpty(e.Exception.StackTrace) Then
-                sDesc &= vbNewLine & e.Exception.StackTrace.Substring(0, e.Exception.StackTrace.IndexOf(vbCr))
-              Else
-                If Not String.IsNullOrEmpty(e.Exception.Source) Then
-                  sDesc &= vbNewLine & " @ " & e.Exception.Source
-                  If e.Exception.TargetSite IsNot Nothing Then sDesc &= "." & e.Exception.TargetSite.Name
-                Else
-                  If e.Exception.TargetSite IsNot Nothing Then sDesc &= vbNewLine & " @ " & e.Exception.TargetSite.Name
-                End If
-              End If
-              sErrRep &= "%2526description=" & DoubleEncode(sDesc)
-              MsgDlg(Nothing, sRet & vbNewLine & vbNewLine & "<a href=""" & sErrRep & """>Report the Error Manually</a>", "The error could not be reported.", "Error Report Failed!", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , , , , , True)
+            Dim sRet As String = GitHubReporter.ReportIssue(e.Exception)
+            If sRet.StartsWith("https://") Or sRet.StartsWith("http://") Then
+              MsgDlg(Nothing, "Thank you for reporting the error." & vbNewLine & vbNewLine & "<a href=""" & sRet & """>View Details about the Error</a>", "The error has been reported.", "Error Report Sent!", MessageBoxButtons.OK, _TaskDialogIcon.MoveToNetwork, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, , , , , True)
+              Return
             End If
+            Dim sErrRep As String = "https://github.com/RealityRipple/" & GitHubReporter.ProjectID & "/issues/new"
+            sErrRep &= "?title=" & srlFunctions.PercentEncode(GitHubReporter.MakeIssueTitle(e.Exception))
+            sErrRep &= "&body=" & srlFunctions.PercentEncode(GitHubReporter.MakeIssueBody(e.Exception))
+            MsgDlg(Nothing, sRet & vbNewLine & vbNewLine & "<a href=""" & sErrRep & """>Report the Error Manually</a>", "The error could not be reported.", "Error Report Failed!", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error, , , , , , True)
           Case DialogResult.Ignore : e.ExitApplication = False
           Case DialogResult.Abort : e.ExitApplication = True
           Case DialogResult.Cancel : e.ExitApplication = False
@@ -353,8 +336,5 @@
         MsgDlg(Nothing, "There was an error while handling another error.", "Error in Error Report system.", "Error Report Error", MessageBoxButtons.OK, _TaskDialogIcon.Error, MessageBoxIcon.Error, , "Error: " & ex.Message & vbNewLine & vbNewLine & "Original Error: " & e.Exception.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     End Sub
-    Private Function DoubleEncode(inString As String) As String
-      Return srlFunctions.PercentEncode(srlFunctions.PercentEncode(inString))
-    End Function
   End Class
 End Namespace
