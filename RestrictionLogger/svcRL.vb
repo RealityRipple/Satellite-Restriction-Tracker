@@ -136,7 +136,8 @@ Public Class svcRL
     End Function
   End Class
   Protected Overrides Sub OnStart(ByVal args() As String)
-    If Not Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location) Then
+    Dim v As Authenticode.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
+    If Not (v = Authenticode.Validity.SignedAndValid Or v = Authenticode.Validity.SignedButUntrusted) Then
       Me.Stop()
       Return
     End If

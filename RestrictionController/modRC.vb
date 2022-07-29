@@ -1,12 +1,14 @@
 ﻿Module modRC
   Sub Main()
-    If Not Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location) Then
+    Dim v As Authenticode.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
+    If Not (v = Authenticode.Validity.SignedAndValid Or v = Authenticode.Validity.SignedButUntrusted) Then
       Console.Clear()
       Console.WriteLine("==Restriction Service Controller==")
       Console.WriteLine()
       Console.WriteLine("The Logger Service Executable is not correctly signed.")
       Console.WriteLine("This file may have been modified or corrupted.")
       Console.WriteLine("Please re-install Satellite Restriction Tracker.")
+      Console.WriteLine("Error Code: 0x" & Hex(v))
       System.Threading.Thread.Sleep(5000)
       Return
     End If
