@@ -969,6 +969,7 @@ Public Class localRestrictionTracker
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "WB Read Table", Table)
       Else
+        ProviderSurvey("WBL")
         RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
       End If
     ElseIf Table.Contains("allowance") Then
@@ -996,6 +997,7 @@ Public Class localRestrictionTracker
       If String.IsNullOrEmpty(sDownT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "WB-B Read Table", Table)
       Else
+        ProviderSurvey("WBX")
         RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now, imSlowed, imFree))
       End If
     Else
@@ -1581,6 +1583,7 @@ Public Class localRestrictionTracker
       If assoc("data")("getPlanData")("usage").ContainsKey("dataLeftText") AndAlso assoc("data")("getPlanData")("usage")("dataLeftText") = "NONE" Then imSlowed = True
       sDown = assoc("data")("getPlanData")("usage")("dataUsedGB")
       sDownT = assoc("data")("getPlanData")("usage")("dataCapGB")
+      ProviderSurvey("VIA")
       RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
     Catch ex As Exception
       RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
@@ -2064,6 +2067,7 @@ Public Class localRestrictionTracker
     If lTotal = 0 Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, "Data temporarily unavailable."))
     Else
+      ProviderSurvey("WXR")
       RaiseEvent ConnectionWXRResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
     End If
   End Sub
@@ -2227,6 +2231,7 @@ Public Class localRestrictionTracker
       If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
       Else
+        ProviderSurvey("RPL")
         RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
       End If
     ElseIf Table.Contains(" GB (") Then
@@ -2278,6 +2283,7 @@ Public Class localRestrictionTracker
       If String.IsNullOrEmpty(sDownT) Then
         RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
       Else
+        ProviderSurvey("RPX")
         RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB) + StrToVal(sBuyMore, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sBuyMoreT, MBPerGB), Now, imSlowed, imFree))
       End If
     Else
@@ -2681,11 +2687,18 @@ Public Class localRestrictionTracker
         lDownT += StrToVal(atxM, MBPerGB)
       End If
     End If
+    ProviderSurvey("DNX")
     RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
   End Sub
 #End Region
 #End Region
 #Region "Useful Functions"
+  Private Sub ProviderSurvey(s As String)
+    Dim sURI As New Uri("https://wb.realityripple.com/providerSurvey.php?p=" & s)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendGET(sURI, responseURI, responseData)
+  End Sub
   Private Sub MakeSocket(KeepAlive As Boolean, Optional ManualRedirect As Boolean = True)
     Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     If wsSocket IsNot Nothing Then
