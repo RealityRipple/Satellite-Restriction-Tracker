@@ -737,7 +737,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginExede()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = "https://mysso.my.viasat.com/federation/json/realms/root/realms/myviasat/authenticate"
+    Dim uriString As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/auth"
     EX_Init(uriString)
   End Sub
   Private Sub LoginExedeR()
@@ -1004,42 +1004,283 @@ Public Class localRestrictionTracker
   End Sub
 #End Region
 #Region "EX"
+#Region "Exede Helper Functions"
+  Private Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
+    Dim gS As Integer = find.IndexOf(groupS)
+    If gS = -1 Then Return Nothing
+    find = find.Substring(gS + groupS.Length)
+    Dim gE As Integer = find.IndexOf(groupE)
+    If gE = -1 Then Return Nothing
+    find = find.Substring(0, gE)
+    Dim ret As New List(Of String)
+    Dim d As String = vbNullChar
+    For I As Integer = 0 To find.Length - 1
+      If d = vbNullChar Then
+        If find(I) = sepS Then d = ""
+      Else
+        If find(I) = sepE Then
+          ret.Add(d)
+          d = vbNullChar
+        Else
+          d = d & find(I)
+        End If
+      End If
+    Next
+    If ret.Count = 0 Then Return Nothing
+    Return ret.ToArray
+  End Function
+  Private Function EX_Helper_WithinParens(find As String) As String
+    Dim quote1 As Boolean = False
+    Dim quote2 As Boolean = False
+    Dim parens As Integer = 0
+    For I As Integer = 0 To find.Length - 1
+      If find(I) = "'"c Then
+        If quote1 Then
+          quote1 = False
+        ElseIf Not quote2 Then
+          quote1 = True
+        End If
+      End If
+      If find(I) = """"c Then
+        If quote2 Then
+          quote2 = False
+        ElseIf Not quote1 Then
+          quote2 = True
+        End If
+      End If
+      If quote1 Or quote2 Then Continue For
+      If find(I) = "{"c Then parens += 1
+      If find(I) = "}"c Then parens -= 1
+      If parens = 0 Then
+        find = find.Substring(0, I + 1)
+        Exit For
+      End If
+    Next
+    Return find
+  End Function
+  Private Function EX_Helper_Unescape(d As String)
+    For I As Integer = 0 To 255
+      Dim h As String = srlFunctions.PadHex(I, 2).ToUpper
+      Dim c As Char = ChrW(I)
+      d = d.Replace("\x" & h, c)
+    Next
+    Return d
+  End Function
+  Private Function EX_Helper_Parse_okta(body As String) As Dictionary(Of String, String)
+    Dim ret As New Dictionary(Of String, String)
+    ret.Add("base", "https://login.viasat.com/oauth2/auss5o0l1DDF9mIke696")
+    ret.Add("client_id", "0oa1z83muzscFURhw697")
+    ret.Add("redirect_uri", "https://my.viasat.com/callback")
+    Dim oktaLoc As Integer = body.IndexOf("okta:{")
+    If oktaLoc = -1 Then Return ret
+    Dim okta As String = body.Substring(oktaLoc + 5)
+    okta = EX_Helper_WithinParens(okta)
+    okta = System.Text.RegularExpressions.Regex.Replace(okta, "([{,])([A-Za-z_$][A-Za-z0-9_$]+):", "$1""$2"":")
+    Dim jOkta As JSONReader = Nothing
+    Try
+      Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(okta))
+        jOkta = New JSONReader(jStream, True)
+      End Using
+    Catch ex As Exception
+      Return ret
+    End Try
+    If Not jOkta.Serial.Count = 1 Then Return ret
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(jOkta)
+      If Not assoc.ContainsKey("prod") Then Return ret
+      If assoc("prod").ContainsKey("baseUrl") Then ret("base") = assoc("prod")("baseUrl")
+      If assoc("prod").ContainsKey("webClient") Then
+        If assoc("prod")("webClient").ContainsKey("clientId") Then ret("client_id") = assoc("prod")("webClient")("clientId")
+        If assoc("prod")("webClient").ContainsKey("redirectUrl") Then ret("redirect_uri") = assoc("prod")("webClient")("redirectUrl")
+      End If
+    Catch ex As Exception
+
+    End Try
+    Return ret
+  End Function
+  Private Function EX_Helper_Parse_scope(body As String) As String
+    Dim ret As String = "openid profle email offline_access"
+    Dim scopeData As String() = EX_Helper_FindBetween(body, "c=[", "]", """"c, """"c)
+    If scopeData IsNot Nothing Then ret = Join(scopeData)
+    Return ret
+  End Function
+  Private Function EX_Helper_Parse_urlBuilder(body As String) As Dictionary(Of String, String)
+    Dim ret As New Dictionary(Of String, String)
+    ret.Add("path", "/v1/authorize?")
+    ret.Add("response_type", "code")
+    ret.Add("state", "asdfasdf")
+    Dim fLoc As Integer = body.IndexOf("var i,s="""".concat(t).concat(")
+    If fLoc = -1 Then Return ret
+    Dim f As String = body.Substring(fLoc)
+    Dim fEnd As Integer = f.IndexOf("}))")
+    If fEnd = -1 Then Return ret
+    f = f.Substring(0, fEnd + 3)
+    Dim pathData As String() = EX_Helper_FindBetween(f, "s="""".concat(t).concat(", ")", """"c, """"c)
+    If pathData IsNot Nothing Then ret("path") = Join(pathData, "")
+    Dim respData As String() = EX_Helper_FindBetween(f, "response_type:", ",", """"c, """"c)
+    If respData IsNot Nothing Then ret("response_type") = respData(0)
+    Dim stateData As String() = EX_Helper_FindBetween(f, "state:", "}", """"c, """"c)
+    If stateData IsNot Nothing Then ret("state") = stateData(0)
+    Return ret
+  End Function
+  Private Function EX_Helper_MakeLoginFromStruct(struct As Object, valList As Dictionary(Of String, String)) As Dictionary(Of String, Object)
+    Dim oRet As New Dictionary(Of String, Object)
+    If Not struct.ContainsKey("value") Then Return New Dictionary(Of String, Object)
+    If Not IsArray(struct("value")) Then Return New Dictionary(Of String, Object)
+    For I As Integer = 0 To struct("value").Length - 1
+      If Not struct("value")(I).ContainsKey("name") Then Continue For
+      Dim prefName As String = struct("value")(I)("name")
+      If valList.ContainsKey(prefName) Then
+        oRet.Add(prefName, valList(prefName))
+        Continue For
+      End If
+      If struct("value")(I).ContainsKey("value") Then
+        oRet.Add(prefName, struct("value")(I)("value"))
+        Continue For
+      End If
+      If struct("value")(I).ContainsKey("type") Then
+        Dim r As Object = Nothing
+        Select Case struct("value")(I)("type")
+          Case "object"
+            If struct("value")(I).ContainsKey("form") Then r = EX_Helper_MakeLoginFromStruct(struct("value")(I)("form"), valList)
+          Case "boolean"
+            r = Nothing
+        End Select
+        If Not r Is Nothing Then oRet.Add(prefName, r)
+      End If
+    Next
+    Return oRet
+  End Function
+#End Region
+
   Private Sub EX_Init(sURI As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, 0, sURI)
+    BeginAttempt(ConnectionStates.Initialize, ConnectionSubStates.None, 0, 0, sURI)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    Dim aHeader As New Net.WebHeaderCollection()
-    aHeader.Add("X-Requested-With: XMLHttpRequest")
-    aHeader.Add("Content-Type: application/json")
-    SendPOST(New Uri(sURI), "", responseURI, responseData, aHeader)
+    SendGET(New Uri(sURI), responseURI, responseData)
     If ClosingTime Then Return
-    EX_InitResponse(responseData, responseURI)
+    EX_Init_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_InitResponse(Response As String, ResponseURI As Uri)
+  Private Sub EX_Init_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not Response.Contains("[{""name"":""IDToken1"",""value"":""""}]") Then
-      RaiseError("Authentication Failed: Could not parse login JSON.", "EX Init", Response, ResponseURI)
+    Dim appLoc As Integer = Response.IndexOf("_app")
+    If appLoc = -1 Then
+      RaiseError("Initialize Failed: Could not find OAuth Script.", "EX Init", Response, ResponseURI)
       Return
     End If
-    If Not Response.Contains("[{""name"":""IDToken2"",""value"":""""}]") Then
-      RaiseError("Authentication Failed: Could not parse login JSON.", "EX Init", Response, ResponseURI)
+    Dim scriptLoc As Integer = Response.Substring(0, appLoc).LastIndexOf("<script")
+    If scriptLoc = -1 Then
+      RaiseError("Initialize Failed: Could not find OAuth Script Tag.", "EX Init", Response, ResponseURI)
       Return
     End If
-    EX_Login(Response, ResponseURI)
+    Dim scriptSrc As String = Response.Substring(scriptLoc)
+    Dim srcStart As Integer = scriptSrc.IndexOf("""")
+    If srcStart = -1 Then
+      RaiseError("Initialize Failed: Could not find OAuth Script URL.", "EX Init", Response, ResponseURI)
+      Return
+    End If
+    scriptSrc = scriptSrc.Substring(srcStart + 1)
+    Dim srcEnd As Integer = scriptSrc.IndexOf("""")
+    If srcEnd = -1 Then
+      RaiseError("Initialize Failed: Could not find OAuth Script URL.", "EX Init", Response, ResponseURI)
+      Return
+    End If
+    scriptSrc = scriptSrc.Substring(0, srcEnd)
+    Dim host As String = ResponseURI.Scheme & Uri.SchemeDelimiter & ResponseURI.Host
+    Dim url As New Uri(host & scriptSrc)
+    EX_OAuth(url)
   End Sub
-  Private Sub EX_Login(POSTData As String, sURI As Uri)
+  Private Sub EX_OAuth(sURI As Uri)
     MakeSocket(True)
-    Dim sSend As String = POSTData
-    sSend = sSend.Replace("[{""name"":""IDToken1"",""value"":""""}]", "[{""name"":""IDToken1"",""value"":""" & sUsername & """}]")
-    sSend = sSend.Replace("[{""name"":""IDToken2"",""value"":""""}]", "[{""name"":""IDToken2"",""value"":""" & sPassword & """}]")
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, sURI.OriginalString)
+    BeginAttempt(ConnectionStates.Prepare, ConnectionSubStates.None, 0, 0, sURI.OriginalString)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendGET(sURI, responseURI, responseData)
+    If ClosingTime Then Return
+    EX_OAuth_Response(responseData, responseURI)
+  End Sub
+  Private Sub EX_OAuth_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    Dim okData As Dictionary(Of String, String) = EX_Helper_Parse_okta(Response)
+    Dim scope As String = EX_Helper_Parse_scope(Response)
+    Dim uData As Dictionary(Of String, String) = EX_Helper_Parse_urlBuilder(Response)
+    Dim url As New Uri(okData("base") & uData("path") &
+                       "client_id=" & System.Uri.EscapeDataString(okData("client_id")) &
+                       "&response_type=" & System.Uri.EscapeDataString(uData("response_type")) &
+                       "&redirect_uri=" & System.Uri.EscapeDataString(okData("redirect_uri")) &
+                       "&scope=" & System.Uri.EscapeDataString(scope) &
+                       "&state=" & System.Uri.EscapeDataString(uData("state")))
+    EX_ReadLogin(url)
+  End Sub
+  Private Sub EX_ReadLogin(sURI As Uri)
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, 0, sURI.OriginalString)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendGET(sURI, responseURI, responseData)
+    If ClosingTime Then Return
+    EX_ReadLogin_Response(responseData, responseURI)
+  End Sub
+  Private Sub EX_ReadLogin_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    Dim oktaDataLoc As Integer = Response.IndexOf("var oktaData = {")
+    If oktaDataLoc = -1 Then
+      RaiseError("Login Failed: Could not parse Okta response.", "EX Read Login Response", Response, ResponseURI)
+      Return
+    End If
+    Dim oktaData As String = Response.Substring(oktaDataLoc + 15)
+    Dim oktaDataEnd As Integer = oktaData.IndexOf("};")
+    If oktaDataEnd = -1 Then
+      RaiseError("Login Failed: Could not parse Okta response.", "EX Read Login Response", Response, ResponseURI)
+      Return
+    End If
+    oktaData = oktaData.Substring(0, oktaDataEnd + 1)
+    While oktaData.Contains("function(){")
+      Dim fn As String = oktaData.Substring(oktaData.IndexOf("function(){") + 10)
+      fn = EX_Helper_WithinParens(fn)
+      oktaData = oktaData.Replace("function()" & fn, """[JS Function]""")
+    End While
+    oktaData = EX_Helper_Unescape(oktaData)
+    Dim jData As JSONReader = Nothing
+    Try
+      Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(oktaData))
+        jData = New JSONReader(jStream, True)
+      End Using
+    Catch ex As Exception
+      RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
+      Return
+    End Try
+    If Not jData.Serial.Count = 1 Then
+      RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
+      Return
+    End If
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(jData)
+      If Not assoc.ContainsKey("signIn") Then
+        RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
+        Return
+      End If
+      If Not assoc("signIn").ContainsKey("stateToken") Then
+        RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
+        Return
+      End If
+      Dim sBody As String = "{""stateToken"":""" & assoc("signIn")("stateToken") & """}"
+      Dim url As New Uri("https://login.viasat.com/idp/idx/introspect")
+      EX_Login(url, sBody)
+    Catch ex As Exception
+      RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
+    End Try
+  End Sub
+  Private Sub EX_Login(sURI As Uri, POSTData As String)
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.None, 0, 0, sURI.OriginalString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     Dim aHeader As New Net.WebHeaderCollection()
-    aHeader.Add("X-Requested-With", "XMLHttpRequest")
-    aHeader.Add(Net.HttpRequestHeader.ContentType, "application/json")
-    SendPOST(sURI, sSend, responseURI, responseData, aHeader)
+    aHeader.Add(Net.HttpRequestHeader.Accept, "application/ion+json; okta-version=1.0.0")
+    aHeader.Add(Net.HttpRequestHeader.ContentType, "application/ion+json; okta-version=1.0.0")
+    SendPOST(sURI, POSTData, responseURI, responseData, aHeader)
     If ClosingTime Then Return
     EX_Login_Response(responseData, responseURI)
   End Sub
@@ -1051,63 +1292,148 @@ Public Class localRestrictionTracker
         exJS = New JSONReader(jStream, True)
       End Using
     Catch ex As Exception
-      RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
+      RaiseError("Login Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
       Return
     End Try
     If Not exJS.Serial.Count = 1 Then
-      RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
+      RaiseError("Login Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
       Return
     End If
-    For Each el In exJS.Serial(0).SubElements
-      If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
-      If el.Key = "successUrl" Then
-        Dim sURL As String = "https://mysso.my.viasat.com/federation/oauth2/authorize?client_id=my-viasat-web&response_type=code&redirect_uri=" & el.Value & "/callback&scope=uid"
-        EX_OAuth2(sURL)
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(exJS)
+      Dim formData As Object = Nothing
+      If Not assoc.ContainsKey("remediation") Then
+        RaiseError("Login Failed: Could not parse login response JSON.", "EX Login Response", Response, ResponseURI)
         Return
       End If
-    Next
-    If Response.ToLower.Contains("your username and/or password are incorrect.") Then
-      RaiseError("Login Failed: Incorrect Password")
-      Return
-    End If
-    RaiseError("Authentication Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
+      If Not assoc("remediation").ContainsKey("value") Then
+        RaiseError("Login Failed: Could not parse login response JSON.", "EX Login Response", Response, ResponseURI)
+        Return
+      End If
+      If Not IsArray(assoc("remediation")("value")) Then
+        RaiseError("Login Failed: Could not parse login response JSON.", "EX Login Response", Response, ResponseURI)
+        Return
+      End If
+      For I As Integer = 0 To assoc("remediation")("value").Length - 1
+        If Not assoc("remediation")("value")(I).ContainsKey("name") Then Continue For
+        If Not assoc("remediation")("value")(I)("name") = "identify" Then Continue For
+        If Not assoc("remediation")("value")(I).ContainsKey("method") Then Continue For
+        If Not assoc("remediation")("value")(I)("method") = "POST" Then Continue For
+        If Not assoc("remediation")("value")(I).ContainsKey("accepts") Then Continue For
+        If Not assoc("remediation")("value")(I).ContainsKey("produces") Then Continue For
+        If Not assoc("remediation")("value")(I).ContainsKey("href") Then Continue For
+        If Not assoc("remediation")("value")(I).ContainsKey("value") Then Continue For
+        If Not IsArray(assoc("remediation")("value")(I)("value")) Then Continue For
+        formData = assoc("remediation")("value")(I)
+        Exit For
+      Next
+      Dim url As New Uri(formData("href"))
+      Dim valList As New Dictionary(Of String, String)
+      valList.Add("identifier", sUsername)
+      valList.Add("passcode", sPassword)
+      Dim body As Dictionary(Of String, Object) = EX_Helper_MakeLoginFromStruct(formData, valList)
+      Dim sBody As String = JSONAssociator.MakeString(body)
+      Dim aHeaders As New Net.WebHeaderCollection
+      aHeaders.Add(Net.HttpRequestHeader.Accept, formData("accepts"))
+      aHeaders.Add(Net.HttpRequestHeader.ContentType, formData("produces"))
+      EX_Auth(url, aHeaders, sBody)
+    Catch ex As Exception
+      RaiseError("Login Failed: Could not parse login response JSON.", "EX Login Response", Response, ResponseURI)
+    End Try
   End Sub
-  Private Sub EX_OAuth2(sURL As String)
+  Private Sub EX_Auth(sURI As Uri, aHeaders As Net.WebHeaderCollection, POSTData As String)
     MakeSocket(True)
+    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, sURI.OriginalString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.LoadHome, 0, 0, sURL)
-    SendGET(New Uri(sURL), responseURI, responseData)
+    SendPOST(sURI, POSTData, responseURI, responseData, aHeaders)
     If ClosingTime Then Return
-    EX_OAuth2_Response(responseData, responseURI)
+    EX_Auth_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_OAuth2_Response(Response As String, ResponseURI As Uri)
+  Private Sub EX_Auth_Response(Response As String, ResponseURI As Uri)
+    If CheckForErrors(Response, ResponseURI) Then Return
+    Dim jsAuth As JSONReader
+    Try
+      Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Response))
+        jsAuth = New JSONReader(jStream, True)
+      End Using
+    Catch ex As Exception
+      RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
+      Return
+    End Try
+    If Not jsAuth.Serial.Count = 1 Then
+      RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
+      Return
+    End If
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(jsAuth)
+      If assoc.ContainsKey("messages") Then
+        If assoc("messages").ContainsKey("value") AndAlso IsArray(assoc("messages")("value")) Then
+          For I As Integer = 0 To assoc("messages")("value").Length - 1
+            If Not assoc("messages")("value")(I).ContainsKey("message") Then Continue For
+            If assoc("messages")("value")(I)("message") = "Authentication failed" Then
+              RaiseError("Login Failed: Incorrect Password")
+              Return
+            End If
+          Next
+        End If
+      End If
+      If Not assoc.ContainsKey("success") Then
+        RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
+        Return
+      End If
+      If Not assoc("success").ContainsKey("href") Then
+        RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
+        Return
+      End If
+      Dim url As New Uri(assoc("success")("href"))
+      EX_Home(url)
+    Catch ex As Exception
+      RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
+    End Try
+  End Sub
+  Private Sub EX_Home(sURI As Uri)
+    MakeSocket(True)
+    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, 0, sURI.OriginalString)
+    Dim responseData As String = Nothing
+    Dim responseURI As Uri = Nothing
+    SendGET(sURI, responseURI, responseData)
+    If ClosingTime Then Return
+    EX_Home_Response(responseData, responseURI)
+  End Sub
+  Private Sub EX_Home_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
     Dim sToken As String = ResponseURI.Query
     If String.IsNullOrEmpty(sToken) Then
-      RaiseError("Could not log in.", "EX OAuth2 Response", Response, ResponseURI)
+      RaiseError("Could not log in.", "EX Home Response", Response, ResponseURI)
       Return
     End If
     If Not sToken.Contains("code=") Then
-      RaiseError("Could not log in.", "EX OAuth2 Response", Response, ResponseURI)
+      RaiseError("Could not log in.", "EX Home Response", Response, ResponseURI)
       Return
     End If
     sToken = sToken.Substring(sToken.IndexOf("code=") + 5)
     If sToken.Contains("&") Then sToken = sToken.Substring(0, sToken.IndexOf("&"))
-    'sToken = srlFunctions.PercentDecode(sToken)
     EX_Token(sToken)
   End Sub
   Private Sub EX_Token(sCode As String)
-    Dim tURI As String = "https://my-viasat-server-prod.icat.viasat.io/graphql"
-    Dim sSend As String = "{""operationName"":""getTokenUsingCode"",""variables"":{""code"":""" & sCode & """, ""platform"":""web""},""query"":""mutation getTokenUsingCode($code: String!, $platform: ClientPlatform!) {\n" &
-          "  getTokenUsingCode(code: $code, platform: $platform) {\n" &
-          "    accessToken\n" &
-          "    refreshToken\n" &
-          "    accessTokenExpirationTime\n" &
-          "    __typename\n" &
-          "  }\n" &
-          "}\n" &
-          """}"
+    Dim tURI As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/api/graphql"
+    Dim aSend As New Dictionary(Of String, Object)
+    aSend.Add("operationName", "getTokenUsingCode")
+    Dim aInput As New Dictionary(Of String, Object)
+    aInput.Add("code", sCode)
+    aInput.Add("platform", "Web")
+    aInput.Add("env", "prod")
+    Dim aVars As New Dictionary(Of String, Object)
+    aVars.Add("input", aInput)
+    aSend.Add("variables", aVars)
+    aSend.Add("query", "query getTokenUsingCode($input: GetTokenUsingCodeInput!) {\n" &
+                       "  getTokenUsingCode(input: $input) {\n" &
+                       "    accessToken\n" &
+                       "    __typename\n" &
+                       "  }\n" &
+                       "}\n")
+    Dim sSend As String = JSONAssociator.MakeString(aSend)
     Dim hdrs As New Net.WebHeaderCollection
     hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
     MakeSocket(True)
@@ -1116,42 +1442,66 @@ Public Class localRestrictionTracker
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
     If ClosingTime Then Return
-    EX_Read_Token(responseData, responseURI)
+    EX_Token_Response(responseData, responseURI)
   End Sub
-  Private Sub EX_Read_Token(Response As String, ResponseURI As Uri)
+  Private Sub EX_Token_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not Response.Contains("""accessToken"":""") Then
+    Dim jTok As JSONReader
+    Try
+      Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Response))
+        jTok = New JSONReader(jStream, True)
+      End Using
+    Catch ex As Exception
+      RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+      Return
+    End Try
+    If Not jTok.Serial.Count = 1 Then
       RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
       Return
     End If
-    Dim sToken As String = Response.Substring(Response.IndexOf("""accessToken"":""") + 15)
-    If Not sToken.Contains("""") Then
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(jTok)
+      If Not assoc.ContainsKey("data") Then
+        RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+        Return
+      End If
+      If Not assoc("data").ContainsKey("getTokenUsingCode") Then
+        RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+        Return
+      End If
+      If Not assoc("data")("getTokenUsingCode").ContainsKey("accessToken") Then
+        RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+        Return
+      End If
+      Dim sToken As String = assoc("data")("getTokenUsingCode")("accessToken")
+      EX_Downlad_Table(sToken)
+    Catch ex As Exception
       RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
-      Return
-    End If
-    sToken = sToken.Substring(0, sToken.IndexOf(""""))
-    EX_Downlad_Table(sToken)
+    End Try
   End Sub
   Private Sub EX_Downlad_Table(sToken As String)
-    Dim tURI As String = "https://my-viasat-server-prod.icat.viasat.io/graphql"
-    Dim sSend As String = "{""operationName"":""InitialQuery"",""variables"":{},""query"":""query InitialQuery {\n" &
-          "  getAccountInfo {\n" &
-          "    accountStatus\n" &
-          "  }\n" &
-          "  getUsageInfo {\n" &
-          "    currentUsageAmount\n" &
-          "    currentUsageMeasurement\n" &
-          "    isUnlimited\n" &
-          "    planLimitAmount\n" &
-          "    planLimitMeasurement\n" &
-          "    usageStartDate\n" &
-          "    usageResetDate\n" &
-          "  }\n" &
-          "}\n" &
-          """}"
+    Dim tURI As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/api/graphql"
+
+    Dim aSend As New Dictionary(Of String, Object)
+    aSend.Add("operationName", "getPlanData")
+    aSend.Add("variables", New Dictionary(Of String, Object))
+    aSend.Add("query", "query getPlanData($refetchData: Boolean) {\n" &
+                       "  getPlanData(refetchData: $refetchData) {\n" &
+                       "    accountStatus\n" &
+                       "    isUnlimited\n" &
+                       "    usage {\n" &
+                       "      dataLeftText\n" &
+                       "      dataUsedGB\n" &
+                       "      dataCapGB\n" &
+                       "      __typename\n" &
+                       "    }\n" &
+                       "    __typename\n" &
+                       "  }\n" &
+                       "}\n")
+    Dim sSend As String = JSONAssociator.MakeString(aSend)
     Dim hdrs As New Net.WebHeaderCollection
     hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
-    hdrs.Add("x-auth-type", "MySSO")
+    hdrs.Add("x-auth-type", "Okta")
     hdrs.Add("x-auth-token", sToken)
     MakeSocket(True)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 1, 0, tURI)
@@ -1177,98 +1527,64 @@ Public Class localRestrictionTracker
       RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
       Return
     End If
-    Dim jUsage As JSONReader.JSElement = Nothing
-    Dim jAccount As JSONReader.JSElement = Nothing
-    For Each el In exJS.Serial(0).SubElements
-      If Not el.Type = JSONReader.ElementType.Group Then Continue For
-      If el.Key = "data" Then
-        For Each el2 In el.SubElements
-          If Not el2.Type = JSONReader.ElementType.Group Then Continue For
-          If el2.Key = "getUsageInfo" Then
-            jUsage = el2
-            Exit For
-          End If
-          If el2.Key = "getAccountInfo" Then
-            jAccount = el2
-          End If
-        Next
-        If Not jUsage.Type = JSONReader.ElementType.None Then Exit For
-      End If
-    Next
-    If Not jUsage.Type = JSONReader.ElementType.Group Then
-      If jAccount.Type = JSONReader.ElementType.Group Then
-        For Each el In jAccount.SubElements
-          If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
-          If el.Key = "accountStatus" Then
-            Select Case el.Value.ToUpper
-              Case "DISCONNECTED"
-                RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
-                Return
-              Case Else
-                RaiseError("Login Failed: Exede says your account is " & el.Value.ToUpper & ". Check your username and password.")
-                Return
-            End Select
-            If el.Value = "DISCONNECTED" Then
-
-            Else
-
-            End If
-          End If
-        Next
-      End If
-      For Each el In exJS.Serial(0).SubElements
-        If Not el.Type = JSONReader.ElementType.Array Then Continue For
-        If el.Key = "errors" Then
-          Dim sMsg As String = ""
-          For Each er In el.Collection
-            If Not er.Type = JSONReader.ElementType.Group Then Continue For
-            For Each eg In er.SubElements
-              If Not eg.Type = JSONReader.ElementType.KeyValue Then Continue For
-              If Not eg.Key = "message" Then Continue For
-              sMsg &= eg.Value & " - "
-            Next
-          Next
-          If Not String.IsNullOrEmpty(sMsg) Then
-            sMsg = sMsg.Substring(0, sMsg.Length - 3)
-            RaiseError("Usage Failed: " & sMsg)
+    Try
+      Dim assoc As Object = JSONAssociator.Associate(exJS)
+      Dim sDown As String = String.Empty, sDownT As String = String.Empty
+      If assoc.ContainsKey("errors") AndAlso IsArray(assoc("errors")) Then
+        For I As Integer = 0 To assoc("errors").count - 1
+          If assoc("errors")(I).ContainsKey("message") Then
+            RaiseError("Usage Failed: " & assoc("errors")(I)("message"), "EX Usage Response", Table)
             Return
           End If
-          Exit For
-        End If
-      Next
+        Next
+      End If
+      If Not assoc.ContainsKey("data") Then
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      If Not assoc("data").ContainsKey("getPlanData") Then
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      If assoc("data")("getPlanData").ContainsKey("accountStatus") AndAlso Not String.IsNullOrEmpty(assoc("data")("getPlanData")("accountStatus")) Then
+        Select Case assoc("data")("getPlanData")("accountStatus")
+          Case "DISCONNECTED"
+            RaiseError("Login Failed: Exede Account Disconnected. Check your username and password.")
+            Return
+          Case "NON-PAY"
+            RaiseError("Login Failed: Exede Account Unpaid. Check your username and password.")
+            Return
+          Case "DEACTIVATED"
+            RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
+            Return
+          Case "ACTIVE"
+
+          Case Else
+            'RaiseError("Login Failed: Exede Account in Unknown State: " & assoc("data")("getPlanData")("accountStatus") & ". Check your username and password.")
+            'Return
+        End Select
+      End If
+      If assoc("data")("getPlanData").ContainsKey("isUnlimited") AndAlso assoc("data")("getPlanData")("isUnlimited") = "true" Then imFree = True
+      If Not assoc("data")("getPlanData").ContainsKey("usage") Then
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      Dim jUsage As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")
+      If Not assoc("data")("getPlanData")("usage").ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(assoc("data")("getPlanData")("usage")("dataCapGB")) Then
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      If Not assoc("data")("getPlanData")("usage").ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(assoc("data")("getPlanData")("usage")("dataUsedGB")) Then
+        RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+        Return
+      End If
+      If assoc("data")("getPlanData")("usage").ContainsKey("dataLeftText") AndAlso assoc("data")("getPlanData")("usage")("dataLeftText") = "NONE" Then imSlowed = True
+      sDown = assoc("data")("getPlanData")("usage")("dataUsedGB")
+      sDownT = assoc("data")("getPlanData")("usage")("dataCapGB")
+      RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
+    Catch ex As Exception
       RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-      Return
-    End If
-    Dim sDown As String = String.Empty, sDownT As String = String.Empty
-    Dim sDownSz As String = "B", sDownSzT As String = "B"
-    For Each el In jUsage.SubElements
-      If Not el.Type = JSONReader.ElementType.KeyValue Then Continue For
-      Select Case el.Key
-        Case "currentUsageAmount"
-          sDown = el.Value
-        Case "currentUsageMeasurement"
-          sDownSz = el.Value
-        Case "planLimitAmount"
-          sDownT = el.Value
-        Case "planLimitMeasurement"
-          sDownSzT = el.Value
-      End Select
-    Next
-    Dim iDownSz As ULong = 1024 * 1024 * 1024
-    Dim iDownSzT As ULong = 1024 * 1024 * 1024
-    Select Case sDownSz.ToLower
-      Case "k", "kb" : iDownSz = 1024 * 1024
-      Case "m", "mb" : iDownSz = 1024
-      Case "g", "gb" : iDownSz = 1
-    End Select
-    Select Case sDownSzT.ToLower
-      Case "k", "kb" : iDownSzT = 1024 * 1024
-      Case "m", "mb" : iDownSzT = 1024
-      Case "g", "gb" : iDownSzT = 1
-    End Select
-    sDown = StrToFloat(sDown) / iDownSz
-    sDownT = StrToFloat(sDownT) / iDownSzT
-    RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
+    End Try
   End Sub
 #End Region
 #Region "ER"
