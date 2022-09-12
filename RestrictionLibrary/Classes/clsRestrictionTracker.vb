@@ -1476,6 +1476,10 @@ Public Class localRestrictionTracker
         Return
       End If
       Dim sToken As String = assoc("data")("getTokenUsingCode")("accessToken")
+      If String.IsNullOrEmpty(sToken) Then
+        RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+        Return
+      End If
       EX_Downlad_Table(sToken)
     Catch ex As Exception
       RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
@@ -1483,7 +1487,6 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Downlad_Table(sToken As String)
     Dim tURI As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/api/graphql"
-
     Dim aSend As New Dictionary(Of String, Object)
     aSend.Add("operationName", "getPlanData")
     aSend.Add("variables", New Dictionary(Of String, Object))
@@ -1533,8 +1536,20 @@ Public Class localRestrictionTracker
       Dim assoc As Object = JSONAssociator.Associate(exJS)
       Dim sDown As String = String.Empty, sDownT As String = String.Empty
       If assoc.ContainsKey("errors") AndAlso IsArray(assoc("errors")) Then
-        For I As Integer = 0 To assoc("errors").count - 1
+        For I As Integer = 0 To assoc("errors").Length - 1
           If assoc("errors")(I).ContainsKey("message") Then
+            If assoc("errors")(I)("message") = "Internal server error" Then
+              RaiseError("The server ran into an internal error. Please try again later.")
+              Return
+            End If
+            If assoc("errors")(I)("message").Contains("received invalid response to SSL negotiation") Then
+              RaiseError("The server ran into an internal error. Please try again later.")
+              Return
+            End If
+            If assoc("errors")(I)("message").Contains("canceling statement due to statement timeout") Then
+              RaiseError("The server ran into an internal error. Please try again later.")
+              Return
+            End If
             RaiseError("Usage Failed: " & assoc("errors")(I)("message"), "EX Usage Response", Table)
             Return
           End If
