@@ -231,6 +231,8 @@ Public Class srlFunctions
           Return ERRLIST("ABORTED")
         ElseIf ex.Message.Contains("The operation has timed out") Then
           Return ERRLIST("TIMEOUT")
+        ElseIf ex.Message.Contains("The connection was closed unexpectedly") Then
+          Return ERRLIST("DROPPED")
         Else
           If Not String.IsNullOrEmpty(dataPath) Then reportHandler.BeginInvoke(ex, dataPath, Nothing, Nothing)
           Return AppendErrorDetails(ERRLIST("ABORTED"), ex, ":"c)
