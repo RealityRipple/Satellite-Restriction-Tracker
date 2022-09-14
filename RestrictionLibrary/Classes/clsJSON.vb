@@ -470,5 +470,4 @@ Public Class JSONAssociator
     End If
     Return sRet
   End Function
-
 End Class
