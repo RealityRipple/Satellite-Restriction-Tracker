@@ -154,7 +154,7 @@ Public Class StoredPasswordLegacy
   End Sub
   Private Shared Sub GenLoggerKey()
     crypter = Nothing
-    Dim bKey() As Byte = CType(System.Runtime.InteropServices.GuidAttribute.GetCustomAttribute(System.Reflection.Assembly.LoadFile(My.Application.Info.DirectoryPath & "\RestrictionLogger.exe"), GetType(System.Runtime.InteropServices.GuidAttribute)).TypeId.Guid, Guid).ToByteArray()
+    Dim bKey() As Byte = CType(System.Runtime.InteropServices.GuidAttribute.GetCustomAttribute(System.Reflection.Assembly.LoadFile(IO.Path.Combine(My.Application.Info.DirectoryPath, "RestrictionLogger.exe")), GetType(System.Runtime.InteropServices.GuidAttribute)).TypeId.Guid, Guid).ToByteArray()
     Dim bSeed() As Byte = {&H4E, &H4E, &HE9, &H24, &HD5, &H2D, &H45, &H2A, &HB7, &HF0, &HE5, &H21, &H22, &HC8, &H90, &H76}
     Dim sessionKeyHMAC As New Security.Cryptography.HMACSHA256(bKey)
     Dim cryptHASH = sessionKeyHMAC.ComputeHash(bSeed)

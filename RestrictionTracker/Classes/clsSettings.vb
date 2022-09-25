@@ -19,15 +19,15 @@ Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
-    If srlFunctions.InUseChecker(CommonAppDataDirectory & "\user.config", IO.FileAccess.Write) Then
+    If srlFunctions.InUseChecker(IO.Path.Combine(CommonAppDataDirectory, "user.config"), IO.FileAccess.Write) Then
       Try
-        xConfig.Save(CommonAppDataDirectory & "\user.config")
+        xConfig.Save(IO.Path.Combine(CommonAppDataDirectory, "user.config"))
         Return True
       Catch ex As Exception
         MsgDlg(Nothing, "There was an error saving the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
       End Try
     Else
-      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & CommonAppDataDirectory & "\user.config"" may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
+      MsgDlg(Nothing, My.Application.Info.ProductName & " was unable to write to the Satellite Restriction Logger service settings file.", "The Service settings were not saved.", "Logger Service Error", MessageBoxButtons.OK, _TaskDialogIcon.Batch, MessageBoxIcon.Warning, , "The program could not get write permissions." & vbNewLine & "The file """ & IO.Path.Combine(CommonAppDataDirectory, "user.config") & """ may be in use.", _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
     End If
     Return False
   End Function
@@ -230,12 +230,12 @@ Class AppSettings
   End Enum
   Private ReadOnly Property ConfigFile As String
     Get
-      Return LocalAppDataDirectory & "user.config"
+      Return IO.Path.Combine(LocalAppDataDirectory, "user.config")
     End Get
   End Property
   Private ReadOnly Property ConfigFileBackup As String
     Get
-      Return LocalAppDataDirectory & "backup.config"
+      Return IO.Path.Combine(LocalAppDataDirectory, "backup.config")
     End Get
   End Property
   Public Sub New()

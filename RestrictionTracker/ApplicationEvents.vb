@@ -25,8 +25,8 @@
       End If
       EnableVisualStyles = True
       System.Threading.Thread.CurrentThread.CurrentUICulture = Globalization.CultureInfo.GetCultureInfo(1033)
-      Dim AppDataWB As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
-      Dim AppDataSRT As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & My.Application.Info.CompanyName & "\" & My.Application.Info.ProductName
+      Dim AppDataWB As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), My.Application.Info.CompanyName, "WildBlue Bandwidth Monitor")
+      Dim AppDataSRT As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), My.Application.Info.CompanyName, My.Application.Info.ProductName)
       Dim appRet As TriState = CopyDirectory(AppDataWB, AppDataSRT)
       Select Case appRet
         Case TriState.True
@@ -98,19 +98,19 @@
           cSave.Timeout = cSettings.Timeout
           cSave.Save()
         Else
-          If My.Computer.FileSystem.FileExists(AppDataAllPath & "\user.config") Then My.Computer.FileSystem.DeleteFile(AppDataAllPath & "\user.config")
+          If My.Computer.FileSystem.FileExists(IO.Path.Combine(AppDataAllPath, "user.config")) Then My.Computer.FileSystem.DeleteFile(IO.Path.Combine(AppDataAllPath, "user.config"))
         End If
       End If
       Dim sOldStartup As String = Nothing
       If My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access") Then
-        sOldStartup = Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access\WildBlue Bandwidth Monitor.lnk"
+        sOldStartup = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access", "WildBlue Bandwidth Monitor.lnk")
       Else
-        sOldStartup = Environment.GetFolderPath(Environment.SpecialFolder.Startup) & "\WildBlue Bandwidth Monitor.lnk"
+        sOldStartup = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "WildBlue Bandwidth Monitor.lnk")
       End If
       If My.Computer.FileSystem.FileExists(sOldStartup) Then
         My.Computer.FileSystem.DeleteFile(sOldStartup)
         If Not My.Computer.FileSystem.FileExists(StartupPath) Then
-          Dim sMyEXE As String = My.Application.Info.DirectoryPath & "\" & My.Application.Info.AssemblyName & ".exe"
+          Dim sMyEXE As String = IO.Path.Combine(My.Application.Info.DirectoryPath, My.Application.Info.AssemblyName & ".exe")
           Using link As New ShellLink
             link.Target = sMyEXE
             link.WorkingDirectory = My.Application.Info.DirectoryPath
@@ -120,12 +120,12 @@
           End Using
         End If
       End If
-      Dim OldDir As String = My.Computer.FileSystem.SpecialDirectories.ProgramFiles & "\" & Application.Info.CompanyName & "\WildBlue Bandwidth Monitor"
+      Dim OldDir As String = IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.ProgramFiles, Application.Info.CompanyName, "WildBlue Bandwidth Monitor")
       If My.Computer.FileSystem.DirectoryExists(OldDir) Then
         If MsgDlg(Nothing, "Would you like to remove the defunct WildBlue Bandwidth Monitor from your computer?" & vbNewLine & "Your settings will be saved for use in the new Satellite Restriction Tracker.", "WildBlue Bandwith Monitor has been rebranded.", "Uninstall WildBlue Bandwidth Monitor?", MessageBoxButtons.YesNo, _TaskDialogIcon.DefaultPrograms, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1) = DialogResult.Yes Then
-          If My.Computer.FileSystem.FileExists(OldDir & "\unins000.exe") Then
+          If My.Computer.FileSystem.FileExists(IO.Path.Combine(OldDir, "unins000.exe")) Then
             Try
-              ShellEx(OldDir & "\unins000.exe", "/silent")
+              ShellEx(IO.Path.Combine(OldDir, "unins000.exe"), "/silent")
             Catch ex As Exception
               MsgDlg(Nothing, "Unable to run WildBlue Bandwidth Monitor uninstaller. Please uninstall the program manually through Start or the <a href=""control appwiz.cpl"">Control Panel</a>.", "The Uninstaller failed to run.", "Uninstall Failed", MessageBoxButtons.OK, _TaskDialogIcon.ControlPanel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, ex.Message, _TaskDialogExpandedDetailsLocation.ExpandFooter, "View Error Details", "Hide Error Details")
             End Try

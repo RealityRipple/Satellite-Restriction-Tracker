@@ -1,5 +1,5 @@
 ﻿Public NotInheritable Class frmAbout
-  Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
+  Private sEXEPath As String = IO.Path.Combine(LocalAppDataDirectory, "SRT_Setup.exe")
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
   Private tReset As Threading.Timer

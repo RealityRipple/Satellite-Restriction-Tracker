@@ -220,7 +220,7 @@ Public Class frmWizard
         End If
       Case 2
         pctLeftBox.Image = My.Resources.wizService
-        If My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
+        If My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
           optLocal.Enabled = True
           lblLocal.Text = "Gather data whenever the computer is online"
           lblLocal.Enabled = optLocal.Checked
@@ -687,7 +687,7 @@ Public Class frmWizard
       End Try
       Return
     End If
-    If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
+    If IO.File.Exists(IO.Path.Combine(LocalAppDataDirectory, "user.config")) Then IO.File.Delete(IO.Path.Combine(LocalAppDataDirectory, "user.config"))
     AccountType = acct
     DrawStatus(False)
     tbsWizardPages.SelectedIndex += 1
@@ -709,7 +709,7 @@ Public Class frmWizard
       End Try
       Return
     End If
-    If IO.File.Exists(LocalAppDataDirectory & "user.config") Then IO.File.Delete(LocalAppDataDirectory & "user.config")
+    If IO.File.Exists(IO.Path.Combine(LocalAppDataDirectory, "user.config")) Then IO.File.Delete(IO.Path.Combine(LocalAppDataDirectory, "user.config"))
     AccountType = SatHostTypes.Other
     Dim skipIt As Boolean = False
     Dim forceRetry As Boolean = False

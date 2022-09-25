@@ -31,7 +31,7 @@ Public Class frmMain
   Private sDisp_TT_M = sDISPLAY_TT_NEXT.Replace("%t", sDisp_TT_T)
   Private sDisp_TT_T As String = sDISPLAY_TT_T_SOON
   Private sDisp_TT_E As String = ""
-  Private sEXEPath As String = LocalAppDataDirectory & "SRT_Setup.exe"
+  Private sEXEPath As String = IO.Path.Combine(LocalAppDataDirectory, "SRT_Setup.exe")
   Private animData As WindowAnimationData
   Private dwmComp As Boolean
   Private restoreMax As Boolean
@@ -557,7 +557,7 @@ Public Class frmMain
       cSave.Timeout = mySettings.Timeout
       cSave.Save()
     End If
-    If My.Computer.FileSystem.FileExists(AppDataPath & "del.bat") Then My.Computer.FileSystem.DeleteFile(AppDataPath & "del.bat")
+    If My.Computer.FileSystem.FileExists(IO.Path.Combine(AppDataPath, "del.bat")) Then My.Computer.FileSystem.DeleteFile(IO.Path.Combine(AppDataPath, "del.bat"))
     Select Case e.CloseReason
       Case CloseReason.WindowsShutDown
       Case CloseReason.ApplicationExitCall
@@ -662,7 +662,7 @@ Public Class frmMain
         End Try
       End If
     End If
-    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
@@ -1920,7 +1920,7 @@ Public Class frmMain
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
           ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
-          If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+          If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then frmHistory.mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
           frmHistory.DoResize(True)
         End If
       Case Windows.Forms.DialogResult.Abort
@@ -1998,7 +1998,7 @@ Public Class frmMain
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
         ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
-        If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then frmHistory.mySettings.HistoryDir = Application.StartupPath & "\Config\"
+        If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then frmHistory.mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
         frmHistory.DoResize(True)
       End If
     End If
@@ -2619,8 +2619,8 @@ Public Class frmMain
   Private Sub ControlService(Run As Boolean)
     Try
       If mySettings.Service Then
-        If My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
-          Dim ControllerProps As New ProcessStartInfo(Application.StartupPath & "\RestrictionController.exe")
+        If My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
+          Dim ControllerProps As New ProcessStartInfo(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe"))
           ControllerProps.Arguments = IIf(Run, "/run", "/stop")
           ControllerProps.WindowStyle = ProcessWindowStyle.Hidden
           Process.Start(ControllerProps)

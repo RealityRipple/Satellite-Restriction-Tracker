@@ -13,7 +13,7 @@
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
     mySettings = New AppSettings
-    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     RepadAllItems(Me)
     Dim sAccount As String = mySettings.Account
     Dim sUsername, sProvider As String
@@ -250,18 +250,22 @@
     DoCheck()
     Dim DisableHistory As Boolean = False
     Dim aD As String = LocalAppDataDirectory
-    If Not aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD &= IO.Path.DirectorySeparatorChar
+    If aD.EndsWith(IO.Path.DirectorySeparatorChar) Then aD = aD.Substring(0, aD.Length - 1)
     Dim hD As String = mySettings.HistoryDir
     If String.IsNullOrEmpty(hD) Then hD = AppDataAllPath
-    If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
+    If hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD = hD.Substring(0, hD.Length - 1)
+    Dim tDA As String = AppDataAllPath
+    If tDA.EndsWith(IO.Path.DirectorySeparatorChar) Then tDA = tDA.Substring(0, tDA.Length - 1)
+    Dim tD As String = AppDataPath
+    If tD.EndsWith(IO.Path.DirectorySeparatorChar) Then tD = tD.Substring(0, tD.Length - 1)
     If chkService.Checked Then
       optHistoryProgramData.Checked = True
       DisableHistory = True
-    ElseIf String.Compare(aD, Application.StartupPath & "\Config\", True) = 0 Then
+    ElseIf String.Compare(aD, IO.Path.Combine(Application.StartupPath, "Config")) = 0 Then
       optHistoryProgramData.Checked = False
       optHistoryAppData.Checked = False
       optHistoryCustom.Checked = False
-      mySettings.HistoryDir = Application.StartupPath & "\Config\"
+      mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
       DisableHistory = True
       lblPortableDir.Enabled = False
       txtPortableDir.Enabled = False
@@ -711,7 +715,6 @@
       txtHistoryDir.Tag = Nothing
       Dim hD As String = mySettings.HistoryDir
       If String.IsNullOrEmpty(hD) Then hD = AppDataPath
-      If Not hD.EndsWith(IO.Path.DirectorySeparatorChar) Then hD &= IO.Path.DirectorySeparatorChar
       If String.Compare(hD, AppDataAllPath, True) = 0 Then
         optHistoryProgramData.Checked = True
       ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
@@ -1256,7 +1259,7 @@
       }
       If dirDlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
         Dim sDir As String = IO.Path.GetDirectoryName(dirDlg.FileName)
-        If Not sDir.EndsWith(IO.Path.DirectorySeparatorChar) Then sDir &= IO.Path.DirectorySeparatorChar
+        If sDir.EndsWith(IO.Path.DirectorySeparatorChar) Then sDir = sDir.Substring(0, sDir.Length - 1)
         txtHistoryDir.Text = sDir
       End If
     End Using
@@ -1297,11 +1300,10 @@
       Return
     End Try
     Dim sPath As String = txtPortableDir.Text
-    If Not sPath.EndsWith(IO.Path.DirectorySeparatorChar) Then sPath &= IO.Path.DirectorySeparatorChar
     Try
-      IO.File.Copy(Application.ExecutablePath, sPath & "RestrictionTracker.exe", True)
-      IO.File.Copy(Application.StartupPath & "\RestrictionTrackerLib.dll", sPath & "RestrictionTrackerLib.dll", True)
-      IO.Directory.CreateDirectory(sPath & "Config\")
+      IO.File.Copy(Application.ExecutablePath, IO.Path.Combine(sPath, "RestrictionTracker.exe"), True)
+      IO.File.Copy(IO.Path.Combine(Application.StartupPath, "RestrictionTrackerLib.dll"), IO.Path.Combine(sPath, "RestrictionTrackerLib.dll"), True)
+      IO.Directory.CreateDirectory(IO.Path.Combine(sPath, "Config"))
       For Each file As IO.FileInfo In New IO.DirectoryInfo(AppDataPath).EnumerateFiles
         If file.Name = "user.config" Or file.Name = "backup.config" Then
           Dim sConfig As String = My.Computer.FileSystem.ReadAllText(file.FullName, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
@@ -1311,14 +1313,14 @@
             Dim sNewHistory As String = "<setting name=""HistoryDir"">" & vbNewLine & "        <value></value>" & vbNewLine & "      </setting>"
             sConfig = sConfig.Replace(sHistory, sNewHistory)
           End If
-          My.Computer.FileSystem.WriteAllText(sPath & "Config\" & file.Name, sConfig, False, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
+          My.Computer.FileSystem.WriteAllText(IO.Path.Combine(sPath, "Config", file.Name), sConfig, False, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
         Else
-          file.CopyTo(sPath & "Config\" & file.Name, True)
+          file.CopyTo(IO.Path.Combine(sPath, "Config", file.Name), True)
         End If
       Next
       If Not AppDataPath = MySaveDir Then
         For Each file As IO.FileInfo In New IO.DirectoryInfo(MySaveDir(True)).EnumerateFiles
-          file.CopyTo(sPath & "Config\" & file.Name, True)
+          file.CopyTo(IO.Path.Combine(sPath, "Config", file.Name), True)
         Next
       End If
       MsgDlg(Me, My.Application.Info.ProductName & " has been ported to """ & sPath & """!", "Portable application created.", "Files Copied", MessageBoxButtons.OK, _TaskDialogIcon.RemovableDrive, MessageBoxIcon.Information)
@@ -1345,7 +1347,7 @@
       }
       If dirDlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
         Dim sDir As String = IO.Path.GetDirectoryName(dirDlg.FileName)
-        If Not sDir.EndsWith(IO.Path.DirectorySeparatorChar) Then sDir &= IO.Path.DirectorySeparatorChar
+        If sDir.EndsWith(IO.Path.DirectorySeparatorChar) Then sDir = sDir.Substring(0, sDir.Length - 1)
         txtPortableDir.Text = sDir
       End If
     End Using
@@ -1580,7 +1582,7 @@
       Case Else : mySettings.UpdateTime = 15
     End Select
     If String.IsNullOrEmpty(mySettings.HistoryDir) Then mySettings.HistoryDir = MySaveDir(True)
-    If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then
+    If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, StringComparison.OrdinalIgnoreCase) = 0 Then
       Dim sOldFiles() As String = My.Computer.FileSystem.GetFiles(mySettings.HistoryDir).ToArray
       Dim sNewFiles() As String = Nothing
       If My.Computer.FileSystem.DirectoryExists(txtHistoryDir.Text) Then
@@ -1651,7 +1653,7 @@
                   End If
                 Next
                 If DoSkip Then Continue For
-                Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
+                Dim sNewFile As String = IO.Path.Combine(txtHistoryDir.Text, IO.Path.GetFileName(sFile))
                 Try
                   My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
                 Catch ex As Exception
@@ -1684,7 +1686,7 @@
                   End If
                 Next
                 If DoSkip Then Continue For
-                Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
+                Dim sNewFile As String = IO.Path.Combine(txtHistoryDir.Text, IO.Path.GetFileName(sFile))
                 If My.Computer.FileSystem.FileExists(sNewFile) Then Continue For
                 Try
                   My.Computer.FileSystem.MoveFile(sFile, sNewFile, True)
@@ -1715,7 +1717,7 @@
                 End If
               Next
               If DoSkip Then Continue For
-              Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
+              Dim sNewFile As String = IO.Path.Combine(txtHistoryDir.Text, IO.Path.GetFileName(sFile))
               Try
                 My.Computer.FileSystem.MoveFile(sFile, sNewFile)
               Catch ex As Exception
@@ -1745,7 +1747,7 @@
               End If
             Next
             If DoSkip Then Continue For
-            Dim sNewFile As String = txtHistoryDir.Text & "\" & IO.Path.GetFileName(sFile)
+            Dim sNewFile As String = IO.Path.Combine(txtHistoryDir.Text, IO.Path.GetFileName(sFile))
             Try
               My.Computer.FileSystem.MoveFile(sFile, sNewFile)
             Catch ex As Exception
@@ -1901,12 +1903,12 @@
   End Function
   Private Sub DoCheck()
     If pctKeyState.Tag = 0 Then
-      If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
+      If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then
         ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
         'txtInterval.Minimum = 15
         chkService.Enabled = False
         chkService.Checked = False
-      ElseIf My.Computer.FileSystem.FileExists(Application.StartupPath & "\RestrictionController.exe") Then
+      ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
         'txtInterval.Minimum = 15
         chkService.Enabled = True
         chkService.Checked = mySettings.Service

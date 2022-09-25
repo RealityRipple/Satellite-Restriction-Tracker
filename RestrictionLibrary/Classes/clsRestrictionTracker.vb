@@ -583,7 +583,7 @@ Public Class localRestrictionTracker
     Randomize()
     ClosingTime = False
     sDataPath = ConfigPath
-    If mySettings Is Nothing Then mySettings = New AppSettings(ConfigPath & IO.Path.DirectorySeparatorChar.ToString & "user.config")
+    If mySettings Is Nothing Then mySettings = New AppSettings(IO.Path.Combine(ConfigPath, "user.config"))
     Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
     For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
       If (mySettings.SecurityProtocol And protocolTest) = protocolTest Then

@@ -160,7 +160,7 @@ Public Class svcRL
     Try
       DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
       tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), DataPath, 5000, 1000)
-      MySettings = New Settings(DataPath & "\user.config")
+      MySettings = New Settings(IO.Path.Combine(DataPath, "user.config"))
       If MySettings Is Nothing Then
         If myLog IsNot Nothing Then myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
       Else
@@ -210,7 +210,7 @@ Public Class svcRL
   End Sub
   Private Sub InitAccount()
     Try
-      MySettings = New Settings(DataPath & "\user.config")
+      MySettings = New Settings(IO.Path.Combine(DataPath, "user.config"))
       If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
         If String.IsNullOrEmpty(MySettings.PassKey) Or String.IsNullOrEmpty(MySettings.PassSalt) Then
           sPassword = StoredPasswordLegacy.DecryptLogger(MySettings.PassCrypt)
@@ -222,12 +222,12 @@ Public Class svcRL
         sAccount = MySettings.Account
         If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
           sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
-          If My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".wb") Then
-            LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
-          ElseIf My.Computer.FileSystem.FileExists(DataPath & "\History-" & sAccount & ".xml") Then
-            LOG_Initialize(DataPath & "\History-" & sAccount & ".xml")
+          If My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb")) Then
+            LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb"))
+          ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".xml")) Then
+            LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".xml"))
           Else
-            LOG_Initialize(DataPath & "\History-" & sAccount & ".wb")
+            LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb"))
           End If
           If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
         Else

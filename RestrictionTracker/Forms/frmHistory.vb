@@ -14,7 +14,7 @@ Public Class frmHistory
 #Region "Form Events"
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
-    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     useStyle = mySettings.AccountType
     ScreenDefaultColors(mySettings.Colors, useStyle)
     ResetDates()
@@ -74,7 +74,7 @@ Public Class frmHistory
     Dim SetAgo As UInt32 = 30
     If mySettings IsNot Nothing Then SetAgo = mySettings.Ago
     mySettings = New AppSettings
-    If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then mySettings.HistoryDir = Application.StartupPath & "\Config\"
+    If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     mySettings.Ago = SetAgo
     mySettings.Gr = IIf(optGraph.Checked, "aph", "id")
     mySettings.Save()

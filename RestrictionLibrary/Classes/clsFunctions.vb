@@ -689,7 +689,7 @@ Public Class srlFunctions
   ''' <param name="dataPath">The folder where socket errors will be saved to.</param>
   ''' <remarks>See Also: <seealso cref="NetworkErrorToString" />, <seealso cref="SendSocketErrors" />.</remarks>
   Public Shared Sub ReportSocketError(ex As Exception, dataPath As String)
-    Dim ReportList As String = dataPath & "\sckerrs.log"
+    Dim ReportList As String = IO.Path.Combine(dataPath, "sckerrs.log")
     If String.IsNullOrEmpty(ex.Message) Then Return
     Dim sErrMsg As String = ex.Message
     If ex.InnerException IsNot Nothing AndAlso Not String.IsNullOrEmpty(ex.InnerException.Message) Then
@@ -712,7 +712,7 @@ Public Class srlFunctions
   ''' <remarks>See Also: <seealso cref="ReportSocketError" /></remarks>
   Public Shared Sub SendSocketErrors(dataPath As String)
     If lastSocketErrSend > 0 AndAlso TickCount() - lastSocketErrSend < 10 * 60 * 1000 Then Return
-    Dim ReportList As String = dataPath & "\sckerrs.log"
+    Dim ReportList As String = IO.Path.Combine(dataPath, "sckerrs.log")
     If IO.File.Exists(ReportList) Then
       Dim reports As New Collections.Generic.List(Of String)(Split(My.Computer.FileSystem.ReadAllText(ReportList), vbNewLine & vbNewLine))
       For I As Integer = reports.Count - 1 To 0 Step -1

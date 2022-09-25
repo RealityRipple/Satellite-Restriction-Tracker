@@ -166,18 +166,18 @@ Module modFunctions
     End Function
   End Class
   Public Function LoadAlertStyle(Path As String) As NotifierStyle
-    If My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tgz") Then
-      Path = LocalAppDataDirectory & Path & ".tgz"
-    ElseIf My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tar.gz") Then
-      Path = LocalAppDataDirectory & Path & ".tar.gz"
-    ElseIf My.Computer.FileSystem.FileExists(LocalAppDataDirectory & Path & ".tar") Then
-      Path = LocalAppDataDirectory & Path & ".tar"
+    If My.Computer.FileSystem.FileExists(IO.Path.Combine(LocalAppDataDirectory, Path & ".tgz")) Then
+      Path = IO.Path.Combine(LocalAppDataDirectory, Path & ".tgz")
+    ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(LocalAppDataDirectory, Path & ".tar.gz")) Then
+      Path = IO.Path.Combine(LocalAppDataDirectory, Path & ".tar.gz")
+    ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(LocalAppDataDirectory, Path & ".tar")) Then
+      Path = IO.Path.Combine(LocalAppDataDirectory, Path & ".tar")
     Else
       Return New NotifierStyle
     End If
     Try
-      Dim TempAlertDir As String = LocalAppDataDirectory & "notifier\"
-      Dim TempAlertTAR As String = LocalAppDataDirectory & "notifier.tar"
+      Dim TempAlertDir As String = IO.Path.Combine(LocalAppDataDirectory, "notifier")
+      Dim TempAlertTAR As String = IO.Path.Combine(LocalAppDataDirectory, "notifier.tar")
       If Path.EndsWith(".tar") Then
         ExtractTar(Path, TempAlertDir)
       Else
@@ -189,7 +189,7 @@ Module modFunctions
           ExtractTar(Path, TempAlertDir)
         End Try
       End If
-      Dim ns As New NotifierStyle(TempAlertDir & "alert.png", TempAlertDir & "close.png", TempAlertDir & "loc")
+      Dim ns As New NotifierStyle(IO.Path.Combine(TempAlertDir, "alert.png"), IO.Path.Combine(TempAlertDir, "close.png"), IO.Path.Combine(TempAlertDir, "loc"))
       My.Computer.FileSystem.DeleteDirectory(TempAlertDir, FileIO.DeleteDirectoryOption.DeleteAllContents)
       Return ns
     Catch ex As Exception
@@ -277,15 +277,14 @@ Module modFunctions
   End Class
   Private Sub ExtractTar(sTAR As String, sDestPath As String)
     If Not My.Computer.FileSystem.DirectoryExists(sDestPath) Then My.Computer.FileSystem.CreateDirectory(sDestPath)
-    If Not sDestPath.EndsWith("\") Then sDestPath &= "\"
     Using sourceTAR As New IO.FileStream(sTAR, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
       Using binTar As New IO.BinaryReader(sourceTAR)
         Do While binTar.BaseStream.Position < binTar.BaseStream.Length
           Dim tarFile As New TarFileData(binTar)
           If Not String.IsNullOrEmpty(tarFile.FileName) Then
             If tarFile.LinkIndicator = 0 Then
-              My.Computer.FileSystem.WriteAllBytes(sDestPath & tarFile.FileName, tarFile.FileData, False)
-              IO.File.SetLastWriteTime(sDestPath & tarFile.FileName, New Date(1970, 1, 1).AddSeconds(tarFile.LastMod))
+              My.Computer.FileSystem.WriteAllBytes(IO.Path.Combine(sDestPath, tarFile.FileName), tarFile.FileData, False)
+              IO.File.SetLastWriteTime(IO.Path.Combine(sDestPath, tarFile.FileName), New Date(1970, 1, 1).AddSeconds(tarFile.LastMod))
             End If
 
           End If
@@ -329,8 +328,8 @@ Module modFunctions
   End Sub
   Public Sub PlaySong()
     If Song Is Nothing Then
-      My.Computer.FileSystem.WriteAllBytes(LocalAppDataDirectory & "Song.mid", My.Resources.Song, False)
-      Song = New MCIPlayer(LocalAppDataDirectory & "Song.mid")
+      My.Computer.FileSystem.WriteAllBytes(IO.Path.Combine(LocalAppDataDirectory, "Song.mid"), My.Resources.Song, False)
+      Song = New MCIPlayer(IO.Path.Combine(LocalAppDataDirectory, "Song.mid"))
       Song.Play()
     End If
   End Sub
@@ -342,28 +341,28 @@ Module modFunctions
       Song.Dispose()
       Song = Nothing
     End If
-    If My.Computer.FileSystem.FileExists(LocalAppDataDirectory & "Song.mid") Then
+    If My.Computer.FileSystem.FileExists(IO.Path.Combine(LocalAppDataDirectory, "Song.mid")) Then
       Try
-        My.Computer.FileSystem.DeleteFile(LocalAppDataDirectory & "Song.mid")
+        My.Computer.FileSystem.DeleteFile(IO.Path.Combine(LocalAppDataDirectory, "Song.mid"))
       Catch ex As Exception
       End Try
     End If
   End Sub
   Public ReadOnly Property AppDataPath As String
     Get
-      Return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
+      Return IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Application.CompanyName, My.Application.Info.ProductName)
     End Get
   End Property
   Public ReadOnly Property AppDataAllPath As String
     Get
-      Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName & "\" & My.Application.Info.ProductName & "\"
+      Return IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Application.CompanyName, My.Application.Info.ProductName)
     End Get
   End Property
   Public ReadOnly Property CommonAppDataDirectory As String
     Get
       Static sTmp As String
       Static OneAlert As Boolean
-      If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\" & Application.CompanyName)
+      If Not My.Computer.FileSystem.DirectoryExists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Application.CompanyName)) Then My.Computer.FileSystem.CreateDirectory(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), Application.CompanyName))
       If Not My.Computer.FileSystem.DirectoryExists(AppDataAllPath) Then My.Computer.FileSystem.CreateDirectory(AppDataAllPath)
       If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataAllPath
 
@@ -391,13 +390,13 @@ Module modFunctions
   Public ReadOnly Property LocalAppDataDirectory As String
     Get
       Static sTmp As String
-      If Application.StartupPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
-        If Not My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName) Then My.Computer.FileSystem.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\" & Application.CompanyName)
+      If Application.StartupPath.Contains(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)) Or Not My.Computer.FileSystem.DirectoryExists(IO.Path.Combine(Application.StartupPath, "Config")) Then
+        If Not My.Computer.FileSystem.DirectoryExists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Application.CompanyName)) Then My.Computer.FileSystem.CreateDirectory(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Application.CompanyName))
         If Not My.Computer.FileSystem.DirectoryExists(AppDataPath) Then My.Computer.FileSystem.CreateDirectory(AppDataPath)
         If String.IsNullOrEmpty(sTmp) Then sTmp = AppDataPath
       Else
         If String.IsNullOrEmpty(sTmp) Then
-          sTmp = Application.StartupPath & "\Config\"
+          sTmp = IO.Path.Combine(Application.StartupPath, "Config")
         End If
       End If
       Return sTmp
@@ -405,7 +404,7 @@ Module modFunctions
   End Property
   Public ReadOnly Property UpdateParam As String
     Get
-      If LocalAppDataDirectory = Application.StartupPath & "\Config\" Then
+      If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then
         Return "/silent /noicons /dir=""" & Application.StartupPath & """ /type=portable"
       Else
         Return "/silent /noicons"
@@ -415,7 +414,7 @@ Module modFunctions
   Public ReadOnly Property MySaveDir(Optional Create As Boolean = False) As String
     Get
       Dim mySettings As New AppSettings
-      If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(Application.StartupPath & "\Config\") Then
+      If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(IO.Path.Combine(Application.StartupPath, "Config")) Then
         If String.IsNullOrEmpty(mySettings.HistoryDir) Then
           If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
             If Array.Exists(My.Computer.FileSystem.GetFiles(AppDataPath).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
@@ -428,7 +427,7 @@ Module modFunctions
           End If
         End If
       Else
-        mySettings.HistoryDir = Application.StartupPath & "\Config\"
+        mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
       End If
       If Create Then
         Try
@@ -607,9 +606,9 @@ Module modFunctions
       Static sTmp As String
       If String.IsNullOrEmpty(sTmp) Then
         If My.Computer.FileSystem.DirectoryExists(Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access") Then
-          sTmp = Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access\Satellite Restriction Tracker.lnk"
+          sTmp = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup) & " with Internet Access", "Satellite Restriction Tracker.lnk")
         Else
-          sTmp = Environment.GetFolderPath(Environment.SpecialFolder.Startup) & "\Satellite Restriction Tracker.lnk"
+          sTmp = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Satellite Restriction Tracker.lnk")
         End If
       End If
       Return sTmp
@@ -757,7 +756,7 @@ Module modFunctions
             For I As Integer = 0 To spareFiles.Count - 1
               Dim file As String = spareFiles(I)
               Dim sFName As String = IO.Path.GetFileName(file)
-              My.Computer.FileSystem.CopyFile(file, ToDir & "\" & sFName, True)
+              My.Computer.FileSystem.CopyFile(file, IO.Path.Combine(ToDir, sFName), True)
               bDidSomething = True
             Next
           End If
@@ -771,7 +770,7 @@ Module modFunctions
           For I As Integer = 0 To wbFiles.Count - 1
             Dim file As String = wbFiles(I)
             Dim sFName As String = IO.Path.GetFileName(file)
-            My.Computer.FileSystem.CopyFile(file, ToDir & "\" & sFName, True)
+            My.Computer.FileSystem.CopyFile(file, IO.Path.Combine(ToDir, sFName), True)
             bDidSomething = True
           Next
         End If
