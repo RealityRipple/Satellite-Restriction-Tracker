@@ -10,9 +10,6 @@ Module modFunctions
   Private Class MCIPlayer
     Implements IDisposable
     Private sAlias As String
-    <Runtime.InteropServices.DllImport("winmm.dll")>
-    Private Shared Function mciSendString(ByVal strCommand As String, ByVal strReturn As System.Text.StringBuilder, ByVal iReturnLength As Integer, ByVal hwndCallback As IntPtr) As Long
-    End Function
     Public Sub New(ByVal sFileName As String)
       If Status() <> "" Then
         [Stop]()
@@ -20,36 +17,36 @@ Module modFunctions
       End If
       sAlias = IO.Path.GetFileNameWithoutExtension(sFileName)
       Dim sCommand As String = "open """ & sFileName & """ type mpegvideo alias " & sAlias
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub Close()
       Dim sCommand As String = "close " & sAlias
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
       sAlias = String.Empty
     End Sub
     Public Sub CloseAll()
       Dim sCommand As String = "close all wait"
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub Pause()
       Dim sCommand As String = "pause " & sAlias
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub Play(Optional Repeat As Boolean = False)
       Dim sCommand As String = "play " & sAlias & IIf(Repeat, " repeat", String.Empty)
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub [Resume]()
       Dim sCommand As String = "play " & sAlias & " from " & CLng(Status())
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub [Stop]()
       Dim sCommand As String = "stop " & sAlias
-      mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
+      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Function Status() As String
       Dim sBuffer As New System.Text.StringBuilder(128)
-      mciSendString("status " & sAlias & " mode", sBuffer, sBuffer.Capacity, IntPtr.Zero)
+      NativeMethods.mciSendString("status " & sAlias & " mode", sBuffer, sBuffer.Capacity, IntPtr.Zero)
       Return sBuffer.ToString()
     End Function
 #Region "IDisposable Support"
@@ -809,7 +806,7 @@ Module modFunctions
     Get
       Dim ai As NativeMethods.ANIMATIONINFO
       ai.Size = Len(ai)
-      NativeMethods.SystemParametersInfo(NativeMethods.SPI_GETANIMATION, ai.Size, ai, 0)
+      NativeMethods.SystemParametersInfo(NativeMethods.SPI_GETANIMATION, ai.Size, ai, 0UI)
       MinAnimation = ai.MinAnimate
     End Get
   End Property
@@ -820,11 +817,11 @@ Module modFunctions
     Dim screenRect = Screen.GetBounds(wad.startRect.Location)
     wad.destPoint = New Point(screenRect.Width - 96, screenRect.Height - 16)
     Select Case TaskBarPosition.GetTaskBarEdge(window.Handle)
-      Case TaskBarPosition.ABEdge.ABE_TOP
+      Case NativeMethods.ABEdge.ABE_TOP
         wad.destPoint = New Point(screenRect.Width - 96, 16)
-      Case TaskBarPosition.ABEdge.ABE_LEFT
+      Case NativeMethods.ABEdge.ABE_LEFT
         wad.destPoint = New Point(16, screenRect.Height - 96)
-      Case TaskBarPosition.ABEdge.ABE_RIGHT
+      Case NativeMethods.ABEdge.ABE_RIGHT
         wad.destPoint = New Point(screenRect.Width - 16, screenRect.Height - 96)
     End Select
     wad.backColor = window.BackColor

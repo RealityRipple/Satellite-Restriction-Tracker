@@ -205,7 +205,7 @@
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Check for &Updates"
     ttAbout.SetToolTip(cmdUpdate, "Check for a new version of Satellite Restriction Tracker.")
-    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, 0)
+    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, IntPtr.Zero, IntPtr.Zero)
   End Sub
   Private Sub NewUpdate()
     If Me.InvokeRequired Then
@@ -228,7 +228,7 @@
     cmdUpdate.Visible = True
     cmdUpdate.Text = "Apply &Update"
     ttAbout.SetToolTip(cmdUpdate, My.Application.Info.ProductName & " must restart before the update can be applied.")
-    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, 0, 1)
+    If Not isAdmin() Then NativeMethods.SendMessage(cmdUpdate.Handle, NativeMethods.BCM_SETSHIELD, IntPtr.Zero, 1)
   End Sub
   Private Sub BeginCheck()
     updateChecker = New clsUpdate

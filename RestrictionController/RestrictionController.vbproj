@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsAuthenticode.vb" />
+    <Compile Include="clsNativeMethods.vb" />
     <Compile Include="modRC.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

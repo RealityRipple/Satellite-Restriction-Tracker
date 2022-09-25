@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsAuthenticode.vb" />
+    <Compile Include="clsNativeMethods.vb" />
     <Compile Include="clsSettings.vb" />
     <Compile Include="modDB.vb" />
     <Compile Include="My Project\Application.Designer.vb">

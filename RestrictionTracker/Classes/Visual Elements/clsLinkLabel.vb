@@ -217,9 +217,9 @@ Public Class LinkLabel
     End If
   End Sub
   Protected Overrides Sub WndProc(ByRef msg As System.Windows.Forms.Message)
-    If msg.Msg = 32 Then
+    If msg.Msg = &H20 Then
       If MyBase.Cursor = Cursors.Hand Then
-        NativeMethods.SetCursor(NativeMethods.LoadCursor(0, 32649))
+        NativeMethods.SetCursor(NativeMethods.LoadCursor(IntPtr.Zero, &H7F89))
         msg.Result = IntPtr.Zero
         Return
       End If

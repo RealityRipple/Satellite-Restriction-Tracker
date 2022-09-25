@@ -1,7 +1,7 @@
 ﻿Module modRC
   Sub Main()
-    Dim v As Authenticode.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
-    If Not (v = Authenticode.Validity.SignedAndValid Or v = Authenticode.Validity.SignedButUntrusted) Then
+    Dim v As NativeMethods.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
+    If Not (v = NativeMethods.Validity.SignedAndValid Or v = NativeMethods.Validity.SignedButUntrusted) Then
       Console.Clear()
       Console.WriteLine("==Restriction Service Controller==")
       Console.WriteLine()

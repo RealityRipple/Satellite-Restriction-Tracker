@@ -23,7 +23,7 @@
     txtInfo.Text = "Loading Update Information" & vbNewLine & vbNewLine & "Please Wait..."
     lblBETA.Visible = BETA
     chkStopBETA.Visible = BETA
-    If UACIcon Then NativeMethods.SendMessage(cmdDownload.Handle, NativeMethods.BCM_SETSHIELD, 0, 1)
+    If UACIcon Then NativeMethods.SendMessage(cmdDownload.Handle, NativeMethods.BCM_SETSHIELD, IntPtr.Zero, 1)
   End Sub
   Private Sub cmdDownload_Click(sender As System.Object, e As System.EventArgs) Handles cmdDownload.Click
     If chkStopBETA.Visible And chkStopBETA.Checked Then

@@ -230,12 +230,12 @@ Public Class frmMain
       tmrIcoDelay.Interval = 2000
       tmrIcoDelay.Enabled = True
     Else
-      Dim trayNotifyWnd As IntPtr = NativeMethods.FindWindowEx(shellTrayWnd, 0, "TrayNotifyWnd", String.Empty)
+      Dim trayNotifyWnd As IntPtr = NativeMethods.FindWindowEx(shellTrayWnd, IntPtr.Zero, "TrayNotifyWnd", String.Empty)
       If trayNotifyWnd.Equals(IntPtr.Zero) Then
         tmrIcoDelay.Interval = 1000
         tmrIcoDelay.Enabled = True
       Else
-        Dim sysPagerWnd As IntPtr = NativeMethods.FindWindowEx(trayNotifyWnd, 0, "SysPager", String.Empty)
+        Dim sysPagerWnd As IntPtr = NativeMethods.FindWindowEx(trayNotifyWnd, IntPtr.Zero, "SysPager", String.Empty)
         If sysPagerWnd.Equals(IntPtr.Zero) Then
           tmrIcoDelay.Interval = 500
           tmrIcoDelay.Enabled = True
@@ -359,7 +359,7 @@ Public Class frmMain
     Else
       NativeMethods.InsertMenu(hSysMenu, 1, NativeMethods.MenuFlags.MF_STRING Or NativeMethods.MenuFlags.MF_UNCHECKED Or NativeMethods.MenuFlags.MF_BYPOSITION, SCALE_MENU_ID, SCALE_MENU_TEXT)
     End If
-    NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, 0, String.Empty)
+    NativeMethods.InsertMenu(hSysMenu, 2, NativeMethods.MenuFlags.MF_SEPARATOR Or NativeMethods.MenuFlags.MF_BYPOSITION, IntPtr.Zero, String.Empty)
   End Sub
   Protected Overrides Sub WndProc(ByRef m As System.Windows.Forms.Message)
     If mySettings Is Nothing Then

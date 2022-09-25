@@ -1,12 +1,28 @@
 ﻿Imports System.Runtime.InteropServices
 Public NotInheritable Class NativeMethods
-  Public Const WM_WINDOWPOSCHANGING As Integer = &H46
-  Public Const WM_SYSCOMMAND As Integer = &H112
-  Public Const WM_DWMCOMPOSITIONCHANGED As Integer = &H31E
-  Public Const SC_MINIMIZE As Integer = &HF020
-  Public Const SPI_GETANIMATION As Integer = &H48
-  <Flags()> _
-  Public Enum MenuFlags As Integer
+  Public Const WM_WINDOWPOSCHANGING As Int32 = &H46
+  Public Const WM_SYSCOMMAND As Int32 = &H112
+  Public Const WM_DWMCOMPOSITIONCHANGED As Int32 = &H31E
+  Public Const WM_NCLBUTTONDOWN As Integer = &HA1
+  Public Const WM_GETSYSMENU As Integer = &H313
+  Public Const BCM_SETSHIELD As Int32 = &H160C
+  Public Const SC_MINIMIZE As Int32 = &HF020
+  Public Const SPI_GETANIMATION As UInt32 = &H48
+  Public Const ABM_GETTASKBARPOS = &H5
+  Public Const ABM_GETSTATE = &H4
+  Public Const DTT_COMPOSITED As Int32 = CInt((1 << 13))
+  Public Const DTT_GLOWSIZE As Int32 = CInt((1 << 11))
+  Public Const DT_SINGLELINE As Int32 = &H20
+  Public Const DT_CENTER As Int32 = &H1
+  Public Const DT_VCENTER As Int32 = &H4
+  Public Const DT_NOPREFIX As Int32 = &H800
+  Public Const SRCCOPY As Int32 = &HCC0020
+  Public Const BI_RGB As Int32 = 0
+  Public Const DIB_RGB_COLORS As Int32 = 0
+  Public Const HTCAPTION As Integer = 2
+
+  <Flags()>
+  Public Enum MenuFlags As Int32
     MF_BYCOMMAND = &H0
     MF_BYPOSITION = &H400
     MF_BITMAP = &H4
@@ -22,7 +38,7 @@ Public NotInheritable Class NativeMethods
     MF_STRING = &H0
     MF_UNCHECKED = &H0
   End Enum
-  Public Enum MetricsList As Integer
+  Public Enum MetricsList As Int32
     SM_CXSCREEN = 0
     SM_CYSCREEN = 1
     SM_CXVSCROLL = 2
@@ -122,13 +138,8 @@ Public NotInheritable Class NativeMethods
     SM_CONVERTIBLESLATEMODE = &H2003
     SM_SYSTEMDOCKED = &H2004
   End Enum
-  Public Structure ANIMATIONINFO
-    Public Size As Integer
-    Public MinAnimate As Integer
-  End Structure
-  Public Const BCM_SETSHIELD As Integer = &H160C
   <Flags()>
-  Public Enum WINDOWPOS_FLAGS As UInteger
+  Public Enum WINDOWPOS_FLAGS As UInt32
     SWP_NOSIZE = &H1
     SWP_NOMOVE = &H2
     SWP_NOZORDER = &H4
@@ -144,55 +155,199 @@ Public NotInheritable Class NativeMethods
     SWP_NOCLIENTMOVE = &H1000
     SWP_STATECHANGED = &H8000
   End Enum
+  Public Enum ABEdge
+    ABE_LEFT = 0
+    ABE_TOP
+    ABE_RIGHT
+    ABE_BOTTOM
+  End Enum
+  Public Enum Validity As UInt32
+    Unsigned = &H800B0100UI
+    SignedButBad = &H80096010UI
+    SignedButInvalid = &H800B0000UI
+    SignedButUntrusted = &H800B0109UI
+    SignedAndValid = 0
+    BadThumb = &HA0090001UI
+    BadSerial = &HA0090002UI
+    BadSubject = &HA0090003UI
+    BadRootThumb = &HA0090101UI
+    BadRootSerial = &HA0090102UI
+    BadRootSubject = &HA0090103UI
+  End Enum
+
+  Public Structure ANIMATIONINFO
+    Public Size As Int32
+    Public MinAnimate As Int32
+  End Structure
   Public Structure WINDOWPOS
     Public hWnd As IntPtr
     Public hWndInsertAfter As IntPtr
-    Public X As Integer
-    Public Y As Integer
-    Public Width As Integer
-    Public Height As Integer
+    Public X As Int32
+    Public Y As Int32
+    Public Width As Int32
+    Public Height As Int32
     Public Flags As WINDOWPOS_FLAGS
   End Structure
-  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
-  Public Shared Function GetSystemMenu(hWnd As IntPtr, bRevert As Boolean) As IntPtr
+  Public Structure APPBARDATA
+    Public cbSize As Int32
+    Public hwnd As IntPtr
+    Public uCallbackMessage As Int32
+    Public uEdge As ABEdge
+    Public rc As RECT
+    Public lParam As Int32
+  End Structure
+  Public Structure RECT
+    Public Left As Int32
+    Public Top As Int32
+    Public Right As Int32
+    Public Bottom As Int32
+  End Structure
+  Public Structure MARGINS
+    Public m_Left As Int32
+    Public m_Right As Int32
+    Public m_Top As Int32
+    Public m_Bottom As Int32
+  End Structure
+  Public Structure POINTAPI
+    Public x As Int32
+    Public y As Int32
+  End Structure
+  Public Structure DTTOPTS
+    Public dwSize As UInt32
+    Public dwFlags As UInt32
+    Public crText As UInt32
+    Public crBorder As UInt32
+    Public crShadow As UInt32
+    Public iTextShadowType As Int32
+    Public ptShadowOffset As POINTAPI
+    Public iBorderSize As Int32
+    Public iFontPropId As Int32
+    Public iColorPropId As Int32
+    Public iStateId As Int32
+    Public fApplyOverlay As Int32
+    Public iGlowSize As Int32
+    Public pfnDrawTextCallback As IntPtr
+    Public lParam As Int32
+  End Structure
+  Public Structure BITMAPINFOHEADER
+    Public biSize As Int32
+    Public biWidth As Int32
+    Public biHeight As Int32
+    Public biPlanes As Int16
+    Public biBitCount As Int16
+    Public biCompression As Int32
+    Public biSizeImage As Int32
+    Public biXPelsPerMeter As Int32
+    Public biYPelsPerMeter As Int32
+    Public biClrUsed As Int32
+    Public biClrImportant As Int32
+  End Structure
+  Public Structure RGBQUAD
+    Public rgbBlue As Byte
+    Public rgbGreen As Byte
+    Public rgbRed As Byte
+    Public rgbReserved As Byte
+  End Structure
+  Public Structure BITMAPINFO
+    Public bmiHeader As BITMAPINFOHEADER
+    Public bmiColors As RGBQUAD
+  End Structure
+
+
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function ShowWindow(hWnd As IntPtr, nCmdShow As Int32) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
-  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
-  Public Shared Function AppendMenu(hMenu As IntPtr, uFlags As Integer, uIDNewItem As Integer, lpNewItem As String) As IntPtr
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function GetSystemMenu(hWnd As IntPtr, <MarshalAs(UnmanagedType.Bool)> bRevert As Boolean) As IntPtr
   End Function
-  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
-  Public Shared Function InsertMenu(hMenu As IntPtr, uPosition As Integer, uFlags As Integer, uIDNewItem As Integer, lpNewItem As String) As Boolean
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function InsertMenu(hMenu As IntPtr, uPosition As Int32, uFlags As Int32, uIDNewItem As IntPtr, lpNewItem As String) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
-  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
-  Public Shared Function ModifyMenu(hMenu As IntPtr, uPosition As Integer, uFlags As Integer, uIDNewItem As Integer, lpNewItem As String) As Boolean
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function ModifyMenu(hMenu As IntPtr, uPosition As Int32, uFlags As Int32, uIDNewItem As IntPtr, lpNewItem As String) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
-  <DllImport("user32", CharSet:=CharSet.Unicode)> _
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
   Public Shared Function FindWindow(lpClassName As String, lpWindowName As String) As IntPtr
   End Function
-  <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Unicode)> _
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
   Public Shared Function FindWindowEx(parentHandle As IntPtr, childAfter As IntPtr, lclassName As String, windowTitle As String) As IntPtr
   End Function
-  <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
-  Public Shared Function SetWindowText(hWnd As IntPtr, lpString As String) As Boolean
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SetWindowText(hWnd As IntPtr, lpString As String) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
-  <DllImport("user32", SetLastError:=True)>
-  Public Shared Function LoadCursor(hInstance As IntPtr, lpCursorName As Integer) As Integer
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function LoadCursor(hInstance As IntPtr, lpCursorName As IntPtr) As IntPtr
   End Function
-  <DllImport("user32", SetLastError:=True)>
-  Public Shared Function SetCursor(hCursor As Integer) As Integer
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SetCursor(hCursor As IntPtr) As IntPtr
   End Function
-  <DllImport("user32", SetLastError:=True)>
-  Public Shared Function GetAncestor(ByVal hWnd As IntPtr, ByVal gaFlags As Integer) As IntPtr
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function GetAncestor(ByVal hWnd As IntPtr, ByVal gaFlags As Int32) As IntPtr
   End Function
-  <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
-  Public Shared Function GetSystemMetrics(ByVal nIndex As MetricsList) As Integer
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function GetSystemMetrics(ByVal nIndex As MetricsList) As Int32
   End Function
-  <DllImport("user32", SetLastError:=True, CharSet:=CharSet.Auto)>
-  Public Shared Function DestroyIcon(ByVal hWnd As IntPtr) As Boolean
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function DestroyIcon(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
-  <DllImport("user32", CharSet:=CharSet.Auto, setlasterror:=True)>
-  Public Shared Function SendMessage(hWnd As IntPtr, msg As UInt32, wParam As UInt32, lParam As UInt32) As UInt32
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SystemParametersInfo(uAction As UInt32, uParam As UInt32, ByRef lpvParam As ANIMATIONINFO, fuWinIni As UInt32) As UInt32
   End Function
-  <DllImport("user32", CharSet:=CharSet.Auto, SetLastError:=True)>
-  Public Shared Function SystemParametersInfo(uAction As UInteger, uParam As UInteger, ByRef lpvParam As ANIMATIONINFO, fuWinIni As UInteger) As UInteger
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Friend Shared Function SendMessage(hWnd As IntPtr, msg As Int32, wp As IntPtr, lp As IntPtr) As IntPtr
+  End Function
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function GetDC(ByVal hdc As IntPtr) As IntPtr
+  End Function
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function ReleaseCapture() As <MarshalAs(UnmanagedType.Bool)> Boolean
+  End Function
+  <DllImport("user32", CharSet:=CharSet.Unicode)>
+  Public Shared Function ReleaseDC(ByVal hdc As IntPtr, ByVal state As IntPtr) As Int32
+  End Function
+
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SaveDC(ByVal hdc As IntPtr) As Int32
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function CreateCompatibleDC(ByVal hDC As IntPtr) As IntPtr
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SelectObject(ByVal hDC As IntPtr, ByVal hObject As IntPtr) As IntPtr
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function DeleteObject(ByVal hObject As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function DeleteDC(ByVal hdc As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function BitBlt(ByVal hdc As IntPtr, ByVal nXDest As Int32, ByVal nYDest As Int32, ByVal nWidth As Int32, ByVal nHeight As Int32, ByVal hdcSrc As IntPtr, ByVal nXSrc As Int32, ByVal nYSrc As Int32, ByVal dwRop As UInt32) As <MarshalAs(UnmanagedType.Bool)> Boolean
+  End Function
+  <DllImport("gdi32", CharSet:=CharSet.Unicode)>
+  Public Shared Function CreateDIBSection(ByVal hdc As IntPtr, ByRef pbmi As BITMAPINFO, ByVal iUsage As UInt32, ByVal ppvBits As IntPtr, ByVal hSection As IntPtr, ByVal dwOffset As UInt32) As IntPtr
+  End Function
+
+  <DllImport("shell32", CharSet:=CharSet.Unicode)>
+  Public Shared Function SHAppBarMessage(ByVal dwMessage As Int32, ByRef pData As APPBARDATA) As IntPtr
+  End Function
+
+  <DllImport("wintrust", CharSet:=CharSet.Unicode)>
+  Public Shared Function WinVerifyTrust(hWnd As IntPtr, pgActionID As IntPtr, pWinTrustData As IntPtr) As UInt32
+  End Function
+
+  <DllImport("dwmapi", CharSet:=CharSet.Unicode)>
+  Public Shared Sub DwmIsCompositionEnabled(ByRef enabledptr As Int32)
+  End Sub
+  <DllImport("dwmapi", CharSet:=CharSet.Unicode)>
+  Public Shared Sub DwmExtendFrameIntoClientArea(ByVal hWnd As IntPtr, ByRef margin As MARGINS)
+  End Sub
+
+  <DllImport("uxtheme", CharSet:=CharSet.Unicode)>
+  Public Shared Function DrawThemeTextEx(ByVal hTheme As IntPtr, ByVal hdc As IntPtr, ByVal iPartId As Int32, ByVal iStateId As Int32, ByVal text As String, ByVal iCharCount As Int32, ByVal dwFlags As Int32, ByRef pRect As RECT, ByRef pOptions As DTTOPTS) As Int32
+  End Function
+
+  <DllImport("winmm", CharSet:=CharSet.Unicode)>
+  Public Shared Function mciSendString(ByVal strCommand As String, ByVal strReturn As System.Text.StringBuilder, ByVal iReturnLength As Int32, ByVal hwndCallback As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
 End Class

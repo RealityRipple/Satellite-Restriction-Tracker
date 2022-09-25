@@ -1,5 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
 Public Class CurrentOS
+  Private Class NativeMethods
+    <DllImport("kernel32", CallingConvention:=CallingConvention.Winapi)>
+    Public Shared Function IsWow64Process(hProcess As IntPtr, <MarshalAs(UnmanagedType.Bool)> ByRef wow64Process As Boolean) As <MarshalAs(UnmanagedType.Bool)> Boolean
+    End Function
+  End Class
   Private Shared m_Windows As Boolean
   Private Shared m_Unix As Boolean
   Private Shared m_Mac As Boolean
@@ -8,9 +13,6 @@ Public Class CurrentOS
   Private Shared m_32 As Boolean
   Private Shared m_64 As Boolean
   Private Shared m_Name As String
-  <DllImport("kernel32.dll", SetLastError:=True, CallingConvention:=CallingConvention.Winapi)>
-  Private Shared Function IsWow64Process(hProcess As IntPtr, ByRef wow64Process As Boolean) As <MarshalAs(UnmanagedType.Bool)> Boolean
-  End Function
   Public Shared ReadOnly Property IsWindows As Boolean
     Get
       Return m_Windows
@@ -66,7 +68,7 @@ Public Class CurrentOS
     If (Environment.OSVersion.Version.Major = 5 And Environment.OSVersion.Version.Minor >= 1) Or Environment.OSVersion.Version.Major >= 6 Then
       Using p = System.Diagnostics.Process.GetCurrentProcess()
         Dim retVal As Boolean
-        If (IsWow64Process(p.Handle, retVal) = False) Then Return False
+        If (NativeMethods.IsWow64Process(p.Handle, retVal) = False) Then Return False
         Return retVal
       End Using
     Else

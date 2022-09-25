@@ -2,9 +2,6 @@
 Imports System.Security.Cryptography.X509Certificates
 
 Public Class Authenticode
-  <DllImport("wintrust", PreserveSig:=True, SetLastError:=True)>
-  Private Shared Function WinVerifyTrust(hWnd As IntPtr, pgActionID As IntPtr, pWinTrustData As IntPtr) As UInt32
-  End Function
   Private Const RRRootThumb As String = "25E10B83C6F3EA44EE5E8C290EB17200A5F77EBB"
   Private Const RRRootSerial As String = "0087448327"
   Private Const RRRootSubject As String = "CN=RealityRipple Software Root CA, OU=RealityRipple Software Certificate Authority, O=RealityRipple Software, L=Los Berros Canyon, S=California, C=US"
@@ -162,22 +159,9 @@ Public Class Authenticode
     Execute = 0
     Install
   End Enum
-  Public Enum Validity As UInteger
-    Unsigned = &H800B0100UI
-    SignedButBad = &H80096010UI
-    SignedButInvalid = &H800B0000UI
-    SignedButUntrusted = &H800B0109UI
-    SignedAndValid = 0
-    BadThumb = &HA0090001UI
-    BadSerial = &HA0090002UI
-    BadSubject = &HA0090003UI
-    BadRootThumb = &HA0090101UI
-    BadRootSerial = &HA0090102UI
-    BadRootSubject = &HA0090103UI
-  End Enum
-  Private Shared Function VerifyTrust(sFile As String) As Validity
+  Private Shared Function VerifyTrust(sFile As String) As NativeMethods.Validity
     Dim v2ID As New Guid("{00AAC56B-CD44-11d0-8CC2-00C04FC295EE}")
-    Dim result As UInteger = Validity.Unsigned
+    Dim result As UInteger = NativeMethods.Validity.Unsigned
     Dim fileInfo As New WINTRUST_FILE_INFO(sFile, Guid.Empty)
     Using guidPtr As New UnmanagedPointer(Marshal.AllocHGlobal(Marshal.SizeOf(GetType(Guid))), AllocMethod.HGlobal)
       Using wvtDataPtr As New UnmanagedPointer(Marshal.AllocHGlobal(Marshal.SizeOf(GetType(WINTRUST_DATA))), AllocMethod.HGlobal)
@@ -186,14 +170,14 @@ Public Class Authenticode
         Dim pData As IntPtr = wvtDataPtr.Pointer
         Marshal.StructureToPtr(v2ID, pGuid, True)
         Marshal.StructureToPtr(data, pData, True)
-        result = WinVerifyTrust(IntPtr.Zero, pGuid, pData)
+        result = NativeMethods.WinVerifyTrust(IntPtr.Zero, pGuid, pData)
       End Using
     End Using
     fileInfo.Dispose()
     fileInfo = Nothing
     Return result
   End Function
-  Private Shared Function RootIsRealityRipple(sFile As String) As Validity
+  Private Shared Function RootIsRealityRipple(sFile As String) As NativeMethods.Validity
     Dim theCertificate As X509Certificate2
     Try
       Dim theSigner As X509Certificate = X509Certificate.CreateFromSignedFile(sFile)
@@ -208,12 +192,12 @@ Public Class Authenticode
     theCertificateChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag
     theCertificateChain.Build(theCertificate)
     Dim Root As X509Certificate2 = theCertificateChain.ChainElements(theCertificateChain.ChainElements.Count - 1).Certificate
-    If Not Root.Thumbprint = RRRootThumb Then Return Validity.BadRootThumb
-    If Not Root.SerialNumber = RRRootSerial Then Return Validity.BadRootSerial
-    If Not Root.Subject = RRRootSubject Then Return Validity.BadRootSubject
+    If Not Root.Thumbprint = RRRootThumb Then Return NativeMethods.Validity.BadRootThumb
+    If Not Root.SerialNumber = RRRootSerial Then Return NativeMethods.Validity.BadRootSerial
+    If Not Root.Subject = RRRootSubject Then Return NativeMethods.Validity.BadRootSubject
     Return 0
   End Function
-  Private Shared Function SignerIsRealityRipple(sFile As String) As Validity
+  Private Shared Function SignerIsRealityRipple(sFile As String) As NativeMethods.Validity
     Dim theCertificate As X509Certificate2
     Try
       Dim theSigner As X509Certificate = X509Certificate.CreateFromSignedFile(sFile)
@@ -228,16 +212,16 @@ Public Class Authenticode
     theCertificateChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag
     theCertificateChain.Build(theCertificate)
     Dim Signer As X509Certificate2 = theCertificateChain.ChainElements(0).Certificate
-    If Not Signer.Thumbprint = RRSignThumb Then Return Validity.BadThumb
-    If Not Signer.SerialNumber = RRSignSerial Then Return Validity.BadSerial
-    If Not Signer.Subject = RRSignSubject Then Return Validity.BadSubject
+    If Not Signer.Thumbprint = RRSignThumb Then Return NativeMethods.Validity.BadThumb
+    If Not Signer.SerialNumber = RRSignSerial Then Return NativeMethods.Validity.BadSerial
+    If Not Signer.Subject = RRSignSubject Then Return NativeMethods.Validity.BadSubject
     Return 0
   End Function
-  Public Shared Function IsSelfSigned(sFile As String) As Validity
-    Dim iRet As Validity = RootIsRealityRipple(sFile)
-    If Not iRet = Validity.SignedAndValid Then Return iRet
+  Public Shared Function IsSelfSigned(sFile As String) As NativeMethods.Validity
+    Dim iRet As NativeMethods.Validity = RootIsRealityRipple(sFile)
+    If Not iRet = NativeMethods.Validity.SignedAndValid Then Return iRet
     iRet = SignerIsRealityRipple(sFile)
-    If Not iRet = Validity.SignedAndValid Then Return iRet
+    If Not iRet = NativeMethods.Validity.SignedAndValid Then Return iRet
     Return VerifyTrust(sFile)
   End Function
 End Class

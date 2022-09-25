@@ -1,8 +1,5 @@
 ﻿Public Class PasswordBox
   Inherits TextBox
-  <System.Runtime.InteropServices.DllImport("user32.dll")>
-  Private Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wp As IntPtr, lp As IntPtr) As IntPtr
-  End Function
   Private Enum MouseState
     Normal
     Hover
@@ -106,7 +103,7 @@
     SetMargin()
   End Sub
   Private Sub SetMargin()
-    SendMessage(Me.Handle, &HD3, New IntPtr(2), New IntPtr((passButton.Width) << 16))
+    NativeMethods.SendMessage(Me.Handle, &HD3, 2, (passButton.Width << 16))
   End Sub
   Private Sub SetPassImage(PassState As MouseState)
     Dim FG As Color = Color.Black

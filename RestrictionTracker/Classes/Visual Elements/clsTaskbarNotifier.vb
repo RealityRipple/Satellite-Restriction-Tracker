@@ -1,4 +1,3 @@
-﻿Imports System.Runtime.InteropServices
 Public Class TaskbarNotifier
   Inherits System.Windows.Forms.Form
 #Region "TaskbarNotifier Protected Members"
@@ -183,8 +182,6 @@ Public Class TaskbarNotifier
   End Property
 #End Region
 #Region "TaskbarNotifier Public Methods"
-  <DllImport("user32.dll")> Private Shared Function ShowWindow(hWnd As IntPtr, nCmdShow As Int32) As [Boolean]
-  End Function
   Public Overloads Sub Show(strTitle As String, strContent As String, nTimeToShow As Integer, nTimeToStay As Integer, nTimeToHide As Integer)
     Dim r As Rectangle = Nothing
     Dim XLoc As Integer = 0
@@ -232,7 +229,7 @@ Public Class TaskbarNotifier
         SetBounds(XLoc, YLoc, BackgroundBitmap.Width, BackgroundBitmap.Height)
         timer.Interval = nShowEvents
         timer.Start()
-        ShowWindow(Me.Handle, 4)
+        NativeMethods.ShowWindow(Me.Handle, 4)
       Case TaskbarStates.appearing
         Refresh()
       Case TaskbarStates.visible
@@ -495,9 +492,9 @@ Public Class TaskbarNotifier
     End If
   End Sub
   Protected Overrides Sub WndProc(ByRef msg As System.Windows.Forms.Message)
-    If msg.Msg = 32 Then
+    If msg.Msg = &H20 Then
       If MyBase.Cursor = Cursors.Hand Then
-        NativeMethods.SetCursor(NativeMethods.LoadCursor(0, 32649))
+        NativeMethods.SetCursor(NativeMethods.LoadCursor(IntPtr.Zero, &H7F89))
         msg.Result = IntPtr.Zero
         Return
       End If
@@ -541,47 +538,22 @@ Public Class TaskbarNotifier
 #End Region
 End Class
 Public Class TaskBarPosition
-  <DllImport("shell32.dll")>
-  Private Shared Function SHAppBarMessage(ByVal dwMessage As Integer, ByRef pData As APPBARDATA) As Integer
-  End Function
-  Private Structure APPBARDATA
-    Dim cbSize As Integer
-    Dim hwnd As IntPtr
-    Dim uCallbackMessage As Integer
-    Dim uEdge As ABEdge
-    Dim rc As RECT
-    Dim lParam As Integer
-  End Structure
-  Private Structure RECT
-    Dim Left As Integer
-    Dim Top As Integer
-    Dim Right As Integer
-    Dim Bottom As Integer
-  End Structure
-  Public Enum ABEdge
-    ABE_LEFT = 0
-    ABE_TOP
-    ABE_RIGHT
-    ABE_BOTTOM
-  End Enum
-  Const ABM_GETTASKBARPOS = &H5
-  Const ABM_GETSTATE = &H4
   Shared Function GetTaskBarPosition(ByRef CoordinateRectangle As Rectangle, ByVal hwnd As IntPtr) As Boolean
     Try
-      Dim abd As New APPBARDATA
+      Dim abd As New NativeMethods.APPBARDATA
       abd.hwnd = hwnd
-      SHAppBarMessage(ABM_GETTASKBARPOS, abd)
+      NativeMethods.SHAppBarMessage(NativeMethods.ABM_GETTASKBARPOS, abd)
       CoordinateRectangle = New Rectangle(abd.rc.Left, abd.rc.Top, abd.rc.Right - abd.rc.Left, abd.rc.Top - abd.rc.Bottom)
       Return True
     Catch ex As Exception
       Return False
     End Try
   End Function
-  Shared Function GetTaskBarEdge(ByVal hwnd As IntPtr) As ABEdge
+  Shared Function GetTaskBarEdge(ByVal hwnd As IntPtr) As NativeMethods.ABEdge
     Try
-      Dim abd As New APPBARDATA
+      Dim abd As New NativeMethods.APPBARDATA
       abd.hwnd = hwnd
-      SHAppBarMessage(ABM_GETTASKBARPOS, abd)
+      NativeMethods.SHAppBarMessage(NativeMethods.ABM_GETTASKBARPOS, abd)
       Return abd.uEdge
     Catch ex As Exception
       Return 0

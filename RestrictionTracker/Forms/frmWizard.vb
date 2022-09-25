@@ -1,8 +1,6 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
 Imports System.Runtime.InteropServices
 Public Class frmWizard
-  Private Declare Sub ReleaseCapture Lib "user32" ()
-  Private Declare Sub SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd As IntPtr, ByVal wMsg As Integer, ByVal wParam As Integer, ByVal lParam As Integer)
   <StructLayout(LayoutKind.Explicit)>
   Private Structure DWord
     <FieldOffset(0)> Public LongValue As Integer
@@ -16,9 +14,6 @@ Public Class frmWizard
   Private Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
-  Private Const WM_NCLBUTTONDOWN As Integer = &HA1
-  Private Const WM_GETSYSMENU As Integer = &H313
-  Private Const HTCAPTION As Integer = 2
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private WithEvents localTest As localRestrictionTracker
   Private pChecker As Threading.Timer
@@ -28,8 +23,8 @@ Public Class frmWizard
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Public Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
-      ReleaseCapture()
-      SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0&)
+      NativeMethods.ReleaseCapture()
+      NativeMethods.SendMessage(hWnd, NativeMethods.WM_NCLBUTTONDOWN, NativeMethods.HTCAPTION, IntPtr.Zero)
     End If
   End Sub
   Private Sub cmdFAQ_Click(sender As System.Object, e As System.EventArgs) Handles cmdFAQ.Click
@@ -248,7 +243,7 @@ Public Class frmWizard
   End Sub
   Private Sub pctIcon_MouseDown(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctIcon.MouseDown
     If e.X >= 6 And e.X <= 6 + 16 And e.Y >= 8 And e.Y <= 8 + 16 Then
-      If e.Button = Windows.Forms.MouseButtons.Left Or e.Button = Windows.Forms.MouseButtons.Right Then SendMessage(Me.Handle, WM_GETSYSMENU, 0, (New DWord(Cursor.Position.X, Cursor.Position.Y)).LongValue)
+      If e.Button = Windows.Forms.MouseButtons.Left Or e.Button = Windows.Forms.MouseButtons.Right Then NativeMethods.SendMessage(Me.Handle, NativeMethods.WM_GETSYSMENU, IntPtr.Zero, (New DWord(Cursor.Position.X, Cursor.Position.Y)).LongValue)
     ElseIf e.Button = Windows.Forms.MouseButtons.Left Then
       ClickDrag(Me.Handle)
     End If
