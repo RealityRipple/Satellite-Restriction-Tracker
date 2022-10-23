@@ -54,7 +54,7 @@
   Public Function LOG_GetLast() As Date
     If Not isLoaded Then Return New Date(1970, 1, 1)
     If LOG_GetCount() < 1 Then Return New Date(1970, 1, 1)
-    Return usageDB.GetLast.DATETIME
+    Return usageDB.LastRow.DATETIME
   End Function
   Public Sub LOG_Initialize(sAccount As String, withDisplay As Boolean)
     isLoaded = False

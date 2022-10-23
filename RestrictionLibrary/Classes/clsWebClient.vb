@@ -206,7 +206,7 @@
   ''' <returns></returns>
   Public Shared ReadOnly Property UserAgent As String
     Get
-      Return "Mozilla/5.0 (" & CurrentOS.Name & "; CLR: " & srlFunctions.GetCLRVersion & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
+      Return "Mozilla/5.0 (" & CurrentOS.Name & "; CLR: " & srlFunctions.CLRVersion & ") " & My.Application.Info.ProductName.Replace(" ", "") & "/" & My.Application.Info.Version.ToString
     End Get
   End Property
   Private m_Request As Net.WebRequest

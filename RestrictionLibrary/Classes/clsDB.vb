@@ -446,10 +446,12 @@ Public Class DataBase
   ''' </summary>
   ''' <returns></returns>
   ''' <remarks>This function will sort the DataBase before returning a value.</remarks>
-  Public Function GetLast() As DataRow
-    Dim dbVals() As DataRow = ToArray()
-    Return dbVals(dbVals.Length - 1)
-  End Function
+  Public ReadOnly Property LastRow() As DataRow
+    Get
+      Dim dbVals() As DataRow = ToArray()
+      Return dbVals(dbVals.Length - 1)
+    End Get
+  End Property
   ''' <summary>
   ''' A full XML representation of the DataBase.
   ''' </summary>

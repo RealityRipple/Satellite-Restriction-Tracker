@@ -37,7 +37,7 @@
     sRet &= e.ToString & vbNewLine
     sRet &= "```" & vbNewLine & vbNewLine
     sRet &= "OS: " & My.Computer.Info.OSFullName & " (" & sPlat & ") v" & My.Computer.Info.OSVersion & vbNewLine
-    sRet &= "CLR: " & srlFunctions.GetCLRCleanVersion
+    sRet &= "CLR: " & srlFunctions.CLRCleanVersion
     Return sRet
   End Function
   Private Shared Function ReportBug(Title, Body) As String

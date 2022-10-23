@@ -247,7 +247,7 @@ Public Class frmHistory
                 bDisplayed = True
             End Select
             If Not bDisplayed Then
-              If usageDB.GetLast.DOWNLIM = usageDB.GetLast.UPLIM Then
+              If usageDB.LastRow.DOWNLIM = usageDB.LastRow.UPLIM Then
                 pnlGraph.RowStyles(0).Height = 100
                 pnlGraph.RowStyles(1).Height = 0
                 lastRect = Me.Bounds

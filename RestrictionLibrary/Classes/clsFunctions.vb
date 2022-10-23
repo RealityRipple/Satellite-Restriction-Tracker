@@ -913,150 +913,156 @@ Public Class srlFunctions
   ''' <summary>
   ''' Registry-stored Release number.
   ''' </summary>
-  Public Shared Function GetCLRRelease() As UInt32
-    Dim CLRRelease As UInt32 = 0
-    Try
-      If My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Full") IsNot Nothing Then
-        CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").GetValue("Release")
-      ElseIf My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Client") IsNot Nothing Then
-        CLRRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client").GetValue("Release")
-      End If
-    Catch ex As Exception
-      CLRRelease = 0
-    End Try
-    Return CLRRelease
-  End Function
+  Public Shared ReadOnly Property CLRRelease() As UInt32
+    Get
+      Dim iRelease As UInt32 = 0
+      Try
+        If My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Full") IsNot Nothing Then
+          iRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full").GetValue("Release")
+        ElseIf My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4").OpenSubKey("Client") IsNot Nothing Then
+          iRelease = My.Computer.Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Client").GetValue("Release")
+        End If
+      Catch ex As Exception
+        iRelease = 0
+      End Try
+      Return iRelease
+    End Get
+  End Property
   ''' <summary>
   ''' Common Language Runtime exact version number.
   ''' </summary>
-  Public Shared Function GetCLRVersion() As String
-    Dim sCLR As String = Nothing
-    Dim tMONO As Type = Nothing
-    Try
-      tMONO = Type.GetType("Mono.Runtime")
-    Catch ex As Exception
-    End Try
-    If tMONO Is Nothing Then
-      Dim CLRRelease As UInt32 = GetCLRRelease()
-      sCLR = Environment.Version.ToString
-      If Not CLRRelease = 0 Then sCLR &= "_" & Trim(CStr(CLRRelease))
-    Else
-      Dim myMethods() As Reflection.MethodInfo = tMONO.GetMethods(Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Static)
-      For Each mInfo As Reflection.MethodInfo In myMethods
-        If mInfo Is Nothing Then Continue For
-        Dim mName As String = "Unknown"
-        Try
-          mName = mInfo.Name
-        Catch ex As Exception
-          mName = "Unknown"
-        End Try
-        If Not mName = "GetDisplayName" Then Continue For
-        Dim mInvoke As String = Nothing
-        Try
-          mInvoke = mInfo.Invoke(Nothing, Nothing)
-        Catch ex As Exception
-          mInvoke = Nothing
-        End Try
-        If Not String.IsNullOrEmpty(mInvoke) Then
-          If mInvoke.Contains(" ") Then
-            sCLR = mInvoke.Substring(0, mInvoke.IndexOf(" "c))
-            Exit For
+  Public Shared ReadOnly Property CLRVersion() As String
+    Get
+      Dim sCLR As String = Nothing
+      Dim tMONO As Type = Nothing
+      Try
+        tMONO = Type.GetType("Mono.Runtime")
+      Catch ex As Exception
+      End Try
+      If tMONO Is Nothing Then
+        Dim iRelease As UInt32 = CLRRelease
+        sCLR = Environment.Version.ToString
+        If Not iRelease = 0 Then sCLR &= "_" & Trim(CStr(iRelease))
+      Else
+        Dim myMethods() As Reflection.MethodInfo = tMONO.GetMethods(Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Static)
+        For Each mInfo As Reflection.MethodInfo In myMethods
+          If mInfo Is Nothing Then Continue For
+          Dim mName As String = "Unknown"
+          Try
+            mName = mInfo.Name
+          Catch ex As Exception
+            mName = "Unknown"
+          End Try
+          If Not mName = "GetDisplayName" Then Continue For
+          Dim mInvoke As String = Nothing
+          Try
+            mInvoke = mInfo.Invoke(Nothing, Nothing)
+          Catch ex As Exception
+            mInvoke = Nothing
+          End Try
+          If Not String.IsNullOrEmpty(mInvoke) Then
+            If mInvoke.Contains(" ") Then
+              sCLR = mInvoke.Substring(0, mInvoke.IndexOf(" "c))
+              Exit For
+            End If
+          End If
+        Next
+        If Not String.IsNullOrEmpty(sCLR) Then
+          sCLR = "4.0.30319.17020_" & sCLR
+        Else
+          If Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 Then
+            Select Case Environment.Version.Revision
+              Case 17020 : sCLR = "4.0.30319.17020"
+              Case 42000 : sCLR = "4.0.30319.17020_4.4"
+              Case Else : sCLR = "4.0.30319.17020_" & Environment.Version.Revision
+            End Select
+          Else
+            sCLR = Environment.Version.ToString
           End If
         End If
-      Next
-      If Not String.IsNullOrEmpty(sCLR) Then
-        sCLR = "4.0.30319.17020_" & sCLR
-      Else
-        If Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 Then
-          Select Case Environment.Version.Revision
-            Case 17020 : sCLR = "4.0.30319.17020"
-            Case 42000 : sCLR = "4.0.30319.17020_4.4"
-            Case Else : sCLR = "4.0.30319.17020_" & Environment.Version.Revision
-          End Select
-        Else
-          sCLR = Environment.Version.ToString
-        End If
       End If
-    End If
-    Return sCLR
-  End Function
+      Return sCLR
+    End Get
+  End Property
   ''' <summary>
   ''' Common Language Runtime Name and Release version.
   ''' </summary>
-  Public Shared Function GetCLRCleanVersion() As String
-    Dim sVer As String = GetCLRVersion()
-    If Not sVer.Substring(0, 9) = "4.0.30319" Then Return "Unknown Runtime (" & sVer & ")"
-    Dim clrID, clrID2 As Integer
-    Dim monoID As String = Nothing
-    If Not sVer.Substring(10).Contains("_") Then
-      clrID = Val(sVer.Substring(10))
-      clrID2 = 0
-    Else
-      Dim clrRel As String = sVer.Substring(10)
-      Dim clrBld As String = clrRel.Substring(0, clrRel.IndexOf("_"))
-      clrRel = clrRel.Substring(clrRel.IndexOf("_") + 1)
-      clrID = Val(clrBld)
-      clrID2 = Val(clrRel)
-      monoID = clrRel
-    End If
-    If clrID = 17020 Then
-      If Not String.IsNullOrEmpty(monoID) Then Return "MONO " & monoID
-      Return "MONO"
-    End If
-    If clrID < 17929 Then
-      If clrID = 1 Then Return ".NET 4.0 RTM"
-      If clrID = 225 Then Return ".NET 4.0 SP1"
-      If clrID = 269 Then Return ".NET 4.0 + MS12-035 GDR"
-      If clrID = 276 Then Return ".NET 4.0.3 Runtime Update"
-      If clrID = 296 Then Return ".NET 4.0 + MS12-074 GDR"
-      If clrID = 544 Then Return ".NET 4.0 + MS12-035 LDR"
-      If clrID = 1008 Then Return ".NET 4.0 + MS13-052 GDR"
-      If clrID = 1022 Then Return ".NET 4.0 + MS14-009 GDR"
-      If clrID = 1026 Then Return ".NET 4.0 + MS14-057 GDR"
-      If clrID = 2034 Then Return ".NET 4.0 + MS14-009 LDR"
-      Return ".NET 4.0 (" & clrID & ")"
-    End If
-    If clrID < 18408 Then
-      If clrID = 17929 Then Return ".NET 4.5 RTM"
-      If clrID = 18063 Then Return ".NET 4.5 + MS14-009"
-      Return ".NET 4.5 (" & clrID & ")"
-    End If
-    If clrID < 34209 Then
-      If clrID = 18408 Then Return ".NET 4.5.1"
-      If clrID = 18444 Then Return ".NET 4.5.1 + MS14-009"
-      If clrID = 34011 Then Return ".NET 4.5.1 for Windows 8 + MS14-009"
-      If clrID = 34014 Then Return ".NET 4.5.1 for Windows 8.1"
-      Return ".NET 4.5.1 (" & clrID & ")"
-    End If
-    If clrID < 42000 Then
-      If clrID = 34209 Then Return ".NET 4.5.2"
-      If clrID = 35312 Then Return ".NET 4.5.2 (35312)"
-      Return ".NET 4.5.2 (" & clrID & ")"
-    End If
-    If clrID = 42000 Then
-      If clrID2 = 0 Then Return ".NET 4.6"
-      If clrID2 = 393295 Or clrID2 = 393297 Then Return ".NET 4.6" '  6004F 60051
-      If clrID2 = 394254 Or clrID2 = 394271 Then Return ".NET 4.6.1" '6040E 6041F
-      If clrID2 = 394802 Or clrID2 = 394806 Then Return ".NET 4.6.2" '60632 60636
-      If clrID2 = 460798 Or clrID2 = 460805 Then Return ".NET 4.7" '  707FE 70805
-      If clrID2 = 461308 Or clrID2 = 461310 Then Return ".NET 4.7.1" '709FC 709FE
-      If clrID2 = 461808 Or clrID2 = 461814 Then Return ".NET 4.7.2" '70BF0 70BF6
-      If clrID2 = 528040 Or clrID2 = 528049 Or clrID2 = 528209 Or clrID2 = 528449 Then Return ".NET 4.8" '  80EA8 80EB1
+  Public Shared ReadOnly Property CLRCleanVersion() As String
+    Get
+      Dim sVer As String = CLRVersion
+      If Not sVer.Substring(0, 9) = "4.0.30319" Then Return "Unknown Runtime (" & sVer & ")"
+      Dim clrID, clrID2 As Integer
+      Dim monoID As String = Nothing
+      If Not sVer.Substring(10).Contains("_") Then
+        clrID = Val(sVer.Substring(10))
+        clrID2 = 0
+      Else
+        Dim clrRel As String = sVer.Substring(10)
+        Dim clrBld As String = clrRel.Substring(0, clrRel.IndexOf("_"))
+        clrRel = clrRel.Substring(clrRel.IndexOf("_") + 1)
+        clrID = Val(clrBld)
+        clrID2 = Val(clrRel)
+        monoID = clrRel
+      End If
+      If clrID = 17020 Then
+        If Not String.IsNullOrEmpty(monoID) Then Return "MONO " & monoID
+        Return "MONO"
+      End If
+      If clrID < 17929 Then
+        If clrID = 1 Then Return ".NET 4.0 RTM"
+        If clrID = 225 Then Return ".NET 4.0 SP1"
+        If clrID = 269 Then Return ".NET 4.0 + MS12-035 GDR"
+        If clrID = 276 Then Return ".NET 4.0.3 Runtime Update"
+        If clrID = 296 Then Return ".NET 4.0 + MS12-074 GDR"
+        If clrID = 544 Then Return ".NET 4.0 + MS12-035 LDR"
+        If clrID = 1008 Then Return ".NET 4.0 + MS13-052 GDR"
+        If clrID = 1022 Then Return ".NET 4.0 + MS14-009 GDR"
+        If clrID = 1026 Then Return ".NET 4.0 + MS14-057 GDR"
+        If clrID = 2034 Then Return ".NET 4.0 + MS14-009 LDR"
+        Return ".NET 4.0 (" & clrID & ")"
+      End If
+      If clrID < 18408 Then
+        If clrID = 17929 Then Return ".NET 4.5 RTM"
+        If clrID = 18063 Then Return ".NET 4.5 + MS14-009"
+        Return ".NET 4.5 (" & clrID & ")"
+      End If
+      If clrID < 34209 Then
+        If clrID = 18408 Then Return ".NET 4.5.1"
+        If clrID = 18444 Then Return ".NET 4.5.1 + MS14-009"
+        If clrID = 34011 Then Return ".NET 4.5.1 for Windows 8 + MS14-009"
+        If clrID = 34014 Then Return ".NET 4.5.1 for Windows 8.1"
+        Return ".NET 4.5.1 (" & clrID & ")"
+      End If
+      If clrID < 42000 Then
+        If clrID = 34209 Then Return ".NET 4.5.2"
+        If clrID = 35312 Then Return ".NET 4.5.2 (35312)"
+        Return ".NET 4.5.2 (" & clrID & ")"
+      End If
+      If clrID = 42000 Then
+        If clrID2 = 0 Then Return ".NET 4.6"
+        If clrID2 = 393295 Or clrID2 = 393297 Then Return ".NET 4.6" '  6004F 60051
+        If clrID2 = 394254 Or clrID2 = 394271 Then Return ".NET 4.6.1" '6040E 6041F
+        If clrID2 = 394802 Or clrID2 = 394806 Then Return ".NET 4.6.2" '60632 60636
+        If clrID2 = 460798 Or clrID2 = 460805 Then Return ".NET 4.7" '  707FE 70805
+        If clrID2 = 461308 Or clrID2 = 461310 Then Return ".NET 4.7.1" '709FC 709FE
+        If clrID2 = 461808 Or clrID2 = 461814 Then Return ".NET 4.7.2" '70BF0 70BF6
+        If clrID2 = 528040 Or clrID2 = 528049 Or clrID2 = 528209 Or clrID2 = 528449 Then Return ".NET 4.8" '  80EA8 80EB1
 
-      If clrID2 < 393297 Then Return ".NET 4.6 (" & clrID2 & ")"
-      If clrID2 < 394271 Then Return ".NET 4.6.1 (" & clrID2 & ")"
-      If clrID2 < 394806 Then Return ".NET 4.6.2 (" & clrID2 & ")"
-      If clrID2 < 460805 Then Return ".NET 4.7 (" & clrID2 & ")"
-      If clrID2 < 461310 Then Return ".NET 4.7.1 (" & clrID2 & ")"
-      If clrID2 < 461814 Then Return ".NET 4.7.2 (" & clrID2 & ")"
-      If clrID2 < 528049 Then Return ".NET 4.8 (" & clrID2 & ")"
+        If clrID2 < 393297 Then Return ".NET 4.6 (" & clrID2 & ")"
+        If clrID2 < 394271 Then Return ".NET 4.6.1 (" & clrID2 & ")"
+        If clrID2 < 394806 Then Return ".NET 4.6.2 (" & clrID2 & ")"
+        If clrID2 < 460805 Then Return ".NET 4.7 (" & clrID2 & ")"
+        If clrID2 < 461310 Then Return ".NET 4.7.1 (" & clrID2 & ")"
+        If clrID2 < 461814 Then Return ".NET 4.7.2 (" & clrID2 & ")"
+        If clrID2 < 528049 Then Return ".NET 4.8 (" & clrID2 & ")"
 
-      Dim clrAttempt As String = Hex(clrID2)
-      clrAttempt = clrAttempt.Substring(0, clrAttempt.Length - 4)
-      Dim iAVer As Integer = Integer.Parse(clrAttempt, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
-      Return ".NET 4." & iAVer & " (" & clrID2 & ")"
-    End If
-    If clrID2 > 0 Then Return ".NET Future Version (" & clrID & "." & clrID2 & ")"
-    Return ".NET Future Version (" & clrID & ")"
-  End Function
+        Dim clrAttempt As String = Hex(clrID2)
+        clrAttempt = clrAttempt.Substring(0, clrAttempt.Length - 4)
+        Dim iAVer As Integer = Integer.Parse(clrAttempt, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
+        Return ".NET 4." & iAVer & " (" & clrID2 & ")"
+      End If
+      If clrID2 > 0 Then Return ".NET Future Version (" & clrID & "." & clrID2 & ")"
+      Return ".NET Future Version (" & clrID & ")"
+    End Get
+  End Property
 End Class

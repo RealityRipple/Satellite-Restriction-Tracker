@@ -14,7 +14,7 @@
     Me.Text = "About " & ApplicationTitle
     lblProduct.Text = My.Application.Info.ProductName
     lblVersion.Text = "Version " & DisplayVersion(Application.ProductVersion)
-    lblCLR.Text = "on " & srlFunctions.GetCLRCleanVersion
+    lblCLR.Text = "on " & srlFunctions.CLRCleanVersion
     lblCompany.Text = My.Application.Info.CompanyName
     txtDescription.Text = My.Application.Info.Description
     ResetUpdateButton()

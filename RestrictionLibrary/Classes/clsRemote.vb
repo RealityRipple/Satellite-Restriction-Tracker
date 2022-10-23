@@ -236,7 +236,7 @@ Public Class remoteRestrictionTracker
     Secret = System.Text.Encoding.UTF8.GetBytes(ProductKey)
     c_Timeout = Timeout
     c_Proxy = Proxy
-    Dim sFramework As String = srlFunctions.GetCLRCleanVersion
+    Dim sFramework As String = srlFunctions.CLRCleanVersion
     If sFramework.Contains("MONO") Then
       Dim sFWVer As String = sFramework.Substring(5)
       Dim fwMajor As Integer = sFWVer.Substring(0, sFWVer.IndexOf("."))

@@ -180,7 +180,7 @@
     chkNetworkProtocolTLS13.Checked = (mySettings.SecurityProtocol And SecurityProtocolTypeEx.Tls13) = SecurityProtocolTypeEx.Tls13
     Dim useTLSProxy As Boolean = False
     Dim myProtocol As SecurityProtocolTypeEx = Net.ServicePointManager.SecurityProtocol
-    Dim cRel As UInt32 = srlFunctions.GetCLRRelease()
+    Dim cRel As UInt32 = srlFunctions.CLRRelease
     Try
       Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.Ssl3
     Catch ex As Exception
@@ -457,7 +457,7 @@
     Else
       chkNetworkProtocolTLS13.Checked = False
       chkNetworkProtocolTLS13.Enabled = False
-      Dim cRel As UInt32 = srlFunctions.GetCLRRelease()
+      Dim cRel As UInt32 = srlFunctions.CLRRelease
       If (Environment.OSVersion.Version.Major < 10) Then
         ttConfig.SetToolTip(chkNetworkProtocolTLS13, "Your Operating System does not allow TLS 1.3 connections. Enable the TLS Proxy if you need TLS 1.3.")
       ElseIf Environment.Version.Revision = 42000 And cRel < &H80000 Then
