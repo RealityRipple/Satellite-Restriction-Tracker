@@ -442,7 +442,9 @@ Public Class JSONAssociator
       Else
         sRet &= ","
       End If
-      If oValue.GetType Is GetType(Boolean) Then
+      If oValue Is Nothing Then
+        sRet &= "null"
+      ElseIf oValue.GetType Is GetType(Boolean) Then
         If oValue.Value Then
           sRet &= "true"
         Else
