@@ -116,9 +116,8 @@ Public Class svcRL
         If wResponse.ResponseUri.AbsoluteUri.ToString.IndexOf(sAddr) > -1 Then
           Dim sData As String = Nothing
           Using wData As IO.Stream = wResponse.GetResponseStream
-            Using readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(LATIN_1))
-              sData = readStream.ReadToEnd
-            End Using
+            Dim readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(LATIN_1))
+            sData = readStream.ReadToEnd
           End Using
           If String.IsNullOrEmpty(sData) Then
             Return False

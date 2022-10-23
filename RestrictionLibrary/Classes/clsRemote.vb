@@ -335,14 +335,11 @@ Public Class remoteRestrictionTracker
     Array.Resize(IV, CSP.BlockSize / 8)
     Using er = CSP.CreateEncryptor(Key, IV)
       Using mStream As New IO.MemoryStream
-        Using cStream As New CryptoStream(mStream, er, CryptoStreamMode.Write)
-          Dim bPas() As Byte = System.Text.Encoding.UTF8.GetBytes(sPassword)
-          cStream.Write(bPas, 0, bPas.Length)
-          cStream.FlushFinalBlock()
-          bPass = mStream.ToArray
-          cStream.Close()
-        End Using
-        mStream.Close()
+        Dim cStream As New CryptoStream(mStream, er, CryptoStreamMode.Write)
+        Dim bPas() As Byte = System.Text.Encoding.UTF8.GetBytes(sPassword)
+        cStream.Write(bPas, 0, bPas.Length)
+        cStream.FlushFinalBlock()
+        bPass = mStream.ToArray
       End Using
     End Using
     CSP = Nothing
@@ -555,17 +552,16 @@ Public Class remoteRestrictionTracker
   Private Function DecompressData(inData() As Byte) As Byte()
     Using outData As New IO.MemoryStream
       Using inStream As New IO.MemoryStream(inData)
-        Using Decompress As DeflateStream = New DeflateStream(inStream, CompressionMode.Decompress)
-          Dim buffer As Byte() = New Byte(4096) {}
-          Dim numRead As Integer
+        Dim Decompress As DeflateStream = New DeflateStream(inStream, CompressionMode.Decompress)
+        Dim buffer As Byte() = New Byte(4096) {}
+        Dim numRead As Integer
+        numRead = Decompress.Read(buffer, 0, buffer.Length)
+        Do While numRead <> 0
+          outData.Write(buffer, 0, numRead)
           numRead = Decompress.Read(buffer, 0, buffer.Length)
-          Do While numRead <> 0
-            outData.Write(buffer, 0, numRead)
-            numRead = Decompress.Read(buffer, 0, buffer.Length)
-          Loop
-        End Using
+        Loop
       End Using
-      Return outData.ToArray
+    Return outData.ToArray
     End Using
   End Function
 #Region "IDisposable Support"

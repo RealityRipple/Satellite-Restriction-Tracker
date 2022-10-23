@@ -62,9 +62,8 @@ Public Class DetermineType
         If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
           Dim sData As String = Nothing
           Using wData As IO.Stream = wResponse.GetResponseStream
-            Using readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
-              sData = readStream.ReadToEnd
-            End Using
+            Dim readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
+            sData = readStream.ReadToEnd
           End Using
           If String.IsNullOrEmpty(sData) Then
             c_callback.Invoke(ar.AsyncState, False)
@@ -186,9 +185,8 @@ Public Class UpdateAJAXLists
       If wResponse.ResponseUri.AbsoluteUri().ToString.IndexOf(sAddr) > -1 Then
         Dim sData As String = Nothing
         Using wData As IO.Stream = wResponse.GetResponseStream
-          Using readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
-            sData = readStream.ReadToEnd
-          End Using
+          Dim readStream As New IO.StreamReader(wData, System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1))
+          sData = readStream.ReadToEnd
         End Using
         If String.IsNullOrEmpty(sData) Then
           c_callback.Invoke(ar.AsyncState, "DATA_EMPTY", Nothing)

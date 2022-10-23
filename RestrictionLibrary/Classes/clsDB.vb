@@ -230,49 +230,45 @@ Public Class DataBase
           m_xmld = Nothing
         ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".WB") = 0 Then
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-            Using nIn As New IO.BinaryReader(nRead)
-              Dim uRows As UInt64 = LOAD_ReadULong(nIn)
-              For I As UInt64 = 1 To uRows
-                If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
-                Dim DT As Date = LOAD_ReadDate(nIn)
-                Dim Down As Long = LOAD_ReadLong(nIn)
-                Dim DownLim As Long = LOAD_ReadLong(nIn)
-                Dim Up As Long = LOAD_ReadLong(nIn)
-                Dim UpLim As Long = LOAD_ReadLong(nIn)
-                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-                If StopNew Then Return
-              Next
-              nIn.Close()
-            End Using
+            Dim nIn As New IO.BinaryReader(nRead)
+            Dim uRows As UInt64 = LOAD_ReadULong(nIn)
+            For I As UInt64 = 1 To uRows
+              If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
+              Dim DT As Date = LOAD_ReadDate(nIn)
+              Dim Down As Long = LOAD_ReadLong(nIn)
+              Dim DownLim As Long = LOAD_ReadLong(nIn)
+              Dim Up As Long = LOAD_ReadLong(nIn)
+              Dim UpLim As Long = LOAD_ReadLong(nIn)
+              If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+              If StopNew Then Return
+            Next
           End Using
         ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".CSV") = 0 Then
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-            Using nIn As New IO.StreamReader(nRead)
-              Dim firstLine As String = nIn.ReadLine
-              If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
-                Dim firstData() As String = Split(firstLine, ",")
-                Dim DT As Date = Date.Parse(firstData(0), Globalization.CultureInfo.InvariantCulture)
-                Dim Down As Long = firstData(1)
-                Dim DownLim As Long = firstData(2)
-                Dim Up As Long = firstData(3)
-                Dim UpLim As Long = firstData(4)
-                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              End If
-              Do Until nIn.EndOfStream
-                Dim rowData() As String = Split(nIn.ReadLine, ",")
-                Dim DT As Date = Date.Parse(rowData(0), Globalization.CultureInfo.InvariantCulture)
-                Dim Down As Long = rowData(1)
-                Dim DownLim As Long = rowData(2)
-                Dim Up As Long = rowData(3)
-                Dim UpLim As Long = rowData(4)
-                If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-                Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-                If StopNew Then Return
-              Loop
-              nIn.Close()
-            End Using
+            Dim nIn As New IO.StreamReader(nRead)
+            Dim firstLine As String = nIn.ReadLine
+            If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
+              Dim firstData() As String = Split(firstLine, ",")
+              Dim DT As Date = Date.Parse(firstData(0), Globalization.CultureInfo.InvariantCulture)
+              Dim Down As Long = firstData(1)
+              Dim DownLim As Long = firstData(2)
+              Dim Up As Long = firstData(3)
+              Dim UpLim As Long = firstData(4)
+              If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+            End If
+            Do Until nIn.EndOfStream
+              Dim rowData() As String = Split(nIn.ReadLine, ",")
+              Dim DT As Date = Date.Parse(rowData(0), Globalization.CultureInfo.InvariantCulture)
+              Dim Down As Long = rowData(1)
+              Dim DownLim As Long = rowData(2)
+              Dim Up As Long = rowData(3)
+              Dim UpLim As Long = rowData(4)
+              If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
+              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+              If StopNew Then Return
+            Loop
           End Using
         End If
       Catch ex As Exception
@@ -526,66 +522,61 @@ Public Class DataBase
     Try
       If IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".XML") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
-          Using nOut As New IO.StreamWriter(nWrite)
-            nOut.WriteLine("<?xml version=""1.0"" standalone=""yes""?>")
-            nOut.WriteLine("<RestrictionTrackerUsage>")
-            Dim uData As UInt64 = CULng(dVals.Length)
-            For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = dVals(I)
-              If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
-              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-              nOut.WriteLine("  <History>")
-              nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>")
-              nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>")
-              nOut.WriteLine("    <DOWNLIM>" & dRow.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>")
-              nOut.WriteLine("    <UPLOAD>" & dRow.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>")
-              nOut.WriteLine("    <UPLIM>" & dRow.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>")
-              nOut.WriteLine("  </History>")
-            Next
-            nOut.Write("</RestrictionTrackerUsage>")
-          End Using
+          Dim nOut As New IO.StreamWriter(nWrite)
+          nOut.WriteLine("<?xml version=""1.0"" standalone=""yes""?>")
+          nOut.WriteLine("<RestrictionTrackerUsage>")
+          Dim uData As UInt64 = CULng(dVals.Length)
+          For I As UInt64 = 0 To uData - 1
+            Dim dRow As DataRow = dVals(I)
+            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            nOut.WriteLine("  <History>")
+            nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>")
+            nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>")
+            nOut.WriteLine("    <DOWNLIM>" & dRow.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>")
+            nOut.WriteLine("    <UPLOAD>" & dRow.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>")
+            nOut.WriteLine("    <UPLIM>" & dRow.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>")
+            nOut.WriteLine("  </History>")
+          Next
+          nOut.Write("</RestrictionTrackerUsage>")
         End Using
       ElseIf IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".WB") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
-          Using nOut As New IO.BinaryWriter(nWrite)
-            Dim uData As UInt64 = CULng(dVals.Length)
-            Dim truData As UInt64 = 0
-            For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = dVals(I)
-              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-              truData += 1
-            Next
-            SAVE_Write(nOut, truData)
-            For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = dVals(I)
-              If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
-              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-              SAVE_Write(nOut, dRow.DATETIME)
-              SAVE_Write(nOut, dRow.DOWNLOAD)
-              SAVE_Write(nOut, dRow.DOWNLIM)
-              SAVE_Write(nOut, dRow.UPLOAD)
-              SAVE_Write(nOut, dRow.UPLIM)
-            Next
-            nOut.Close()
-          End Using
+          Dim nOut As New IO.BinaryWriter(nWrite)
+          Dim uData As UInt64 = CULng(dVals.Length)
+          Dim truData As UInt64 = 0
+          For I As UInt64 = 0 To uData - 1
+            Dim dRow As DataRow = dVals(I)
+            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            truData += 1
+          Next
+          SAVE_Write(nOut, truData)
+          For I As UInt64 = 0 To uData - 1
+            Dim dRow As DataRow = dVals(I)
+            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            SAVE_Write(nOut, dRow.DATETIME)
+            SAVE_Write(nOut, dRow.DOWNLOAD)
+            SAVE_Write(nOut, dRow.DOWNLIM)
+            SAVE_Write(nOut, dRow.UPLOAD)
+            SAVE_Write(nOut, dRow.UPLIM)
+          Next
         End Using
       ElseIf IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".CSV") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.OpenOrCreate, IO.FileAccess.ReadWrite, IO.FileShare.None)
-          Using nOut As New IO.StreamWriter(nWrite)
-            Dim uData As UInt64 = CULng(dVals.Length)
-            nOut.WriteLine("Time,Download,Download Limit,Upload,Upload Limit")
-            For I As UInt64 = 0 To uData - 1
-              Dim dRow As DataRow = dVals(I)
-              If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
-              If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-              If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-              nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
-            Next
-            nOut.Close()
-          End Using
+          Dim nOut As New IO.StreamWriter(nWrite)
+          Dim uData As UInt64 = CULng(dVals.Length)
+          nOut.WriteLine("Time,Download,Download Limit,Upload,Upload Limit")
+          For I As UInt64 = 0 To uData - 1
+            Dim dRow As DataRow = dVals(I)
+            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
+            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
+          Next
         End Using
       Else
         Return False

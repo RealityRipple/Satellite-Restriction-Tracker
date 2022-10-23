@@ -198,18 +198,16 @@ Module modFunctions
   End Function
   Private Sub ExtractGZ(sGZ As String, sDestFile As String)
     Using sourceTGZ As New IO.FileStream(sGZ, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-      Using sourceGZ As New System.IO.Compression.GZipStream(sourceTGZ, IO.Compression.CompressionMode.Decompress)
-        Using destTAR As IO.FileStream = IO.File.Create(sDestFile)
-          Dim buffer As Byte()
-          ReDim buffer(4095)
-          Dim numRead As Integer = sourceGZ.Read(buffer, 0, buffer.Length)
-          Do While numRead <> 0
-            destTAR.Write(buffer, 0, numRead)
-            numRead = sourceGZ.Read(buffer, 0, buffer.Length)
-          Loop
-          destTAR.Flush(True)
-          destTAR.Close()
-        End Using
+      Dim sourceGZ As New System.IO.Compression.GZipStream(sourceTGZ, IO.Compression.CompressionMode.Decompress)
+      Using destTAR As IO.FileStream = IO.File.Create(sDestFile)
+        Dim buffer As Byte()
+        ReDim buffer(4095)
+        Dim numRead As Integer = sourceGZ.Read(buffer, 0, buffer.Length)
+        Do While numRead <> 0
+          destTAR.Write(buffer, 0, numRead)
+          numRead = sourceGZ.Read(buffer, 0, buffer.Length)
+        Loop
+        destTAR.Flush(True)
       End Using
     End Using
   End Sub
@@ -278,18 +276,16 @@ Module modFunctions
   Private Sub ExtractTar(sTAR As String, sDestPath As String)
     If Not My.Computer.FileSystem.DirectoryExists(sDestPath) Then My.Computer.FileSystem.CreateDirectory(sDestPath)
     Using sourceTAR As New IO.FileStream(sTAR, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-      Using binTar As New IO.BinaryReader(sourceTAR)
-        Do While binTar.BaseStream.Position < binTar.BaseStream.Length
-          Dim tarFile As New TarFileData(binTar)
-          If Not String.IsNullOrEmpty(tarFile.FileName) Then
-            If tarFile.LinkIndicator = 0 Then
-              My.Computer.FileSystem.WriteAllBytes(IO.Path.Combine(sDestPath, tarFile.FileName), tarFile.FileData, False)
-              IO.File.SetLastWriteTime(IO.Path.Combine(sDestPath, tarFile.FileName), New Date(1970, 1, 1).AddSeconds(tarFile.LastMod))
-            End If
-
+      Dim binTar As New IO.BinaryReader(sourceTAR)
+      Do While binTar.BaseStream.Position < binTar.BaseStream.Length
+        Dim tarFile As New TarFileData(binTar)
+        If Not String.IsNullOrEmpty(tarFile.FileName) Then
+          If tarFile.LinkIndicator = 0 Then
+            My.Computer.FileSystem.WriteAllBytes(IO.Path.Combine(sDestPath, tarFile.FileName), tarFile.FileData, False)
+            IO.File.SetLastWriteTime(IO.Path.Combine(sDestPath, tarFile.FileName), New Date(1970, 1, 1).AddSeconds(tarFile.LastMod))
           End If
-        Loop
-      End Using
+        End If
+      Loop
     End Using
   End Sub
 
