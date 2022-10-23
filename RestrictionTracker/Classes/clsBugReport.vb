@@ -56,13 +56,12 @@
     If httpReport.ResponseCode = Net.HttpStatusCode.Created Then
       Try
         Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
-        For Each jNode In jRet.Serial
-          If Not jNode.Type = JSONElementType.Group Then Continue For
-          For Each jEl In jNode.SubElements
-            If Not jEl.Type = JSONElementType.KeyValue Then Continue For
-            If jEl.Key = "html_url" Then Return jEl.Value
+        If jRet.JSON.GetType Is GetType(JSONObject) Then
+          For Each jEl In CType(jRet.JSON, JSONObject).SubElements
+            If Not jEl.GetType Is GetType(JSONString) Then Continue For
+            If jEl.Key = "html_url" Then Return CType(jEl, JSONString).Value
           Next
-        Next
+        End If
       Catch ex As Exception
       End Try
       Return "https://github.com/RealityRipple/" & ProjectID & "/issues"
@@ -77,17 +76,16 @@
     Dim msg As String = "Unknown Error"
     Try
       Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
-      For Each jNode In jRet.Serial
-        If Not jNode.Type = JSONElementType.Group Then Continue For
-        For Each jEl In jNode.SubElements
-          If Not jEl.Type = JSONElementType.KeyValue Then Continue For
+      If jRet.JSON.GetType Is GetType(JSONObject) Then
+        For Each jEl In CType(jRet.JSON, JSONObject).SubElements
+          If Not jEl.GetType Is GetType(JSONString) Then Continue For
           If jEl.Key = "message" Then
-            msg = jEl.Value
+            msg = CType(jEl, JSONString).Value
             Exit For
           End If
+          If Not msg = "Unknown Error" Then Exit For
         Next
-        If Not msg = "Unknown Error" Then Exit For
-      Next
+      End If
     Catch ex As Exception
       msg = "Unknown Error (Invalid JSON)"
     End Try

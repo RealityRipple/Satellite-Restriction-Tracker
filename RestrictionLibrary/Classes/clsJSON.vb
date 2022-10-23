@@ -1,38 +1,28 @@
 ﻿Public Enum JSONElementType
   None
-  Group
+  [Object]
   Array
   KeyValue
-  [String]
+  Value
 End Enum
-Public Structure JSONElement
+Public Class JSONElement
   Private mType As JSONElementType
-  Private mSubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
-  Private mCollection As ObjectModel.ReadOnlyCollection(Of JSONElement)
   Private mKey As String
-  Private mValue As String
-  Public Sub New(sMsg As String)
-    mType = JSONElementType.String
-    mKey = sMsg
-    mValue = sMsg
+  Public Sub New()
+    mType = JSONElementType.None
+    mKey = Nothing
   End Sub
-  Public Sub New(sKey As String, sValue As String)
-    mType = JSONElementType.KeyValue
-    mKey = sKey
-    mValue = sValue
+  Public Sub New(eType As JSONElementType)
+    mType = eType
+    mKey = Nothing
   End Sub
-  Public Sub New(sKey As String, lSubElements As ObjectModel.ReadOnlyCollection(Of JSONElement))
-    mType = JSONElementType.Group
-    mKey = sKey
-    mSubElements = lSubElements
-  End Sub
-  Public Sub New(lCollection As ObjectModel.ReadOnlyCollection(Of JSONElement))
-    mType = JSONElementType.Array
-    mCollection = lCollection
+  Public Sub New(eType As JSONElementType, eKey As String)
+    mType = eType
+    mKey = DecodeString(eKey)
   End Sub
   Public Shared ReadOnly Property Empty As JSONElement
     Get
-      Return New JSONElement(JSONElementType.None)
+      Return New JSONElement()
     End Get
   End Property
   Public ReadOnly Property Type As JSONElementType
@@ -40,43 +30,47 @@ Public Structure JSONElement
       Return mType
     End Get
   End Property
-  Public ReadOnly Property SubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
-    Get
-      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mSubElements)
-    End Get
-  End Property
-  Public ReadOnly Property Collection As ObjectModel.ReadOnlyCollection(Of JSONElement)
-    Get
-      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mCollection)
-    End Get
-  End Property
   Public ReadOnly Property Key As String
     Get
       Return mKey
     End Get
   End Property
-  Public ReadOnly Property Value As String
-    Get
-      Return mValue
-    End Get
-  End Property
+  Public Shared Function FromObject([in] As Object) As JSONElement
+    If [in] Is Nothing Then Return New JSONNull
+    If IsArray([in]) Then
+      Dim aIn As Object() = [in]
+      Return New JSONArray(aIn)
+    End If
+    If [in].GetType Is GetType(Boolean) Then
+      Dim aIn As Boolean = CBool([in])
+      Return New JSONBoolean(aIn)
+    End If
+    If [in].GetType Is GetType(SByte) Or
+       [in].GetType Is GetType(Byte) Or
+       [in].GetType Is GetType(Int16) Or
+       [in].GetType Is GetType(UInt16) Or
+       [in].GetType Is GetType(Int32) Or
+       [in].GetType Is GetType(UInt32) Or
+       [in].GetType Is GetType(Int64) Or
+       [in].GetType Is GetType(UInt64) Or
+       [in].GetType Is GetType(Single) Or
+       [in].GetType Is GetType(Double) Or
+       [in].GetType Is GetType(Decimal) Then Return New JSONNumber([in])
+    If [in].GetType Is GetType(String) Then Return New JSONString([in])
+    If [in].GetType Is GetType(Dictionary(Of String, Object)) Then
+      Dim aIn As Dictionary(Of String, Object) = [in]
+      Return New JSONObject(aIn)
+    End If
+    Return New JSONString([in].ToString)
+  End Function
   Public Overrides Function GetHashCode() As Integer
-    Return mType.GetHashCode Xor mSubElements.GetHashCode Xor mCollection.GetHashCode Xor mKey.GetHashCode Xor mValue.GetHashCode
+    Return mType.GetHashCode Xor mKey.GetHashCode
   End Function
   Public Overrides Function Equals(obj As Object) As Boolean
     If Not obj.GetType Is GetType(JSONElement) Then Return False
     Dim jObj As JSONElement = obj
     If Not mType = jObj.Type Then Return False
     If Not mKey = jObj.Key Then Return False
-    If Not mValue = jObj.Value Then Return False
-    If Not mSubElements.Count = jObj.SubElements.Count Then Return False
-    For I As Integer = 0 To mSubElements.Count - 1
-      If Not mSubElements(I).Equals(jObj.SubElements(I)) Then Return False
-    Next
-    If Not mCollection.Count = jObj.Collection.Count Then Return False
-    For I As Integer = 0 To mCollection.Count - 1
-      If Not mCollection(I).Equals(jObj.Collection(I)) Then Return False
-    Next
     Return True
   End Function
   Public Shared Operator =(objA As JSONElement, objB As JSONElement) As Boolean
@@ -85,13 +79,394 @@ Public Structure JSONElement
   Public Shared Operator <>(objA As JSONElement, objB As JSONElement) As Boolean
     Return Not objA.Equals(objB)
   End Operator
-End Structure
+  Protected Shared Function EncodeString(sIn As String) As String
+    If sIn Is Nothing Then Return Nothing
+    If sIn = "" Then Return ""
+    sIn = sIn.Replace("""", "\""")
+    sIn = sIn.Replace("\", "\\")
+    sIn = sIn.Replace(ChrW(&H8), "\b")
+    sIn = sIn.Replace(ChrW(&HC), "\f")
+    sIn = sIn.Replace(ChrW(&HA), "\n")
+    sIn = sIn.Replace(ChrW(&HD), "\r")
+    sIn = sIn.Replace(ChrW(&H9), "\t")
+    For I As Integer = &H0 To &H1F
+      sIn = sIn.Replace(ChrW(I), "\u" & srlFunctions.PadHex(I, 4))
+    Next
+    Return sIn
+  End Function
+  Protected Shared Function DecodeString(sOut As String) As String
+    If sOut Is Nothing Then Return Nothing
+    If sOut = "" Then Return ""
+    Dim tGuid As Guid = Guid.NewGuid()
+    sOut = sOut.Replace("\\", "{BACKSLASH-" & tGuid.ToString("D") & "}")
+    sOut = sOut.Replace("\""", """")
+    sOut = sOut.Replace("\b", ChrW(&H8))
+    sOut = sOut.Replace("\f", ChrW(&HC))
+    sOut = sOut.Replace("\n", ChrW(&HA))
+    sOut = sOut.Replace("\r", ChrW(&HD))
+    sOut = sOut.Replace("\t", ChrW(&H9))
+    For I As Integer = &H0 To &H1F
+      sOut = sOut.Replace("\u" & srlFunctions.PadHex(I, 4), ChrW(I))
+    Next
+    sOut = sOut.Replace("{BACKSLASH-" & tGuid.ToString("D") & "}", "\")
+    Return sOut
+  End Function
+End Class
+Public Class JSONClosure
+  Inherits JSONElement
+  Public Sub New()
+    MyBase.New(JSONElementType.None)
+  End Sub
+  Public Sub New(eKey As String)
+    MyBase.New(JSONElementType.None, eKey)
+  End Sub
+End Class
+Public Class JSONComma
+  Inherits JSONElement
+  Public Sub New()
+    MyBase.New(JSONElementType.None)
+  End Sub
+  Public Sub New(eKey As String)
+    MyBase.New(JSONElementType.None, eKey)
+  End Sub
+End Class
+Public Class JSONFailure
+  Inherits JSONElement
+  Public Sub New()
+    MyBase.New(JSONElementType.None)
+  End Sub
+  Public Sub New(eKey As String)
+    MyBase.New(JSONElementType.None, eKey)
+  End Sub
+End Class
+Public Class JSONArray
+  Inherits JSONElement
+  Private mCollection As ObjectModel.ReadOnlyCollection(Of JSONElement)
+  Public Sub New(lItems As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    MyBase.New(JSONElementType.Array)
+    mCollection = lItems
+  End Sub
+  Public Sub New(sKey As String, lItems As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    MyBase.New(JSONElementType.Array, sKey)
+    mCollection = lItems
+  End Sub
+  Public Sub New(eArr As Object())
+    Me.New(Nothing, eArr)
+  End Sub
+  Public Sub New(sKey As String, eArr As Object())
+    MyBase.New(JSONElementType.Array, sKey)
+    Dim myItms As New List(Of JSONElement)
+    For Each oEntry As Object In eArr
+      If oEntry Is Nothing Then
+        myItms.Add(New JSONNull())
+        Continue For
+      End If
+      If IsArray(oEntry) Then
+        Dim aVal As Object() = oEntry
+        myItms.Add(New JSONArray(aVal))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(Boolean) Then
+        Dim aVal As Boolean = CBool(oEntry.Value)
+        myItms.Add(New JSONBoolean(aVal))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(SByte) Or
+         oEntry.Value.GetType Is GetType(Byte) Or
+         oEntry.Value.GetType Is GetType(Int16) Or
+         oEntry.Value.GetType Is GetType(UInt16) Or
+         oEntry.Value.GetType Is GetType(Int32) Or
+         oEntry.Value.GetType Is GetType(UInt32) Or
+         oEntry.Value.GetType Is GetType(Int64) Or
+         oEntry.Value.GetType Is GetType(UInt64) Or
+         oEntry.Value.GetType Is GetType(Single) Or
+         oEntry.Value.GetType Is GetType(Double) Or
+         oEntry.Value.GetType Is GetType(Decimal) Then
+        myItms.Add(New JSONNumber(oEntry.Value))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(String) Then
+        myItms.Add(New JSONString(oEntry.Value))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(Dictionary(Of String, Object)) Then
+        Dim aVal As Dictionary(Of String, Object) = oEntry.Value
+        myItms.Add(New JSONObject(aVal))
+        Continue For
+      End If
+      myItms.Add(New JSONString(oEntry.ToString))
+    Next
+    mCollection = New ObjectModel.ReadOnlyCollection(Of JSONElement)(myItms.ToArray)
+  End Sub
+  Public ReadOnly Property Collection As ObjectModel.ReadOnlyCollection(Of JSONElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mCollection)
+    End Get
+  End Property
+  Public Overrides Function GetHashCode() As Integer
+    If MyBase.Key Is Nothing Then Return MyBase.Type.GetHashCode Xor mCollection.GetHashCode
+    Return MyBase.Type.GetHashCode Xor MyBase.Key.GetHashCode Xor mCollection.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONArray) Then Return False
+    Dim jObj As JSONArray = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    If Not mCollection.Count = jObj.Collection.Count Then Return False
+    For I As Integer = 0 To mCollection.Count - 1
+      If Not mCollection(I).Equals(jObj.Collection(I)) Then Return False
+    Next
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    sRet &= "["
+    Dim isFirst As Boolean = True
+    For Each mEl In mCollection
+      If isFirst Then
+        isFirst = False
+      Else
+        sRet &= ","
+      End If
+      sRet &= mEl.ToString
+    Next
+    sRet &= "]"
+    Return sRet
+  End Function
+End Class
+Public Class JSONObject
+  Inherits JSONElement
+  Private mSubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
+  Public Sub New(lItems As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    MyBase.New(JSONElementType.Object)
+    mSubElements = lItems
+  End Sub
+  Public Sub New(sKey As String, lItems As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    MyBase.New(JSONElementType.Object, sKey)
+    mSubElements = lItems
+  End Sub
+  Public Sub New(eArr As Dictionary(Of String, Object))
+    Me.New(Nothing, eArr)
+  End Sub
+  Public Sub New(sKey As String, eArr As Dictionary(Of String, Object))
+    MyBase.New(JSONElementType.Object, sKey)
+    Dim myEls As New List(Of JSONElement)
+    For Each oEntry As KeyValuePair(Of String, Object) In eArr
+      If oEntry.Value Is Nothing Then
+        myEls.Add(New JSONNull(oEntry.Key))
+        Continue For
+      End If
+      If IsArray(oEntry.Value) Then
+        Dim aVal As Object() = oEntry.Value
+        myEls.Add(New JSONArray(oEntry.Key, aVal))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(Boolean) Then
+        Dim aVal As Boolean = CBool(oEntry.Value)
+        myEls.Add(New JSONBoolean(oEntry.Key, aVal))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(SByte) Or
+         oEntry.Value.GetType Is GetType(Byte) Or
+         oEntry.Value.GetType Is GetType(Int16) Or
+         oEntry.Value.GetType Is GetType(UInt16) Or
+         oEntry.Value.GetType Is GetType(Int32) Or
+         oEntry.Value.GetType Is GetType(UInt32) Or
+         oEntry.Value.GetType Is GetType(Int64) Or
+         oEntry.Value.GetType Is GetType(UInt64) Or
+         oEntry.Value.GetType Is GetType(Single) Or
+         oEntry.Value.GetType Is GetType(Double) Or
+         oEntry.Value.GetType Is GetType(Decimal) Then
+        myEls.Add(New JSONNumber(oEntry.Key, oEntry.Value))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(String) Then
+        myEls.Add(New JSONString(oEntry.Key, oEntry.Value))
+        Continue For
+      End If
+      If oEntry.Value.GetType Is GetType(Dictionary(Of String, Object)) Then
+        Dim aVal As Dictionary(Of String, Object) = oEntry.Value
+        myEls.Add(New JSONObject(oEntry.Key, aVal))
+        Continue For
+      End If
+      myEls.Add(New JSONString(oEntry.Key, oEntry.ToString))
+    Next
+    mSubElements = New ObjectModel.ReadOnlyCollection(Of JSONElement)(myEls.ToArray)
+  End Sub
+  Public ReadOnly Property SubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mSubElements)
+    End Get
+  End Property
+  Public Overrides Function GetHashCode() As Integer
+    Return MyBase.Type.GetHashCode Xor mSubElements.GetHashCode Xor MyBase.Key.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONObject) Then Return False
+    Dim jObj As JSONObject = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    If Not mSubElements.Count = jObj.SubElements.Count Then Return False
+    For I As Integer = 0 To mSubElements.Count - 1
+      If Not mSubElements(I).Equals(jObj.SubElements(I)) Then Return False
+    Next
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    sRet &= "{"
+    Dim isFirst As Boolean = True
+    For Each mEl In mSubElements
+      If isFirst Then
+        isFirst = False
+      Else
+        sRet &= ","
+      End If
+      sRet &= mEl.ToString
+    Next
+    sRet &= "}"
+    Return sRet
+  End Function
+End Class
+Public Class JSONString
+  Inherits JSONElement
+  Private mValue As String
+  Public Sub New(sMsg As String)
+    MyBase.New(JSONElementType.Value, Nothing)
+    mValue = DecodeString(sMsg)
+  End Sub
+  Public Sub New(sKey As String, sValue As String)
+    MyBase.New(JSONElementType.KeyValue, DecodeString(sKey))
+    mValue = DecodeString(sValue)
+  End Sub
+  Public ReadOnly Property Value As String
+    Get
+      Return mValue
+    End Get
+  End Property
+  Public Overrides Function GetHashCode() As Integer
+    Return MyBase.Type.GetHashCode Xor MyBase.Key.GetHashCode Xor mValue.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONString) Then Return False
+    Dim jObj As JSONString = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    If Not mValue = jObj.Value Then Return False
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    sRet &= """" & EncodeString(mValue) & """"
+    Return sRet
+  End Function
+End Class
+Public Class JSONNumber
+  Inherits JSONElement
+  Private mValue As String
+  Public Sub New(sMsg As String)
+    MyBase.New(JSONElementType.Value, Nothing)
+    mValue = sMsg
+  End Sub
+  Public Sub New(sKey As String, sValue As String)
+    MyBase.New(JSONElementType.KeyValue, sKey)
+    mValue = sValue
+  End Sub
+  Public ReadOnly Property Value As String
+    Get
+      Return mValue
+    End Get
+  End Property
+  Public Overrides Function GetHashCode() As Integer
+    Return MyBase.Type.GetHashCode Xor MyBase.Key.GetHashCode Xor mValue.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONNumber) Then Return False
+    Dim jObj As JSONNumber = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    If Not mValue = jObj.Value Then Return False
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    sRet &= mValue
+    Return sRet
+  End Function
+End Class
+Public Class JSONBoolean
+  Inherits JSONElement
+  Private mValue As Boolean
+  Public Sub New(sMsg As Boolean)
+    MyBase.New(JSONElementType.Value, Nothing)
+    mValue = sMsg
+  End Sub
+  Public Sub New(sKey As String, sValue As Boolean)
+    MyBase.New(JSONElementType.KeyValue, sKey)
+    mValue = sValue
+  End Sub
+  Public ReadOnly Property Value As Boolean
+    Get
+      Return mValue
+    End Get
+  End Property
+  Public Overrides Function GetHashCode() As Integer
+    Return MyBase.Type.GetHashCode Xor MyBase.Key.GetHashCode Xor mValue.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONBoolean) Then Return False
+    Dim jObj As JSONBoolean = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    If Not mValue = jObj.Value Then Return False
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    If mValue Then
+      sRet &= "true"
+    Else
+      sRet &= "false"
+    End If
+    Return sRet
+  End Function
+End Class
+Public Class JSONNull
+  Inherits JSONElement
+  Public Sub New()
+    MyBase.New(JSONElementType.Value, Nothing)
+  End Sub
+  Public Sub New(sKey As String)
+    MyBase.New(JSONElementType.KeyValue, sKey)
+  End Sub
+  Public Overrides Function GetHashCode() As Integer
+    Return MyBase.Type.GetHashCode Xor MyBase.Key.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONNull) Then Return False
+    Dim jObj As JSONNull = obj
+    If Not MyBase.Type = jObj.Type Then Return False
+    If Not MyBase.Key = jObj.Key Then Return False
+    Return True
+  End Function
+  Public Overrides Function ToString() As String
+    Dim sRet As String = Nothing
+    If Not MyBase.Key Is Nothing Then sRet &= """" & EncodeString(MyBase.Key) & """:"
+    sRet &= "null"
+    Return sRet
+  End Function
+End Class
 
 Public NotInheritable Class JSONReader
-  Private mSerial As List(Of JSONElement)
-  Public ReadOnly Property Serial As ObjectModel.ReadOnlyCollection(Of JSONElement)
+  Private mJSON As JSONElement = New JSONFailure
+  Public ReadOnly Property JSON As JSONElement
     Get
-      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mSerial)
+      Return mJSON
     End Get
   End Property
   Private enc As System.Text.Encoding
@@ -123,15 +498,23 @@ Public NotInheritable Class JSONReader
       stream.Seek(0, IO.SeekOrigin.Begin)
       If ExpectUTF8 Then enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
     End If
-    mSerial = New List(Of JSONElement)
     Dim workElement As JSONElement = ReadElement(stream, TextEncoding)
-    Do Until workElement.Type = JSONElementType.None
-      mSerial.Add(workElement)
-      workElement = Nothing
-      workElement = ReadElement(stream, TextEncoding)
+    If workElement.GetType Is GetType(JSONFailure) Then
+      mJSON = New JSONFailure
+      Return
+    End If
+    Do While stream.Position < stream.Length
+      Dim sRead As String = ReadCharacter(stream, enc)
+      If Char.IsWhiteSpace(sRead) Then Continue Do
+      If String.IsNullOrEmpty(sRead) Then Exit Do
+      mJSON = New JSONFailure
+      Return
     Loop
+    mJSON = workElement
   End Sub
   Private Shared Function ReadCharacter(stream As IO.Stream, streamEncoding As System.Text.Encoding) As String
+    If Not stream.CanRead Then Return Nothing
+    If stream.Length > -1 AndAlso stream.Position > stream.Length Then Return Nothing
     Select Case streamEncoding.CodePage
       Case srlFunctions.LATIN_1
         Dim b As Integer = stream.ReadByte
@@ -205,285 +588,321 @@ Public NotInheritable Class JSONReader
         Return ChrW(b)
     End Select
   End Function
-  Public Shared Function ReadElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSONElement
-    If Not stream.CanRead Then Return JSONElement.Empty
-    Dim myKey As String = Nothing
-    Dim sRead As String = ReadCharacter(stream, streamEncoding)
-    Do Until String.IsNullOrEmpty(sRead)
-      If sRead = "{" Or sRead = "[" Then
-        Dim workElement As JSONElement = ReadElement(stream, streamEncoding)
-        Dim myList As New List(Of JSONElement)
-        Do Until workElement.Type = JSONElementType.None
-          myList.Add(workElement)
-          workElement = Nothing
-          If Not stream.CanRead Then Exit Do
-          workElement = ReadElement(stream, streamEncoding)
-        Loop
-        If sRead = "[" Then Return New JSONElement(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
-        Return New JSONElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+  Private Shared Function ReadObjectElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSONElement
+    If Not stream.CanRead Then Return New JSONFailure
+    Dim sRead As String
+    Do
+      sRead = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sRead) Then Return New JSONFailure
+    Loop While Char.IsWhiteSpace(sRead)
+    If sRead = "}" Then Return New JSONClosure
+    If sRead = "," Then Return New JSONComma
+    If Not sRead = """" Then Return New JSONFailure
+    Dim myKey As String = ""
+    Dim bKeyEscape As Boolean = False
+    Do
+      Dim sKeyChar As String = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sKeyChar) Then Return New JSONFailure
+      If bKeyEscape Then
+        myKey &= "\" & sKeyChar
+        bKeyEscape = False
+      ElseIf sKeyChar = "\" Then
+        bKeyEscape = True
+      ElseIf sKeyChar = """" Then
+        Exit Do
+      Else
+        myKey &= sKeyChar
+        bKeyEscape = False
       End If
-      If sRead = "}" Or sRead = "]" Then Return JSONElement.Empty
-      If Not sRead = """" Then
-        If Not stream.CanRead Then Exit Do
-        sRead = ReadCharacter(stream, streamEncoding)
-        Continue Do
-      End If
-      Dim sKey As String = Nothing
-      Dim sText As String = ReadCharacter(stream, streamEncoding)
-      Dim escape As Boolean = False
-      Do Until String.IsNullOrEmpty(sText)
-        If escape Then
-          sKey &= "\" & sText
-          escape = False
-        ElseIf sText = "\" Then
-          escape = True
-        ElseIf sText = """" Then
-          Exit Do
-        Else
-          sKey &= sText
-          escape = False
-        End If
-        If Not stream.CanRead Then Return JSONElement.Empty
-        sText = ReadCharacter(stream, streamEncoding)
-      Loop
-      myKey = sKey
-      If Not stream.CanRead Then Return JSONElement.Empty
-      Dim sSplit As String = ReadCharacter(stream, streamEncoding)
-      Do Until String.IsNullOrEmpty(sSplit)
-        If Not String.IsNullOrEmpty(sSplit) Then
-          If sSplit = ":" Then Exit Do
-          If sSplit = "," Then Exit Do
-          If sSplit = "[" Then Exit Do
-          If sSplit = "]" Then Exit Do
-          If sSplit = "{" Then Exit Do
-          If sSplit = "}" Then Exit Do
-        End If
-        If Not stream.CanRead Then
-          Exit Do
-        End If
-        sSplit = ReadCharacter(stream, streamEncoding)
-      Loop
-      If Not sSplit = ":" Then
-        stream.Seek(-1, IO.SeekOrigin.Current)
-        Return New JSONElement(myKey)
-      End If
-      Dim sNext As String = ReadCharacter(stream, streamEncoding)
-      Do Until String.IsNullOrEmpty(sNext)
-        If Not String.IsNullOrEmpty(sNext) Then
-          If sNext = """" Then Exit Do
-          If sNext = "[" Then Exit Do
-          If sNext = "{" Then Exit Do
-          If sNext.ToUpperInvariant = "T" Or sNext.ToUpperInvariant = "F" Or sNext.ToUpperInvariant = "N" Then Exit Do
-          If IsNumeric(sNext) Or sNext = "-" Then Exit Do
-        End If
-        If Not stream.CanRead Then
-          Exit Do
-        End If
-        sNext = ReadCharacter(stream, streamEncoding)
-      Loop
-      If sNext = "{" Or sNext = "[" Then
-        Dim myList As New List(Of JSONElement)
-        Dim workElement As JSONElement = ReadElement(stream, streamEncoding)
-        Do Until workElement.Type = JSONElementType.None
-          myList.Add(workElement)
-          workElement = Nothing
-          If Not stream.CanRead Then Exit Do
-          workElement = ReadElement(stream, streamEncoding)
-        Loop
-        If sNext = "[" Then Return New JSONElement(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
-        Return New JSONElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
-      End If
-      Dim sVal As String = Nothing
-      If sNext.ToUpperInvariant = "T" Then
-        sText = sNext
-        Do Until String.IsNullOrEmpty(sText)
-          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-            stream.Seek(-1, IO.SeekOrigin.Current)
-            If (sVal.ToUpperInvariant = "TRUE") Then Exit Do
-          Else
-            sVal &= sText
-          End If
-          If Not stream.CanRead Then Return JSONElement.Empty
-          sText = ReadCharacter(stream, streamEncoding)
-        Loop
-        Return New JSONElement(myKey, sVal)
-      End If
-      If sNext.ToUpperInvariant = "F" Then
-        sText = sNext
-        Do Until String.IsNullOrEmpty(sText)
-          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-            stream.Seek(-1, IO.SeekOrigin.Current)
-            If (sVal.ToUpperInvariant = "FALSE") Then Exit Do
-          Else
-            sVal &= sText
-          End If
-          If Not stream.CanRead Then Return JSONElement.Empty
-          sText = ReadCharacter(stream, streamEncoding)
-        Loop
-        Return New JSONElement(myKey, sVal)
-      End If
-      If sNext.ToUpperInvariant = "N" Then
-        sText = sNext
-        Do Until String.IsNullOrEmpty(sText)
-          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-            stream.Seek(-1, IO.SeekOrigin.Current)
-            If (sVal.ToUpperInvariant = "NULL") Then Exit Do
-          Else
-            sVal &= sText
-          End If
-          If Not stream.CanRead Then Return JSONElement.Empty
-          sText = ReadCharacter(stream, streamEncoding)
-        Loop
-        Return New JSONElement(myKey, sVal)
-      End If
-      If IsNumeric(sNext) Or sNext = "-" Then
-        sText = sNext
-        Do Until String.IsNullOrEmpty(sText)
-          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-            stream.Seek(-1, IO.SeekOrigin.Current)
-            If IsNumeric(sVal) Then Exit Do
-          Else
-            sVal &= sText
-          End If
-          If Not stream.CanRead Then Return JSONElement.Empty
-          sText = ReadCharacter(stream, streamEncoding)
-        Loop
-        Return New JSONElement(myKey, sVal)
-      End If
-      sText = ReadCharacter(stream, streamEncoding)
-      escape = False
-      Do Until String.IsNullOrEmpty(sText)
-        If escape Then
-          sVal &= "\" & sText
-          escape = False
-        ElseIf sText = "\" Then
-          escape = True
-        ElseIf sText = """" Then
-          Exit Do
-        Else
-          sVal &= sText
-          escape = False
-        End If
-        If Not stream.CanRead Then Return JSONElement.Empty
-        sText = ReadCharacter(stream, streamEncoding)
-      Loop
-      Return New JSONElement(myKey, sVal)
     Loop
-    Return JSONElement.Empty
+    Dim sSplit As String
+    Do
+      sSplit = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sSplit) Then Return New JSONFailure
+    Loop While Char.IsWhiteSpace(sSplit)
+    If Not sSplit = ":" Then Return New JSONFailure
+    Do
+      sRead = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sRead) Then Return New JSONFailure
+    Loop While Char.IsWhiteSpace(sRead)
+    If sRead = "{" Then
+      Dim myList As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myList.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myList.Add(workElement)
+        Dim commaElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONObject(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+    End If
+    If sRead = "[" Then
+      Dim myArr As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myArr.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myArr.Add(workElement)
+        Dim commaElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONArray(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myArr))
+    End If
+    Dim sVal As String = Nothing
+    If sRead.ToUpperInvariant = "T" Then
+      sVal = sRead
+      For I As Integer = 1 To 3
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "TRUE" Then Return New JSONFailure
+      Return New JSONBoolean(myKey, True)
+    End If
+    If sRead.ToUpperInvariant = "F" Then
+      sVal = sRead
+      For I As Integer = 1 To 4
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "FALSE" Then Return New JSONFailure
+      Return New JSONBoolean(myKey, False)
+    End If
+    If sRead.ToUpperInvariant = "N" Then
+      sVal = sRead
+      For I As Integer = 1 To 3
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "NULL" Then Return New JSONFailure
+      Return New JSONNull(myKey)
+    End If
+    If IsNumeric(sRead) Or sRead = "-" Then
+      sVal = sRead
+      Dim sChar As String
+      Do
+        sChar = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChar) Then Return New JSONFailure
+        If IsNumeric(sChar) Or sChar = "." Then
+          sVal &= sChar
+        Else
+          stream.Seek(-1, IO.SeekOrigin.Current)
+          Exit Do
+        End If
+      Loop
+      Return New JSONNumber(myKey, sVal)
+    End If
+    If sRead = """" Then
+      Dim bEscape As Boolean = False
+      Do
+        Dim sChar As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChar) Then Return New JSONFailure
+        If bEscape Then
+          sVal &= "\" & sChar
+          bEscape = False
+        ElseIf sChar = "\" Then
+          bEscape = True
+        ElseIf sChar = """" Then
+          Exit Do
+        Else
+          sVal &= sChar
+          bEscape = False
+        End If
+      Loop
+      Return New JSONString(myKey, sVal)
+    End If
+    Return New JSONFailure
+  End Function
+  Private Shared Function ReadArrayElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSONElement
+    If Not stream.CanRead Then Return New JSONFailure
+    Dim sRead As String
+    Do
+      sRead = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sRead) Then Return New JSONFailure
+    Loop While Char.IsWhiteSpace(sRead)
+    If sRead = "]" Then Return New JSONClosure
+    If sRead = "," Then Return New JSONComma
+    If sRead = "{" Then
+      Dim myList As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myList.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myList.Add(workElement)
+        Dim commaElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONObject(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+    End If
+    If sRead = "[" Then
+      Dim myArr As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myArr.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myArr.Add(workElement)
+        Dim commaElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONArray(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myArr))
+    End If
+    Dim sVal As String = Nothing
+    If sRead.ToUpperInvariant = "T" Then
+      sVal = sRead
+      For I As Integer = 1 To 3
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "TRUE" Then Return New JSONFailure
+      Return New JSONBoolean(True)
+    End If
+    If sRead.ToUpperInvariant = "F" Then
+      sVal = sRead
+      For I As Integer = 1 To 4
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "FALSE" Then Return New JSONFailure
+      Return New JSONBoolean(False)
+    End If
+    If sRead.ToUpperInvariant = "N" Then
+      sVal = sRead
+      For I As Integer = 1 To 3
+        Dim sChr As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChr) Then Return New JSONFailure
+        sVal &= sChr
+      Next
+      If Not sVal.ToUpperInvariant = "NULL" Then Return New JSONFailure
+      Return New JSONNull
+    End If
+    If IsNumeric(sRead) Or sRead = "-" Then
+      sVal = sRead
+      Dim sChar As String
+      Do
+        sChar = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChar) Then Return New JSONFailure
+        If IsNumeric(sChar) Or sChar = "." Then
+          sVal &= sChar
+        Else
+          stream.Seek(-1, IO.SeekOrigin.Current)
+          Exit Do
+        End If
+      Loop
+      Return New JSONNumber(sVal)
+    End If
+    If sRead = """" Then
+      Dim bEscape As Boolean = False
+      Do
+        Dim sChar As String = ReadCharacter(stream, streamEncoding)
+        If String.IsNullOrEmpty(sChar) Then Return New JSONFailure
+        If bEscape Then
+          sVal &= "\" & sChar
+          bEscape = False
+        ElseIf sChar = "\" Then
+          bEscape = True
+        ElseIf sChar = """" Then
+          Exit Do
+        Else
+          sVal &= sChar
+          bEscape = False
+        End If
+      Loop
+      Return New JSONString(sVal)
+    End If
+    Return New JSONFailure
+  End Function
+  Public Shared Function ReadElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSONElement
+    If Not stream.CanRead Then Return New JSONFailure
+    Dim sRead As String
+    Do
+      sRead = ReadCharacter(stream, streamEncoding)
+      If String.IsNullOrEmpty(sRead) Then Return New JSONFailure
+    Loop While Char.IsWhiteSpace(sRead)
+    If sRead = "{" Then
+      Dim myList As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myList.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myList.Add(workElement)
+        Dim commaElement As JSONElement = ReadObjectElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONObject(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+    End If
+    If sRead = "[" Then
+      Dim myArr As New List(Of JSONElement)
+      Do
+        Dim workElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If workElement.GetType Is GetType(JSONClosure) And myArr.Count = 0 Then Exit Do
+        If workElement.Type = JSONElementType.None Then Return New JSONFailure
+        myArr.Add(workElement)
+        Dim commaElement As JSONElement = ReadArrayElement(stream, streamEncoding)
+        If commaElement.GetType Is GetType(JSONClosure) Then Exit Do
+        If Not commaElement.GetType Is GetType(JSONComma) Then Return New JSONFailure
+      Loop
+      Return New JSONArray(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myArr))
+    End If
+    If sRead = "," Then Return New JSONComma
+    Return New JSONFailure
   End Function
 End Class
 
 Friend NotInheritable Class JSONAssociator
   Private Sub New()
   End Sub
-  Private Shared Function MakeAssoc(jsIn As JSONElement) As Object
-    Select Case jsIn.Type
-      Case JSONElementType.None
-        Return Nothing
-      Case JSONElementType.String
-        Return jsIn.Value
-      Case JSONElementType.KeyValue
-        Return jsIn.Value
-      Case JSONElementType.Array
-        Dim dArr As New List(Of Object)
-        For I As Integer = 0 To jsIn.Collection.Count - 1
-          Dim assocList As Object = MakeAssoc(jsIn.Collection(I))
-          dArr.Add(assocList)
-        Next
-        Return dArr.ToArray
-      Case JSONElementType.Group
-        Dim dGrp As New Dictionary(Of String, Object)
-        For Each gEnt As JSONElement In jsIn.SubElements
-          Dim grpList As Object = MakeAssoc(gEnt)
-          dGrp.Add(gEnt.Key, grpList)
-        Next
-        Return dGrp
-    End Select
+  Private Shared Function MakeAssoc(jsIn As JSONNull) As Object
     Return Nothing
   End Function
-  Public Shared Function Associate(jsIn As JSONReader, Optional index As Integer = 0) As Object
-    If index < 0 Then Return Nothing
-    If index > jsIn.Serial.Count - 1 Then Return Nothing
-    Dim jEl As JSONElement = jsIn.Serial(index)
-    Return MakeAssoc(jEl)
+  Private Shared Function MakeAssoc(jsIn As JSONBoolean) As Object
+    Return jsIn.Value
   End Function
-  Public Shared Function MakeString(dIn As Dictionary(Of String, Object)) As String
-    Dim sRet As String = "{"
-    Dim isFirst As Boolean = True
-    For Each oEntry As KeyValuePair(Of String, Object) In dIn
-      If isFirst Then
-        sRet &= """" & oEntry.Key & """:"
-        isFirst = False
-      Else
-        sRet &= ",""" & oEntry.Key & """:"
-      End If
-      If oEntry.Value.GetType Is GetType(Boolean) Then
-        If oEntry.Value Then
-          sRet &= "true"
-        Else
-          sRet &= "false"
-        End If
-      ElseIf oEntry.Value.GetType Is GetType(SByte) Or
-             oEntry.Value.GetType Is GetType(Byte) Or
-             oEntry.Value.GetType Is GetType(Int16) Or
-             oEntry.Value.GetType Is GetType(UInt16) Or
-             oEntry.Value.GetType Is GetType(Int32) Or
-             oEntry.Value.GetType Is GetType(UInt32) Or
-             oEntry.Value.GetType Is GetType(Int64) Or
-             oEntry.Value.GetType Is GetType(UInt64) Or
-             oEntry.Value.GetType Is GetType(Single) Or
-             oEntry.Value.GetType Is GetType(Double) Or
-             oEntry.Value.GetType Is GetType(Decimal) Then
-        sRet &= oEntry.Value.ToString
-      ElseIf oEntry.Value.GetType Is GetType(String) Then
-        sRet &= """" & oEntry.Value & """"
-      ElseIf IsArray(oEntry.Value) Then
-        sRet &= MakeString(oEntry.Value)
-      Else
-        sRet &= MakeString(oEntry.Value)
-      End If
-    Next
-    sRet &= "}"
-    Return sRet
+  Private Shared Function MakeAssoc(jsIn As JSONNumber) As Object
+    If jsIn.Value.Contains(".") Then Return CDbl(jsIn.Value)
+    If jsIn.Value.StartsWith("-") Then Return CLng(jsIn.Value)
+    Return CULng(jsIn.Value)
   End Function
-  Public Shared Function MakeString(aIn As Object()) As String
-    Dim sRet As String = "["
-    Dim isFirst As Boolean = True
-    For Each oValue As Object In aIn
-      If isFirst Then
-        isFirst = False
-      Else
-        sRet &= ","
-      End If
-      If oValue Is Nothing Then
-        sRet &= "null"
-      ElseIf oValue.GetType Is GetType(Boolean) Then
-        If oValue.Value Then
-          sRet &= "true"
-        Else
-          sRet &= "false"
-        End If
-      ElseIf oValue.GetType Is GetType(SByte) Or
-             oValue.GetType Is GetType(Byte) Or
-             oValue.GetType Is GetType(Int16) Or
-             oValue.GetType Is GetType(UInt16) Or
-             oValue.GetType Is GetType(Int32) Or
-             oValue.GetType Is GetType(UInt32) Or
-             oValue.GetType Is GetType(Int64) Or
-             oValue.GetType Is GetType(UInt64) Or
-             oValue.GetType Is GetType(Single) Or
-             oValue.GetType Is GetType(Double) Or
-             oValue.GetType Is GetType(Decimal) Then
-        sRet &= oValue.ToString
-      ElseIf oValue.GetType Is GetType(String) Then
-        sRet &= """" & oValue & """"
-      ElseIf IsArray(oValue) Then
-        sRet &= MakeString(oValue)
-      Else
-        sRet &= MakeString(oValue)
-      End If
+  Private Shared Function MakeAssoc(jsIn As JSONString) As Object
+    Return jsIn.Value
+  End Function
+  Private Shared Function MakeAssoc(jsIn As JSONArray) As Object
+    Dim dArr As New List(Of Object)
+    For I As Integer = 0 To jsIn.Collection.Count - 1
+      Dim assocList As Object = MakeAssoc(jsIn.Collection(I))
+      dArr.Add(assocList)
     Next
-    sRet &= "]"
-    Return sRet
+    Return dArr.ToArray
+  End Function
+  Private Shared Function MakeAssoc(jsIn As JSONObject) As Object
+    Dim dGrp As New Dictionary(Of String, Object)
+    For Each gEnt As JSONElement In jsIn.SubElements
+      Dim grpList As Object = MakeAssoc(gEnt)
+      dGrp.Add(gEnt.Key, grpList)
+    Next
+    Return dGrp
+  End Function
+  Private Shared Function MakeAssoc(jsIn As JSONElement) As Object
+    If jsIn.GetType Is GetType(JSONNull) Then Return MakeAssoc(CType(jsIn, JSONNull))
+    If jsIn.GetType Is GetType(JSONBoolean) Then Return MakeAssoc(CType(jsIn, JSONBoolean))
+    If jsIn.GetType Is GetType(JSONNumber) Then Return MakeAssoc(CType(jsIn, JSONNumber))
+    If jsIn.GetType Is GetType(JSONString) Then Return MakeAssoc(CType(jsIn, JSONString))
+    If jsIn.GetType Is GetType(JSONArray) Then Return MakeAssoc(CType(jsIn, JSONArray))
+    If jsIn.GetType Is GetType(JSONObject) Then Return MakeAssoc(CType(jsIn, JSONObject))
+    Stop
+    Return Nothing
+  End Function
+  Public Shared Function Associate(jsIn As JSONReader) As Object
+    If jsIn.JSON.GetType Is GetType(JSONFailure) Then Return Nothing
+    Return MakeAssoc(jsIn.JSON)
   End Function
 End Class

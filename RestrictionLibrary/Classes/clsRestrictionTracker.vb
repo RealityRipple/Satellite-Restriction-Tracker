@@ -478,7 +478,7 @@
       Catch ex As Exception
         Return ret
       End Try
-      If Not jOkta.Serial.Count = 1 Then Return ret
+      If jOkta.JSON.GetType Is GetType(JSONFailure) Then Return ret
       Try
         Dim assoc As Object = JSONAssociator.Associate(jOkta)
         If Not assoc.ContainsKey("prod") Then Return ret
@@ -645,7 +645,7 @@
         RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
         Return
       End Try
-      If Not jData.Serial.Count = 1 Then
+      If jData.JSON.GetType Is GetType(JSONFailure) Then
         RaiseError("Reading Login Failed: Could not parse Okta JSON.", "EX Read Login Response", Response, ResponseURI)
         Return
       End If
@@ -689,7 +689,7 @@
         RaiseError("Login Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
         Return
       End Try
-      If Not exJS.Serial.Count = 1 Then
+      If exJS.JSON.GetType Is GetType(JSONFailure) Then
         RaiseError("Login Failed: Could not parse login response.", "EX Login Response", Response, ResponseURI)
         Return
       End If
@@ -726,7 +726,7 @@
         valList.Add("identifier", sUsername)
         valList.Add("passcode", sPassword)
         Dim body As Dictionary(Of String, Object) = EX_Helper_MakeLoginFromStruct(formData, valList)
-        Dim sBody As String = JSONAssociator.MakeString(body)
+        Dim sBody As String = New JSONObject(body).ToString
         Dim aHeaders As New Net.WebHeaderCollection
         aHeaders.Add(Net.HttpRequestHeader.Accept, formData("accepts"))
         aHeaders.Add(Net.HttpRequestHeader.ContentType, formData("produces"))
@@ -755,7 +755,7 @@
         RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
         Return
       End Try
-      If Not jsAuth.Serial.Count = 1 Then
+      If jsAuth.JSON.GetType Is GetType(JSONFailure) Then
         RaiseError("Authentication Failed: Could not parse auth response.", "EX Auth Response", Response, ResponseURI)
         Return
       End If
@@ -831,7 +831,7 @@
                          "    __typename\n" &
                          "  }\n" &
                          "}\n")
-      Dim sSend As String = JSONAssociator.MakeString(aSend)
+      Dim sSend As String = New JSONObject(aSend).ToString
       Dim hdrs As New Net.WebHeaderCollection
       hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
       MakeSocket(True)
@@ -853,7 +853,7 @@
         RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
         Return
       End Try
-      If Not jTok.Serial.Count = 1 Then
+      If jTok.JSON.GetType Is GetType(JSONFailure) Then
         RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
         Return
       End If
@@ -903,7 +903,7 @@
                          "    __typename\n" &
                          "  }\n" &
                          "}\n")
-      Dim sSend As String = JSONAssociator.MakeString(aSend)
+      Dim sSend As String = New JSONObject(aSend).ToString
       Dim hdrs As New Net.WebHeaderCollection
       hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
       hdrs.Add("x-auth-type", "Okta")
@@ -928,7 +928,7 @@
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
         Return
       End Try
-      If Not exJS.Serial.Count = 1 Then
+      If exJS.JSON.GetType Is GetType(JSONFailure) Then
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
         Return
       End If
