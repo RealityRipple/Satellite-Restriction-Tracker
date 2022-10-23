@@ -138,8 +138,10 @@ Public MustInherit Class RR_HMAC
   Public Shared Shadows Function Create(algorithmName As String) As HMAC
     Return DirectCast(CryptoConfig.CreateFromName(algorithmName), HMAC)
   End Function
-  Protected Class KeyBuilder
+  Protected NotInheritable Class KeyBuilder
     Private Shared rng As RandomNumberGenerator = RandomNumberGenerator.Create()
+    Private Sub New()
+    End Sub
     Public Shared Function Key(size As Integer) As Byte()
       Dim key__1 As Byte() = New Byte(size - 1) {}
       rng.GetBytes(key__1)

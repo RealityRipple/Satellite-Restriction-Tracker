@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 
-Public Class srlFunctions
+Public NotInheritable Class srlFunctions
   Private Shared lastSocketErrSend As Long = 0
   ''' <summary>
   ''' ISO-8859-1 Latin-1 Encoding
@@ -13,6 +13,8 @@ Public Class srlFunctions
   Public Const UTF_32_LE As Integer = 12000
   Public Const UTF_32_BE As Integer = 12001
 
+  Private Sub New()
+  End Sub
   ''' <summary>
   ''' Encodes a string for use in HTML form submissions.
   ''' </summary>

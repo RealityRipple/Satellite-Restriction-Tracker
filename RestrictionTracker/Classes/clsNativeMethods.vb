@@ -350,4 +350,7 @@ Friend NotInheritable Class NativeMethods
   <DllImport("winmm", CharSet:=CharSet.Unicode)>
   Public Shared Function mciSendString(ByVal strCommand As String, ByVal strReturn As System.Text.StringBuilder, ByVal iReturnLength As Int32, ByVal hwndCallback As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
   End Function
+
+  Private Sub New()
+  End Sub
 End Class

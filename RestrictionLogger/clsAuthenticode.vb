@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography.X509Certificates
 
-Friend Class Authenticode
+Friend NotInheritable Class Authenticode
   Private Const RRRootThumb As String = "25E10B83C6F3EA44EE5E8C290EB17200A5F77EBB"
   Private Const RRRootSerial As String = "0087448327"
   Private Const RRRootSubject As String = "CN=RealityRipple Software Root CA, OU=RealityRipple Software Certificate Authority, O=RealityRipple Software, L=Los Berros Canyon, S=California, C=US"
@@ -159,6 +159,8 @@ Friend Class Authenticode
     Execute = 0
     Install
   End Enum
+  Private Sub New()
+  End Sub
   Private Shared Function VerifyTrust(sFile As String) As NativeMethods.Validity
     Dim v2ID As New Guid("{00AAC56B-CD44-11d0-8CC2-00C04FC295EE}")
     Dim result As UInteger = NativeMethods.Validity.Unsigned

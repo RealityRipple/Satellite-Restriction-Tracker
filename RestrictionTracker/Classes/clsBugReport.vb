@@ -1,6 +1,8 @@
 ﻿Friend Class GitHubReporter
   Public Const ProjectID As String = "Satellite-Restriction-Tracker"
   Private Const Token As String = ""
+  Private Sub New()
+  End Sub
   Private Shared Function JSONEscape(sInput As String) As String
     If sInput.Contains("\") Then sInput = sInput.Replace("\", "\\")
     If sInput.Contains("""") Then sInput = sInput.Replace("""", "\""")

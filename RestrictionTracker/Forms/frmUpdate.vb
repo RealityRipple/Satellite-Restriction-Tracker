@@ -1,4 +1,4 @@
-﻿Friend Class frmUpdate
+﻿Friend NotInheritable Class frmUpdate
   Private Ret As Boolean
   Private Sub frmUpdate_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Ret = False

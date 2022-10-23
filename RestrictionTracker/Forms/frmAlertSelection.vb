@@ -1,4 +1,4 @@
-﻿Public Class frmAlertSelection
+﻿Public NotInheritable Class frmAlertSelection
   Friend AlertStyle As String
   Private Changed As Boolean
   Private taskNotifier As TaskbarNotifier = Nothing

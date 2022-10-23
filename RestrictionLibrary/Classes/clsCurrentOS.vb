@@ -1,9 +1,11 @@
 ﻿Imports System.Runtime.InteropServices
-Public Class CurrentOS
-  Private Class NativeMethods
+Public NotInheritable Class CurrentOS
+  Private NotInheritable Class NativeMethods
     <DllImport("kernel32", CallingConvention:=CallingConvention.Winapi)>
     Public Shared Function IsWow64Process(hProcess As IntPtr, <MarshalAs(UnmanagedType.Bool)> ByRef wow64Process As Boolean) As <MarshalAs(UnmanagedType.Bool)> Boolean
     End Function
+    Private Sub New()
+    End Sub
   End Class
   Private Shared bPopulated As Boolean = False
   Private Shared bWindows As Boolean
@@ -14,6 +16,8 @@ Public Class CurrentOS
   Private Shared b32 As Boolean
   Private Shared b64 As Boolean
   Private Shared sName As String
+  Private Sub New()
+  End Sub
   Private Shared Sub Init()
     If bPopulated Then Return
     bWindows = System.IO.Path.DirectorySeparatorChar = "\"

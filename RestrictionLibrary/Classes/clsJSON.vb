@@ -1,4 +1,4 @@
-﻿Public Class JSONReader
+﻿Public NotInheritable Class JSONReader
   Public Enum ElementType
     None
     Group
@@ -349,7 +349,9 @@
   End Function
 End Class
 
-Friend Class JSONAssociator
+Friend NotInheritable Class JSONAssociator
+  Private Sub New()
+  End Sub
   Private Shared Function MakeAssoc(jsIn As JSONReader.JSElement) As Object
     Select Case jsIn.Type
       Case JSONReader.ElementType.None

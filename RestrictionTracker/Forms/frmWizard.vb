@@ -1,6 +1,6 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
 Imports System.Runtime.InteropServices
-Friend Class frmWizard
+Friend NotInheritable Class frmWizard
   <StructLayout(LayoutKind.Explicit)>
   Private Structure DWord
     <FieldOffset(0)> Public LongValue As Integer

@@ -1,4 +1,4 @@
-﻿Public Class frmMain
+﻿Public NotInheritable Class frmMain
   Private myPanel As localRestrictionTracker.SatHostTypes
   Private Enum LoadStates
     Loading

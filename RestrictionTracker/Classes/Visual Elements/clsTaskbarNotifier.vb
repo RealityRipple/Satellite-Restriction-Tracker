@@ -431,6 +431,8 @@ Friend Class TaskbarNotifier
 #End Region
 End Class
 Friend Class TaskBarPosition
+  Private Sub New()
+  End Sub
   Shared Function GetTaskBarPosition(ByRef CoordinateRectangle As Rectangle, ByVal hwnd As IntPtr) As Boolean
     Try
       Dim abd As New NativeMethods.APPBARDATA

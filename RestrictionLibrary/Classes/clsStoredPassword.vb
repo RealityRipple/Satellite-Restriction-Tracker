@@ -1,4 +1,6 @@
-﻿Public Class StoredPassword
+﻿Public NotInheritable Class StoredPassword
+  Private Sub New()
+  End Sub
   Private Shared Function AESCTR(bData() As Byte, bKey() As Byte) As Byte()
     Dim hAES As New Security.Cryptography.RijndaelManaged()
     hAES.Padding = Security.Cryptography.PaddingMode.None
@@ -101,7 +103,7 @@
     Return Convert.ToBase64String(bOut)
   End Function
 End Class
-Public Class StoredPasswordLegacy
+Public NotInheritable Class StoredPasswordLegacy
   Private Class RC4
     Private State As Byte()
     Private X, Y As Byte
@@ -144,6 +146,8 @@ Public Class StoredPasswordLegacy
     End Function
   End Class
   Private Shared crypter As RC4
+  Private Sub New()
+  End Sub
   Private Shared Sub GenKey()
     crypter = Nothing
     Dim bKey() As Byte = {&H43, &HD6, &HE6, &HFD, &H8A, &H76, &H91, &H3C, &HA1, &H69, &H2C, &H8F, &HB7, &HC1, &HCD, &H1F}

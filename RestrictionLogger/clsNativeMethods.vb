@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Friend Class NativeMethods
+Friend NotInheritable Class NativeMethods
   Public Enum Validity As UInteger
     Unsigned = &H800B0100UI
     SignedButBad = &H80096010UI
@@ -17,4 +17,7 @@ Friend Class NativeMethods
   <DllImport("wintrust", CharSet:=CharSet.Unicode)>
   Public Shared Function WinVerifyTrust(hWnd As IntPtr, pgActionID As IntPtr, pWinTrustData As IntPtr) As UInt32
   End Function
+
+  Private Sub New()
+  End Sub
 End Class

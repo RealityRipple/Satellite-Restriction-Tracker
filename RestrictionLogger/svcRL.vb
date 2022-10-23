@@ -8,6 +8,8 @@ Friend Class svcRL
   Private DataPath As String
   Private WithEvents tracker As localRestrictionTracker
   Private Class DetermineType
+    Private Sub New()
+    End Sub
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then Return SatHostTypes.Dish
       If Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then Return SatHostTypes.Exede

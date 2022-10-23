@@ -1,4 +1,4 @@
-﻿Public Class frmDBProgress
+﻿Public NotInheritable Class frmDBProgress
   Private Sub frmDBProgress_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Me.CenterToParent()
   End Sub

@@ -1,5 +1,5 @@
 ﻿Imports RestrictionLibrary.localRestrictionTracker
-Public Class frmHistory
+Public NotInheritable Class frmHistory
   Friend mySettings As AppSettings
   Private lastRect As Rectangle
   Private bSizeBegin As Boolean

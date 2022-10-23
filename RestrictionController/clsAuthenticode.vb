@@ -159,6 +159,8 @@ Friend Class Authenticode
     Execute = 0
     Install
   End Enum
+  Private Sub New()
+  End Sub
   Private Shared Function VerifyTrust(sFile As String) As NativeMethods.Validity
     Dim v2ID As New Guid("{00AAC56B-CD44-11d0-8CC2-00C04FC295EE}")
     Dim result As UInteger = NativeMethods.Validity.Unsigned
