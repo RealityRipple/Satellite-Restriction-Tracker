@@ -44,8 +44,8 @@
   End Sub
   Private Sub lstStyles_DragDrop(sender As Object, e As System.Windows.Forms.DragEventArgs) Handles lstStyles.DragDrop
     If e.Data.GetFormats(True).Contains("FileDrop") Then
-      Dim Data = e.Data.GetData("FileDrop")
-      If UBound(Data) = 0 Then
+      Dim Data As String() = e.Data.GetData("FileDrop")
+      If Data.Length = 1 Then
         Dim StylePath As String = Data(0)
         Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
         Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
@@ -65,7 +65,7 @@
         Else
           e.Effect = DragDropEffects.None
         End If
-      ElseIf UBound(Data) > 0 Then
+      ElseIf Data.Length > 1 Then
         For Each StylePath As String In Data
           Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
           Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
@@ -90,8 +90,8 @@
   End Sub
   Private Sub lstStyles_DragOver(sender As Object, e As System.Windows.Forms.DragEventArgs) Handles lstStyles.DragOver
     If e.Data.GetFormats(True).Contains("FileDrop") Then
-      Dim Data = e.Data.GetData("FileDrop")
-      If UBound(Data) = 0 Then
+      Dim Data As String() = e.Data.GetData("FileDrop")
+      If Data.Length = 1 Then
         Dim StylePath As String = Data(0)
         Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
         Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
@@ -104,7 +104,7 @@
         Else
           e.Effect = DragDropEffects.None
         End If
-      ElseIf UBound(Data) > 0 Then
+      ElseIf Data.Length > 1 Then
         Dim hasTar As Boolean = False
         For Each StylePath As String In Data
           Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)

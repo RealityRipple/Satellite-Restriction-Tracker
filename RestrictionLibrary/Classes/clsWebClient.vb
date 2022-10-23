@@ -223,27 +223,28 @@
       End If
       Dim request As Net.WebRequest = MyBase.GetWebRequest(address)
       If request.GetType Is GetType(Net.HttpWebRequest) Then
-        CType(request, Net.HttpWebRequest).UserAgent = WebClientCore.UserAgent
-        CType(request, Net.HttpWebRequest).ReadWriteTimeout = c_RWTimeout * 1000
-        CType(request, Net.HttpWebRequest).Timeout = c_Timeout * 1000
-        CType(request, Net.HttpWebRequest).CookieContainer = Nothing
+        Dim hRequest As Net.HttpWebRequest = request
+        hRequest.UserAgent = WebClientCore.UserAgent
+        hRequest.ReadWriteTimeout = c_RWTimeout * 1000
+        hRequest.Timeout = c_Timeout * 1000
+        hRequest.CookieContainer = Nothing
         Dim sCookieHeader As String = c_CookieJar.GetCookieHeader(address)
         If Not String.IsNullOrEmpty(sCookieHeader) Then
           If sCookieHeader.Contains(REPLACE_COMMA) Or sCookieHeader.Contains(REPLACE_SEMIC) Then
             sCookieHeader = sCookieHeader.Replace(REPLACE_COMMA, ",")
             sCookieHeader = sCookieHeader.Replace(REPLACE_SEMIC, ";")
           End If
-          CType(request, Net.HttpWebRequest).Headers.Add(Net.HttpRequestHeader.Cookie, sCookieHeader)
+          hRequest.Headers.Add(Net.HttpRequestHeader.Cookie, sCookieHeader)
           If c_SendCookieJar Then
             Dim cNewJar As New Net.CookieContainer
-            AppendCookies(cNewJar, "Cookie", CType(request, Net.HttpWebRequest).Headers, address.Host)
-            CType(request, Net.HttpWebRequest).CookieContainer = cNewJar
+            AppendCookies(cNewJar, "Cookie", hRequest.Headers, address.Host)
+            hRequest.CookieContainer = cNewJar
           End If
         End If
-        CType(request, Net.HttpWebRequest).AllowAutoRedirect = Not c_ManualRedirect
-        CType(request, Net.HttpWebRequest).KeepAlive = c_KeepAlive
-        CType(request, Net.HttpWebRequest).ProtocolVersion = HTTPVersion
-        CType(request, Net.HttpWebRequest).CachePolicy = New Net.Cache.HttpRequestCachePolicy(Net.Cache.HttpRequestCacheLevel.BypassCache)
+        hRequest.AllowAutoRedirect = Not c_ManualRedirect
+        hRequest.KeepAlive = c_KeepAlive
+        hRequest.ProtocolVersion = HTTPVersion
+        hRequest.CachePolicy = New Net.Cache.HttpRequestCachePolicy(Net.Cache.HttpRequestCacheLevel.BypassCache)
       End If
       m_Request = request
       Return request
@@ -305,26 +306,39 @@
     Try
       If response Is Nothing Then Return Nothing
       AppendCookies(c_CookieJar, "Set-Cookie", response.Headers, response.ResponseUri.Host)
-      If response.GetType Is GetType(Net.HttpWebResponse) AndAlso Not String.IsNullOrEmpty(CType(response, Net.HttpWebResponse).CharacterSet) Then
-        Dim charSet As String = CType(response, Net.HttpWebResponse).CharacterSet
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
-      ElseIf response.ContentType.ToUpperInvariant.Contains("CHARSET=") Then
-        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToUpperInvariant.IndexOf("CHARSET"))
-        charSet = charSet.Substring(charSet.IndexOf("=") + 1)
-        If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
-        Try
-          Me.Encoding = System.Text.Encoding.GetEncoding(charSet)
-        Catch ex As Exception
-          Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-        End Try
+      Dim chEncoding As System.Text.Encoding = Nothing
+      If response.GetType Is GetType(Net.HttpWebResponse) Then
+        Dim hResponse As Net.HttpWebResponse = response
+        c_ResponseCode = hResponse.StatusCode
+        If Not String.IsNullOrEmpty(hResponse.CharacterSet) Then
+          Dim charSet As String = hResponse.CharacterSet
+          Try
+            chEncoding = System.Text.Encoding.GetEncoding(charSet)
+          Catch ex As Exception
+            chEncoding = Nothing
+          End Try
+        End If
       End If
+      If chEncoding Is Nothing Then
+        If response.ContentType.ToUpperInvariant.Contains("CHARSET=") Then
+          Dim charSet As String = response.ContentType.Substring(response.ContentType.ToUpperInvariant.IndexOf("CHARSET"))
+          charSet = charSet.Substring(charSet.IndexOf("=") + 1)
+          If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
+          Try
+            chEncoding = System.Text.Encoding.GetEncoding(charSet)
+          Catch ex As Exception
+            chEncoding = Nothing
+          End Try
+        End If
+      End If
+      If chEncoding Is Nothing Then chEncoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
+      Try
+        Me.Encoding = chEncoding
+      Catch ex As Exception
+        Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
+      End Try
       m_Result = response
       c_ResponseURI = response.ResponseUri
-      c_ResponseCode = CType(response, Net.HttpWebResponse).StatusCode
       Return response
     Catch ex As Net.WebException
       Return HandleWebResponse(request, ex.Response)

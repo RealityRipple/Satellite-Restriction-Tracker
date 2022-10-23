@@ -394,85 +394,81 @@ Public Class JSONAssociator
   Public Shared Function Associate(jEl As JSONReader.JSElement) As Object
     Return MakeAssoc(jEl)
   End Function
-  Public Shared Function MakeString(oIn As Object) As String
-    Dim sRet As String = ""
-    If oIn.GetType Is GetType(Dictionary(Of String, Object)) Then
-      sRet &= "{"
-      Dim isFirst As Boolean = True
-      For Each oEntry As KeyValuePair(Of String, Object) In oIn
-        If isFirst Then
-          sRet &= """" & oEntry.Key & """:"
-          isFirst = False
+  Public Shared Function MakeString(dIn As Dictionary(Of String, Object)) As String
+    Dim sRet As String = "{"
+    Dim isFirst As Boolean = True
+    For Each oEntry As KeyValuePair(Of String, Object) In dIn
+      If isFirst Then
+        sRet &= """" & oEntry.Key & """:"
+        isFirst = False
+      Else
+        sRet &= ",""" & oEntry.Key & """:"
+      End If
+      If oEntry.Value.GetType Is GetType(Boolean) Then
+        If oEntry.Value Then
+          sRet &= "true"
         Else
-          sRet &= ",""" & oEntry.Key & """:"
+          sRet &= "false"
         End If
-        If oEntry.Value.GetType Is GetType(Boolean) Then
-          If oEntry.Value Then
-            sRet &= "true"
-          Else
-            sRet &= "false"
-          End If
-        ElseIf oEntry.Value.GetType Is GetType(SByte) Or
-               oEntry.Value.GetType Is GetType(Byte) Or
-               oEntry.Value.GetType Is GetType(Int16) Or
-               oEntry.Value.GetType Is GetType(UInt16) Or
-               oEntry.Value.GetType Is GetType(Int32) Or
-               oEntry.Value.GetType Is GetType(UInt32) Or
-               oEntry.Value.GetType Is GetType(Int64) Or
-               oEntry.Value.GetType Is GetType(UInt64) Or
-               oEntry.Value.GetType Is GetType(Single) Or
-               oEntry.Value.GetType Is GetType(Double) Or
-               oEntry.Value.GetType Is GetType(Decimal) Then
-          sRet &= oEntry.Value.ToString
-        ElseIf oEntry.Value.GetType Is GetType(String) Then
-          sRet &= """" & oEntry.Value & """"
-        ElseIf IsArray(oEntry.Value) Then
-          sRet &= MakeString(oEntry.Value)
+      ElseIf oEntry.Value.GetType Is GetType(SByte) Or
+             oEntry.Value.GetType Is GetType(Byte) Or
+             oEntry.Value.GetType Is GetType(Int16) Or
+             oEntry.Value.GetType Is GetType(UInt16) Or
+             oEntry.Value.GetType Is GetType(Int32) Or
+             oEntry.Value.GetType Is GetType(UInt32) Or
+             oEntry.Value.GetType Is GetType(Int64) Or
+             oEntry.Value.GetType Is GetType(UInt64) Or
+             oEntry.Value.GetType Is GetType(Single) Or
+             oEntry.Value.GetType Is GetType(Double) Or
+             oEntry.Value.GetType Is GetType(Decimal) Then
+        sRet &= oEntry.Value.ToString
+      ElseIf oEntry.Value.GetType Is GetType(String) Then
+        sRet &= """" & oEntry.Value & """"
+      ElseIf IsArray(oEntry.Value) Then
+        sRet &= MakeString(oEntry.Value)
+      Else
+        sRet &= MakeString(oEntry.Value)
+      End If
+    Next
+    sRet &= "}"
+    Return sRet
+  End Function
+  Public Shared Function MakeString(aIn As Object()) As String
+    Dim sRet As String = "["
+    Dim isFirst As Boolean = True
+    For Each oValue As Object In aIn
+      If isFirst Then
+        isFirst = False
+      Else
+        sRet &= ","
+      End If
+      If oValue.GetType Is GetType(Boolean) Then
+        If oValue.Value Then
+          sRet &= "true"
         Else
-          sRet &= MakeString(oEntry.Value)
+          sRet &= "false"
         End If
-      Next
-      sRet &= "}"
-    ElseIf IsArray(oIn) Then
-      sRet &= "["
-      Dim isFirst As Boolean = True
-      For Each oValue As Object In oIn
-        If isFirst Then
-          isFirst = False
-        Else
-          sRet &= ","
-        End If
-        If oValue.GetType Is GetType(Boolean) Then
-          If oValue.Value Then
-            sRet &= "true"
-          Else
-            sRet &= "false"
-          End If
-        ElseIf oValue.GetType Is GetType(SByte) Or
-               oValue.GetType Is GetType(Byte) Or
-               oValue.GetType Is GetType(Int16) Or
-               oValue.GetType Is GetType(UInt16) Or
-               oValue.GetType Is GetType(Int32) Or
-               oValue.GetType Is GetType(UInt32) Or
-               oValue.GetType Is GetType(Int64) Or
-               oValue.GetType Is GetType(UInt64) Or
-               oValue.GetType Is GetType(Single) Or
-               oValue.GetType Is GetType(Double) Or
-               oValue.GetType Is GetType(Decimal) Then
-          sRet &= oValue.ToString
-        ElseIf oValue.GetType Is GetType(String) Then
-          sRet &= """" & oValue & """"
-        ElseIf IsArray(oValue) Then
-          sRet &= MakeString(oValue)
-        Else
-          sRet &= MakeString(oValue)
-        End If
-      Next
-      sRet &= "]"
-    Else
-      Debug.Print("Unknown Type: " & oIn.GetType.ToString)
-      Return Nothing
-    End If
+      ElseIf oValue.GetType Is GetType(SByte) Or
+             oValue.GetType Is GetType(Byte) Or
+             oValue.GetType Is GetType(Int16) Or
+             oValue.GetType Is GetType(UInt16) Or
+             oValue.GetType Is GetType(Int32) Or
+             oValue.GetType Is GetType(UInt32) Or
+             oValue.GetType Is GetType(Int64) Or
+             oValue.GetType Is GetType(UInt64) Or
+             oValue.GetType Is GetType(Single) Or
+             oValue.GetType Is GetType(Double) Or
+             oValue.GetType Is GetType(Decimal) Then
+        sRet &= oValue.ToString
+      ElseIf oValue.GetType Is GetType(String) Then
+        sRet &= """" & oValue & """"
+      ElseIf IsArray(oValue) Then
+        sRet &= MakeString(oValue)
+      Else
+        sRet &= MakeString(oValue)
+      End If
+    Next
+    sRet &= "]"
     Return sRet
   End Function
 End Class

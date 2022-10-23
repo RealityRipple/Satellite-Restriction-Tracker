@@ -1955,11 +1955,12 @@
       ElseIf ctl.GetType = GetType(ComboBox) Then
         ctl.Margin = New Padding(3)
       ElseIf ctl.GetType = GetType(CheckBox) Then
-        ctl.Margin = New Padding(3)
+        Dim chTL As CheckBox = ctl
+        chTL.Margin = New Padding(3)
         If Environment.OSVersion.Version.Major = 5 Then
-          CType(ctl, CheckBox).FlatStyle = FlatStyle.Standard
+          chTL.FlatStyle = FlatStyle.Standard
         Else
-          CType(ctl, CheckBox).FlatStyle = FlatStyle.System
+          chTL.FlatStyle = FlatStyle.System
         End If
       ElseIf ctl.GetType = GetType(NumericUpDownIncrementable) Then
         ctl.Margin = New Padding(3)

@@ -154,7 +154,7 @@ Public Class frmHistory
   End Sub
   Private Sub DoGraph(state As Object)
     Dim graphStyle As Byte = state(0)
-    Dim graphData = state(1)
+    Dim graphData As DataBase.DataRow() = state(1)
     Dim downSize As Size = state(2)
     Select Case graphStyle
       Case 0
