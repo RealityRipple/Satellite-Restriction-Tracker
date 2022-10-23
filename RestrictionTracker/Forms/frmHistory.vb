@@ -298,7 +298,7 @@ Public Class frmHistory
       ttHistory.Hide(pctUld)
     End If
   End Sub
-  Private Function CalculateNow(GraphSpace As Rectangle, StartX As Date, EndX As Date, MyLoc As Point) As Date
+  Private Shared Function CalculateNow(GraphSpace As Rectangle, StartX As Date, EndX As Date, MyLoc As Point) As Date
     Dim DateSpan As Integer = DateDiff(DateInterval.Minute, StartX, EndX)
     Return DateAdd(DateInterval.Minute, ((MyLoc.X - GraphSpace.Left) / GraphSpace.Width) * DateSpan, StartX)
   End Function
@@ -781,7 +781,7 @@ Public Class frmHistory
     None
     One
   End Enum
-  Private Function BadDataNote(Note As BadDataNotes, ImgSize As Size) As Image
+  Private Shared Function BadDataNote(Note As BadDataNotes, ImgSize As Size) As Image
     If ImgSize.Width = 0 Or ImgSize.Height = 0 Then Return Nothing
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Using g As Graphics = Graphics.FromImage(iPic)
@@ -796,7 +796,7 @@ Public Class frmHistory
     End Using
     Return iPic
   End Function
-  Private Function ResizingNote(ImgSize As Size) As Image
+  Private Shared Function ResizingNote(ImgSize As Size) As Image
     If ImgSize.Width = 0 Or ImgSize.Height = 0 Then Return Nothing
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)

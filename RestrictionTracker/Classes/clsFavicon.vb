@@ -126,7 +126,7 @@
       c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URI.OriginalString & """!"))
     End Try
   End Sub
-  Private Function GenerateCloneImage(fromImage As Image, width As Integer, height As Integer) As Image
+  Private Shared Function GenerateCloneImage(fromImage As Image, width As Integer, height As Integer) As Image
     Using newImage As New Bitmap(width, height)
       Using g As Graphics = Graphics.FromImage(newImage)
         g.DrawImage(fromImage, 0, 0, width, height)
@@ -134,7 +134,7 @@
       Return newImage.Clone
     End Using
   End Function
-  Private Function GenerateCloneImage(fromIcon As Icon) As Image
+  Private Shared Function GenerateCloneImage(fromIcon As Icon) As Image
     Using newImage As New Bitmap(fromIcon.Width, fromIcon.Height)
       Using g As Graphics = Graphics.FromImage(newImage)
         g.DrawIcon(fromIcon, 0, 0)

@@ -344,7 +344,7 @@
       Return HandleWebResponse(request, ex.Response)
     End Try
   End Function
-  Private Function CleanCookie(sCookieData As String) As String
+  Private Shared Function CleanCookie(sCookieData As String) As String
     Dim sReconstruction As String = Nothing
     Do While Not String.IsNullOrEmpty(sCookieData)
       Dim cName As String = Nothing
@@ -394,7 +394,7 @@
     Loop
     Return sReconstruction
   End Function
-  Private Function CookieStrToCookies(sCookieData As String, DefaultDomain As String) As Net.Cookie()
+  Private Shared Function CookieStrToCookies(sCookieData As String, DefaultDomain As String) As Net.Cookie()
     Dim cookieList As New List(Of Net.Cookie)
     Do While Not String.IsNullOrEmpty(sCookieData)
       Dim cName As String = Nothing
@@ -513,7 +513,7 @@
     Loop
     Return cookieList.ToArray
   End Function
-  Private Sub AppendCookies(ByRef CookieJar As Net.CookieContainer, HeaderName As String, Headers As Net.WebHeaderCollection, DefaultDomain As String)
+  Private Shared Sub AppendCookies(ByRef CookieJar As Net.CookieContainer, HeaderName As String, Headers As Net.WebHeaderCollection, DefaultDomain As String)
     For Each sHead In Headers.AllKeys
       If sHead = HeaderName Then
         Dim sCookieData As String = Headers(sHead)
@@ -1353,7 +1353,7 @@ Public Class WebClientEx
 #End Region
 #End Region
 #End Region
-  Private Function CheckHeaderRedirect(HeaderData As Net.WebHeaderCollection, SourceAddr As String) As String
+  Private Shared Function CheckHeaderRedirect(HeaderData As Net.WebHeaderCollection, SourceAddr As String) As String
     For Each Key In HeaderData.AllKeys
       If Key.ToUpperInvariant = "LOCATION" Then
         Dim sNewPath As String = HeaderData.Item(Key)

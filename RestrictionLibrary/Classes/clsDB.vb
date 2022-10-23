@@ -596,22 +596,22 @@ Public Class DataBase
     End Try
   End Function
 #Region "Binary"
-  Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Long)
+  Private Shared Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Long)
     nOut.Write(BitConverter.GetBytes(value), 0, 8)
   End Sub
-  Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As UInt64)
+  Private Shared Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As UInt64)
     nOut.Write(BitConverter.GetBytes(value), 0, 8)
   End Sub
-  Private Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Date)
+  Private Shared Sub SAVE_Write(ByRef nOut As IO.BinaryWriter, value As Date)
     nOut.Write(BitConverter.GetBytes(value.ToBinary), 0, 8)
   End Sub
-  Private Function LOAD_ReadDate(ByRef nIn As IO.BinaryReader) As Date
+  Private Shared Function LOAD_ReadDate(ByRef nIn As IO.BinaryReader) As Date
     Return Date.FromBinary(nIn.ReadInt64)
   End Function
-  Private Function LOAD_ReadLong(ByRef nIn As IO.BinaryReader) As Long
+  Private Shared Function LOAD_ReadLong(ByRef nIn As IO.BinaryReader) As Long
     Return nIn.ReadInt64
   End Function
-  Private Function LOAD_ReadULong(ByRef nIn As IO.BinaryReader) As UInt64
+  Private Shared Function LOAD_ReadULong(ByRef nIn As IO.BinaryReader) As UInt64
     Return nIn.ReadInt64
   End Function
   Public Function TryGetValue(key As UInt64, ByRef value As DataRow) As Boolean Implements IDictionary(Of UInt64, DataRow).TryGetValue

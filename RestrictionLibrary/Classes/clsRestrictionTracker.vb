@@ -784,7 +784,7 @@ Public Class localRestrictionTracker
     If ClosingTime Then Return
     DN_Login_Response(responseData, responseURI)
   End Sub
-  Private Function DNHash(inStr As String) As String
+  Private Shared Function DNHash(inStr As String) As String
     If String.IsNullOrEmpty(inStr) Then Return 0
     Dim a As Integer = 0
     For I As Integer = 0 To inStr.Length - 1
@@ -1002,7 +1002,7 @@ Public Class localRestrictionTracker
 #End Region
 #Region "EX"
 #Region "Exede Helper Functions"
-  Private Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
+  Private Shared Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
     Dim gS As Integer = find.IndexOf(groupS)
     If gS = -1 Then Return Nothing
     find = find.Substring(gS + groupS.Length)
@@ -1026,7 +1026,7 @@ Public Class localRestrictionTracker
     If ret.Count = 0 Then Return Nothing
     Return ret.ToArray
   End Function
-  Private Function EX_Helper_WithinParens(find As String) As String
+  Private Shared Function EX_Helper_WithinParens(find As String) As String
     Dim quote1 As Boolean = False
     Dim quote2 As Boolean = False
     Dim parens As Integer = 0
@@ -1055,7 +1055,7 @@ Public Class localRestrictionTracker
     Next
     Return find
   End Function
-  Private Function EX_Helper_Unescape(d As String)
+  Private Shared Function EX_Helper_Unescape(d As String)
     For I As Integer = 0 To 255
       Dim h As String = srlFunctions.PadHex(I, 2).ToUpperInvariant
       Dim c As Char = ChrW(I)
@@ -1063,7 +1063,7 @@ Public Class localRestrictionTracker
     Next
     Return d
   End Function
-  Private Function EX_Helper_Parse_okta(body As String) As Dictionary(Of String, String)
+  Private Shared Function EX_Helper_Parse_okta(body As String) As Dictionary(Of String, String)
     Dim ret As New Dictionary(Of String, String)
     ret.Add("base", "https://login.viasat.com/oauth2/auss5o0l1DDF9mIke696")
     ret.Add("client_id", "0oa1z83muzscFURhw697")
@@ -1095,13 +1095,13 @@ Public Class localRestrictionTracker
     End Try
     Return ret
   End Function
-  Private Function EX_Helper_Parse_scope(body As String) As String
+  Private Shared Function EX_Helper_Parse_scope(body As String) As String
     Dim ret As String = "openid profle email offline_access"
     Dim scopeData As String() = EX_Helper_FindBetween(body, "c=[", "]", """"c, """"c)
     If scopeData IsNot Nothing Then ret = Join(scopeData)
     Return ret
   End Function
-  Private Function EX_Helper_Parse_urlBuilder(body As String) As Dictionary(Of String, String)
+  Private Shared Function EX_Helper_Parse_urlBuilder(body As String) As Dictionary(Of String, String)
     Dim ret As New Dictionary(Of String, String)
     ret.Add("path", "/v1/authorize?")
     ret.Add("response_type", "code")
@@ -2863,7 +2863,7 @@ Public Class localRestrictionTracker
       ReturnURL = wsSocket.ResponseURI
     End If
   End Sub
-  Private Function FromBase64(base64Str As String) As String
+  Private Shared Function FromBase64(base64Str As String) As String
     Dim bRet() As Byte
     Try
       bRet = Convert.FromBase64String(base64Str)
@@ -2874,7 +2874,7 @@ Public Class localRestrictionTracker
     If sRet.Contains(vbNullChar) Then sRet = sRet.Substring(0, sRet.IndexOf(vbNullChar))
     Return sRet
   End Function
-  Private Function ToBase64(regularStr As String) As String
+  Private Shared Function ToBase64(regularStr As String) As String
     Dim bUTF() As Byte = System.Text.Encoding.UTF8.GetBytes(regularStr)
     Return Convert.ToBase64String(bUTF)
   End Function
@@ -2967,17 +2967,17 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage, FailureText))
     End If
   End Sub
-  Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
+  Private Shared Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
     Return CLng(Val(str.Substring(0, str.IndexOf(" ")).Replace(",", "")) * vMult)
   End Function
-  Private Function StrToFloat(str As String) As Double
+  Private Shared Function StrToFloat(str As String) As Double
     If String.IsNullOrEmpty(str) Then Return 0.0#
     If Not str.Contains(" ") Then Return Val(str.Replace(",", ""))
     Return Val(str.Substring(0, str.IndexOf(" ")).Replace(",", ""))
   End Function
-  Private Sub CleanupResult(ByRef result As String)
+  Private Shared Sub CleanupResult(ByRef result As String)
     If Not String.IsNullOrEmpty(result) Then
       result = Replace(result, "&nbsp;", " ")
       result = Replace(result, vbTab, "")

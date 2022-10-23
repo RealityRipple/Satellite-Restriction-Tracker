@@ -171,12 +171,12 @@ Class AppSettings
     Minimized
     Never
   End Enum
-  Private ReadOnly Property ConfigFile As String
+  Private Shared ReadOnly Property ConfigFile As String
     Get
       Return IO.Path.Combine(LocalAppDataDirectory, "user.config")
     End Get
   End Property
-  Private ReadOnly Property ConfigFileBackup As String
+  Private Shared ReadOnly Property ConfigFileBackup As String
     Get
       Return IO.Path.Combine(LocalAppDataDirectory, "backup.config")
     End Get
@@ -1206,7 +1206,7 @@ Class AppSettings
     End If
     Return False
   End Function
-  Private Function ColorToStr(c As Color) As String
+  Private Shared Function ColorToStr(c As Color) As String
     Dim sA As String
     If c = Color.Transparent Then
       sA = "00"
@@ -1257,7 +1257,7 @@ Class AppSettings
     End If
     Return sA & sR & sG & sB
   End Function
-  Private Function StrToColor(s As String) As Color
+  Private Shared Function StrToColor(s As String) As Color
     Dim iColor As Integer
     If Integer.TryParse(s, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.CurrentCulture, iColor) Then
       If Not (iColor And &HFF000000) = &HFF000000 Then Return Color.Transparent
@@ -1266,12 +1266,12 @@ Class AppSettings
       Return Color.Transparent
     End If
   End Function
-  Public Sub MakeBackup()
+  Public Shared Sub MakeBackup()
     If My.Computer.FileSystem.FileExists(ConfigFile) Then
       My.Computer.FileSystem.CopyFile(ConfigFile, ConfigFileBackup, True)
     End If
   End Sub
-  Public Sub BackupCheckup()
+  Public Shared Sub BackupCheckup()
     If My.Computer.FileSystem.FileExists(ConfigFile) Then
       If My.Computer.FileSystem.FileExists(ConfigFileBackup) Then
         Dim xConfig As XElement

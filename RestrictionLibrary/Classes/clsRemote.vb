@@ -544,12 +544,12 @@ Public Class remoteRestrictionTracker
       Return mSHA.ComputeHash(bHash)
     End Using
   End Function
-  Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
+  Private Shared Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
     Return CLng(Val(str.Substring(0, str.IndexOf(" ")).Replace(",", "")) * vMult)
   End Function
-  Private Function DecompressData(inData() As Byte) As Byte()
+  Private Shared Function DecompressData(inData() As Byte) As Byte()
     Using outData As New IO.MemoryStream
       Using inStream As New IO.MemoryStream(inData)
         Dim Decompress As DeflateStream = New DeflateStream(inStream, CompressionMode.Decompress)

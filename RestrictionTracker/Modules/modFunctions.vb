@@ -24,7 +24,7 @@ Module modFunctions
       NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
       sAlias = String.Empty
     End Sub
-    Public Sub CloseAll()
+    Public Shared Sub CloseAll()
       Dim sCommand As String = "close all wait"
       NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
@@ -121,7 +121,7 @@ Module modFunctions
       ContentHoverColor = ColorIDToColor(locLines(5))
       CloseLocation = PointIDToPoint(locLines(6))
     End Sub
-    Private Function ColorIDToColor(ID As String) As Color
+    Private Shared Function ColorIDToColor(ID As String) As Color
       Try
         If ID.StartsWith("#") Then ID = ID.Substring(1)
         Dim iR As Integer = Integer.Parse(ID.Substring(0, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
@@ -132,7 +132,7 @@ Module modFunctions
         Return Color.Transparent
       End Try
     End Function
-    Private Function RectIDToRect(ID As String) As Rectangle
+    Private Shared Function RectIDToRect(ID As String) As Rectangle
       Try
         ID = ID.Replace(" ", "")
         Dim IDs() As String = Split(ID, ",")
@@ -145,7 +145,7 @@ Module modFunctions
         Return Rectangle.Empty
       End Try
     End Function
-    Private Function PointIDToPoint(ID As String) As Point
+    Private Shared Function PointIDToPoint(ID As String) As Point
       Try
         ID = ID.Replace(" ", "")
         Dim IDs() As String = Split(ID, ",")
@@ -228,14 +228,14 @@ Module modFunctions
         If Leftovers > 0 Then bIn.BaseStream.Seek(512 - Leftovers, IO.SeekOrigin.Current)
       End If
     End Sub
-    Private Function ReadBString(inBytes() As Byte) As String
+    Private Shared Function ReadBString(inBytes() As Byte) As String
       Dim sRet As String = System.Text.Encoding.ASCII.GetString(inBytes)
       If sRet.Contains(vbNullChar) Then sRet = sRet.Replace(vbNullChar, " ")
       If sRet.Contains(" ") Then sRet = sRet.Trim
       sRet = sRet.Trim
       Return sRet
     End Function
-    Private Function ReadBByte(inBytes() As Byte) As Byte
+    Private Shared Function ReadBByte(inBytes() As Byte) As Byte
       Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
         Return Byte.Parse(sRet, Globalization.CultureInfo.InvariantCulture)
@@ -243,7 +243,7 @@ Module modFunctions
         Return 0
       End If
     End Function
-    Private Function ReadBInt(inBytes() As Byte) As UInt32
+    Private Shared Function ReadBInt(inBytes() As Byte) As UInt32
       Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
         Return UInt32.Parse(sRet, Globalization.CultureInfo.InvariantCulture)
@@ -251,7 +251,7 @@ Module modFunctions
         Return 0
       End If
     End Function
-    Private Function ReadBOct(inBytes() As Byte) As UInt64
+    Private Shared Function ReadBOct(inBytes() As Byte) As UInt64
       Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
         Return Convert.ToUInt64(sRet, 8)
@@ -315,7 +315,7 @@ Module modFunctions
     If Song IsNot Nothing Then
       Song.Stop()
       Song.Close()
-      Song.CloseAll()
+      MCIPlayer.CloseAll()
       Song.Dispose()
       Song = Nothing
     End If

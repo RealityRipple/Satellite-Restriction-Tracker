@@ -1118,7 +1118,7 @@
       End If
     End If
   End Sub
-  Private Function MakeAToken(fromString As String) As Integer
+  Private Shared Function MakeAToken(fromString As String) As Integer
     Dim iToken As UInteger = fromString.Length * Int(Rnd() * 32) + Int(Rnd() * &HFFFFFFUI)
     iToken = iToken Mod &HFFFFFFUI
     For I As Integer = 0 To fromString.Length - 1

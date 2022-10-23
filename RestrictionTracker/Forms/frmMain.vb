@@ -83,7 +83,7 @@
         OfflineCheck()
       End If
     End Sub
-    Private Sub OfflineStats(ByRef rpP As Single, ByRef exP As Single, ByRef wbP As Single)
+    Private Shared Sub OfflineStats(ByRef rpP As Single, ByRef exP As Single, ByRef wbP As Single)
       If LOG_GetCount() > 0 Then
         Dim TotalCount As Integer
         Dim RPGuess As Integer
@@ -913,7 +913,7 @@
       End If
     End If
   End Sub
-  Private Function KeyCheck(TestKey As String) As Boolean
+  Private Shared Function KeyCheck(TestKey As String) As Boolean
     If String.IsNullOrWhiteSpace(TestKey) Then Return False
     If TestKey.Contains("-") Then
       Dim sKeys() As String = Split(TestKey, "-")
@@ -1486,7 +1486,7 @@
     End If
     If hadChange Then tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), state, 25, System.Threading.Timeout.Infinite)
   End Sub
-  Private Sub DoChange(ByRef lblTemp As Label, ByRef toVal As Long)
+  Private Shared Sub DoChange(ByRef lblTemp As Label, ByRef toVal As Long)
     Dim tmpVal As Long = 0
     If lblTemp.Text.Length > 3 And lblTemp.Text.Contains(" ") Then
       Dim tmpStr As String = lblTemp.Text.Substring(0, lblTemp.Text.LastIndexOf(" "))
@@ -2045,7 +2045,7 @@
     throb10
     throb11
   End Enum
-  Private Function MakeIcon(name As IconName, Optional icoX As Integer = -1, Optional icoY As Integer = -1) As Icon
+  Private Shared Function MakeIcon(name As IconName, Optional icoX As Integer = -1, Optional icoY As Integer = -1) As Icon
     If icoX < 0 Then icoX = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
     If icoY < 0 Then icoY = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
     Dim large As Boolean = icoX > 16 Or icoY > 16
@@ -2106,7 +2106,7 @@
     Catch ex As Exception
     End Try
   End Sub
-  Private Sub SetNotifyIconText(ni As NotifyIcon, text As String)
+  Private Shared Sub SetNotifyIconText(ni As NotifyIcon, text As String)
     If text.Length >= 128 Then Throw New ArgumentOutOfRangeException("text", "Text limited to 127 characters")
     Dim t As Type = GetType(NotifyIcon)
     Dim hidden As Reflection.BindingFlags = Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Instance
@@ -2675,7 +2675,7 @@
       pctNetTest.Image = My.Resources.ico_err
     End Try
   End Sub
-  Public Function CompareImages(Image1 As Bitmap, Image2 As Bitmap) As Boolean
+  Public Shared Function CompareImages(Image1 As Bitmap, Image2 As Bitmap) As Boolean
     If Image1 Is Nothing Then Return False
     If Image2 Is Nothing Then Return False
     Try

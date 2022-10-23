@@ -740,7 +740,7 @@ Public Class frmCustomColors
         pctHistory.Image = pctHistory.ErrorImage.Clone
     End Select
   End Sub
-  Private Function RandSel(Low As Integer, High As Integer) As Integer
+  Private Shared Function RandSel(Low As Integer, High As Integer) As Integer
     Dim I As Integer = Int(Rnd() * (High - Low)) + Low
     If I = Low Then I = High
     Return I

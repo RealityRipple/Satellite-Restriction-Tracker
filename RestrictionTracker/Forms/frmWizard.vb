@@ -11,7 +11,7 @@ Public Class frmWizard
       HiWord = CShort(hi)
     End Sub
   End Structure
-  Private Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
+  Private Shared Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
   Private WithEvents remoteTest As remoteRestrictionTracker
@@ -20,7 +20,7 @@ Public Class frmWizard
   Private AccountType As SatHostTypes = SatHostTypes.Other
   Private NeedsTLSProxy As Boolean = False
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
-  Public Sub ClickDrag(hWnd As IntPtr)
+  Public Shared Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
       NativeMethods.ReleaseCapture()
       NativeMethods.SendMessage(hWnd, NativeMethods.WM_NCLBUTTONDOWN, NativeMethods.HTCAPTION, IntPtr.Zero)
