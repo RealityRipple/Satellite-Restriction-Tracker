@@ -181,7 +181,7 @@ Public Class DataBase
   ''' </summary>
   ''' <param name="sender">A reference to this <see cref="DataBase" /> class.</param>
   ''' <param name="e">A <see cref="ProgressStateEventArgs" /> entry with the current Value and Total of the DataBase load's progress.</param>
-  Public Event ProgressState(sender As Object, e As ProgressStateEventArgs)
+  Public Event ProgressState As EventHandler(Of ProgressStateEventArgs)
   ''' <summary>
   ''' Create a new DataBase with entries loaded from the specified <paramref name="Path" />.
   ''' </summary>

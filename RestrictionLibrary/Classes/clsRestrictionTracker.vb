@@ -177,7 +177,7 @@ Public Class localRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="ConnectionFailureEventArgs" /> data regarding the failure.</param>
-  Public Event ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs)
+  Public Event ConnectionFailure As EventHandler(Of ConnectionFailureEventArgs)
   ''' <summary>
   ''' Result from a Type A usage meter, containing Download, Download Limit, Upload, and Upload Limit values.
   ''' </summary>
@@ -425,37 +425,37 @@ Public Class localRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs)
+  Public Event ConnectionWBLResult As EventHandler(Of TYPEAResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs)
+  Public Event ConnectionWBXResult As EventHandler(Of TYPEBResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE_RESELLER" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs)
+  Public Event ConnectionWXRResult As EventHandler(Of TYPEBResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.Dish_EXEDE" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEA2ResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs)
+  Public Event ConnectionDNXResult As EventHandler(Of TYPEA2ResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_LEGACY" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs)
+  Public Event ConnectionRPLResult As EventHandler(Of TYPEAResultEventArgs)
   ''' <summary>
   ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_EXEDE" /> account.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-  Public Event ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs)
+  Public Event ConnectionRPXResult As EventHandler(Of TYPEBResultEventArgs)
   ''' <summary>
   ''' Class storing information regarding the current connection status, useful for displaying progress during connection or determining the location of an error.
   ''' </summary>
@@ -516,7 +516,7 @@ Public Class localRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="ConnectionStatusEventArgs" /> data regarding the current state of the connection.</param>
-  Public Event ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs)
+  Public Event ConnectionStatus As EventHandler(Of ConnectionStatusEventArgs)
   ''' <summary>
   ''' Class storing information regarding a successful connection without data, which contains the <see cref="SatHostTypes">SatHostType</see> for the connected provider.
   ''' </summary>
@@ -544,7 +544,7 @@ Public Class localRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="localRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="LoginCompletionEventArgs" /> data regarding the <see cref="SatHostTypes">SatHostType</see> of the account.</param>
-  Public Event LoginComplete(sender As Object, e As LoginCompletionEventArgs)
+  Public Event LoginComplete As EventHandler(Of LoginCompletionEventArgs)
 #End Region
   Private acType As DetermineType
   Private mySettings As AppSettings

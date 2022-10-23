@@ -11,7 +11,7 @@ Public Class LinkLabel
   Private c_LinkHoverColor As Color
   Private c_LinkActiveColor As Color
   Private c_LinkVisitedColor As Color
-  Public Event LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
+  Public Event LinkClicked As EventHandler(Of LinkLabelLinkClickedEventArgs)
   <DefaultValue(True)>
   Public Property Link As Boolean
     Get

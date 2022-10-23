@@ -1165,7 +1165,7 @@
   Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf remoteTest_Failure), sender, e)
+        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.FailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
       Catch ex As Exception
       End Try
       Return

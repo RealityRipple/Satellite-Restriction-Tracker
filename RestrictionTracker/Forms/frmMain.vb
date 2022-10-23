@@ -962,7 +962,7 @@ Public Class frmMain
   Private Sub localData_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localData.ConnectionStatus
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionStatus), sender, e)
+        Me.Invoke(New EventHandler(Of ConnectionStatusEventArgs)(AddressOf localData_ConnectionStatus), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1006,7 +1006,7 @@ Public Class frmMain
   Private Sub localData_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localData.ConnectionFailure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionFailure), sender, e)
+        Me.Invoke(New EventHandler(Of ConnectionFailureEventArgs)(AddressOf localData_ConnectionFailure), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1122,7 +1122,7 @@ Public Class frmMain
   Private Sub localData_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionDNXResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEA2ResultEventArgs)(AddressOf localData_ConnectionDNXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1148,7 +1148,7 @@ Public Class frmMain
   Private Sub localData_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPXResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEBResultEventArgs)(AddressOf localData_ConnectionRPXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1174,7 +1174,7 @@ Public Class frmMain
   Private Sub localData_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionRPLResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEAResultEventArgs)(AddressOf localData_ConnectionRPLResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1200,7 +1200,7 @@ Public Class frmMain
   Private Sub localData_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBLResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEAResultEventArgs)(AddressOf localData_ConnectionWBLResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1226,7 +1226,7 @@ Public Class frmMain
   Private Sub localData_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWBXResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEBResultEventArgs)(AddressOf localData_ConnectionWBXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1252,7 +1252,7 @@ Public Class frmMain
   Private Sub localData_ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs) Handles localData.ConnectionWXRResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf localData_ConnectionWXRResult), sender, e)
+        Me.Invoke(New EventHandler(Of TYPEBResultEventArgs)(AddressOf localData_ConnectionWXRResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1301,7 +1301,7 @@ Public Class frmMain
   Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf remoteData_Failure), sender, e)
+        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.FailureEventArgs)(AddressOf remoteData_Failure), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1354,7 +1354,7 @@ Public Class frmMain
   Private Sub remoteData_Success(sender As Object, e As remoteRestrictionTracker.SuccessEventArgs) Handles remoteData.Success
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf remoteData_Success), sender, e)
+        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.SuccessEventArgs)(AddressOf remoteData_Success), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -2184,7 +2184,7 @@ Public Class frmMain
   Private Sub updateChecker_CheckResult(sender As Object, e As clsUpdate.CheckEventArgs) Handles updateChecker.CheckResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.CheckEventArgs)(AddressOf updateChecker_CheckResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -2340,7 +2340,7 @@ Public Class frmMain
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.DownloadEventArgs)(AddressOf updateChecker_DownloadResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -2392,7 +2392,7 @@ Public Class frmMain
   Private Sub updateChecker_UpdateProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.UpdateProgressChanged
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.ProgressEventArgs)(AddressOf updateChecker_UpdateProgressChanged), sender, e)
       Catch ex As Exception
       End Try
       Return

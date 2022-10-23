@@ -44,12 +44,12 @@
       Version = sVersion
     End Sub
   End Class
-  Public Event CheckingVersion(sender As Object, e As EventArgs)
-  Public Event CheckProgressChanged(sender As Object, e As ProgressEventArgs)
-  Public Event CheckResult(sender As Object, e As CheckEventArgs)
-  Public Event DownloadingUpdate(sender As Object, e As EventArgs)
-  Public Event UpdateProgressChanged(sender As Object, e As ProgressEventArgs)
-  Public Event DownloadResult(sender As Object, e As DownloadEventArgs)
+  Public Event CheckingVersion As EventHandler
+  Public Event CheckProgressChanged As EventHandler(Of ProgressEventArgs)
+  Public Event CheckResult As EventHandler(Of CheckEventArgs)
+  Public Event DownloadingUpdate As EventHandler
+  Public Event UpdateProgressChanged As EventHandler(Of ProgressEventArgs)
+  Public Event DownloadResult As EventHandler(Of DownloadEventArgs)
   Private WithEvents wsVer As WebClientCore
   Private DownloadURL As String
   Private VerNumber As String

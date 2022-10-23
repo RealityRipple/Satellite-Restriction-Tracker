@@ -103,7 +103,7 @@ Public Class remoteRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="remoteRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="FailureEventArgs" /> data regarding the failure.</param>
-  Public Event Failure(sender As Object, e As FailureEventArgs)
+  Public Event Failure As EventHandler(Of FailureEventArgs)
   ''' <summary>
   ''' Response information from the server on a successful connection to the Remote Usage Service.
   ''' </summary>
@@ -197,13 +197,13 @@ Public Class remoteRestrictionTracker
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="remoteRestrictionTracker" /> class.</param>
   ''' <param name="e"><see cref="SuccessEventArgs" /> data regarding the result.</param>
-  Public Event Success(sender As Object, e As SuccessEventArgs)
+  Public Event Success As EventHandler(Of SuccessEventArgs)
   ''' <summary>
   ''' Triggered when the connection to the Remote Usage Service succeeds and the Product Key is correct.
   ''' </summary>
   ''' <param name="sender">Instance of the <see cref="remoteRestrictionTracker" /> class.</param>
   ''' <param name="e">Empty <see cref="EventArgs" /> object.</param>
-  Public Event OKKey(sender As Object, e As EventArgs)
+  Public Event OKKey As EventHandler
   Private ClosingTime As Boolean
   Private tLogin As Threading.Thread
   Private c_Timeout As Integer

@@ -71,7 +71,7 @@ Public Class LinkPictureBox
     MyBase.OnMouseUp(e)
   End Sub
   <EditorBrowsable(EditorBrowsableState.Always)>
-  Shadows Event KeyDown(sender As Object, e As KeyEventArgs)
+  Shadows Event KeyDown As EventHandler(Of KeyEventArgs)
   Protected Overrides Sub OnKeyDown(e As System.Windows.Forms.KeyEventArgs)
     If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then
       If oldPos.IsEmpty Then
@@ -83,7 +83,7 @@ Public Class LinkPictureBox
     MyBase.OnKeyDown(e)
   End Sub
   <EditorBrowsable(EditorBrowsableState.Always)>
-  Shadows Event KeyUp(sender As Object, e As KeyEventArgs)
+  Shadows Event KeyUp As EventHandler(Of KeyEventArgs)
   Protected Overrides Sub OnKeyUp(e As System.Windows.Forms.KeyEventArgs)
     If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then
       If Not oldPos.IsEmpty Then

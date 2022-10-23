@@ -262,7 +262,7 @@
   Private Sub updateChecker_CheckProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.CheckProgressChanged
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckProgressChanged), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.ProgressEventArgs)(AddressOf updateChecker_CheckProgressChanged), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -274,7 +274,7 @@
   Private Sub updateChecker_CheckResult(sender As Object, e As clsUpdate.CheckEventArgs) Handles updateChecker.CheckResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_CheckResult), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.CheckEventArgs)(AddressOf updateChecker_CheckResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -402,7 +402,7 @@
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_DownloadResult), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.DownloadEventArgs)(AddressOf updateChecker_DownloadResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -437,7 +437,7 @@
   Private Sub updateChecker_UpdateProgressChanged(sender As Object, e As clsUpdate.ProgressEventArgs) Handles updateChecker.UpdateProgressChanged
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(AddressOf updateChecker_UpdateProgressChanged), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.ProgressEventArgs)(AddressOf updateChecker_UpdateProgressChanged), sender, e)
       Catch ex As Exception
       End Try
       Return

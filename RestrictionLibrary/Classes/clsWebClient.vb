@@ -198,7 +198,7 @@
   ''' </summary>
   ''' <param name="sender">The class which is triggering the event.</param>
   ''' <param name="e">The exception contained in an EventArg</param>
-  Public Event Failure(sender As Object, e As ErrorEventArgs)
+  Public Event Failure As EventHandler(Of ErrorEventArgs)
   ''' <summary>
   ''' The User Agent for Satellite Restriction Tracker
   ''' </summary>
