@@ -197,6 +197,19 @@ Public Structure DataRow
   Public Function IsEmpty() As Boolean
     Return (mDT.ToBinary = 0 And mD = 0 And mU = 0 And mDL = 0 And mUL = 0)
   End Function
+  Public Overrides Function GetHashCode() As Integer
+    Return mDT.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not TypeOf obj Is DataRow Then Return False
+    Return mDT.ToBinary = obj.ToBinary
+  End Function
+  Public Shared Operator =(objA As DataRow, objB As DataRow) As Boolean
+    Return objA.DATETIME.ToBinary = objB.DATETIME.ToBinary
+  End Operator
+  Public Shared Operator <>(objA As DataRow, objB As DataRow) As Boolean
+    Return Not objA.DATETIME.ToBinary = objB.DATETIME.ToBinary
+  End Operator
 End Structure
 ''' <summary>
 ''' Stores information about usage activity for an account, with access to subroutines and functions for manipulating the list and storing it as one of three file types.

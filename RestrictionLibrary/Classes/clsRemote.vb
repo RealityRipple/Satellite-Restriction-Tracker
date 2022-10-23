@@ -177,6 +177,20 @@ Namespace Remote
       mDownMax = iDownMax
       mUpMax = iUpMax
     End Sub
+    Public Overrides Function GetHashCode() As Integer
+      Return mTime.GetHashCode
+    End Function
+    Public Overrides Function Equals(obj As Object) As Boolean
+      If Not obj.GetType Is GetType(ServiceResult) Then Return False
+      Dim srObj As ServiceResult = obj
+      Return srObj.Time.ToBinary = mTime.ToBinary
+    End Function
+    Public Shared Operator =(objA As ServiceResult, objB As ServiceResult) As Boolean
+      Return objA.Time.ToBinary = objB.Time.ToBinary
+    End Operator
+    Public Shared Operator <>(objA As ServiceResult, objB As ServiceResult) As Boolean
+      Return Not objA.Time.ToBinary = objB.Time.ToBinary
+    End Operator
   End Structure
 
   ''' <summary>

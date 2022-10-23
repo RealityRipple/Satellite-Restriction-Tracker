@@ -35,7 +35,6 @@ Public Structure JSONElement
       Return New JSONElement(JSONElementType.None)
     End Get
   End Property
-
   Public ReadOnly Property Type As JSONElementType
     Get
       Return mType
@@ -61,7 +60,33 @@ Public Structure JSONElement
       Return mValue
     End Get
   End Property
+  Public Overrides Function GetHashCode() As Integer
+    Return mType.GetHashCode Xor mSubElements.GetHashCode Xor mCollection.GetHashCode Xor mKey.GetHashCode Xor mValue.GetHashCode
+  End Function
+  Public Overrides Function Equals(obj As Object) As Boolean
+    If Not obj.GetType Is GetType(JSONElement) Then Return False
+    Dim jObj As JSONElement = obj
+    If Not mType = jObj.Type Then Return False
+    If Not mKey = jObj.Key Then Return False
+    If Not mValue = jObj.Value Then Return False
+    If Not mSubElements.Count = jObj.SubElements.Count Then Return False
+    For I As Integer = 0 To mSubElements.Count - 1
+      If Not mSubElements(I).Equals(jObj.SubElements(I)) Then Return False
+    Next
+    If Not mCollection.Count = jObj.Collection.Count Then Return False
+    For I As Integer = 0 To mCollection.Count - 1
+      If Not mCollection(I).Equals(jObj.Collection(I)) Then Return False
+    Next
+    Return True
+  End Function
+  Public Shared Operator =(objA As JSONElement, objB As JSONElement) As Boolean
+    Return objA.Equals(objB)
+  End Operator
+  Public Shared Operator <>(objA As JSONElement, objB As JSONElement) As Boolean
+    Return Not objA.Equals(objB)
+  End Operator
 End Structure
+
 Public NotInheritable Class JSONReader
   Private mSerial As List(Of JSONElement)
   Public ReadOnly Property Serial As ObjectModel.ReadOnlyCollection(Of JSONElement)
