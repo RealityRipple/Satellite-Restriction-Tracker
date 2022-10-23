@@ -123,7 +123,7 @@
   <data name="lblWelcomeText.Text" xml:space="preserve">
     <value>Since this is your first time using Satellite Restriction Tracker, we'd like to help you get set up. Simply follow the on-screen instructions and you'll be tracking your ViaSat Internet usage in no time!
 
-You will need your WildBlue or Exede account information ready to set up Satellite Restriction Tracker. If you do not have this information, please contact your ViaSat reseller.
+You will need your ViaSat or Exede account information ready to set up Satellite Restriction Tracker. If you do not have this information, please contact your ViaSat reseller.
 
 For best results, please make sure you're connected to the Internet before you begin.
 
@@ -131,9 +131,6 @@ Press Next to begin or Cancel to close this wizard.</value>
   </data>
   <data name="lblAccountName.Text" xml:space="preserve">
     <value>Please enter your Account name. This is the username you use to log in to the meter site. Usually it's just a username, though it may be an E-Mail Address if you enter an E-Mail Address to log into the website.</value>
-  </data>
-  <data name="lblAccountProvider.Text" xml:space="preserve">
-    <value>Please select your ViaSat reseller or provider below. If your provider is not listed, you can enter the site you use to check your usage manually and Satellite Restriction Tracker will attempt to connect through it.</value>
   </data>
   <data name="lblAccountPassText.Text" xml:space="preserve">
     <value>Please enter the password to your ViaSat Account. This password should be the one used to log in to the meter site.

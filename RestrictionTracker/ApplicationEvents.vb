@@ -81,7 +81,6 @@
         If cSettings.Service Then
           Dim cSave As New SvcSettings
           cSave.Account = cSettings.Account
-          cSave.AccountType = cSettings.AccountType
           cSave.Interval = cSettings.Interval
           If Not String.IsNullOrEmpty(cSettings.PassCrypt) Then
             Dim newKey() As Byte = StoredPassword.GenerateKey()

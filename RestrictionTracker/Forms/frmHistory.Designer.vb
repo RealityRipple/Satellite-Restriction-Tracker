@@ -33,13 +33,11 @@ Partial Class frmHistory
     Me.cmdExport = New System.Windows.Forms.Button()
     Me.lblBackup = New System.Windows.Forms.Label()
     Me.chkExportRange = New System.Windows.Forms.CheckBox()
-    Me.pnlGraph = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctUld = New System.Windows.Forms.PictureBox()
-    Me.pctDld = New System.Windows.Forms.PictureBox()
+    Me.pctGraph = New System.Windows.Forms.PictureBox()
     Me.dgvUsage = New System.Windows.Forms.DataGridView()
     Me.colDATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.colDOWNLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
-    Me.colUPLOAD = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colUSED = New System.Windows.Forms.DataGridViewTextBoxColumn()
+    Me.colLIMIT = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.DATETIME = New System.Windows.Forms.DataGridViewTextBoxColumn()
     Me.pnlAge = New System.Windows.Forms.TableLayoutPanel()
     Me.lblFrom = New System.Windows.Forms.Label()
@@ -57,9 +55,7 @@ Partial Class frmHistory
     Me.grpAge = New System.Windows.Forms.GroupBox()
     Me.ttHistory = New RestrictionTracker.ToolTip(Me.components)
     Me.pnlButtons.SuspendLayout()
-    Me.pnlGraph.SuspendLayout()
-    CType(Me.pctUld, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctDld, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctGraph, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.dgvUsage, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAge.SuspendLayout()
     CType(Me.pctErr, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -153,41 +149,15 @@ Partial Class frmHistory
     Me.ttHistory.SetToolTip(Me.chkExportRange, "Export only the data within the Age Parameters range.")
     Me.chkExportRange.UseVisualStyleBackColor = True
     '
-    'pnlGraph
+    'pctGraph
     '
-    Me.pnlGraph.ColumnCount = 1
-    Me.pnlGraph.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlGraph.Controls.Add(Me.pctUld, 0, 1)
-    Me.pnlGraph.Controls.Add(Me.pctDld, 0, 0)
-    Me.pnlGraph.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlGraph.Location = New System.Drawing.Point(0, 76)
-    Me.pnlGraph.Name = "pnlGraph"
-    Me.pnlGraph.RowCount = 2
-    Me.pnlGraph.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlGraph.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlGraph.Size = New System.Drawing.Size(514, 205)
-    Me.pnlGraph.TabIndex = 5
-    Me.pnlGraph.Visible = False
-    '
-    'pctUld
-    '
-    Me.pctUld.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-    Me.pctUld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctUld.Location = New System.Drawing.Point(3, 105)
-    Me.pctUld.Name = "pctUld"
-    Me.pctUld.Size = New System.Drawing.Size(508, 97)
-    Me.pctUld.TabIndex = 5
-    Me.pctUld.TabStop = False
-    '
-    'pctDld
-    '
-    Me.pctDld.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-    Me.pctDld.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pctDld.Location = New System.Drawing.Point(3, 3)
-    Me.pctDld.Name = "pctDld"
-    Me.pctDld.Size = New System.Drawing.Size(508, 96)
-    Me.pctDld.TabIndex = 4
-    Me.pctDld.TabStop = False
+    Me.pctGraph.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+    Me.pctGraph.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pctGraph.Location = New System.Drawing.Point(0, 76)
+    Me.pctGraph.Name = "pctGraph"
+    Me.pctGraph.Size = New System.Drawing.Size(514, 205)
+    Me.pctGraph.TabIndex = 5
+    Me.pctGraph.TabStop = False
     '
     'dgvUsage
     '
@@ -198,7 +168,7 @@ Partial Class frmHistory
     Me.dgvUsage.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
     Me.dgvUsage.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
     Me.dgvUsage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-    Me.dgvUsage.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colDOWNLOAD, Me.colUPLOAD})
+    Me.dgvUsage.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.colDATETIME, Me.colUSED, Me.colLIMIT})
     Me.dgvUsage.Dock = System.Windows.Forms.DockStyle.Fill
     Me.dgvUsage.Location = New System.Drawing.Point(0, 76)
     Me.dgvUsage.Name = "dgvUsage"
@@ -217,21 +187,21 @@ Partial Class frmHistory
     Me.colDATETIME.Name = "colDATETIME"
     Me.colDATETIME.ReadOnly = True
     '
-    'colDOWNLOAD
+    'colUSED
     '
     DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colDOWNLOAD.DefaultCellStyle = DataGridViewCellStyle3
-    Me.colDOWNLOAD.HeaderText = "Download"
-    Me.colDOWNLOAD.Name = "colDOWNLOAD"
-    Me.colDOWNLOAD.ReadOnly = True
+    Me.colUSED.DefaultCellStyle = DataGridViewCellStyle3
+    Me.colUSED.HeaderText = "Used"
+    Me.colUSED.Name = "colUSED"
+    Me.colUSED.ReadOnly = True
     '
-    'colUPLOAD
+    'colLIMIT
     '
     DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-    Me.colUPLOAD.DefaultCellStyle = DataGridViewCellStyle4
-    Me.colUPLOAD.HeaderText = "Upload"
-    Me.colUPLOAD.Name = "colUPLOAD"
-    Me.colUPLOAD.ReadOnly = True
+    Me.colLIMIT.DefaultCellStyle = DataGridViewCellStyle4
+    Me.colLIMIT.HeaderText = "Total"
+    Me.colLIMIT.Name = "colLIMIT"
+    Me.colLIMIT.ReadOnly = True
     '
     'DATETIME
     '
@@ -436,7 +406,7 @@ Partial Class frmHistory
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
     Me.CancelButton = Me.cmdClose
     Me.ClientSize = New System.Drawing.Size(514, 312)
-    Me.Controls.Add(Me.pnlGraph)
+    Me.Controls.Add(Me.pctGraph)
     Me.Controls.Add(Me.dgvUsage)
     Me.Controls.Add(Me.grpAge)
     Me.Controls.Add(Me.pnlButtons)
@@ -448,9 +418,7 @@ Partial Class frmHistory
     Me.Text = "Satellite Restriction Tracker Usage History"
     Me.pnlButtons.ResumeLayout(False)
     Me.pnlButtons.PerformLayout()
-    Me.pnlGraph.ResumeLayout(False)
-    CType(Me.pctUld, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctDld, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctGraph, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.dgvUsage, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAge.ResumeLayout(False)
     Me.pnlAge.PerformLayout()
@@ -461,7 +429,7 @@ Partial Class frmHistory
   End Sub
   Friend WithEvents pnlButtons As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents cmdClose As System.Windows.Forms.Button
-  Friend WithEvents pnlGraph As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents pctGraph As System.Windows.Forms.PictureBox
   Friend WithEvents dgvUsage As System.Windows.Forms.DataGridView
   Friend WithEvents DATETIME As System.Windows.Forms.DataGridViewTextBoxColumn
   Friend WithEvents pnlAge As System.Windows.Forms.TableLayoutPanel
@@ -480,12 +448,10 @@ Partial Class frmHistory
   Friend WithEvents cmdImport As System.Windows.Forms.Button
   Friend WithEvents cmdExport As System.Windows.Forms.Button
   Friend WithEvents lblBackup As System.Windows.Forms.Label
-  Friend WithEvents pctUld As System.Windows.Forms.PictureBox
-  Friend WithEvents pctDld As System.Windows.Forms.PictureBox
   Friend WithEvents pctErr As System.Windows.Forms.PictureBox
   Friend WithEvents ttHistory As ToolTip
   Friend WithEvents chkExportRange As System.Windows.Forms.CheckBox
   Friend WithEvents colDATETIME As System.Windows.Forms.DataGridViewTextBoxColumn
-  Friend WithEvents colDOWNLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
-  Friend WithEvents colUPLOAD As System.Windows.Forms.DataGridViewTextBoxColumn
+  Friend WithEvents colUSED As System.Windows.Forms.DataGridViewTextBoxColumn
+  Friend WithEvents colLIMIT As System.Windows.Forms.DataGridViewTextBoxColumn
 End Class

@@ -1,9 +1,8 @@
 ﻿Public NotInheritable Class frmMain
-  Private myPanel As Local.SatHostTypes
   Private Enum LoadStates
     Loading
     Loaded
-    Lookup
+    DB
   End Enum
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Private Delegate Sub ParamaterizedInvoker2(parameter As Object, secondParam As Object)
@@ -12,8 +11,6 @@
   Private WithEvents remoteData As Remote.ServiceConnection
   Private WithEvents localData As Local.SiteConnection
 #Region "Constants"
-  Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
-  Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
   Private Const sDISPLAY As String = "Usage Levels (%lt)"
   Private Const sDISPLAY_LT_NONE As String = "No History"
   Private Const sDISPLAY_LT_BUSY As String = "Please Wait"
@@ -35,7 +32,7 @@
   Private dwmComp As Boolean
   Private restoreMax As Boolean
   Private mySettings As AppSettings
-  Private sAccount, sPassword, sProvider As String
+  Private sAccount, sPassword As String
   Private imSlowed As Boolean
   Private imFree As Boolean
   Private FullCheck As Boolean = True
@@ -44,13 +41,11 @@
   Private ClosingTime As Boolean
   Private sFailTray As String
   Private bAlert As TriState
-  Private typeA_down, typeA_up, typeA_dlim, typeA_ulim As Long
-  Private typeB_used, typeB_lim As Long
+  Private uCache_used, uCache_lim As Long
   Private lastBalloon As Long
   Private c_PauseActivity As String
   Private iconItem As Integer
   Private iconStop As Boolean
-  Private CheckedAJAX As Boolean
   Private iconBefore As Icon
   Public Property PauseActivity As String
     Get
@@ -60,160 +55,10 @@
       c_PauseActivity = value
     End Set
   End Property
-#Region "Server Type Determination"
-  Private Class DetermineTypeOffline
-    Public Delegate Sub TypeDeterminedOfflineCallback(HostType As Local.SatHostTypes)
-    Private c_callback As TypeDeterminedOfflineCallback
-    Public Sub New(callback As TypeDeterminedOfflineCallback)
-      c_callback = callback
-    End Sub
-    Public Sub Start(Provider As String)
-      Dim beginInvoker As New BeginTestInvoker(AddressOf BeginTest)
-      beginInvoker.BeginInvoke(Provider, Nothing, Nothing)
-    End Sub
-    Private Delegate Sub BeginTestInvoker(Provider As String)
-    Private Sub BeginTest(Provider As String)
-      If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then
-        c_callback.Invoke(Local.SatHostTypes.Dish_EXEDE)
-      ElseIf Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then
-        c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
-      ElseIf Provider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-        c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE_RESELLER)
-      Else
-        OfflineCheck()
-      End If
-    End Sub
-    Private Shared Sub OfflineStats(ByRef rpP As Single, ByRef exP As Single, ByRef wbP As Single)
-      If LOG_GetCount() > 0 Then
-        Dim TotalCount As Integer
-        Dim RPGuess As Integer
-        Dim ExGuess As Integer
-        Dim WBGuess As Integer
-        Dim logStep As Integer = 1
-        If LOG_GetCount() > 50 Then
-          logStep = 10
-        ElseIf LOG_GetCount() > 10 Then
-          logStep = 5
-        Else
-          logStep = 1
-        End If
-        For I As Integer = 0 To LOG_GetCount() - 1 Step logStep
-          Dim dtDate As Date
-          Dim lDown As Long
-          Dim lDLim As Long
-          Dim lUp As Long
-          Dim lULim As Long
-          LOG_Get(I, dtDate, lDown, lDLim, lUp, lULim)
-          If lDLim = lULim Then
-            If lDown = lUp Then
-              RPGuess += 1
-            Else
-              ExGuess += 1
-            End If
-          ElseIf lULim = 0 Then
-            ExGuess += 1
-          Else
-            WBGuess += 1
-          End If
-          TotalCount += 1
-        Next
-        rpP = RPGuess / TotalCount
-        exP = ExGuess / TotalCount
-        wbP = WBGuess / TotalCount
-      End If
-    End Sub
-    Private Sub OfflineCheck()
-      Dim rpP, exP, wbP As Single
-      OfflineStats(rpP, exP, wbP)
-      If rpP = 0 And exP = 0 And wbP = 0 Then
-        c_callback.Invoke(Local.SatHostTypes.Other)
-      Else
-        If rpP > exP And rpP > wbP Then
-          c_callback.Invoke(Local.SatHostTypes.RuralPortal_EXEDE)
-        ElseIf exP > rpP And exP > wbP Then
-          c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
-        ElseIf wbP > rpP And wbP > exP Then
-          c_callback.Invoke(Local.SatHostTypes.WildBlue_LEGACY)
-        Else
-          If rpP > wbP And exP > wbP And rpP = exP Then
-            c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
-          Else
-            c_callback.Invoke(Local.SatHostTypes.Other)
-            'TODO: Handle unknown host type
-            Debug.Print("Oh noes! I don't know what type of host this is!")
-          End If
-        End If
-      End If
-    End Sub
-  End Class
-  Private Sub TypeDetermination_TypeDetermined(HostGroup As Local.SatHostGroup)
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New Local.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    If HostGroup = Local.SatHostGroup.Other Then
-      iconStop = True
-      Dim TypeDeterminationOffline As New DetermineTypeOffline(AddressOf TypeDeterminationOffline_TypeDetermined)
-      TypeDeterminationOffline.Start(sProvider)
-    Else
-      If HostGroup = Local.SatHostGroup.Dish Then
-        mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
-      ElseIf HostGroup = Local.SatHostGroup.WildBlue Then
-        mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
-      ElseIf HostGroup = Local.SatHostGroup.RuralPortal Then
-        mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
-      ElseIf HostGroup = Local.SatHostGroup.Exede Then
-        mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
-      ElseIf HostGroup = Local.SatHostGroup.ExedeReseller Then
-        mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-      End If
-      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-      mySettings.Save()
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-      GrabAttempt = 0
-      localData = New Local.SiteConnection(LocalAppDataDirectory)
-    End If
-  End Sub
-  Private Sub TypeDeterminationOffline_TypeDetermined(HostType As Local.SatHostTypes)
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New DetermineTypeOffline.TypeDeterminedOfflineCallback(AddressOf TypeDeterminationOffline_TypeDetermined), HostType)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    If HostType = Local.SatHostTypes.Other Then
-      iconStop = True
-      DisplayUsage(False, True)
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please connect to the Internet.", True)
-    Else
-      mySettings.AccountType = HostType
-      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-      mySettings.Save()
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
-      If localData IsNot Nothing Then
-        localData.Dispose()
-        localData = Nothing
-      End If
-      GrabAttempt = 0
-      localData = New Local.SiteConnection(LocalAppDataDirectory)
-    End If
-  End Sub
-#End Region
 #Region "Form Events"
   Private Sub frmMain_Load(sender As Object, e As System.EventArgs) Handles Me.Load
     AddHandler Microsoft.Win32.SystemEvents.PowerModeChanged, AddressOf PowerModeChanged
     CheckComposition()
-    CheckedAJAX = False
     If mySettings Is Nothing Then ReLoadSettings()
     NextGrabTick = Long.MinValue
     Me.Opacity = 0
@@ -222,7 +67,7 @@
     ControlService(False)
     tmrIcoDelay.Interval = 100
     tmrIcoDelay.Enabled = True
-    DisplayResults(0, 0, 0, 0)
+    DisplayResults(0, 0)
     EnableProgressIcon()
   End Sub
   Private Sub tmrIcoDelay_Tick(sender As System.Object, e As System.EventArgs) Handles tmrIcoDelay.Tick
@@ -276,10 +121,8 @@
         End If
         If Me.Opacity = 0 Then Me.Opacity = 1
         SetStatusText("Initializing", "Beginning application initialization process...", False)
-        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        Dim lookupInvoker As New MethodInvoker(AddressOf LookupProvider)
-        lookupInvoker.BeginInvoke(Nothing, Nothing)
+        Dim initDBInvoker As New MethodInvoker(AddressOf initDB)
+        initDBInvoker.BeginInvoke(Nothing, Nothing)
       Else
         mnuRestore.Text = "&Focus"
         iconStop = True
@@ -446,13 +289,9 @@
       pnlDetails.Font = Me.Font
     End If
     ResizePanels()
-    If myPanel = Local.SatHostTypes.Other Then
-      lblRRS.Font = pnlDetails.Font
-      lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
-    End If
     If myState = LoadStates.Loaded Then
       If Me.WindowState = FormWindowState.Normal Then mySettings.MainSize = Me.Size
-    ElseIf Not myPanel = Local.SatHostTypes.Other Then
+    Else
       lblRRS.Font = pnlDetails.Font
       lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
     End If
@@ -462,17 +301,9 @@
       Else
         pctNetTest.Top = 0
       End If
-      If pnlTypeA.Visible Then
-        If pctNetTest.Bottom > pnlTypeA.Top - 1 Then
-          pctNetTest.Height = pnlTypeA.Top - 1 - pctNetTest.Top
-          pctNetTest.Width = pctNetTest.Height
-        Else
-          pctNetTest.Height = 16
-          pctNetTest.Width = pctNetTest.Height
-        End If
-      ElseIf pnlTypeB.Visible Then
-        If pctNetTest.Bottom > pnlTypeB.Top - 1 Then
-          pctNetTest.Height = pnlTypeB.Top - 1 - pctNetTest.Top
+      If pnlUsage.Visible Then
+        If pctNetTest.Bottom > pnlUsage.Top - 1 Then
+          pctNetTest.Height = pnlUsage.Top - 1 - pctNetTest.Top
           pctNetTest.Width = pctNetTest.Height
         Else
           pctNetTest.Height = 16
@@ -484,28 +315,12 @@
   End Sub
   Private Sub ResizePanels()
     Dim trayIcoVal As Icon = Nothing
-    If myPanel = Local.SatHostTypes.WildBlue_LEGACY Or myPanel = Local.SatHostTypes.RuralPortal_LEGACY Or myPanel = Local.SatHostTypes.Dish_EXEDE Then
-      If typeA_dlim = 0 And typeA_ulim = 0 Then
-        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = MakeIcon(IconName.norm)
-      Else
-        pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, typeA_down, typeA_dlim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, typeA_up, typeA_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = CreateTypeATrayIcon(typeA_down, typeA_dlim, typeA_up, typeA_ulim)
-      End If
-    ElseIf myPanel = Local.SatHostTypes.RuralPortal_EXEDE Or myPanel = Local.SatHostTypes.WildBlue_EXEDE Or myPanel = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
-      If typeB_lim = 0 Then
-        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = MakeIcon(IconName.norm)
-      Else
-        pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, typeB_used, typeB_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-        trayIcoVal = CreateTypeBTrayIcon(typeB_used, typeB_lim)
-      End If
-    ElseIf myPanel = Local.SatHostTypes.Other Then
-      lblNothing.Text = My.Application.Info.ProductName
-      lblRRS.Text = "by " & Application.CompanyName
-      ttUI.SetToolTip(lblRRS, "Visit realityripple.com.")
+    If uCache_lim = 0 Then
+      pctUsage.Image = DisplayRProgress(pctUsage.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+      trayIcoVal = MakeIcon(IconName.norm)
+    Else
+      pctUsage.Image = DisplayRProgress(pctUsage.DisplayRectangle.Size, uCache_used, uCache_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
+      trayIcoVal = CreateUsageTrayIcon(uCache_used, uCache_lim)
     End If
     If trayIcoVal IsNot Nothing Then
       If tmrIcon.Enabled Then
@@ -665,7 +480,7 @@
       End If
     End If
     If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    ScreenDefaultColors(mySettings.Colors)
     NOTIFIER_STYLE = LoadAlertStyle(mySettings.AlertStyle)
     Dim hSysMenu As IntPtr = NativeMethods.GetSystemMenu(Me.Handle, False)
     If mySettings.TopMost Then
@@ -777,26 +592,16 @@
     End If
     myState = Tag
   End Sub
-  Private Sub LookupProvider()
-    SetTag(LoadStates.Lookup)
+  Private Sub initDB()
+    SetTag(LoadStates.DB)
     SetStatusText("Loading History", "Reading usage history into memory...", False)
     LOG_Initialize(sAccount, False)
     If ClosingTime Then Return
-    If mySettings.AccountType = Local.SatHostTypes.Other Then
-      If mySettings.AccountTypeForced Then
-        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
-      Else
-        SetStatusText("Analyzing Account", "Determining your account type...", False)
-        Dim TypeDetermination As New Local.DetermineType(AddressOf TypeDetermination_TypeDetermined)
-        TypeDetermination.Start(sProvider, mySettings.Timeout, mySettings.Proxy)
-      End If
-    Else
-      iconStop = True
-      SetStatusText("No History", String.Empty, False)
-      DisplayUsage(True, False)
-      Dim TimerInvoker As New MethodInvoker(AddressOf StartTimer)
-      TimerInvoker.BeginInvoke(Nothing, Nothing)
-    End If
+    iconStop = True
+    SetStatusText("No History", String.Empty, False)
+    DisplayUsage(True, False)
+    Dim TimerInvoker As New MethodInvoker(AddressOf StartTimer)
+    TimerInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub InitAccount()
     If Me.InvokeRequired Then
@@ -814,12 +619,7 @@
         sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
       End If
     End If
-    If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
-    Else
-      sAccount = String.Empty
-      sProvider = String.Empty
-    End If
+    If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then sAccount = sAccount.Substring(0, sAccount.LastIndexOf("@"))
   End Sub
 #End Region
 #Region "Login Functions"
@@ -841,26 +641,14 @@
           CheckForUpdates()
         Else
           If Not String.IsNullOrEmpty(sAccount) Then
-            If String.IsNullOrEmpty(sProvider) Then
-              sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
-              SetStatusText("Reloading", "Reloading History...", False)
-              LOG_Initialize(sAccount, False)
-              If ClosingTime Then Return
-            End If
             If Math.Abs(DateDiff(DateInterval.Minute, LOG_GetLast, Now)) >= 10 Then
-              If Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then
+              If Not String.IsNullOrEmpty(sPassword) Then
                 NextGrabTick = Long.MaxValue
                 PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
-                If Not CheckedAJAX And mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
-                  SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
-                  Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
-                  AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage")
-                Else
-                  SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
-                  Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-                  UsageInvoker.BeginInvoke(Nothing, Nothing)
-                End If
+                SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
+                Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
+                UsageInvoker.BeginInvoke(Nothing, Nothing)
                 Return
               End If
             End If
@@ -878,7 +666,7 @@
       End Try
       Return
     End If
-    If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Or Not sAccount.Contains("@") Then
+    If String.IsNullOrEmpty(sAccount) Or String.IsNullOrEmpty(sPassword) Then
       RestoreWindow()
       cmdConfig.Focus()
       MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Warning)
@@ -952,13 +740,11 @@
     End If
     If LOG_GetCount() > 0 Then
       Dim dtDate As Date
-      Dim lDown As Long
-      Dim lDLim As Long
-      Dim lUp As Long
-      Dim lULim As Long
-      LOG_Get(LOG_GetCount() - 1, dtDate, lDown, lDLim, lUp, lULim)
+      Dim lUsed As Long
+      Dim lLimit As Long
+      LOG_Get(LOG_GetCount() - 1, dtDate, lused, lLimit)
       If bStatusText Then SetStatusText(srlFunctions.TimeToString(dtDate), String.Empty, False)
-      DisplayResults(lDown, lDLim, lUp, lULim)
+      DisplayResults(lUsed, lLimit)
     End If
   End Sub
   Private Sub SetNextLoginTime(Optional MinutesAhead As Integer = -1)
@@ -1004,18 +790,11 @@
         Select Case e.SubState
           Case Local.SiteConnectionSubStates.ReadLogin : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Login Page" & sAppend & "...", False)
           Case Local.SiteConnectionSubStates.Authenticate : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Authenticating" & sAppend & "...", False)
-          Case Local.SiteConnectionSubStates.Verify : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Verifying" & sAppend & "...", False)
           Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Logging In" & sAppend & "...", False)
         End Select
       Case Local.SiteConnectionStates.TableDownload
         Select Case e.SubState
           Case Local.SiteConnectionSubStates.LoadHome : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Home Page" & sAppend & "...", False)
-          Case Local.SiteConnectionSubStates.LoadAJAX
-            If e.Attempt = 0 Then
-              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
-            Else
-              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
-            End If
           Case Local.SiteConnectionSubStates.LoadTable : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
           Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
         End Select
@@ -1098,26 +877,8 @@
           localData = New Local.SiteConnection(LocalAppDataDirectory)
           Return
         End If
-        If (e.Message = "AJAX failed to yield data table." Or e.Message = "Can't determine AJAX order.") And GrabAttempt < 1 Then
-          GrabAttempt += 1
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          Dim sMessage As String = e.Message & " Attempting to Update AJAX Lists..."
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), sMessage, False)
-          Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_ListUpdated)
-          AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, GrabAttempt)
-          Return
-        End If
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         DisplayUsage(False, True)
-      Case Local.SiteConnectionFailureType.FatalLoginFailure
-        GrabAttempt = 0
-        If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.Other
-        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
-        If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
-        DisplayUsage(False, False)
       Case Local.SiteConnectionFailureType.UnknownAccountDetails
         GrabAttempt = 0
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enter your account details in the Config window.", True)
@@ -1125,25 +886,16 @@
         RestoreWindow()
         cmdConfig.Focus()
         MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Case Local.SiteConnectionFailureType.UnknownAccountType
-        GrabAttempt = 0
-        If mySettings.AccountTypeForced Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
-        Else
-          SetStatusText("Analyzing Account", "Determining your account type...", False)
-          Dim TypeDetermination As New Local.DetermineType(AddressOf TypeDetermination_TypeDetermined)
-          TypeDetermination.Start(sProvider, mySettings.Timeout, mySettings.Proxy)
-        End If
     End Select
     If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
     End If
   End Sub
-  Private Sub localData_ConnectionDNXResult(sender As Object, e As Local.TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
+  Private Sub localData_ConnectionResult(sender As Object, e As Local.SiteResultEventArgs) Handles localData.ConnectionResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of Local.TYPEA2ResultEventArgs)(AddressOf localData_ConnectionDNXResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.SiteResultEventArgs)(AddressOf localData_ConnectionResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1151,11 +903,9 @@
     GrabAttempt = 0
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
-    myPanel = Local.SatHostTypes.Dish_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
+    LOG_Add(e.Update, e.Used, e.Limit, True)
     mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+    ScreenDefaultColors(mySettings.Colors)
     If e.SlowedDetected Then imSlowed = True
     imFree = e.FreeDetected
     DisplayUsage(True, True)
@@ -1163,160 +913,7 @@
       localData.Dispose()
       localData = Nothing
     End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionRPXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionRPXResult), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    GrabAttempt = 0
-    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = Local.SatHostTypes.RuralPortal_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
-    mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-    If e.SlowedDetected Then imSlowed = True
-    imFree = e.FreeDetected
-    DisplayUsage(True, True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
-  End Sub
-  Private Sub localData_ConnectionRPLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Local.TYPEAResultEventArgs)(AddressOf localData_ConnectionRPLResult), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    GrabAttempt = 0
-    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-    myPanel = Local.SatHostTypes.RuralPortal_LEGACY
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.RuralPortal_LEGACY
-    mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-    If e.SlowedDetected Then imSlowed = True
-    imFree = e.FreeDetected
-    DisplayUsage(True, True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
-  End Sub
-  Private Sub localData_ConnectionWBLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Local.TYPEAResultEventArgs)(AddressOf localData_ConnectionWBLResult), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    GrabAttempt = 0
-    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-    myPanel = Local.SatHostTypes.WildBlue_LEGACY
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
-    mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-    If e.SlowedDetected Then imSlowed = True
-    imFree = e.FreeDetected
-    DisplayUsage(True, True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
-  End Sub
-  Private Sub localData_ConnectionWBXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionWBXResult), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    GrabAttempt = 0
-    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = Local.SatHostTypes.WildBlue_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
-    mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-    If e.SlowedDetected Then imSlowed = True
-    imFree = e.FreeDetected
-    DisplayUsage(True, True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
-  End Sub
-  Private Sub localData_ConnectionWXRResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionWXRResult
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionWXRResult), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    GrabAttempt = 0
-    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-    mySettings.Save()
-    ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
-    If e.SlowedDetected Then imSlowed = True
-    imFree = e.FreeDetected
-    DisplayUsage(True, True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
-  End Sub
-#Region "Host List"
-  Private didHostListSave As Boolean = False
-  Private Sub SaveToHostList()
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New MethodInvoker(AddressOf SaveToHostList))
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    If didHostListSave Then Return
-    Try
-      Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLowerInvariant
-      Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & myProvider)
-      sckHostList.BeginGetResponse(Nothing, Nothing)
-      didHostListSave = True
-    Catch ex As Exception
-      didHostListSave = False
-    End Try
-  End Sub
-#End Region
 #End Region
 #Region "Remote Usage Events"
   Private Sub remoteData_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteData.Failure
@@ -1388,8 +985,7 @@
       SetStatusText(LastTime, "Saving History...", False)
     End If
     If e IsNot Nothing Then
-      If Not mySettings.AccountTypeForced Then mySettings.AccountType = e.Provider
-      ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
+      ScreenDefaultColors(mySettings.Colors)
       mySettings.Save()
       Dim iPercent As Integer = 0
       Dim iInterval As Integer = 1
@@ -1406,10 +1002,10 @@
               If iDur <= 700 Then iInterval = 2
             End If
           End If
-          LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Count - 1))
+          LOG_Add(Row.Time, Row.Used, Row.Limit, (I = e.Results.Count - 1))
         Else
           If DateDiff(DateInterval.Minute, LOG_GetLast, Row.Time) > 1 Then
-            LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Count - 1))
+            LOG_Add(Row.Time, Row.Used, Row.Limit, (I = e.Results.Count - 1))
           End If
         End If
       Next
@@ -1428,8 +1024,6 @@
       remoteData.Dispose()
       remoteData = Nothing
     End If
-    Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
-    hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
 #End Region
 #Region "Graphs"
@@ -1450,36 +1044,16 @@
       Return
     End If
     Dim hadChange As Boolean = True
-    Select Case state
-      Case "TYPEA"
-        Dim lDown As Long = typeA_down
-        Dim lDLim As Long = typeA_dlim
-        Dim lUp As Long = typeA_up
-        Dim lULim As Long = typeA_ulim
-        Dim lDFree As Long = lDLim - lDown
-        Dim lUFree As Long = lULim - lUp
-        If lDown > 0 Or lDFree <> 0 Or lDLim > 0 Or lUp > 0 Or lUFree <> 0 Or lULim > 0 Then
-          DoChange(lblTypeADldUsedVal, lDown)
-          DoChange(lblTypeADldFreeVal, lDFree)
-          DoChange(lblTypeADldLimitVal, lDLim)
-          DoChange(lblTypeAUldUsedVal, lUp)
-          DoChange(lblTypeAUldFreeVal, lUFree)
-          DoChange(lblTypeAUldLimitVal, lULim)
-          If lDown = 0 And lDFree = 0 And lDLim = 0 And lUp = 0 And lUFree = 0 And lULim = 0 Then hadChange = False
-        End If
-        ResizePanels()
-      Case "TYPEB"
-        Dim lUsed As Long = typeB_used
-        Dim lLim As Long = typeB_lim
-        Dim lFree As Long = lLim - lUsed
-        If lUsed <> 0 Or typeB_lim > 0 Or lFree <> 0 Then
-          DoChange(lblTypeBUsedVal, lUsed)
-          DoChange(lblTypeBFreeVal, lFree)
-          DoChange(lblTypeBLimitVal, lLim)
-          If lUsed = 0 And lFree = 0 And lLim = 0 Then hadChange = False
-        End If
-        ResizePanels()
-    End Select
+    Dim lUsed As Long = uCache_used
+    Dim lLim As Long = uCache_lim
+    Dim lFree As Long = lLim - lUsed
+    If lUsed <> 0 Or uCache_lim > 0 Or lFree <> 0 Then
+      DoChange(lblUsageUsedVal, lUsed)
+      DoChange(lblUsageFreeVal, lFree)
+      DoChange(lblUsageLimitVal, lLim)
+      If lUsed = 0 And lFree = 0 And lLim = 0 Then hadChange = False
+    End If
+    ResizePanels()
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
       tmrChanges = Nothing
@@ -1543,304 +1117,75 @@
   Private Function AccuratePercent(value As Double) As String
     Return FormatPercent(value, mySettings.Accuracy, TriState.True, TriState.False, TriState.False)
   End Function
-  Private Sub DisplayTypeAResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
+  Private Sub DisplayUsageResults(lUsed As Long, lLimit As Long, sLastUpdate As String)
     Dim sTTT As String = Me.Text
-    Dim overDown, overUp As Boolean
-    overDown = (lDown >= lDownLim)
-    overUp = (lUp >= lUpLim)
-    If overDown Or overUp Then
-      imSlowed = True
-    ElseIf (lDown < (lDownLim * 0.7)) And (lUp < (lUpLim * 0.7)) Then
-      imSlowed = False
-    End If
-    pnlTypeA.Visible = True
-    pnlTypeB.Visible = False
+    imSlowed = (lUsed >= lLimit)
+    pnlUsage.Visible = True
     pnlNothing.Visible = False
-    typeA_down = lDown
-    typeA_dlim = lDownLim
-    typeA_up = lUp
-    typeA_ulim = lUpLim
+    uCache_used = lUsed
+    uCache_lim = lLimit
     If tmrChanges IsNot Nothing Then
       tmrChanges.Dispose()
       tmrChanges = Nothing
     End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEA", 75, System.Threading.Timeout.Infinite)
-    If overDown Then
-      lblTypeADldFreeVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeADldFreeVal, "You are over your Download limit!")
-    Else
-      lblTypeADldFreeVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeADldFreeVal, Nothing)
-    End If
-    If overUp Then
-      lblTypeAUldFreeVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeAUldFreeVal, "You are over your Upload limit!")
-    Else
-      lblTypeAUldFreeVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeAUldFreeVal, Nothing)
-    End If
+    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), Nothing, 75, System.Threading.Timeout.Infinite)
     If imSlowed Then
-      lblTypeADldLimitVal.ForeColor = Color.Red
-      lblTypeAUldLimitVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeADldLimitVal, "Your connection has been restricted!")
-      ttUI.SetToolTip(lblTypeAUldLimitVal, "Your connection has been restricted!")
+      lblUsageFreeVal.ForeColor = Color.Red
+      lblUsageLimitVal.ForeColor = Color.Red
+      ttUI.SetToolTip(lblUsageFreeVal, "You are over your usage limit!")
+      ttUI.SetToolTip(lblUsageLimitVal, "Your connection has been restricted!")
     Else
-      lblTypeADldLimitVal.ForeColor = SystemColors.ControlText
-      lblTypeAUldLimitVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeADldLimitVal, Nothing)
-      ttUI.SetToolTip(lblTypeAUldLimitVal, Nothing)
+      lblUsageFreeVal.ForeColor = SystemColors.ControlText
+      lblUsageLimitVal.ForeColor = SystemColors.ControlText
+      ttUI.SetToolTip(lblUsageFreeVal, Nothing)
+      ttUI.SetToolTip(lblUsageLimitVal, Nothing)
     End If
-    gbTypeADld.Text = "Download (" & AccuratePercent(lDown / lDownLim) & ")"
-    gbTypeAUld.Text = "Upload (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetToolTip(pctTypeADld, "Graph representing your download usage.")
-    ttUI.SetToolTip(pctTypeAUld, "Graph representing your upload usage.")
-    pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    Dim dFree, uFree As String
-    If lDownLim > lDown Then
-      dFree = ", " & MBorGB(lDownLim - lDown) & " Free"
-    ElseIf lDownLim < lDown Then
-      dFree = ", " & MBorGB(lDown - lDownLim) & " Over"
-    Else
-      dFree = String.Empty
-    End If
-    If lUpLim > lUp Then
-      uFree = ", " & MBorGB(lUpLim - lUp) & " Free"
-    ElseIf lUpLim < lUp Then
-      uFree = ", " & MBorGB(lUp - lDownLim) & " Over"
-    Else
-      uFree = String.Empty
-    End If
+    pctUsage.Image = DisplayRProgress(pctUsage.DisplayRectangle.Size, lUsed, lLimit, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
     sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
            "Updated " & sLastUpdate & vbCr &
-           "Down: " & MBorGB(lDown) & " (" & AccuratePercent(lDown / lDownLim) & ")" & dFree & vbCr &
-           "Up: " & MBorGB(lUp) & " (" & AccuratePercent(lUp / lUpLim) & ")" & uFree
-    If sTTT.Length > ttLimit Then
-      If lDownLim > lDown Then
-        dFree = " (" & MBorGB(lDownLim - lDown) & " Free)"
-      ElseIf lDownLim < lDown Then
-        dFree = " (" & MBorGB(lDown - lDownLim) & " Over)"
-      Else
-        dFree = String.Empty
-      End If
-      If lUpLim > lUp Then
-        uFree = " (" & MBorGB(lUpLim - lUp) & " Free)"
-      ElseIf lUpLim < lUp Then
-        uFree = " (" & MBorGB(lUp - lDownLim) & " Over)"
-      Else
-        uFree = String.Empty
-      End If
-      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-             "D: " & AccuratePercent(lDown / lDownLim) & dFree & vbCr &
-             "U: " & AccuratePercent(lUp / lUpLim) & uFree
-    End If
-    iconBefore = CreateTypeATrayIcon(lDown, lDownLim, lUp, lUpLim)
-    iconStop = True
-    SetNotifyIconText(trayIcon, sTTT)
-    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
-  End Sub
-  Private Sub DisplayTypeA2Results(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
-    Dim sTTT As String = Me.Text
-    imSlowed = (lDown >= lDownLim)
-    pnlTypeA.Visible = True
-    pnlTypeB.Visible = False
-    pnlNothing.Visible = False
-    typeA_down = lDown
-    typeA_dlim = lDownLim
-    typeA_up = lUp
-    typeA_ulim = lUpLim
-    If tmrChanges IsNot Nothing Then
-      tmrChanges.Dispose()
-      tmrChanges = Nothing
-    End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEA", 75, System.Threading.Timeout.Infinite)
-    If imSlowed Then
-      lblTypeADldFreeVal.ForeColor = Color.Red
-      lblTypeADldLimitVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeADldFreeVal, "You are over your Anytime limit!")
-      ttUI.SetToolTip(lblTypeADldLimitVal, "Your Anytime connection has been restricted!")
-    Else
-      lblTypeADldFreeVal.ForeColor = SystemColors.ControlText
-      lblTypeADldLimitVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeADldFreeVal, Nothing)
-      ttUI.SetToolTip(lblTypeADldLimitVal, Nothing)
-    End If
-    If lUp >= lUpLim Then
-      lblTypeAUldFreeVal.ForeColor = Color.Red
-      lblTypeAUldLimitVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeAUldFreeVal, "You are over your Off-Peak limit!")
-      ttUI.SetToolTip(lblTypeAUldLimitVal, "Your Off-Peak connection has been restricted!")
-    Else
-      lblTypeAUldFreeVal.ForeColor = SystemColors.ControlText
-      lblTypeAUldLimitVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeAUldFreeVal, Nothing)
-      ttUI.SetToolTip(lblTypeAUldLimitVal, Nothing)
-    End If
-    gbTypeADld.Text = "Anytime (" & AccuratePercent(lDown / lDownLim) & ")"
-    gbTypeAUld.Text = "Off-Peak (" & AccuratePercent(lUp / lUpLim) & ")"
-    ttUI.SetToolTip(pctTypeADld, "Graph representing your Anytime usage.")
-    ttUI.SetToolTip(pctTypeAUld, "Graph representing your Off-Peak usage (used between 2am and 8am).")
-    pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, lUp, lUpLim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    Dim atFree, opFree As String
-    If lDownLim > lDown Then
-      atFree = ", " & MBorGB(lDownLim - lDown) & " Free"
-    ElseIf lDownLim < lDown Then
-      atFree = ", " & MBorGB(lDown - lDownLim) & " Over"
-    Else
-      atFree = String.Empty
-    End If
-    If lUpLim > lUp Then
-      opFree = ", " & MBorGB(lUpLim - lUp) & " Free"
-    ElseIf lUpLim < lUp Then
-      opFree = ", " & MBorGB(lUp - lUpLim) & " Over"
-    Else
-      opFree = String.Empty
-    End If
-    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
-           "Updated " & sLastUpdate & vbCr &
-           "Anytime: " & MBorGB(lDown) & " (" & AccuratePercent(lDown / lDownLim) & ")" & atFree & vbCr &
-           "Off-Peak: " & MBorGB(lUp) & " (" & AccuratePercent(lUp / lUpLim) & ")" & opFree
-    If sTTT.Length > ttLimit Then
-      If lDownLim > lDown Then
-        atFree = " (" & MBorGB(lDownLim - lDown) & " Free)"
-      ElseIf lDownLim < lDown Then
-        atFree = " (" & MBorGB(lDown - lDownLim) & " Free)"
-      Else
-        atFree = String.Empty
-      End If
-      If lUpLim > lUp Then
-        opFree = " (" & MBorGB(lUpLim - lUp) & " Free)"
-      ElseIf lUpLim < lUp Then
-        opFree = " (" & MBorGB(lUp - lUpLim) & " Free)"
-      Else
-        opFree = String.Empty
-      End If
-      sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-             "A-T: " & AccuratePercent(lDown / lDownLim) & atFree & vbCr &
-             "O-P: " & AccuratePercent(lUp / lUpLim) & opFree
-    End If
-    iconBefore = CreateTypeATrayIcon(lDown, lDownLim, lUp, lUpLim)
-    iconStop = True
-    SetNotifyIconText(trayIcon, sTTT)
-    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
-  End Sub
-  Private Sub DisplayTypeBResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, sLastUpdate As String)
-    If Not (lDown = lUp And lDownLim = lUpLim) Then
-      DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-      Return
-    End If
-    Dim sTTT As String = Me.Text
-    imSlowed = (lDown >= lDownLim)
-    pnlTypeA.Visible = False
-    pnlTypeB.Visible = True
-    pnlNothing.Visible = False
-    typeB_used = lDown
-    typeB_lim = lDownLim
-    If tmrChanges IsNot Nothing Then
-      tmrChanges.Dispose()
-      tmrChanges = Nothing
-    End If
-    tmrChanges = New Threading.Timer(New Threading.TimerCallback(AddressOf DisplayChangeInterval), "TYPEB", 75, System.Threading.Timeout.Infinite)
-    If imSlowed Then
-      lblTypeBFreeVal.ForeColor = Color.Red
-      lblTypeBLimitVal.ForeColor = Color.Red
-      ttUI.SetToolTip(lblTypeBFreeVal, "You are over your usage limit!")
-      ttUI.SetToolTip(lblTypeBLimitVal, "Your connection has been restricted!")
-    Else
-      lblTypeBFreeVal.ForeColor = SystemColors.ControlText
-      lblTypeBLimitVal.ForeColor = SystemColors.ControlText
-      ttUI.SetToolTip(lblTypeBFreeVal, Nothing)
-      ttUI.SetToolTip(lblTypeBLimitVal, Nothing)
-    End If
-    pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, lDown, lDownLim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
-    sTTT = "Satellite Usage" & IIf(imSlowed, " (Slowed)", "") & vbCr &
-           "Updated " & sLastUpdate & vbCr &
-            MBorGB(lDown) & " of " & MBorGB(lDownLim) & " (" & AccuratePercent(lDown / lDownLim) & ")"
+            MBorGB(lUsed) & " of " & MBorGB(lLimit) & " (" & AccuratePercent(lUsed / lLimit) & ")"
     If sTTT.Length > ttLimit Then
       sTTT = "Usage" & IIf(imSlowed, " (Slow)", "") & " [" & sLastUpdate & "]" & vbCr &
-            AccuratePercent(lDown / lDownLim)
+            AccuratePercent(lUsed / lLimit)
     End If
-    If lDownLim > lDown Then
-      sTTT &= vbCr & MBorGB(lDownLim - lDown) & " Free"
-    ElseIf lDownLim < lDown Then
-      sTTT &= vbCr & MBorGB(lDown - lDownLim) & " Over"
+    If lLimit > lUsed Then
+      sTTT &= vbCr & MBorGB(lLimit - lUsed) & " Free"
+    ElseIf lLimit < lUsed Then
+      sTTT &= vbCr & MBorGB(lUsed - lLimit) & " Over"
     End If
-    iconBefore = CreateTypeBTrayIcon(lDown, lDownLim)
+    iconBefore = CreateUsageTrayIcon(lUsed, lLimit)
     iconStop = True
     SetNotifyIconText(trayIcon, sTTT)
-    DisplayResultAlert(mySettings.AccountType, lDown, lUp)
+    DisplayResultAlert(lUsed)
   End Sub
-  Private Sub DisplayResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
-    If lDownLim > 0 Or lUpLim > 0 Then
+  Private Sub DisplayResults(lUsed As Long, lLimit As Long)
+    If lLimit > 0 Then
       Dim lastUpdate As Date = LOG_GetLast()
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt", Globalization.CultureInfo.InvariantCulture)
-      myPanel = mySettings.AccountType
-      Select Case mySettings.AccountType
-        Case Local.SatHostTypes.RuralPortal_EXEDE, Local.SatHostTypes.WildBlue_EXEDE, Local.SatHostTypes.WildBlue_EXEDE_RESELLER : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case Local.SatHostTypes.Dish_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case Else : DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-      End Select
+      DisplayUsageResults(lUsed, lLimit, sLastUpdate)
     Else
-      pnlTypeA.Visible = False
-      pnlTypeB.Visible = False
+      pnlUsage.Visible = False
       pnlNothing.Visible = True
-      myPanel = Local.SatHostTypes.Other
       trayIcon.Text = Me.Text
       iconBefore = MakeIcon(IconName.norm)
       iconStop = True
     End If
   End Sub
-  Private Sub DisplayResultAlert(Type As Local.SatHostTypes, lDown As Long, lUp As Long)
+  Private Sub DisplayResultAlert(lUsed As Long)
     If mySettings.Overuse > 0 Then
       If lastBalloon > 0 AndAlso srlFunctions.TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Return
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
         Dim lItems() As DataRow = LOG_GetRange(Now.AddMinutes(TimeCheck), Now) ' Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
-          Select Case Type
-            Case Local.SatHostTypes.WildBlue_LEGACY, Local.SatHostTypes.RuralPortal_LEGACY
-              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-                MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Download Detected", My.Application.Info.ProductName & " has logged a download of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = srlFunctions.TickCount()
-                Exit For
-              ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
-                Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
-                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-                MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Upload Detected", My.Application.Info.ProductName & " has logged an upload of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = srlFunctions.TickCount()
-                Exit For
-              End If
-            Case Local.SatHostTypes.WildBlue_EXEDE, Local.SatHostTypes.WildBlue_EXEDE_RESELLER, Local.SatHostTypes.RuralPortal_EXEDE
-              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-                MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = srlFunctions.TickCount()
-                Exit For
-              End If
-            Case Local.SatHostTypes.Dish_EXEDE
-              If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
-                Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
-                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-                MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = srlFunctions.TickCount()
-                Exit For
-              ElseIf lUp - lItems(I).UPLOAD >= mySettings.Overuse Then
-                Dim ChangeSize As Long = Math.Abs(lUp - lItems(I).UPLOAD)
-                Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
-                MakeNotifier(taskNotifier, False)
-                If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Off-Peak Usage Detected", My.Application.Info.ProductName & " has logged an Off-Peak usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
-                lastBalloon = srlFunctions.TickCount()
-                Exit For
-              End If
-          End Select
+          If lUsed - lItems(I).USED >= mySettings.Overuse Then
+            Dim ChangeSize As Long = Math.Abs(lUsed - lItems(I).USED)
+            Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
+            MakeNotifier(taskNotifier, False)
+            If taskNotifier IsNot Nothing Then taskNotifier.Show("Excessive Usage Detected", My.Application.Info.ProductName & " has logged a usage change of " & MBorGB(ChangeSize) & " in " & ConvertTime(ChangeTime) & "!", 200, 0, 100)
+            lastBalloon = srlFunctions.TickCount()
+            Exit For
+          End If
         Next
       End If
     End If
@@ -1850,7 +1195,7 @@
 #Region "Buttons"
   Private Sub cmdRefresh_Click(sender As System.Object, e As System.EventArgs) Handles cmdRefresh.Click
     InitAccount()
-    If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then
+    If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sPassword) Then
       EnableProgressIcon()
       SetNextLoginTime()
       If My.Computer.Keyboard.CtrlKeyDown Then
@@ -1864,15 +1209,9 @@
         If ClosingTime Then Return
         cmdRefresh.Enabled = True
       End If
-      If Not CheckedAJAX And mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
-        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
-        Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
-        AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage")
-      Else
-        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Beginning Usage Request...", False)
-        Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-        UsageInvoker.BeginInvoke(Nothing, Nothing)
-      End If
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Beginning Usage Request...", False)
+      Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
+      UsageInvoker.BeginInvoke(Nothing, Nothing)
     Else
       RestoreWindow()
       cmdConfig.Focus()
@@ -1908,9 +1247,9 @@
     End Using
     Dim WaitTime As Long = srlFunctions.TickCount() + 2000
     If Not myState = LoadStates.Loaded Then
-      If Not myState = LoadStates.Lookup Then
-        Dim lookupInvoker As New MethodInvoker(AddressOf LookupProvider)
-        lookupInvoker.BeginInvoke(Nothing, Nothing)
+      If Not myState = LoadStates.DB Then
+        Dim initDBInvoker As New MethodInvoker(AddressOf initDB)
+        initDBInvoker.BeginInvoke(Nothing, Nothing)
       End If
       Do Until myState = LoadStates.Loaded
         Application.DoEvents()
@@ -1920,13 +1259,11 @@
     End If
     Select Case dRet
       Case Windows.Forms.DialogResult.Yes
-        didHostListSave = False
         ReLoadSettings()
         SetNextLoginTime()
         Dim ReInitInvoker As New MethodInvoker(AddressOf ReInit)
         ReInitInvoker.BeginInvoke(Nothing, Nothing)
       Case Windows.Forms.DialogResult.OK
-        didHostListSave = False
         ReLoadSettings()
         If bReRun Then
           SetNextLoginTime()
@@ -1941,7 +1278,7 @@
         sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
         If frmHistory.Visible Then
           frmHistory.mySettings = New AppSettings
-          ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
+          ScreenDefaultColors(frmHistory.mySettings.Colors)
           If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then frmHistory.mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
           frmHistory.DoResize(True)
         End If
@@ -2019,7 +1356,7 @@
       sizeChangeInvoker.BeginInvoke(Me, New EventArgs, Nothing, Nothing)
       If frmHistory.Visible Then
         frmHistory.mySettings = New AppSettings
-        ScreenDefaultColors(frmHistory.mySettings.Colors, frmHistory.mySettings.AccountType)
+        ScreenDefaultColors(frmHistory.mySettings.Colors)
         If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then frmHistory.mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
         frmHistory.DoResize(True)
       End If
@@ -2134,34 +1471,7 @@
     sFailTray = Nothing
   End Sub
 #Region "Graphs"
-  Private Function CreateTypeATrayIcon(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long) As Icon
-    Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
-    Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
-    Dim imgTray As New Bitmap(icoX, icoY)
-    Using g As Graphics = Graphics.FromImage(imgTray)
-      g.Clear(Color.Transparent)
-      If imSlowed Then
-        g.DrawIconUnstretched(MakeIcon(IconName.restricted, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-        If lDown < lDownLim Then CreateTrayIcon_Left(g, lDown, lDownLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, icoX, icoY)
-        If lUp < lUpLim Then CreateTrayIcon_Right(g, lUp, lUpLim, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC, icoX, icoY)
-      ElseIf imFree Then
-        g.DrawIconUnstretched(MakeIcon(IconName.free, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-      Else
-        g.DrawIconUnstretched(MakeIcon(IconName.norm, icoX, icoY), New Rectangle(0, 0, icoX, icoY))
-        CreateTrayIcon_Left(g, lDown, lDownLim, mySettings.Colors.TrayDownA, mySettings.Colors.TrayDownB, mySettings.Colors.TrayDownC, icoX, icoY)
-        CreateTrayIcon_Right(g, lUp, lUpLim, mySettings.Colors.TrayUpA, mySettings.Colors.TrayUpB, mySettings.Colors.TrayUpC, icoX, icoY)
-      End If
-    End Using
-    Try
-      Dim hIcon As IntPtr = imgTray.GetHicon()
-      Dim iIcon As Icon = Icon.FromHandle(hIcon).Clone
-      NativeMethods.DestroyIcon(hIcon)
-      Return iIcon
-    Catch ex As Exception
-      Return MakeIcon(IconName.norm, icoX, icoY)
-    End Try
-  End Function
-  Private Function CreateTypeBTrayIcon(lUsed As Long, lLim As Long) As Icon
+  Private Function CreateUsageTrayIcon(lUsed As Long, lLim As Long) As Icon
     Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
     Dim icoY As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CYSMICON)
     Dim imgTray As New Bitmap(icoX, icoY)
@@ -2438,60 +1748,6 @@
       sProgress = "[Waiting for Response]"
     End If
     SetStatusText("Downloading Update " & sProgress, sStatus, False)
-  End Sub
-  Private Sub UpdateAJAXLists_ListUpdated(asyncState As Object, shortList As String, fullList As String)
-    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists.", True)
-      DisplayUsage(False, True)
-      Return
-    End If
-    If mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "AJAX failed to yield data table. A fix should be available soon.", True)
-      DisplayUsage(False, True)
-      Return
-    End If
-    mySettings.AJAXOrderShort = shortList
-    mySettings.AJAXOrderFull = fullList
-    mySettings.Save()
-    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Updated AJAX Lists. Reconnecting...", True)
-    If localData IsNot Nothing Then
-      localData.Dispose()
-      localData = Nothing
-    End If
-    localData = New Local.SiteConnection(LocalAppDataDirectory)
-  End Sub
-  Private Sub UpdateAJAXLists_UpdateChecked(asyncState As Object, shortList As String, fullList As String)
-    CheckedAJAX = True
-    If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
-      'Error
-      If Not String.IsNullOrEmpty(shortList) Then
-        If shortList.StartsWith("ERR_") Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Error Updating AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList.Substring(4), False)
-        ElseIf shortList.StartsWith("URL_") Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirected to " & shortList.Substring(4) & ".", False)
-        ElseIf shortList = "DATA_EMPTY" Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "No Data from Server.", False)
-        ElseIf shortList.StartsWith("DATA_REDIR_") Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirection to new URL." & vbNewLine & shortList.Substring(11), False)
-        ElseIf shortList.StartsWith("DATA_SEP_") Then
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Malformed Data from Server." & vbNewLine & shortList.Substring(9), False)
-        Else
-          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList, False)
-        End If
-      Else
-        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
-      End If
-    ElseIf mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
-      'No Change
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
-    Else
-      mySettings.AJAXOrderShort = shortList
-      mySettings.AJAXOrderFull = fullList
-      mySettings.Save()
-      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "AJAX Lists Updated. Preparing Connection...", False)
-    End If
-    Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-    UsageInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
 #End Region
 #Region "Useful Functions"

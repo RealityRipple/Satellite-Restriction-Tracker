@@ -836,87 +836,45 @@ Friend Module modFunctions
   End Sub
 #Region "Graphs"
 #Region "History"
-  Private dGraph, uGraph As Rectangle
+  Private dGraph As Rectangle
   Private oldDate, newDate As Date
-  Private dData(), uData() As DataRow
-  Private Enum Direction
-    No
-    Down
-    Up
-  End Enum
-  Public Function GetGraphRect(DownGraph As Boolean, ByRef firstX As Date, ByRef lastX As Date) As Rectangle
+  Private dData() As DataRow
+  Public Function GetGraphRect(ByRef firstX As Date, ByRef lastX As Date) As Rectangle
     firstX = oldDate
     lastX = newDate
-    If DownGraph Then
-      Return dGraph
-    Else
-      Return uGraph
-    End If
+    Return dGraph
   End Function
-  Friend Function GetGraphData(fromDate As Date, DownGraph As Boolean) As DataRow
-    If DownGraph Then
-      If dData Is Nothing Then Return DataRow.Empty
-      Dim closestRow As DataRow
-      Dim closestVal As Integer = Integer.MaxValue
-      For Each item In dData
-        If Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate)) < closestVal Then
-          closestRow = item
-          closestVal = Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate))
-        End If
-      Next
-      Return closestRow
-    Else
-      If uData Is Nothing Then Return DataRow.Empty
-      Dim closestRow As DataRow
-      Dim closestVal As Integer = Integer.MaxValue
-      For Each item In uData
-        If Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate)) < closestVal Then
-          closestRow = item
-          closestVal = Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate))
-        End If
-      Next
-      Return closestRow
-    End If
+  Friend Function GetGraphData(fromDate As Date) As DataRow
+    If dData Is Nothing Then Return DataRow.Empty
+    Dim closestRow As DataRow
+    Dim closestVal As Integer = Integer.MaxValue
+    For Each item In dData
+      If Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate)) < closestVal Then
+        closestRow = item
+        closestVal = Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate))
+      End If
+    Next
+    Return closestRow
   End Function
   Public Function DrawRGraph(Data() As DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, Direction.No, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
+    Return DrawGraph(Data, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
-  Public Function DrawLineGraph(Data() As DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
-    Return DrawGraph(Data, IIf(Down, Direction.Down, Direction.Up), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
-  End Function
-  Private Function DrawGraph(ByVal Data() As DataRow, GraphDir As Direction, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+  Private Function DrawGraph(ByVal Data() As DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then
       dData = Nothing
-      uData = Nothing
       Return New Bitmap(1, 1)
     End If
     Dim yMax As Long = 0
     Dim lMax As Long = 0
-    If GraphDir = Direction.No Then
-      Dim yVMax As Long = -1
-      For I As Integer = 0 To Data.Length - 1
-        If yVMax < Data(I).DOWNLOAD Then yVMax = Data(I).DOWNLOAD
-        If yVMax < Data(I).DOWNLIM Then yVMax = Data(I).DOWNLIM
-      Next
-      If yVMax = -1 Then yVMax = 0
-      yMax = yVMax
-      If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-      lMax = yVMax
-    Else
-      Dim yDMax As Long = -1
-      Dim yUMax As Long = -1
-      For I As Integer = 0 To Data.Length - 1
-        If yDMax < Data(I).DOWNLOAD Then yDMax = Data(I).DOWNLOAD
-        If yUMax < Data(I).UPLOAD Then yUMax = Data(I).UPLOAD
-        If yDMax < Data(I).DOWNLIM Then yDMax = Data(I).DOWNLIM
-        If yUMax < Data(I).UPLIM Then yUMax = Data(I).UPLIM
-      Next
-      If yDMax = -1 Then yDMax = 0
-      If yUMax = -1 Then yUMax = 0
-      yMax = IIf(yDMax > yUMax, yDMax, yUMax)
-      If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
-      lMax = IIf(GraphDir = Direction.Down, yDMax, yUMax)
-    End If
+    Dim yVMax As Long = -1
+    For I As Integer = 0 To Data.Length - 1
+      If yVMax < Data(I).USED Then yVMax = Data(I).USED
+      If yVMax < Data(I).LIMIT Then yVMax = Data(I).LIMIT
+    Next
+    If yVMax = -1 Then yVMax = 0
+    yMax = yVMax
+    If Not yMax Mod 1000 = 0 Then yMax = (yMax \ 1000) * 1000
+    lMax = yVMax
     If Not lMax Mod 1000 = 0 Then lMax = (lMax \ 1000) * 1000 + 1000
     Dim iPic As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
     Dim g As Graphics = Graphics.FromImage(iPic)
@@ -928,13 +886,8 @@ Friend Module modFunctions
     g.Clear(ColorBG)
     Dim yTop As Integer = lXHeight / 2
     Dim yHeight As Integer = ImgSize.Height - (lXHeight * 1.5)
-    If GraphDir = Direction.Up Then
-      uGraph = New Rectangle(lYWidth, yTop, lLineWidth + 1, yHeight)
-      uData = Data
-    Else
-      dGraph = New Rectangle(lYWidth, yTop, lLineWidth + 1, yHeight)
-      dData = Data
-    End If
+    dGraph = New Rectangle(lYWidth, yTop, lLineWidth + 1, yHeight)
+    dData = Data
     g.DrawLine(New Pen(ColorText), lYWidth, yTop, lYWidth, yTop + yHeight)
     g.DrawLine(New Pen(ColorText), lYWidth, yTop + yHeight, ImgSize.Width, yTop + yHeight)
     oldDate = Data.First.DATETIME
@@ -1152,11 +1105,7 @@ Friend Module modFunctions
       g.DrawString(sLastDisp, tFont, New SolidBrush(ColorText), lastI - iLastDispWidth + 3, ImgSize.Height - lXHeight + 5)
     End If
     Dim MaxY As Integer = 0
-    If GraphDir = Direction.No Then
-      MaxY = yTop + yHeight - (Data(Data.Length - 1).DOWNLIM / lMax * yHeight)
-    Else
-      MaxY = yTop + yHeight - (IIf(GraphDir = Direction.Down, Data(Data.Length - 1).DOWNLIM, Data(Data.Length - 1).UPLIM) / lMax * yHeight)
-    End If
+    MaxY = yTop + yHeight - (Data(Data.Length - 1).LIMIT / lMax * yHeight)
     Dim lMaxPoints(lMaxGraphTime) As Point
     Dim lPoints(lMaxGraphTime + 3) As Point
     Dim lTypes(lMaxGraphTime + 3) As Byte
@@ -1168,11 +1117,7 @@ Friend Module modFunctions
       For J As Integer = 0 To Data.Length - 1
         If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
           Dim jLim As Long = -1
-          If GraphDir = Direction.Up Then
-            jLim = Data(J).UPLIM
-          Else
-            jLim = Data(J).DOWNLIM
-          End If
+          jLim = Data(J).LIMIT
           If lHigh < jLim Then lHigh = jLim
         End If
       Next
@@ -1195,11 +1140,7 @@ Friend Module modFunctions
             For J As Integer = 0 To Data.Length - 1
               If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
                 Dim jLim As Long = -1
-                If GraphDir = Direction.Up Then
-                  jLim = Data(J).UPLIM
-                Else
-                  jLim = Data(J).DOWNLIM
-                End If
+                jLim = Data(J).LIMIT
                 If nextHVal < jLim Then nextHVal = jLim
               End If
             Next
@@ -1241,13 +1182,8 @@ Friend Module modFunctions
         If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
           Dim jVal As Long = -1
           Dim jMax As Long = -1
-          If GraphDir = Direction.Up Then
-            jVal = Data(J).UPLOAD
-            jMax = Data(J).UPLIM
-          Else
-            jVal = Data(J).DOWNLOAD
-            jMax = Data(J).DOWNLIM
-          End If
+          jVal = Data(J).USED
+          jMax = Data(J).LIMIT
           If lLow > jVal Then lLow = jVal
           If mLow > jMax Then mLow = jMax
           If lHigh < jVal Then lHigh = jVal
@@ -1276,11 +1212,7 @@ Friend Module modFunctions
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
                   Dim jVal As Long = -1
-                  If GraphDir = Direction.Up Then
-                    jVal = Data(J).UPLOAD
-                  Else
-                    jVal = Data(J).DOWNLOAD
-                  End If
+                  jVal = Data(J).USED
                   If nextHVal < jVal Then nextHVal = jVal
                 End If
               Next
@@ -1316,11 +1248,7 @@ Friend Module modFunctions
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
                   Dim jVal As Long = -1
-                  If GraphDir = Direction.Up Then
-                    jVal = Data(J).UPLOAD
-                  Else
-                    jVal = Data(J).DOWNLOAD
-                  End If
+                  jVal = Data(J).USED
                   If nextLVal > jVal Then nextLVal = jVal
                 End If
               Next
@@ -1360,11 +1288,7 @@ Friend Module modFunctions
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
                   Dim jVal As Long = -1
-                  If GraphDir = Direction.Up Then
-                    jVal = Data(J).UPLOAD
-                  Else
-                    jVal = Data(J).DOWNLOAD
-                  End If
+                  jVal = Data(J).USED
                   If nextLVal > jVal Then nextLVal = jVal
                 End If
               Next
@@ -1378,11 +1302,7 @@ Friend Module modFunctions
               For J As Integer = 0 To Data.Length - 1
                 If Math.Abs(DateDiff(dGraphInterval, Data(J).DATETIME, dFind)) <= lGraphInterval Then
                   Dim jVal As Long = 0
-                  If GraphDir = Direction.Up Then
-                    jVal = Data(J).UPLOAD
-                  Else
-                    jVal = Data(J).DOWNLOAD
-                  End If
+                  jVal = Data(J).USED
                   If nextHVal < jVal Then nextHVal = jVal
                 End If
               Next
@@ -1435,85 +1355,9 @@ Friend Module modFunctions
   End Function
   Public Sub ClearGraphData()
     dData = Nothing
-    uData = Nothing
   End Sub
 #End Region
 #Region "Progress"
-  Public Function DisplayProgress(ImgSize As Size, Current As Long, Total As Long, Accuracy As Integer, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color) As Image
-    If ImgSize.IsEmpty Then Return Nothing
-    Dim bmpTmp As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
-    Dim fontSize As Single = 8
-    If ImgSize.Width < ImgSize.Height Then
-      If ImgSize.Width / 12 > 8 Then
-        fontSize = ImgSize.Width / 12
-      Else
-        fontSize = 8
-      End If
-    Else
-      If ImgSize.Height / 12 > 8 Then
-        fontSize = ImgSize.Height / 12
-      Else
-        fontSize = 8
-      End If
-    End If
-    Dim fFont As Font = MonospaceFont(fontSize)
-    Dim linGrBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(0, ImgSize.Height), ColorA, ColorB, ColorC)
-    If Total = 0 Then
-      Using g As Graphics = Graphics.FromImage(bmpTmp)
-        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-        g.Clear(ColorBG)
-        g.FillRectangle(linGrBrush, 0, 0, ImgSize.Width, ImgSize.Height)
-        Dim Msg As String = "Loading..."
-        Dim pF As New PointF(ImgSize.Width / 2 - g.MeasureString(Msg, fFont).Width / 2, ImgSize.Height / 2 - g.MeasureString(Msg, fFont).Height / 2)
-        g.DrawString(Msg, fFont, New SolidBrush(Color.FromArgb(128, ColorBG)), pF.X + 2, pF.Y + 2)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorBG), pF.X + 1, pF.Y + 1)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorText), pF)
-      End Using
-      Return bmpTmp
-    Else
-      Dim Val As Long
-      Dim Msg As String
-      If Current < Total Then
-        Using g As Graphics = Graphics.FromImage(bmpTmp)
-          g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-          g.Clear(ColorBG)
-          If Total > 0 And Current > 0 Then
-            Val = (Total - Current) / Total * ImgSize.Height
-            g.FillRectangle(linGrBrush, 0, Val, ImgSize.Width, ImgSize.Height - Val)
-            For I As Double = -1 To ImgSize.Height + 1 Step ((ImgSize.Height + 2.0) / 10.0)
-              g.DrawLine(New Pen(ColorBG), 0, CInt(I), ImgSize.Width, CInt(I))
-            Next I
-            Msg = FormatPercent(Current / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          Else
-            Msg = "0%"
-          End If
-          Dim pF As New PointF(ImgSize.Width / 2 - g.MeasureString(Msg, fFont).Width / 2, ImgSize.Height / 2 - g.MeasureString(Msg, fFont).Height / 2)
-          g.DrawString(Msg, fFont, New SolidBrush(Color.FromArgb(128, ColorBG)), pF.X + 2, pF.Y + 2)
-          g.DrawString(Msg, fFont, New SolidBrush(ColorBG), pF.X + 1, pF.Y + 1)
-          g.DrawString(Msg, fFont, New SolidBrush(ColorText), pF)
-        End Using
-      Else
-        Using g As Graphics = Graphics.FromImage(bmpTmp)
-          g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-          g.Clear(ColorBG)
-          If Total > 0 And Current > 0 Then
-            g.FillRectangle(linGrBrush, 0, 0, ImgSize.Width, ImgSize.Height)
-            For I As Double = -1 To ImgSize.Height + 1 Step ((ImgSize.Height + 2.0) / 10.0)
-              g.DrawLine(New Pen(ColorBG), 0, CInt(I), ImgSize.Width, CInt(I))
-            Next I
-            Msg = FormatPercent(Current / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          Else
-            Msg = "0%"
-          End If
-          Dim pF As New PointF(ImgSize.Width / 2 - g.MeasureString(Msg, fFont).Width / 2, ImgSize.Height / 2 - g.MeasureString(Msg, fFont).Height / 2)
-          g.DrawString(Msg, fFont, New SolidBrush(Color.FromArgb(128, ColorBG)), pF.X + 2, pF.Y + 2)
-          g.DrawString(Msg, fFont, New SolidBrush(ColorBG), pF.X + 1, pF.Y + 1)
-          g.DrawString(Msg, fFont, New SolidBrush(ColorText), pF)
-        End Using
-      End If
-      Return bmpTmp
-    End If
-  End Function
   Public Function DisplayRProgress(ImgSize As Size, Down As Long, Total As Long, Accuracy As Integer, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color) As Image
     If ImgSize.IsEmpty Then Return Nothing
     Dim Msg As String
@@ -1628,171 +1472,51 @@ Friend Module modFunctions
     g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Ceiling(icoX / 2)), icoY - yUsed)
   End Sub
 #End Region
-  Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors, useStyle As Local.SatHostTypes)
-    Dim defaultColors As AppSettings.AppColors = GetDefaultColors(useStyle)
+  Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors)
+    Dim defaultColors As AppSettings.AppColors = GetDefaultColors()
     If Colors.MainDownA = Color.Transparent Or Colors.MainDownA.A < 255 Then Colors.MainDownA = defaultColors.MainDownA
     If Colors.MainDownB = Color.Transparent Or Colors.MainDownB.A < 255 Then Colors.MainDownB = defaultColors.MainDownB
     If Colors.MainDownC = Color.Transparent Or Colors.MainDownC.A < 255 Then Colors.MainDownC = defaultColors.MainDownC
-    If Colors.MainUpA = Color.Transparent Or Colors.MainUpA.A < 255 Then Colors.MainUpA = defaultColors.MainUpA
-    If Colors.MainUpB = Color.Transparent Or Colors.MainUpB.A < 255 Then Colors.MainUpB = defaultColors.MainUpB
-    If Colors.MainUpC = Color.Transparent Or Colors.MainUpC.A < 255 Then Colors.MainUpC = defaultColors.MainUpC
     If Colors.MainText = Color.Transparent Or Colors.MainText.A < 255 Then Colors.MainText = defaultColors.MainText
     If Colors.MainBackground = Color.Transparent Or Colors.MainBackground.A < 255 Then Colors.MainBackground = defaultColors.MainBackground
 
     If Colors.TrayDownA = Color.Transparent Or Colors.TrayDownA.A < 255 Then Colors.TrayDownA = defaultColors.TrayDownA
     If Colors.TrayDownB = Color.Transparent Or Colors.TrayDownB.A < 255 Then Colors.TrayDownB = defaultColors.TrayDownB
     If Colors.TrayDownC = Color.Transparent Or Colors.TrayDownC.A < 255 Then Colors.TrayDownC = defaultColors.TrayDownC
-    If Colors.TrayUpA = Color.Transparent Or Colors.TrayUpA.A < 255 Then Colors.TrayUpA = defaultColors.TrayUpA
-    If Colors.TrayUpB = Color.Transparent Or Colors.TrayUpB.A < 255 Then Colors.TrayUpB = defaultColors.TrayUpB
-    If Colors.TrayUpC = Color.Transparent Or Colors.TrayUpC.A < 255 Then Colors.TrayUpC = defaultColors.TrayUpC
 
     If Colors.HistoryDownLine = Color.Transparent Or Colors.HistoryDownLine.A < 255 Then Colors.HistoryDownLine = defaultColors.HistoryDownLine
     If Colors.HistoryDownA = Color.Transparent Or Colors.HistoryDownA.A < 255 Then Colors.HistoryDownA = defaultColors.HistoryDownA
     If Colors.HistoryDownB = Color.Transparent Or Colors.HistoryDownB.A < 255 Then Colors.HistoryDownB = defaultColors.HistoryDownB
     If Colors.HistoryDownC = Color.Transparent Or Colors.HistoryDownC.A < 255 Then Colors.HistoryDownC = defaultColors.HistoryDownC
     If Colors.HistoryDownMax = Color.Transparent Or Colors.HistoryDownMax.A < 255 Then Colors.HistoryDownMax = defaultColors.HistoryDownMax
-    If Colors.HistoryUpLine = Color.Transparent Or Colors.HistoryUpLine.A < 255 Then Colors.HistoryUpLine = defaultColors.HistoryUpLine
-    If Colors.HistoryUpA = Color.Transparent Or Colors.HistoryUpA.A < 255 Then Colors.HistoryUpA = defaultColors.HistoryUpA
-    If Colors.HistoryUpB = Color.Transparent Or Colors.HistoryUpB.A < 255 Then Colors.HistoryUpB = defaultColors.HistoryUpB
-    If Colors.HistoryUpC = Color.Transparent Or Colors.HistoryUpC.A < 255 Then Colors.HistoryUpC = defaultColors.HistoryUpC
-    If Colors.HistoryUpMax = Color.Transparent Or Colors.HistoryUpMax.A < 255 Then Colors.HistoryUpMax = defaultColors.HistoryUpMax
     If Colors.HistoryText = Color.Transparent Or Colors.HistoryText.A < 255 Then Colors.HistoryText = defaultColors.HistoryText
     If Colors.HistoryBackground = Color.Transparent Or Colors.HistoryBackground.A < 255 Then Colors.HistoryBackground = defaultColors.HistoryBackground
     If Colors.HistoryLightGrid = Color.Transparent Or Colors.HistoryLightGrid.A < 255 Then Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
     If Colors.HistoryDarkGrid = Color.Transparent Or Colors.HistoryDarkGrid.A < 255 Then Colors.HistoryDarkGrid = defaultColors.HistoryDarkGrid
   End Sub
-  Public Function GetDefaultColors(useStyle As Local.SatHostTypes) As AppSettings.AppColors
+  Public Function GetDefaultColors() As AppSettings.AppColors
     Dim outColors As New AppSettings.AppColors
-    Select Case useStyle
-      Case Local.SatHostTypes.WildBlue_LEGACY, Local.SatHostTypes.RuralPortal_LEGACY
-        outColors.MainDownA = Color.DarkBlue
-        outColors.MainDownB = Color.Blue
-        outColors.MainDownC = Color.Aqua
-        outColors.MainUpA = Color.DarkBlue
-        outColors.MainUpB = Color.Blue
-        outColors.MainUpC = Color.Aqua
-        outColors.MainText = Color.White
-        outColors.MainBackground = Color.Black
 
-        outColors.TrayDownA = Color.DarkBlue
-        outColors.TrayDownB = Color.Blue
-        outColors.TrayDownC = Color.Aqua
-        outColors.TrayUpA = Color.DarkBlue
-        outColors.TrayUpB = Color.Blue
-        outColors.TrayUpC = Color.Aqua
+    outColors.MainDownA = Color.DarkBlue
+    outColors.MainDownB = Color.Blue
+    outColors.MainDownC = Color.Aqua
+    outColors.MainText = Color.White
+    outColors.MainBackground = Color.Black
 
-        outColors.HistoryDownLine = Color.DarkBlue
-        outColors.HistoryDownA = Color.DarkBlue
-        outColors.HistoryDownB = Color.Blue
-        outColors.HistoryDownC = Color.Aqua
-        outColors.HistoryDownMax = Color.Yellow
-        outColors.HistoryUpLine = Color.DarkBlue
-        outColors.HistoryUpA = Color.DarkBlue
-        outColors.HistoryUpB = Color.Blue
-        outColors.HistoryUpC = Color.Aqua
-        outColors.HistoryUpMax = Color.Yellow
-        outColors.HistoryText = Color.Black
-        outColors.HistoryBackground = Color.White
-        outColors.HistoryLightGrid = Color.LightGray
-        outColors.HistoryDarkGrid = Color.DarkGray
+    outColors.TrayDownA = Color.DarkBlue
+    outColors.TrayDownB = Color.Blue
+    outColors.TrayDownC = Color.Aqua
 
-      Case Local.SatHostTypes.RuralPortal_EXEDE, Local.SatHostTypes.WildBlue_EXEDE
-        outColors.MainDownA = Color.DarkBlue
-        outColors.MainDownB = Color.Blue
-        outColors.MainDownC = Color.Aqua
-        outColors.MainUpA = Color.Transparent
-        outColors.MainUpB = Color.Transparent
-        outColors.MainUpC = Color.Transparent
-        outColors.MainText = Color.White
-        outColors.MainBackground = Color.Black
+    outColors.HistoryDownLine = Color.DarkBlue
+    outColors.HistoryDownA = Color.DarkBlue
+    outColors.HistoryDownB = Color.Blue
+    outColors.HistoryDownC = Color.Aqua
+    outColors.HistoryDownMax = Color.Yellow
+    outColors.HistoryText = Color.Black
+    outColors.HistoryBackground = Color.White
+    outColors.HistoryLightGrid = Color.LightGray
+    outColors.HistoryDarkGrid = Color.DarkGray
 
-        outColors.TrayDownA = Color.DarkBlue
-        outColors.TrayDownB = Color.Blue
-        outColors.TrayDownC = Color.Aqua
-        outColors.TrayUpA = Color.Transparent
-        outColors.TrayUpB = Color.Transparent
-        outColors.TrayUpC = Color.Transparent
-
-        outColors.HistoryDownLine = Color.DarkBlue
-        outColors.HistoryDownA = Color.DarkBlue
-        outColors.HistoryDownB = Color.Blue
-        outColors.HistoryDownC = Color.Aqua
-        outColors.HistoryDownMax = Color.Yellow
-        outColors.HistoryUpLine = Color.DarkBlue
-        outColors.HistoryUpA = Color.Transparent
-        outColors.HistoryUpB = Color.Transparent
-        outColors.HistoryUpC = Color.Transparent
-        outColors.HistoryUpMax = Color.Transparent
-        outColors.HistoryText = Color.Black
-        outColors.HistoryBackground = Color.White
-        outColors.HistoryLightGrid = Color.LightGray
-        outColors.HistoryDarkGrid = Color.DarkGray
-
-      Case Local.SatHostTypes.Dish_EXEDE
-        outColors.MainDownA = Color.DarkBlue
-        outColors.MainDownB = Color.Blue
-        outColors.MainDownC = Color.Aqua
-        outColors.MainUpA = Color.DarkBlue
-        outColors.MainUpB = Color.Blue
-        outColors.MainUpC = Color.Aqua
-        outColors.MainText = Color.White
-        outColors.MainBackground = Color.Black
-
-        outColors.TrayDownA = Color.DarkBlue
-        outColors.TrayDownB = Color.Blue
-        outColors.TrayDownC = Color.Aqua
-        outColors.TrayUpA = Color.DarkBlue
-        outColors.TrayUpB = Color.Blue
-        outColors.TrayUpC = Color.Aqua
-
-        outColors.HistoryDownLine = Color.DarkBlue
-        outColors.HistoryDownA = Color.DarkBlue
-        outColors.HistoryDownB = Color.Blue
-        outColors.HistoryDownC = Color.Aqua
-        outColors.HistoryDownMax = Color.Yellow
-        outColors.HistoryUpLine = Color.DarkBlue
-        outColors.HistoryUpA = Color.DarkBlue
-        outColors.HistoryUpB = Color.Blue
-        outColors.HistoryUpC = Color.Aqua
-        outColors.HistoryUpMax = Color.Yellow
-        outColors.HistoryText = Color.Black
-        outColors.HistoryBackground = Color.White
-        outColors.HistoryLightGrid = Color.LightGray
-        outColors.HistoryDarkGrid = Color.DarkGray
-
-      Case Else
-        outColors.MainDownA = Color.DarkBlue
-        outColors.MainDownB = Color.Blue
-        outColors.MainDownC = Color.Aqua
-        outColors.MainUpA = Color.DarkBlue
-        outColors.MainUpB = Color.Blue
-        outColors.MainUpC = Color.Aqua
-        outColors.MainText = Color.White
-        outColors.MainBackground = Color.Black
-
-        outColors.TrayDownA = Color.DarkBlue
-        outColors.TrayDownB = Color.Blue
-        outColors.TrayDownC = Color.Aqua
-        outColors.TrayUpA = Color.DarkBlue
-        outColors.TrayUpB = Color.Blue
-        outColors.TrayUpC = Color.Aqua
-
-        outColors.HistoryDownLine = Color.DarkBlue
-        outColors.HistoryDownA = Color.DarkBlue
-        outColors.HistoryDownB = Color.Blue
-        outColors.HistoryDownC = Color.Aqua
-        outColors.HistoryDownMax = Color.Yellow
-        outColors.HistoryUpLine = Color.DarkBlue
-        outColors.HistoryUpA = Color.DarkBlue
-        outColors.HistoryUpB = Color.Blue
-        outColors.HistoryUpC = Color.Aqua
-        outColors.HistoryUpMax = Color.Yellow
-        outColors.HistoryText = Color.Black
-        outColors.HistoryBackground = Color.White
-        outColors.HistoryLightGrid = Color.LightGray
-        outColors.HistoryDarkGrid = Color.DarkGray
-
-    End Select
     Return outColors
   End Function
 #End Region

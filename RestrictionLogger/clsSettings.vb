@@ -1,25 +1,19 @@
 ﻿Friend Class Settings
   Private m_Account As String
-  Private m_AccountType As Local.SatHostTypes
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
   Private m_Interval As String
-  Private m_Timeout As String
-  Private m_ProxySetting As String
   Public Sub New(ConfigPath As String)
     Dim xConfig As XElement
     Try
       xConfig = XElement.Load(ConfigPath)
     Catch ex As Exception
       m_Account = String.Empty
-      m_AccountType = Local.SatHostTypes.Other
       m_PassCrypt = String.Empty
       m_PassKey = ""
       m_PassSalt = ""
       m_Interval = "15"
-      m_Timeout = "60"
-      m_ProxySetting = "None"
       Return
     End Try
     Dim xuserSettings As XElement = xConfig.Element("userSettings")
@@ -27,22 +21,11 @@
     Dim xAccount As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
     If xAccount Is Nothing Then
       m_Account = String.Empty
-      m_AccountType = Local.SatHostTypes.Other
     Else
       Try
         m_Account = xAccount.Element("value").Value
       Catch ex As Exception
         m_Account = String.Empty
-      End Try
-      Try
-        Dim xAccountType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "type")
-        If xAccountType Is Nothing Then
-          m_AccountType = Local.SatHostTypes.Other
-        Else
-          m_AccountType = StringToHostType(xAccountType.Value)
-        End If
-      Catch ex As Exception
-        m_AccountType = Local.SatHostTypes.Other
       End Try
     End If
     Dim xPassCrypt As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
@@ -85,39 +68,11 @@
         m_Interval = 15
       End Try
     End If
-    Dim xTimeout As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Timeout")
-    If xTimeout Is Nothing Then
-      m_Timeout = "60"
-    Else
-      Try
-        m_Timeout = xTimeout.Element("value").Value
-      Catch ex As Exception
-        m_Timeout = "60"
-      End Try
-    End If
-    Dim xProxy As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
-    If xProxy Is Nothing Then
-      m_ProxySetting = "None"
-    Else
-      Try
-        m_ProxySetting = xProxy.Element("value").Value
-      Catch ex As Exception
-        m_ProxySetting = "None"
-      End Try
-    End If
   End Sub
   Public ReadOnly Property Account As String
     Get
       Return m_Account
     End Get
-  End Property
-  Public Property AccountType As Local.SatHostTypes
-    Get
-      Return m_AccountType
-    End Get
-    Set(value As Local.SatHostTypes)
-      m_AccountType = value
-    End Set
   End Property
   Public ReadOnly Property PassCrypt As String
     Get
@@ -139,71 +94,4 @@
       Return m_Interval
     End Get
   End Property
-  Public ReadOnly Property Timeout As Integer
-    Get
-      Return m_Timeout
-    End Get
-  End Property
-  Public ReadOnly Property Proxy As Net.IWebProxy
-    Get
-      If m_ProxySetting.Contains(":"c) Then
-        Dim myProxySettings() As String = Split(m_ProxySetting, ":")
-        Dim pType As String = myProxySettings(0)
-        Select Case pType.ToUpperInvariant
-          Case "IP"
-            Dim pIP As String = myProxySettings(1)
-            Dim pPort As Integer = myProxySettings(2)
-            If myProxySettings.Length > 3 Then
-              Dim pUser As String = myProxySettings(3)
-              Dim pPass As String = myProxySettings(4)
-              If myProxySettings.Length > 5 Then
-                Dim pDomain As String = myProxySettings(5)
-                Return New Net.WebProxy(pIP, pPort) With {.Credentials = New Net.NetworkCredential(pUser, pPass, pDomain)}
-              Else
-                Return New Net.WebProxy(pIP, pPort) With {.Credentials = New Net.NetworkCredential(pUser, pPass)}
-              End If
-            Else
-              Return New Net.WebProxy(pIP, pPort)
-            End If
-          Case "URL"
-            Dim pURL As String = myProxySettings(1)
-            If myProxySettings.Length > 2 Then
-              Dim pUser As String = myProxySettings(2)
-              Dim pPass As String = myProxySettings(3)
-              If myProxySettings.Length > 4 Then
-                Dim pDomain As String = myProxySettings(4)
-                Return New Net.WebProxy(pURL, False, Nothing, New Net.NetworkCredential(pUser, pPass, pDomain))
-              Else
-                Return New Net.WebProxy(pURL, False, Nothing, New Net.NetworkCredential(pUser, pPass))
-              End If
-            Else
-              Return New Net.WebProxy(pURL)
-            End If
-          Case Else
-            Return Nothing
-        End Select
-      Else
-        Select Case m_ProxySetting.ToUpperInvariant
-          Case "NONE" : Return Nothing
-          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
-          Case Else : Return Nothing
-        End Select
-      End If
-    End Get
-  End Property
-  Private Shared Function StringToHostType(st As String) As Local.SatHostTypes
-    Select Case st.ToUpperInvariant
-      Case "WBL" : Return Local.SatHostTypes.WildBlue_LEGACY
-      Case "WBX", "WBV" : Return Local.SatHostTypes.WildBlue_EXEDE
-      Case "WXR" : Return Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-      Case "RPL" : Return Local.SatHostTypes.RuralPortal_LEGACY
-      Case "RPX" : Return Local.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return Local.SatHostTypes.Dish_EXEDE
-      Case "WILDBLUE" : Return Local.SatHostTypes.WildBlue_LEGACY
-      Case "EXEDE" : Return Local.SatHostTypes.WildBlue_EXEDE
-      Case "DISH", "DISHNET" : Return Local.SatHostTypes.Dish_EXEDE
-      Case "RURALPORTAL" : Return Local.SatHostTypes.RuralPortal_EXEDE
-      Case Else : Return Local.SatHostTypes.Other
-    End Select
-  End Function
 End Class

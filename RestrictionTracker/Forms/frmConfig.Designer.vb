@@ -41,22 +41,6 @@ Partial Class frmConfig
     Me.txtAccount = New System.Windows.Forms.TextBox()
     Me.txtPassword = New RestrictionTracker.PasswordBox()
     Me.lblAccountViaSatDescription = New System.Windows.Forms.Label()
-    Me.pnlAccountProviderTitle = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblAccountProviderTitle = New System.Windows.Forms.Label()
-    Me.lnAccountProviderTitle = New RestrictionTracker.LineBreak()
-    Me.pnlAccountProvider = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctAccountProviderIcon = New System.Windows.Forms.PictureBox()
-    Me.cmbProvider = New System.Windows.Forms.ComboBox()
-    Me.lblProvider = New System.Windows.Forms.Label()
-    Me.lblAccountType = New System.Windows.Forms.Label()
-    Me.pnlAccountTypes = New System.Windows.Forms.TableLayoutPanel()
-    Me.optAccountTypeWBL = New System.Windows.Forms.RadioButton()
-    Me.optAccountTypeWBX = New System.Windows.Forms.RadioButton()
-    Me.optAccountTypeRPX = New System.Windows.Forms.RadioButton()
-    Me.optAccountTypeRPL = New System.Windows.Forms.RadioButton()
-    Me.optAccountTypeDNX = New System.Windows.Forms.RadioButton()
-    Me.lblAccountProviderDescription = New System.Windows.Forms.Label()
-    Me.chkAccountTypeAuto = New System.Windows.Forms.CheckBox()
     Me.pnlAccountKey = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlKey = New System.Windows.Forms.TableLayoutPanel()
     Me.pctKeyState = New System.Windows.Forms.PictureBox()
@@ -243,10 +227,6 @@ Partial Class frmConfig
     Me.pnlAccountViaSat.SuspendLayout()
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAccountViaSatInput.SuspendLayout()
-    Me.pnlAccountProviderTitle.SuspendLayout()
-    Me.pnlAccountProvider.SuspendLayout()
-    CType(Me.pctAccountProviderIcon, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.pnlAccountTypes.SuspendLayout()
     Me.pnlAccountKey.SuspendLayout()
     Me.pnlKey.SuspendLayout()
     CType(Me.pctKeyState, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -343,24 +323,20 @@ Partial Class frmConfig
     '
     Me.pnlAccount.ColumnCount = 1
     Me.pnlAccount.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccount.Controls.Add(Me.pnlAccountKeyTitle, 0, 6)
+    Me.pnlAccount.Controls.Add(Me.pnlAccountKeyTitle, 0, 3)
     Me.pnlAccount.Controls.Add(Me.pnlAccountViaSatTitle, 0, 0)
     Me.pnlAccount.Controls.Add(Me.pnlAccountViaSat, 0, 1)
-    Me.pnlAccount.Controls.Add(Me.pnlAccountProviderTitle, 0, 3)
-    Me.pnlAccount.Controls.Add(Me.pnlAccountProvider, 0, 4)
-    Me.pnlAccount.Controls.Add(Me.pnlAccountKey, 0, 7)
+    Me.pnlAccount.Controls.Add(Me.pnlAccountKey, 0, 4)
     Me.pnlAccount.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlAccount.Location = New System.Drawing.Point(0, 0)
     Me.pnlAccount.Name = "pnlAccount"
-    Me.pnlAccount.RowCount = 8
+    Me.pnlAccount.RowCount = 5
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccount.Size = New System.Drawing.Size(385, 477)
     Me.pnlAccount.TabIndex = 0
     '
@@ -553,237 +529,6 @@ Partial Class frmConfig
     Me.lblAccountViaSatDescription.Size = New System.Drawing.Size(296, 13)
     Me.lblAccountViaSatDescription.TabIndex = 0
     Me.lblAccountViaSatDescription.Text = "This account information should match your meter page login."
-    '
-    'pnlAccountProviderTitle
-    '
-    Me.pnlAccountProviderTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pnlAccountProviderTitle.AutoSize = True
-    Me.pnlAccountProviderTitle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAccountProviderTitle.ColumnCount = 2
-    Me.pnlAccountProviderTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountProviderTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountProviderTitle.Controls.Add(Me.lblAccountProviderTitle, 0, 0)
-    Me.pnlAccountProviderTitle.Controls.Add(Me.lnAccountProviderTitle, 1, 0)
-    Me.pnlAccountProviderTitle.Location = New System.Drawing.Point(3, 156)
-    Me.pnlAccountProviderTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
-    Me.pnlAccountProviderTitle.Name = "pnlAccountProviderTitle"
-    Me.pnlAccountProviderTitle.RowCount = 1
-    Me.pnlAccountProviderTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountProviderTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlAccountProviderTitle.TabIndex = 2
-    '
-    'lblAccountProviderTitle
-    '
-    Me.lblAccountProviderTitle.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblAccountProviderTitle.AutoSize = True
-    Me.lblAccountProviderTitle.Location = New System.Drawing.Point(3, 0)
-    Me.lblAccountProviderTitle.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblAccountProviderTitle.Name = "lblAccountProviderTitle"
-    Me.lblAccountProviderTitle.Size = New System.Drawing.Size(95, 13)
-    Me.lblAccountProviderTitle.TabIndex = 0
-    Me.lblAccountProviderTitle.Text = "Provider / Reseller"
-    '
-    'lnAccountProviderTitle
-    '
-    Me.lnAccountProviderTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountProviderTitle.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountProviderTitle.CausesValidation = False
-    Me.lnAccountProviderTitle.Location = New System.Drawing.Point(100, 4)
-    Me.lnAccountProviderTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
-    Me.lnAccountProviderTitle.Name = "lnAccountProviderTitle"
-    Me.lnAccountProviderTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAccountProviderTitle.Size = New System.Drawing.Size(274, 4)
-    Me.lnAccountProviderTitle.TabIndex = 1
-    Me.lnAccountProviderTitle.TabStop = False
-    '
-    'pnlAccountProvider
-    '
-    Me.pnlAccountProvider.AutoSize = True
-    Me.pnlAccountProvider.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAccountProvider.ColumnCount = 3
-    Me.pnlAccountProvider.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountProvider.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountProvider.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountProvider.Controls.Add(Me.pctAccountProviderIcon, 0, 0)
-    Me.pnlAccountProvider.Controls.Add(Me.cmbProvider, 2, 1)
-    Me.pnlAccountProvider.Controls.Add(Me.lblProvider, 1, 1)
-    Me.pnlAccountProvider.Controls.Add(Me.lblAccountType, 1, 2)
-    Me.pnlAccountProvider.Controls.Add(Me.pnlAccountTypes, 1, 3)
-    Me.pnlAccountProvider.Controls.Add(Me.lblAccountProviderDescription, 1, 0)
-    Me.pnlAccountProvider.Controls.Add(Me.chkAccountTypeAuto, 2, 2)
-    Me.pnlAccountProvider.Location = New System.Drawing.Point(3, 177)
-    Me.pnlAccountProvider.Name = "pnlAccountProvider"
-    Me.pnlAccountProvider.RowCount = 4
-    Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountProvider.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAccountProvider.Size = New System.Drawing.Size(351, 147)
-    Me.pnlAccountProvider.TabIndex = 3
-    '
-    'pctAccountProviderIcon
-    '
-    Me.pctAccountProviderIcon.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.pctAccountProviderIcon.Image = Global.RestrictionTracker.My.Resources.Resources.account_provider
-    Me.pctAccountProviderIcon.Location = New System.Drawing.Point(21, 3)
-    Me.pctAccountProviderIcon.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
-    Me.pctAccountProviderIcon.Name = "pctAccountProviderIcon"
-    Me.pnlAccountProvider.SetRowSpan(Me.pctAccountProviderIcon, 2)
-    Me.pctAccountProviderIcon.Size = New System.Drawing.Size(32, 32)
-    Me.pctAccountProviderIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-    Me.pctAccountProviderIcon.TabIndex = 0
-    Me.pctAccountProviderIcon.TabStop = False
-    '
-    'cmbProvider
-    '
-    Me.cmbProvider.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.cmbProvider.FormattingEnabled = True
-    Me.cmbProvider.Location = New System.Drawing.Point(142, 22)
-    Me.cmbProvider.Name = "cmbProvider"
-    Me.cmbProvider.Size = New System.Drawing.Size(150, 21)
-    Me.cmbProvider.TabIndex = 2
-    Me.ttConfig.SetToolTip(Me.cmbProvider, "Your ViaSat Provider domain." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you were given an E-Mail address, this is everyt" & _
-        "hing after the @ symbol." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "You can choose a domain from the dropdown or enter you" & _
-        "r own to add it to the list.")
-    '
-    'lblProvider
-    '
-    Me.lblProvider.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblProvider.AutoSize = True
-    Me.lblProvider.Location = New System.Drawing.Point(59, 26)
-    Me.lblProvider.Name = "lblProvider"
-    Me.lblProvider.Size = New System.Drawing.Size(46, 13)
-    Me.lblProvider.TabIndex = 1
-    Me.lblProvider.Text = "&Domain:"
-    '
-    'lblAccountType
-    '
-    Me.lblAccountType.AutoSize = True
-    Me.lblAccountType.Location = New System.Drawing.Point(59, 52)
-    Me.lblAccountType.Margin = New System.Windows.Forms.Padding(3, 6, 3, 0)
-    Me.lblAccountType.Name = "lblAccountType"
-    Me.lblAccountType.Size = New System.Drawing.Size(77, 13)
-    Me.lblAccountType.TabIndex = 3
-    Me.lblAccountType.Text = "&Account Type:"
-    '
-    'pnlAccountTypes
-    '
-    Me.pnlAccountTypes.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.pnlAccountTypes.AutoSize = True
-    Me.pnlAccountTypes.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAccountTypes.ColumnCount = 2
-    Me.pnlAccountProvider.SetColumnSpan(Me.pnlAccountTypes, 2)
-    Me.pnlAccountTypes.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountTypes.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeWBL, 0, 1)
-    Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeWBX, 0, 2)
-    Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeRPX, 1, 2)
-    Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeRPL, 1, 1)
-    Me.pnlAccountTypes.Controls.Add(Me.optAccountTypeDNX, 0, 3)
-    Me.pnlAccountTypes.Location = New System.Drawing.Point(129, 70)
-    Me.pnlAccountTypes.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlAccountTypes.Name = "pnlAccountTypes"
-    Me.pnlAccountTypes.RowCount = 4
-    Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 31.34329!))
-    Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.32836!))
-    Me.pnlAccountTypes.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.32836!))
-    Me.pnlAccountTypes.Size = New System.Drawing.Size(222, 77)
-    Me.pnlAccountTypes.TabIndex = 5
-    '
-    'optAccountTypeWBL
-    '
-    Me.optAccountTypeWBL.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAccountTypeWBL.AutoSize = True
-    Me.optAccountTypeWBL.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAccountTypeWBL.Location = New System.Drawing.Point(3, 3)
-    Me.optAccountTypeWBL.Name = "optAccountTypeWBL"
-    Me.optAccountTypeWBL.Size = New System.Drawing.Size(73, 18)
-    Me.optAccountTypeWBL.TabIndex = 0
-    Me.optAccountTypeWBL.Text = "WildBlue"
-    Me.ttConfig.SetToolTip(Me.optAccountTypeWBL, "Legacy WildBlue packages.")
-    Me.optAccountTypeWBL.UseVisualStyleBackColor = True
-    '
-    'optAccountTypeWBX
-    '
-    Me.optAccountTypeWBX.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAccountTypeWBX.AutoSize = True
-    Me.optAccountTypeWBX.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAccountTypeWBX.Location = New System.Drawing.Point(3, 28)
-    Me.optAccountTypeWBX.Name = "optAccountTypeWBX"
-    Me.optAccountTypeWBX.Size = New System.Drawing.Size(61, 18)
-    Me.optAccountTypeWBX.TabIndex = 1
-    Me.optAccountTypeWBX.Text = "Exede"
-    Me.ttConfig.SetToolTip(Me.optAccountTypeWBX, "Exede, Exede Evolution, and Exede Freedom packages.")
-    Me.optAccountTypeWBX.UseVisualStyleBackColor = True
-    '
-    'optAccountTypeRPX
-    '
-    Me.optAccountTypeRPX.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAccountTypeRPX.AutoSize = True
-    Me.optAccountTypeRPX.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAccountTypeRPX.Location = New System.Drawing.Point(82, 28)
-    Me.optAccountTypeRPX.Name = "optAccountTypeRPX"
-    Me.optAccountTypeRPX.Size = New System.Drawing.Size(125, 18)
-    Me.optAccountTypeRPX.TabIndex = 4
-    Me.optAccountTypeRPX.Text = "Rural Portal (Exede)"
-    Me.ttConfig.SetToolTip(Me.optAccountTypeRPX, "Exede packages through a RuralPortal provider.")
-    Me.optAccountTypeRPX.UseVisualStyleBackColor = True
-    '
-    'optAccountTypeRPL
-    '
-    Me.optAccountTypeRPL.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAccountTypeRPL.AutoSize = True
-    Me.optAccountTypeRPL.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAccountTypeRPL.Location = New System.Drawing.Point(82, 3)
-    Me.optAccountTypeRPL.Name = "optAccountTypeRPL"
-    Me.optAccountTypeRPL.Size = New System.Drawing.Size(137, 18)
-    Me.optAccountTypeRPL.TabIndex = 3
-    Me.optAccountTypeRPL.Text = "Rural Portal (WildBlue)"
-    Me.ttConfig.SetToolTip(Me.optAccountTypeRPL, "Legacy WildBlue packages through a RuralPortal provider.")
-    Me.optAccountTypeRPL.UseVisualStyleBackColor = True
-    '
-    'optAccountTypeDNX
-    '
-    Me.optAccountTypeDNX.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optAccountTypeDNX.AutoSize = True
-    Me.optAccountTypeDNX.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optAccountTypeDNX.Location = New System.Drawing.Point(3, 54)
-    Me.optAccountTypeDNX.Name = "optAccountTypeDNX"
-    Me.optAccountTypeDNX.Size = New System.Drawing.Size(52, 18)
-    Me.optAccountTypeDNX.TabIndex = 2
-    Me.optAccountTypeDNX.Text = "Dish"
-    Me.ttConfig.SetToolTip(Me.optAccountTypeDNX, "Exede package through Dish.")
-    Me.optAccountTypeDNX.UseVisualStyleBackColor = True
-    '
-    'lblAccountProviderDescription
-    '
-    Me.lblAccountProviderDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblAccountProviderDescription.AutoSize = True
-    Me.pnlAccountProvider.SetColumnSpan(Me.lblAccountProviderDescription, 2)
-    Me.lblAccountProviderDescription.Location = New System.Drawing.Point(59, 3)
-    Me.lblAccountProviderDescription.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblAccountProviderDescription.Name = "lblAccountProviderDescription"
-    Me.lblAccountProviderDescription.Size = New System.Drawing.Size(289, 13)
-    Me.lblAccountProviderDescription.TabIndex = 0
-    Me.lblAccountProviderDescription.Text = "The Domain is your meter page URL or E-Mail address host."
-    '
-    'chkAccountTypeAuto
-    '
-    Me.chkAccountTypeAuto.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.chkAccountTypeAuto.AutoSize = True
-    Me.chkAccountTypeAuto.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkAccountTypeAuto.Location = New System.Drawing.Point(160, 49)
-    Me.chkAccountTypeAuto.Name = "chkAccountTypeAuto"
-    Me.chkAccountTypeAuto.Size = New System.Drawing.Size(170, 18)
-    Me.chkAccountTypeAuto.TabIndex = 4
-    Me.chkAccountTypeAuto.Text = "Auto-Detect (Recommended)"
-    Me.ttConfig.SetToolTip(Me.chkAccountTypeAuto, "Satellite Restriction Tracker will automatically determine your account type on c" & _
-        "onnection." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If you'd like to choose a type manually, you can uncheck this box an" & _
-        "d select an option below.")
-    Me.chkAccountTypeAuto.UseVisualStyleBackColor = False
     '
     'pnlAccountKey
     '
@@ -3297,13 +3042,6 @@ Partial Class frmConfig
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAccountViaSatInput.ResumeLayout(False)
     Me.pnlAccountViaSatInput.PerformLayout()
-    Me.pnlAccountProviderTitle.ResumeLayout(False)
-    Me.pnlAccountProviderTitle.PerformLayout()
-    Me.pnlAccountProvider.ResumeLayout(False)
-    Me.pnlAccountProvider.PerformLayout()
-    CType(Me.pctAccountProviderIcon, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.pnlAccountTypes.ResumeLayout(False)
-    Me.pnlAccountTypes.PerformLayout()
     Me.pnlAccountKey.ResumeLayout(False)
     Me.pnlAccountKey.PerformLayout()
     Me.pnlKey.ResumeLayout(False)
@@ -3509,21 +3247,6 @@ Partial Class frmConfig
   Friend WithEvents txtAccount As System.Windows.Forms.TextBox
   Friend WithEvents txtPassword As PasswordBox
   Friend WithEvents lblAccountViaSatDescription As System.Windows.Forms.Label
-  Friend WithEvents pnlAccountProviderTitle As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblAccountProviderTitle As System.Windows.Forms.Label
-  Friend WithEvents lnAccountProviderTitle As RestrictionTracker.LineBreak
-  Friend WithEvents pnlAccountProvider As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctAccountProviderIcon As System.Windows.Forms.PictureBox
-  Friend WithEvents cmbProvider As System.Windows.Forms.ComboBox
-  Friend WithEvents lblProvider As System.Windows.Forms.Label
-  Friend WithEvents lblAccountType As System.Windows.Forms.Label
-  Friend WithEvents pnlAccountTypes As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents optAccountTypeWBL As System.Windows.Forms.RadioButton
-  Friend WithEvents optAccountTypeWBX As System.Windows.Forms.RadioButton
-  Friend WithEvents optAccountTypeDNX As System.Windows.Forms.RadioButton
-  Friend WithEvents optAccountTypeRPX As System.Windows.Forms.RadioButton
-  Friend WithEvents optAccountTypeRPL As System.Windows.Forms.RadioButton
-  Friend WithEvents lblAccountProviderDescription As System.Windows.Forms.Label
   Friend WithEvents pnlAccountKey As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pnlKey As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pctKeyState As System.Windows.Forms.PictureBox
@@ -3602,7 +3325,6 @@ Partial Class frmConfig
   Friend WithEvents optNetTestSpeedTest As System.Windows.Forms.RadioButton
   Friend WithEvents tmrIcoWait As System.Windows.Forms.Timer
   Friend WithEvents lblNetworkProtocolDescription As System.Windows.Forms.Label
-  Friend WithEvents chkAccountTypeAuto As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayAnim As System.Windows.Forms.CheckBox
   Friend WithEvents chkTrayClose As System.Windows.Forms.CheckBox
   Friend WithEvents chkNetworkProtocolTLS10 As System.Windows.Forms.CheckBox

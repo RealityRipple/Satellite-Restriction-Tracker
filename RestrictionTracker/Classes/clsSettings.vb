@@ -1,8 +1,6 @@
 ﻿Imports System.Xml.Linq
-Imports RestrictionLibrary.Local
 Friend Class SvcSettings
   Private m_Account As String
-  Private m_AccountType As SatHostTypes
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
@@ -10,11 +8,10 @@ Friend Class SvcSettings
   Private m_Timeout As Integer
   Private m_ProxySetting As String
   Public Function Save() As Boolean
-    Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionLogger.My.MySettings",
-                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XElement("value", m_Account)),
+                                                          New XElement("setting", New XAttribute("name", "Account"), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
@@ -33,7 +30,6 @@ Friend Class SvcSettings
   End Function
   Public Sub New()
     m_Account = Nothing
-    m_AccountType = SatHostTypes.Other
     m_PassCrypt = Nothing
     m_PassKey = ""
     m_PassSalt = ""
@@ -44,11 +40,6 @@ Friend Class SvcSettings
   Public WriteOnly Property Account As String
     Set(value As String)
       m_Account = value
-    End Set
-  End Property
-  Public WriteOnly Property AccountType As SatHostTypes
-    Set(value As SatHostTypes)
-      m_AccountType = value
     End Set
   End Property
   Public Property PassCrypt As String
@@ -122,8 +113,6 @@ Friend Class SvcSettings
 End Class
 Friend Class AppSettings
   Private m_Account As String
-  Private m_AccountType As SatHostTypes
-  Private m_AccountTypeF As Boolean
   Private m_StartWait As Integer
   Private m_Interval As Integer
   Private m_Gr As String
@@ -157,8 +146,6 @@ Friend Class AppSettings
   Private m_NetTest As String
   Private m_SecurProtocol As Net.SecurityProtocolType
   Private m_SecurEnforced As Boolean
-  Private m_AJAXShort As String
-  Private m_AJAXFull As String
   Public Loaded As Boolean
   Public Colors As AppColors
   Public Enum UpdateTypes
@@ -212,32 +199,11 @@ Friend Class AppSettings
       Dim xAccount As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
       If xAccount Is Nothing Then
         m_Account = String.Empty
-        m_AccountType = SatHostTypes.Other
       Else
         Try
           m_Account = xAccount.Element("value").Value
         Catch ex As Exception
           m_Account = String.Empty
-        End Try
-        Try
-          Dim xAccountType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "type")
-          If xAccountType Is Nothing Then
-            m_AccountType = SatHostTypes.Other
-          Else
-            m_AccountType = srlFunctions.StringToHostType(xAccountType.Value)
-          End If
-        Catch ex As Exception
-          m_AccountType = SatHostTypes.Other
-        End Try
-        Try
-          Dim xAccountTypeF As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "forceType")
-          If xAccountTypeF Is Nothing Then
-            m_AccountTypeF = False
-          Else
-            m_AccountTypeF = xAccountTypeF.Value = "True"
-          End If
-        Catch ex As Exception
-          m_AccountTypeF = False
         End Try
       End If
       Dim xStartWait As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "StartWait")
@@ -616,24 +582,6 @@ Friend Class AppSettings
           m_NetTest = Nothing
         End Try
       End If
-      Dim xAJAXOrder As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "AJAXOrder")
-      If xAJAXOrder Is Nothing Then
-        m_AJAXShort = Nothing
-        m_AJAXFull = Nothing
-      Else
-        Try
-          Dim xAJAXOrderShort As XElement = Array.Find(xAJAXOrder.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Short")
-          m_AJAXShort = xAJAXOrderShort.Element("value").Value
-        Catch ex As Exception
-          m_AJAXShort = Nothing
-        End Try
-        Try
-          Dim xAJAXOrderFull As XElement = Array.Find(xAJAXOrder.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Full")
-          m_AJAXFull = xAJAXOrderFull.Element("value").Value
-        Catch ex As Exception
-          m_AJAXFull = Nothing
-        End Try
-      End If
       Colors = New AppColors
       Dim xcolorSettings As XElement = xConfig.Element("colorSettings")
       If xcolorSettings Is Nothing Then
@@ -681,47 +629,6 @@ Friend Class AppSettings
                 Colors.MainDownC = StrToColor(xMainDC.Element("value").Value)
               Catch ex As Exception
                 Colors.MainDownC = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xMainUp As XElement = Array.Find(xMain.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xMainUp Is Nothing Then
-            Colors.MainUpA = Color.Transparent
-            Colors.MainUpB = Color.Transparent
-            Colors.MainUpC = Color.Transparent
-          Else
-            Dim xMainUA As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xMainUA Is Nothing Then
-              Colors.MainUpA = Color.Transparent
-            Else
-              Try
-                Colors.MainUpA = StrToColor(xMainUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainUpA = Color.Transparent
-              End Try
-            End If
-            Dim xMainUB As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xMainUB Is Nothing Then
-              Colors.MainUpB = Color.Transparent
-            Else
-              Try
-                If xMainUB.Element("value").Value = "No" Then
-                  Colors.MainUpB = Color.Transparent
-                Else
-                  Colors.MainUpB = StrToColor(xMainUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.MainUpB = Color.Transparent
-              End Try
-            End If
-            Dim xMainUC As XElement = Array.Find(xMainUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xMainUC Is Nothing Then
-              Colors.MainUpC = Color.Transparent
-            Else
-              Try
-                Colors.MainUpC = StrToColor(xMainUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.MainUpC = Color.Transparent
               End Try
             End If
           End If
@@ -788,47 +695,6 @@ Friend Class AppSettings
                 Colors.TrayDownC = StrToColor(xTrayDC.Element("value").Value)
               Catch ex As Exception
                 Colors.TrayDownC = Color.Transparent
-              End Try
-            End If
-          End If
-          Dim xTrayUp As XElement = Array.Find(xTray.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xTrayUp Is Nothing Then
-            Colors.TrayUpA = Color.Transparent
-            Colors.TrayUpB = Color.Transparent
-            Colors.TrayUpC = Color.Transparent
-          Else
-            Dim xTrayUA As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xTrayUA Is Nothing Then
-              Colors.TrayUpA = Color.Transparent
-            Else
-              Try
-                Colors.TrayUpA = StrToColor(xTrayUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayUpA = Color.Transparent
-              End Try
-            End If
-            Dim xTrayUB As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xTrayUB Is Nothing Then
-              Colors.TrayUpB = Color.Transparent
-            Else
-              Try
-                If xTrayUB.Element("value").Value = "No" Then
-                  Colors.TrayUpB = Color.Transparent
-                Else
-                  Colors.TrayUpB = StrToColor(xTrayUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.TrayUpB = Color.Transparent
-              End Try
-            End If
-            Dim xTrayUC As XElement = Array.Find(xTrayUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xTrayUC Is Nothing Then
-              Colors.TrayUpC = Color.Transparent
-            Else
-              Try
-                Colors.TrayUpC = StrToColor(xTrayUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.TrayUpC = Color.Transparent
               End Try
             End If
           End If
@@ -900,68 +766,6 @@ Friend Class AppSettings
               End Try
             End If
           End If
-          Dim xHistoryUp As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Upload")
-          If xHistoryUp Is Nothing Then
-            Colors.HistoryUpA = Color.Transparent
-            Colors.HistoryUpB = Color.Transparent
-            Colors.HistoryUpC = Color.Transparent
-            Colors.HistoryUpLine = Color.Transparent
-          Else
-            Dim xHistoryUA As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Start")
-            If xHistoryUA Is Nothing Then
-              Colors.HistoryUpA = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpA = StrToColor(xHistoryUA.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpA = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUB As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Mid")
-            If xHistoryUB Is Nothing Then
-              Colors.HistoryUpB = Color.Transparent
-            Else
-              Try
-                If xHistoryUB.Element("value").Value = "No" Then
-                  Colors.HistoryUpB = Color.Transparent
-                Else
-                  Colors.HistoryUpB = StrToColor(xHistoryUB.Element("value").Value)
-                End If
-              Catch ex As Exception
-                Colors.HistoryUpB = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUC As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "End")
-            If xHistoryUC Is Nothing Then
-              Colors.HistoryUpC = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpC = StrToColor(xHistoryUC.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpC = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryUM As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Maximum")
-            If xHistoryUM Is Nothing Then
-              Colors.HistoryUpMax = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpMax = StrToColor(xHistoryUM.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpMax = Color.Transparent
-              End Try
-            End If
-            Dim xHistoryULine As XElement = Array.Find(xHistoryUp.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Line")
-            If xHistoryULine Is Nothing Then
-              Colors.HistoryUpLine = Color.Transparent
-            Else
-              Try
-                Colors.HistoryUpLine = StrToColor(xHistoryULine.Element("value").Value)
-              Catch ex As Exception
-                Colors.HistoryUpLine = Color.Transparent
-              End Try
-            End If
-          End If
           Dim xHistoryText As XElement = Array.Find(xHistory.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Text")
           If xHistoryText Is Nothing Then
             Colors.HistoryText = Color.Transparent
@@ -1017,8 +821,6 @@ Friend Class AppSettings
   End Sub
   Private Sub Reset()
     m_Account = Nothing
-    m_AccountType = SatHostTypes.Other
-    m_AccountTypeF = False
     m_StartWait = 5
     m_Interval = 15
     m_Gr = "aph"
@@ -1052,8 +854,6 @@ Friend Class AppSettings
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     m_SecurEnforced = False
     m_NetTest = Nothing
-    m_AJAXShort = Nothing
-    m_AJAXFull = Nothing
     Colors = New AppColors
     ResetColors()
   End Sub
@@ -1066,9 +866,6 @@ Friend Class AppSettings
     Colors.MainDownA = Color.Transparent
     Colors.MainDownB = Color.Transparent
     Colors.MainDownC = Color.Transparent
-    Colors.MainUpA = Color.Transparent
-    Colors.MainUpB = Color.Transparent
-    Colors.MainUpC = Color.Transparent
     Colors.MainText = Color.Transparent
     Colors.MainBackground = Color.Transparent
   End Sub
@@ -1076,9 +873,6 @@ Friend Class AppSettings
     Colors.TrayDownA = Color.Transparent
     Colors.TrayDownB = Color.Transparent
     Colors.TrayDownC = Color.Transparent
-    Colors.TrayUpA = Color.Transparent
-    Colors.TrayUpB = Color.Transparent
-    Colors.TrayUpC = Color.Transparent
   End Sub
   Private Sub ResetHistory()
     Colors.HistoryDownA = Color.Transparent
@@ -1086,18 +880,12 @@ Friend Class AppSettings
     Colors.HistoryDownC = Color.Transparent
     Colors.HistoryDownMax = Color.Transparent
     Colors.HistoryDownLine = Color.Transparent
-    Colors.HistoryUpA = Color.Transparent
-    Colors.HistoryUpB = Color.Transparent
-    Colors.HistoryUpC = Color.Transparent
-    Colors.HistoryUpMax = Color.Transparent
-    Colors.HistoryUpLine = Color.Transparent
     Colors.HistoryText = Color.Transparent
     Colors.HistoryBackground = Color.Transparent
     Colors.HistoryLightGrid = Color.Transparent
     Colors.HistoryDarkGrid = Color.Transparent
   End Sub
   Public Function Save() As Boolean
-    Dim sAccountType As String = srlFunctions.HostTypeToString(m_AccountType)
     Dim sUpdateType As String = "Ask"
     Select Case m_UpdateType
       Case UpdateTypes.Auto : sUpdateType = "Auto"
@@ -1118,7 +906,7 @@ Friend Class AppSettings
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionTracker.My.MySettings",
-                                                          New XElement("setting", New XAttribute("name", "Account"), New XAttribute("type", sAccountType), New XAttribute("forceType", IIf(m_AccountTypeF, "True", "False")), New XElement("value", m_Account)),
+                                                          New XElement("setting", New XAttribute("name", "Account"), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "StartWait"), New XElement("value", m_StartWait)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
@@ -1150,31 +938,20 @@ Friend Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
                                                           New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
                                                           New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))),
-                                                          New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)),
-                                                          New XElement("section", New XAttribute("name", "AJAXOrder"),
-                                                                       New XElement("setting", New XAttribute("name", "Short"), New XElement("value", m_AJAXShort)),
-                                                                       New XElement("setting", New XAttribute("name", "Full"), New XElement("value", m_AJAXFull))))),
+                                                          New XElement("setting", New XAttribute("name", "NetTestURL"), New XElement("value", m_NetTest)))),
                                 New XElement("colorSettings",
                                              New XElement("graph", New XAttribute("name", "Main"),
                                                           New XElement("section", New XAttribute("name", "Download"),
                                                                        New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.MainDownA))),
                                                                        New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.MainDownB))),
                                                                        New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.MainDownC)))),
-                                                          New XElement("section", New XAttribute("name", "Upload"),
-                                                                       New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.MainUpA))),
-                                                                       New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.MainUpB))),
-                                                                       New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.MainUpC)))),
                                                           New XElement("setting", New XAttribute("name", "Text"), New XElement("value", ColorToStr(Colors.MainText))),
                                                           New XElement("setting", New XAttribute("name", "Background"), New XElement("value", ColorToStr(Colors.MainBackground)))),
                                              New XElement("graph", New XAttribute("name", "Tray"),
                                                           New XElement("section", New XAttribute("name", "Download"),
                                                                        New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.TrayDownA))),
                                                                        New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.TrayDownB))),
-                                                                       New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.TrayDownC)))),
-                                                          New XElement("section", New XAttribute("name", "Upload"),
-                                                                       New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.TrayUpA))),
-                                                                       New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.TrayUpB))),
-                                                                       New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.TrayUpC))))),
+                                                                       New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.TrayDownC))))),
                                              New XElement("graph", New XAttribute("name", "History"),
                                                           New XElement("section", New XAttribute("name", "Download"),
                                                                        New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.HistoryDownA))),
@@ -1182,12 +959,6 @@ Friend Class AppSettings
                                                                        New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.HistoryDownC))),
                                                                        New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryDownMax))),
                                                                        New XElement("setting", New XAttribute("name", "Line"), New XElement("value", ColorToStr(Colors.HistoryDownLine)))),
-                                                          New XElement("section", New XAttribute("name", "Upload"),
-                                                                       New XElement("setting", New XAttribute("name", "Start"), New XElement("value", ColorToStr(Colors.HistoryUpA))),
-                                                                       New XElement("setting", New XAttribute("name", "Mid"), New XElement("value", ColorToStr(Colors.HistoryUpB))),
-                                                                       New XElement("setting", New XAttribute("name", "End"), New XElement("value", ColorToStr(Colors.HistoryUpC))),
-                                                                       New XElement("setting", New XAttribute("name", "Maximum"), New XElement("value", ColorToStr(Colors.HistoryUpMax))),
-                                                                       New XElement("setting", New XAttribute("name", "Line"), New XElement("value", ColorToStr(Colors.HistoryUpLine)))),
                                                           New XElement("setting", New XAttribute("name", "Text"), New XElement("value", ColorToStr(Colors.HistoryText))),
                                                           New XElement("setting", New XAttribute("name", "Background"), New XElement("value", ColorToStr(Colors.HistoryBackground))),
                                                           New XElement("section", New XAttribute("name", "Grid"),
@@ -1299,22 +1070,6 @@ Friend Class AppSettings
     End Get
     Set(value As String)
       m_Account = value
-    End Set
-  End Property
-  Public Property AccountType As SatHostTypes
-    Get
-      Return m_AccountType
-    End Get
-    Set(value As SatHostTypes)
-      m_AccountType = value
-    End Set
-  End Property
-  Public Property AccountTypeForced As Boolean
-    Get
-      Return m_AccountTypeF
-    End Get
-    Set(value As Boolean)
-      m_AccountTypeF = value
     End Set
   End Property
   Public Property PassCrypt As String
@@ -1659,47 +1414,20 @@ Friend Class AppSettings
       m_NetTest = value
     End Set
   End Property
-  Public Property AJAXOrderFull As String
-    Get
-      Return m_AJAXFull
-    End Get
-    Set(value As String)
-      m_AJAXFull = value
-    End Set
-  End Property
-  Public Property AJAXOrderShort As String
-    Get
-      Return m_AJAXShort
-    End Get
-    Set(value As String)
-      m_AJAXShort = value
-    End Set
-  End Property
   Class AppColors
     Private c_MainDA As Color
     Private c_MainDB As Color
     Private c_MainDC As Color
-    Private c_MainUA As Color
-    Private c_MainUB As Color
-    Private c_MainUC As Color
     Private c_MainText As Color
     Private c_MainBG As Color
     Private c_TrayDA As Color
     Private c_TrayDB As Color
     Private c_TrayDC As Color
-    Private c_TrayUA As Color
-    Private c_TrayUB As Color
-    Private c_TrayUC As Color
     Private c_HistoryDA As Color
     Private c_HistoryDB As Color
     Private c_HistoryDC As Color
     Private c_HistoryDM As Color
     Private c_HistoryDLine As Color
-    Private c_HistoryUA As Color
-    Private c_HistoryUB As Color
-    Private c_HistoryUC As Color
-    Private c_HistoryUM As Color
-    Private c_HistoryULine As Color
     Private c_HistoryText As Color
     Private c_HistoryBG As Color
     Private c_HistoryLight As Color
@@ -1726,30 +1454,6 @@ Friend Class AppSettings
       End Get
       Set(value As Color)
         c_MainDC = value
-      End Set
-    End Property
-    Public Property MainUpA As Color
-      Get
-        Return c_MainUA
-      End Get
-      Set(value As Color)
-        c_MainUA = value
-      End Set
-    End Property
-    Public Property MainUpB As Color
-      Get
-        Return c_MainUB
-      End Get
-      Set(value As Color)
-        c_MainUB = value
-      End Set
-    End Property
-    Public Property MainUpC As Color
-      Get
-        Return c_MainUC
-      End Get
-      Set(value As Color)
-        c_MainUC = value
       End Set
     End Property
     Public Property MainText As Color
@@ -1792,30 +1496,6 @@ Friend Class AppSettings
         c_TrayDC = value
       End Set
     End Property
-    Public Property TrayUpA As Color
-      Get
-        Return c_TrayUA
-      End Get
-      Set(value As Color)
-        c_TrayUA = value
-      End Set
-    End Property
-    Public Property TrayUpB As Color
-      Get
-        Return c_TrayUB
-      End Get
-      Set(value As Color)
-        c_TrayUB = value
-      End Set
-    End Property
-    Public Property TrayUpC As Color
-      Get
-        Return c_TrayUC
-      End Get
-      Set(value As Color)
-        c_TrayUC = value
-      End Set
-    End Property
     Public Property HistoryDownA As Color
       Get
         Return c_HistoryDA
@@ -1854,46 +1534,6 @@ Friend Class AppSettings
       End Get
       Set(value As Color)
         c_HistoryDLine = value
-      End Set
-    End Property
-    Public Property HistoryUpA As Color
-      Get
-        Return c_HistoryUA
-      End Get
-      Set(value As Color)
-        c_HistoryUA = value
-      End Set
-    End Property
-    Public Property HistoryUpB As Color
-      Get
-        Return c_HistoryUB
-      End Get
-      Set(value As Color)
-        c_HistoryUB = value
-      End Set
-    End Property
-    Public Property HistoryUpC As Color
-      Get
-        Return c_HistoryUC
-      End Get
-      Set(value As Color)
-        c_HistoryUC = value
-      End Set
-    End Property
-    Public Property HistoryUpMax As Color
-      Get
-        Return c_HistoryUM
-      End Get
-      Set(value As Color)
-        c_HistoryUM = value
-      End Set
-    End Property
-    Public Property HistoryUpLine As Color
-      Get
-        Return c_HistoryULine
-      End Get
-      Set(value As Color)
-        c_HistoryULine = value
       End Set
     End Property
     Public Property HistoryText As Color

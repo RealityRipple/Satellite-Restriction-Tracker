@@ -41,17 +41,13 @@ Partial Class frmWizard
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
     Me.lblAccountName = New System.Windows.Forms.Label()
-    Me.lblAccountProvider = New System.Windows.Forms.Label()
-    Me.lblAccountHost = New System.Windows.Forms.Label()
     Me.txtAccountUsername = New System.Windows.Forms.TextBox()
     Me.lblAccountPassText = New System.Windows.Forms.Label()
     Me.txtAccountPass = New RestrictionTracker.PasswordBox()
     Me.lblAccountPass = New System.Windows.Forms.Label()
     Me.lblAccountUsername = New System.Windows.Forms.Label()
-    Me.cmbAccountHost = New System.Windows.Forms.ComboBox()
     Me.lblAccountTitle = New System.Windows.Forms.Label()
-    Me.lnAccountSpace1 = New RestrictionTracker.LineBreak()
-    Me.lnAccountSpace2 = New RestrictionTracker.LineBreak()
+    Me.lnAccountSpace = New RestrictionTracker.LineBreak()
     Me.tabService = New System.Windows.Forms.TabPage()
     Me.pnlService = New System.Windows.Forms.TableLayoutPanel()
     Me.lblServiceTitle = New System.Windows.Forms.Label()
@@ -346,33 +342,26 @@ Partial Class frmWizard
     Me.pnlAccount.ColumnCount = 2
     Me.pnlAccount.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlAccount.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccount.Controls.Add(Me.lblAccountName, 0, 4)
-    Me.pnlAccount.Controls.Add(Me.lblAccountProvider, 0, 1)
-    Me.pnlAccount.Controls.Add(Me.lblAccountHost, 0, 2)
-    Me.pnlAccount.Controls.Add(Me.txtAccountUsername, 1, 5)
-    Me.pnlAccount.Controls.Add(Me.lblAccountPassText, 0, 7)
-    Me.pnlAccount.Controls.Add(Me.txtAccountPass, 1, 8)
-    Me.pnlAccount.Controls.Add(Me.lblAccountPass, 0, 8)
-    Me.pnlAccount.Controls.Add(Me.lblAccountUsername, 0, 5)
-    Me.pnlAccount.Controls.Add(Me.cmbAccountHost, 1, 2)
+    Me.pnlAccount.Controls.Add(Me.lblAccountName, 0, 1)
+    Me.pnlAccount.Controls.Add(Me.txtAccountUsername, 1, 2)
+    Me.pnlAccount.Controls.Add(Me.lblAccountPassText, 0, 4)
+    Me.pnlAccount.Controls.Add(Me.txtAccountPass, 1, 5)
+    Me.pnlAccount.Controls.Add(Me.lblAccountPass, 0, 5)
+    Me.pnlAccount.Controls.Add(Me.lblAccountUsername, 0, 2)
     Me.pnlAccount.Controls.Add(Me.lblAccountTitle, 0, 0)
-    Me.pnlAccount.Controls.Add(Me.lnAccountSpace1, 0, 3)
-    Me.pnlAccount.Controls.Add(Me.lnAccountSpace2, 0, 6)
+    Me.pnlAccount.Controls.Add(Me.lnAccountSpace, 0, 3)
     Me.pnlAccount.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlAccount.Location = New System.Drawing.Point(0, 0)
     Me.pnlAccount.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlAccount.Name = "pnlAccount"
-    Me.pnlAccount.RowCount = 9
+    Me.pnlAccount.RowCount = 7
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlAccount.Size = New System.Drawing.Size(447, 311)
     Me.pnlAccount.TabIndex = 0
     '
@@ -382,43 +371,17 @@ Partial Class frmWizard
     Me.lblAccountName.AutoSize = True
     Me.pnlAccount.SetColumnSpan(Me.lblAccountName, 2)
     Me.lblAccountName.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountName.Location = New System.Drawing.Point(3, 127)
+    Me.lblAccountName.Location = New System.Drawing.Point(3, 35)
     Me.lblAccountName.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountName.Name = "lblAccountName"
     Me.lblAccountName.Size = New System.Drawing.Size(432, 48)
     Me.lblAccountName.TabIndex = 5
     Me.lblAccountName.Text = resources.GetString("lblAccountName.Text")
     '
-    'lblAccountProvider
-    '
-    Me.lblAccountProvider.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblAccountProvider.AutoSize = True
-    Me.pnlAccount.SetColumnSpan(Me.lblAccountProvider, 2)
-    Me.lblAccountProvider.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountProvider.Location = New System.Drawing.Point(3, 35)
-    Me.lblAccountProvider.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblAccountProvider.Name = "lblAccountProvider"
-    Me.lblAccountProvider.Size = New System.Drawing.Size(434, 48)
-    Me.lblAccountProvider.TabIndex = 1
-    Me.lblAccountProvider.Text = resources.GetString("lblAccountProvider.Text")
-    '
-    'lblAccountHost
-    '
-    Me.lblAccountHost.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblAccountHost.AutoSize = True
-    Me.lblAccountHost.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.lblAccountHost.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountHost.Location = New System.Drawing.Point(3, 91)
-    Me.lblAccountHost.Name = "lblAccountHost"
-    Me.lblAccountHost.Size = New System.Drawing.Size(65, 17)
-    Me.lblAccountHost.TabIndex = 2
-    Me.lblAccountHost.Text = "P&rovider:"
-    Me.lblAccountHost.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-    '
     'txtAccountUsername
     '
     Me.txtAccountUsername.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtAccountUsername.Location = New System.Drawing.Point(84, 181)
+    Me.txtAccountUsername.Location = New System.Drawing.Point(84, 89)
     Me.txtAccountUsername.Name = "txtAccountUsername"
     Me.txtAccountUsername.Size = New System.Drawing.Size(360, 20)
     Me.txtAccountUsername.TabIndex = 7
@@ -430,7 +393,7 @@ Partial Class frmWizard
     Me.lblAccountPassText.AutoSize = True
     Me.pnlAccount.SetColumnSpan(Me.lblAccountPassText, 2)
     Me.lblAccountPassText.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountPassText.Location = New System.Drawing.Point(3, 218)
+    Me.lblAccountPassText.Location = New System.Drawing.Point(3, 135)
     Me.lblAccountPassText.Margin = New System.Windows.Forms.Padding(3)
     Me.lblAccountPassText.Name = "lblAccountPassText"
     Me.lblAccountPassText.Size = New System.Drawing.Size(440, 64)
@@ -440,7 +403,7 @@ Partial Class frmWizard
     'txtAccountPass
     '
     Me.txtAccountPass.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtAccountPass.Location = New System.Drawing.Point(84, 288)
+    Me.txtAccountPass.Location = New System.Drawing.Point(84, 205)
     Me.txtAccountPass.Name = "txtAccountPass"
     Me.txtAccountPass.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
     Me.txtAccountPass.Size = New System.Drawing.Size(360, 20)
@@ -453,7 +416,7 @@ Partial Class frmWizard
     Me.lblAccountPass.AutoSize = True
     Me.lblAccountPass.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.lblAccountPass.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountPass.Location = New System.Drawing.Point(3, 289)
+    Me.lblAccountPass.Location = New System.Drawing.Point(3, 206)
     Me.lblAccountPass.Name = "lblAccountPass"
     Me.lblAccountPass.Size = New System.Drawing.Size(69, 17)
     Me.lblAccountPass.TabIndex = 10
@@ -466,26 +429,12 @@ Partial Class frmWizard
     Me.lblAccountUsername.AutoSize = True
     Me.lblAccountUsername.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.lblAccountUsername.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblAccountUsername.Location = New System.Drawing.Point(3, 182)
+    Me.lblAccountUsername.Location = New System.Drawing.Point(3, 90)
     Me.lblAccountUsername.Name = "lblAccountUsername"
     Me.lblAccountUsername.Size = New System.Drawing.Size(75, 17)
     Me.lblAccountUsername.TabIndex = 6
     Me.lblAccountUsername.Text = "&Username:"
     Me.lblAccountUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-    '
-    'cmbAccountHost
-    '
-    Me.cmbAccountHost.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cmbAccountHost.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-    Me.cmbAccountHost.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-    Me.cmbAccountHost.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.cmbAccountHost.FormattingEnabled = True
-    Me.cmbAccountHost.Location = New System.Drawing.Point(84, 89)
-    Me.cmbAccountHost.Name = "cmbAccountHost"
-    Me.cmbAccountHost.Size = New System.Drawing.Size(360, 21)
-    Me.cmbAccountHost.TabIndex = 3
-    Me.ttWizard.SetToolTip(Me.cmbAccountHost, "Choose your ViaSat provider website. If your provider is not listed, you can ente" & _
-        "r the domain name of your meter page or ViaSat E-Mail Address.")
     '
     'lblAccountTitle
     '
@@ -501,31 +450,18 @@ Partial Class frmWizard
     Me.lblAccountTitle.Text = "Your ViaSat Account Settings"
     Me.lblAccountTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
-    'lnAccountSpace1
+    'lnAccountSpace
     '
-    Me.lnAccountSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountSpace1.CausesValidation = False
-    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace1, 2)
-    Me.lnAccountSpace1.Location = New System.Drawing.Point(3, 116)
-    Me.lnAccountSpace1.Name = "lnAccountSpace1"
-    Me.lnAccountSpace1.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnAccountSpace1.Size = New System.Drawing.Size(441, 4)
-    Me.lnAccountSpace1.TabIndex = 4
-    Me.lnAccountSpace1.TabStop = False
-    '
-    'lnAccountSpace2
-    '
-    Me.lnAccountSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountSpace2.CausesValidation = False
-    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace2, 2)
-    Me.lnAccountSpace2.Location = New System.Drawing.Point(3, 207)
-    Me.lnAccountSpace2.Name = "lnAccountSpace2"
-    Me.lnAccountSpace2.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnAccountSpace2.Size = New System.Drawing.Size(441, 4)
-    Me.lnAccountSpace2.TabIndex = 8
-    Me.lnAccountSpace2.TabStop = False
+    Me.lnAccountSpace.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lnAccountSpace.AutoValidate = System.Windows.Forms.AutoValidate.Disable
+    Me.lnAccountSpace.CausesValidation = False
+    Me.pnlAccount.SetColumnSpan(Me.lnAccountSpace, 2)
+    Me.lnAccountSpace.Location = New System.Drawing.Point(3, 120)
+    Me.lnAccountSpace.Name = "lnAccountSpace"
+    Me.lnAccountSpace.Padding = New System.Windows.Forms.Padding(1)
+    Me.lnAccountSpace.Size = New System.Drawing.Size(441, 4)
+    Me.lnAccountSpace.TabIndex = 8
+    Me.lnAccountSpace.TabStop = False
     '
     'tabService
     '
@@ -1296,8 +1232,6 @@ Partial Class frmWizard
   Friend WithEvents lblWelcomeText As System.Windows.Forms.Label
   Friend WithEvents tabAccount As System.Windows.Forms.TabPage
   Friend WithEvents pnlAccount As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblAccountProvider As System.Windows.Forms.Label
-  Friend WithEvents lblAccountHost As System.Windows.Forms.Label
   Friend WithEvents txtAccountUsername As System.Windows.Forms.TextBox
   Friend WithEvents lblAccountPassText As System.Windows.Forms.Label
   Friend WithEvents txtAccountPass As RestrictionTracker.PasswordBox
@@ -1326,7 +1260,6 @@ Partial Class frmWizard
   Friend WithEvents tmrDraw As System.Windows.Forms.Timer
   Friend WithEvents lblAccountName As System.Windows.Forms.Label
   Friend WithEvents lblAccountUsername As System.Windows.Forms.Label
-  Friend WithEvents cmbAccountHost As System.Windows.Forms.ComboBox
   Friend WithEvents lblServiceTitle As System.Windows.Forms.Label
   Friend WithEvents txtSignUp As RestrictionTracker.LinkLabel
   Friend WithEvents lblActivity As System.Windows.Forms.Label
@@ -1348,10 +1281,9 @@ Partial Class frmWizard
   Friend WithEvents lblOverTime As System.Windows.Forms.Label
   Friend WithEvents lblAccountTitle As System.Windows.Forms.Label
   Friend WithEvents ttWizard As RestrictionTracker.ToolTip
-  Friend WithEvents lnAccountSpace1 As RestrictionTracker.LineBreak
-  Friend WithEvents lnAccountSpace2 As RestrictionTracker.LineBreak
-  Friend WithEvents lnServiceSpace2 As RestrictionTracker.LineBreak
+  Friend WithEvents lnAccountSpace As RestrictionTracker.LineBreak
   Friend WithEvents lnServiceSpace1 As RestrictionTracker.LineBreak
+  Friend WithEvents lnServiceSpace2 As RestrictionTracker.LineBreak
   Friend WithEvents lnDisplaySpace1 As RestrictionTracker.LineBreak
   Friend WithEvents lnDisplaySpace2 As RestrictionTracker.LineBreak
   Friend WithEvents pctIcon As System.Windows.Forms.PictureBox

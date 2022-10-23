@@ -15,18 +15,12 @@
     mySettings = New AppSettings
     If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     RepadAllItems(Me)
-    Dim sAccount As String = mySettings.Account
-    Dim sUsername, sProvider As String
-    If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-      sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1)
+    Dim Username As String = mySettings.Account
+    If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
+      txtAccount.Text = Username.Substring(0, Username.LastIndexOf("@"))
     Else
-      sUsername = sAccount
-      sProvider = ""
+      txtAccount.Text = Username
     End If
-    txtAccount.Text = sUsername
-    UseDefaultHostList()
-    cmbProvider.Text = sProvider
     ttConfig.SetToolTip(txtPassword.Button, "Toggle display of the Password.")
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
@@ -35,15 +29,6 @@
         txtPassword.Text = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
       End If
     End If
-    Select Case mySettings.AccountType
-      Case Local.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
-      Case Local.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
-      Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : optAccountTypeWBX.Checked = True
-      Case Local.SatHostTypes.Dish_EXEDE : optAccountTypeDNX.Checked = True
-      Case Local.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
-      Case Local.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
-    End Select
-    chkAccountTypeAuto.Checked = Not mySettings.AccountTypeForced
     txtKey1.ContextMenu = mnuKey
     txtKey2.ContextMenu = mnuKey
     txtKey3.ContextMenu = mnuKey
@@ -294,8 +279,6 @@
     fswController.NotifyFilter = IO.NotifyFilters.Attributes Or IO.NotifyFilters.CreationTime Or IO.NotifyFilters.DirectoryName Or IO.NotifyFilters.FileName Or IO.NotifyFilters.LastAccess Or IO.NotifyFilters.LastWrite Or IO.NotifyFilters.Security Or IO.NotifyFilters.Size
     fswController.EnableRaisingEvents = True
     bLoaded = True
-    Dim populateInvoker As New MethodInvoker(AddressOf PopulateHostList)
-    populateInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
   Private Sub RunAccountTest(sKey As String)
     If Me.InvokeRequired Then
@@ -311,7 +294,7 @@
     Else
       Return
     End If
-    remoteTest = New Remote.ServiceConnection(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
+    remoteTest = New Remote.ServiceConnection(txtAccount.Text & "@exede.net", String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub RunNetworkProtocolTest()
     If pctKeyState.Tag = 1 Then
@@ -522,7 +505,6 @@
   Private isShown As Boolean = False
   Private Sub Panel_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pnlAccount.MouseMove,
     pnlAccountViaSat.MouseMove, pnlAccountViaSatInput.MouseMove,
-    pnlAccountProvider.MouseMove, pnlAccountTypes.MouseMove,
     pnlAccountKey.MouseMove, pnlKey.MouseMove,
     pnlPrefs.MouseMove,
     pnlPrefStart.MouseMove, pnlPrefStartInput.MouseMove,
@@ -550,19 +532,14 @@
   End Sub
 #End Region
 #Region "Inputs"
-  Private Sub txtVal_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtAccount.KeyDown, txtPassword.KeyDown, cmbProvider.KeyDown
+  Private Sub txtVal_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtAccount.KeyDown, txtPassword.KeyDown
     If e.Control And e.KeyCode = Keys.V Then
-      If sender.name = "cmbProvider" Then
-        CType(sender, ComboBox).SelectedText = Clipboard.GetText.Trim
-      Else
-        CType(sender, TextBox).SelectedText = Clipboard.GetText.Trim
-      End If
+      CType(sender, TextBox).SelectedText = Clipboard.GetText.Trim
       e.SuppressKeyPress = True
       e.Handled = True
     End If
   End Sub
   Private Sub ValuesChanged(sender As System.Object, e As EventArgs) Handles txtPassword.KeyPress, txtPassword.TextChanged,
-                                                                             optAccountTypeWBL.CheckedChanged, optAccountTypeWBX.CheckedChanged, optAccountTypeDNX.CheckedChanged, optAccountTypeRPL.CheckedChanged, optAccountTypeRPX.CheckedChanged,
                                                                              txtStartWait.KeyPress, txtStartWait.KeyUp, txtStartWait.Scroll, txtStartWait.ValueChanged,
                                                                              txtInterval.KeyPress, txtInterval.KeyUp, txtInterval.Scroll, txtInterval.ValueChanged,
                                                                              txtAccuracy.KeyPress, txtAccuracy.KeyUp, txtAccuracy.Scroll, txtAccuracy.ValueChanged,
@@ -582,7 +559,7 @@
                                                                              chkTrayMin.CheckedChanged, chkTrayAnim.CheckedChanged, chkTrayClose.CheckedChanged
     cmdSave.Enabled = SettingsChanged()
   End Sub
-  Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged, cmbProvider.KeyPress, cmbProvider.TextChanged, cmbProvider.SelectedIndexChanged
+  Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged
     If Not bLoaded Then Return
     If pChecker IsNot Nothing Then
       pctKeyState.Tag = IIf(CheckState, 1, 0)
@@ -601,14 +578,6 @@
     Else
       cmdSave.Enabled = SettingsChanged()
     End If
-  End Sub
-  Private Sub chkAccountTypeAuto_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkAccountTypeAuto.CheckedChanged
-    optAccountTypeWBL.Enabled = Not chkAccountTypeAuto.Checked
-    optAccountTypeDNX.Enabled = Not chkAccountTypeAuto.Checked
-    optAccountTypeWBX.Enabled = Not chkAccountTypeAuto.Checked
-    optAccountTypeRPL.Enabled = Not chkAccountTypeAuto.Checked
-    optAccountTypeRPX.Enabled = Not chkAccountTypeAuto.Checked
-    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
     If e.KeyValue = 86 And e.Control Then
@@ -1038,42 +1007,6 @@
     txtKey5.Clear()
   End Sub
 #End Region
-#Region "Host List"
-  Private Sub PopulateHostList()
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New MethodInvoker(AddressOf PopulateHostList))
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Dim wsHostList As New WebClientEx
-    wsHostList.KeepAlive = False
-    Dim sHostList As String = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
-    If sHostList.StartsWith("Error: ") Then Return
-    Try
-      If sHostList.Contains(vbLf) Then
-        Dim HostList() As String = Split(sHostList, vbLf)
-        bLoaded = False
-        cmbProvider.Items.Clear()
-        cmbProvider.Items.AddRange(HostList)
-        If mySettings.Account.Contains("@") Then
-          Dim sProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1)
-          cmbProvider.Text = sProvider
-        End If
-        bLoaded = True
-      End If
-    Catch ex As Exception
-    End Try
-  End Sub
-  Private Sub UseDefaultHostList()
-    cmbProvider.Items.Clear()
-    Dim hostData() As String = Split(My.Resources.HostList, vbNewLine)
-    For I As Integer = 0 To hostData.Length - 1
-      cmbProvider.Items.Add(hostData(I))
-    Next
-  End Sub
-#End Region
 #Region "Net Test"
   Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
@@ -1140,7 +1073,7 @@
       End Try
     ElseIf lblPurchaseKey.Text = LINK_PANEL Then
       Try
-        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "@" & cmbProvider.Text & "&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
+        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "@exede.net&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
       Catch ex As Exception
         Dim taskNotifier As TaskbarNotifier = Nothing
         MakeNotifier(taskNotifier, False)
@@ -1367,11 +1300,6 @@
       txtPassword.Focus()
       Return
     End If
-    If String.IsNullOrEmpty(cmbProvider.Text) Then
-      MsgDlg(Me, "Please enter your ViaSat Provider domain or select one from the list before saving the Configuration.", "Please select your Provider.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Internet, MessageBoxIcon.Information)
-      cmbProvider.Focus()
-      Return
-    End If
     If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked Or chkNetworkProtocolTLS13.Checked) Then
       MsgDlg(Me, "Please select at least one Security Protocol type to connect with before saving the Configuration.", "Please select your Security Protocol.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
       If chkNetworkProtocolTLS13.CanFocus Then
@@ -1413,15 +1341,8 @@
         Return
       End If
     Next
-    If cmbProvider.Text.ToUpperInvariant.Contains("EXCEDE") Or
-       cmbProvider.Text.ToUpperInvariant.Contains("FORCE") Or
-       cmbProvider.Text.ToUpperInvariant.Contains("MYSSO") Or
-       cmbProvider.Text.ToUpperInvariant.Contains("MYEXEDE") Or
-       cmbProvider.Text.ToUpperInvariant.Contains("MY.EXEDE") Then cmbProvider.Text = "exede.net"
-    If cmbProvider.Text.ToUpperInvariant = "DISH.NET" Or
-       cmbProvider.Text.ToUpperInvariant = "DISH.COM" Then cmbProvider.Text = "mydish.com"
-    If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, Global.System.StringComparison.OrdinalIgnoreCase) <> 0 Then
-      mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
+    If String.Compare(mySettings.Account, txtAccount.Text, Global.System.StringComparison.OrdinalIgnoreCase) <> 0 Then
+      mySettings.Account = txtAccount.Text
       bAccount = True
     End If
     Dim newPass As Boolean = False
@@ -1437,26 +1358,6 @@
       mySettings.PassKey = Convert.ToBase64String(newKey)
       mySettings.PassSalt = Convert.ToBase64String(newSalt)
       bAccount = True
-    End If
-    If Not chkAccountTypeAuto.Checked Then
-      If optAccountTypeWBL.Checked Then
-        mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
-      ElseIf optAccountTypeWBX.Checked Then
-        If cmbProvider.Text.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-          mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-        Else
-          mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
-        End If
-      ElseIf optAccountTypeDNX.Checked Then
-        mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
-      ElseIf optAccountTypeRPL.Checked Then
-        mySettings.AccountType = Local.SatHostTypes.RuralPortal_LEGACY
-      ElseIf optAccountTypeRPX.Checked Then
-        mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
-      End If
-      mySettings.AccountTypeForced = True
-    Else
-      mySettings.AccountTypeForced = False
     End If
     Dim sKey As String = ""
     If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
@@ -1771,7 +1672,6 @@
     If mySettings.Service Then
       Dim cSave As New SvcSettings
       cSave.Account = mySettings.Account
-      cSave.AccountType = mySettings.AccountType
       cSave.Interval = mySettings.Interval
       Dim newSvcPass As Boolean = False
       If String.IsNullOrEmpty(cSave.PassKey) Or String.IsNullOrEmpty(cSave.PassSalt) Then
@@ -1803,22 +1703,11 @@
   Private Function SettingsChanged() As Boolean
     If mySettings Is Nothing Then Return False
     If bHardChange Then Return True
-    If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
+    If Not String.Compare(mySettings.Account, txtAccount.Text, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
     If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
       Return True
     Else
       If Not StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt) = txtPassword.Text Then Return True
-    End If
-    If mySettings.AccountTypeForced = chkAccountTypeAuto.Checked Then Return True
-    If Not chkAccountTypeAuto.Checked Then
-      Select Case mySettings.AccountType
-        Case Local.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
-        Case Local.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
-        Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : If Not optAccountTypeWBX.Checked Then Return True
-        Case Local.SatHostTypes.Dish_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
-        Case Local.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
-        Case Local.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True
-      End Select
     End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""

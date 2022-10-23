@@ -1,38 +1,5 @@
 ﻿Namespace Local
   ''' <summary>
-  ''' Types of Satellite hosts which are supported by <see cref="SiteConnection" />.
-  ''' </summary>
-  Public Enum SatHostTypes
-    ''' <summary>
-    ''' WildBlue type meter with <see cref="TYPEAResultEventArgs">Type A</see> usage, including Download, Download Limit, Upload, and Upload Limit values, reading through an address of myaccount.DOMAIN/wbisp/DOMAIN/.
-    ''' </summary>
-    WildBlue_LEGACY    ' Down, Up, DownLim, UpLim     [TYPEA]
-    ''' <summary>
-    ''' Exede type meter with <see cref="TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through my.exede.net.
-    ''' </summary>
-    WildBlue_EXEDE     ' Used, Limit                  [TYPEB]
-    ''' <summary>
-    ''' Exede type meter with <see cref="TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through my.satelliteinternetco.com, using AJAX.
-    ''' </summary>
-    WildBlue_EXEDE_RESELLER
-    ''' <summary>
-    ''' RuralPortal WildBlue type meter with <see cref="TYPEAResultEventArgs">Type A</see> usage, including Download, Download Limit, Upload, and Upload Limit values, reading through an address of DOMAIN.ruralportal.net.
-    ''' </summary>
-    RuralPortal_LEGACY ' Down, Up, DownLim, UpLim     [TYPEA]
-    ''' <summary>
-    ''' RuralPortal Exede type meter with <see cref="TYPEBResultEventArgs">Type B</see> usage, including only Used and Limit values, reading through an address of DOMAIN.ruralportal.net.
-    ''' </summary>
-    RuralPortal_EXEDE  ' Used, Limit                  [TYPEB]
-    ''' <summary>
-    ''' Exede through Dish Network type meter with <see cref="TYPEA2ResultEventArgs">Type A2</see> uage, including AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values, reading through mydish.com.
-    ''' </summary>
-    Dish_EXEDE         ' AnyTime, AnyTimeLim, OffPeak, OffPeakLim [TYPEA2]
-    ''' <summary>
-    ''' The provider is unknown or hasn't been determined yet.
-    ''' </summary>
-    Other
-  End Enum
-  ''' <summary>
   ''' Current status of the <see cref="SiteConnection" /> connection.
   ''' </summary>
   Public Enum SiteConnectionStates
@@ -66,27 +33,19 @@
     ''' </summary>
     None
     ''' <summary>
-    ''' The login page is being read. Exede and Exede Reseller use this step.
+    ''' The login page is being read.
     ''' </summary>
     ReadLogin
     ''' <summary>
-    ''' The username and password are being sent. All providers use this step.
+    ''' The username and password are being sent.
     ''' </summary>
     Authenticate
     ''' <summary>
-    ''' The login is being verified. Only Dish uses this step.
-    ''' </summary>
-    Verify
-    ''' <summary>
-    ''' The home page is being loaded. This is also known as the Dashboard. Exede and Dish use this step.
+    ''' The Code parameter from the home page URL is being loaded.
     ''' </summary>
     LoadHome
     ''' <summary>
-    ''' The Code parameter from the home page URL is being loaded. Only Exede uses this step.
-    ''' </summary>
-    LoadAJAX
-    ''' <summary>
-    ''' The previous attempt to load AJAX data failed, so now the system is loading every page of AJAX data it can in an attempt to find the meter. Only Exede Reseller uses this step.
+    ''' Usage data is being requested and accessed.
     ''' </summary>
     LoadTable
   End Enum
@@ -95,25 +54,17 @@
   ''' </summary>
   Public Enum SiteConnectionFailureType
     ''' <summary>
-    ''' The Account Type is unknown, so the <see cref="SiteConnection" /> connection can not begin. There should be no <see cref="SiteConnectionFailureEventArgs.Message" /> for this <see cref="SiteConnectionFailureEventArgs" />.
-    ''' </summary>
-    UnknownAccountType
-    ''' <summary>
     ''' The Username or Password are missing, so the <see cref="SiteConnection" /> connection can not begin. There should be no <see cref="SiteConnectionFailureEventArgs.Message" /> for this <see cref="SiteConnectionFailureEventArgs" />.
     ''' </summary>
     UnknownAccountDetails
     ''' <summary>
-    ''' There was an issue while logging in, but the login process is still going through. Currently the only issue triggered is from <see cref="SatHostGroup.RuralPortal" /> with the <see cref="SiteConnectionFailureEventArgs.Message" /> "Your password needs to be changed." when the server is prompting the user to change the password for one reason or another.
+    ''' There was an issue while logging in, but the login process is still going through.
     ''' </summary>
     LoginIssue
     ''' <summary>
     ''' There was an issue while logging in. The <see cref="SiteConnectionFailureEventArgs.Message" /> will contain information about the <see cref="SiteConnection.ConnectionFailure" />.
     ''' </summary>
     LoginFailure
-    ''' <summary>
-    ''' There was an issue while logging in, and the <see cref="AppSettings.AccountType" /> is wrong. The <see cref="SiteConnectionFailureEventArgs.Message" /> will contain information about the <see cref="SiteConnection.ConnectionFailure" />.
-    ''' </summary>
-    FatalLoginFailure
     ''' <summary>
     ''' The server timed out. There should be no <see cref="SiteConnectionFailureEventArgs.Message" /> for this <see cref="SiteConnectionFailureEventArgs" />.
     ''' </summary>
@@ -169,185 +120,9 @@
     End Property
   End Class
   ''' <summary>
-  ''' Result from a Type A usage meter, containing Download, Download Limit, Upload, and Upload Limit values.
+  ''' Result from usage meter, containing Used and Limit values.
   ''' </summary>
-  Public Class TYPEAResultEventArgs
-    Inherits EventArgs
-    Private m_Down As Long
-    Private m_Up As Long
-    Private m_DownLim As Long
-    Private m_UpLim As Long
-    Private m_Update As Date
-    Private m_slow As Boolean
-    Private m_free As Boolean
-    ''' <summary>
-    ''' Constructor for a <see cref="TYPEAResultEventArgs" /> used in <see cref="SiteConnection.ConnectionWBLResult" /> and <see cref="SiteConnection.ConnectionRPLResult" /> events.
-    ''' </summary>
-    ''' <param name="lDown">Number of megabytes used in download.</param>
-    ''' <param name="lDownLim">Number of megabytes allowed in download.</param>
-    ''' <param name="lUp">Number of megabytes used in upload.</param>
-    ''' <param name="lUpLim">Number of megabytes allowed in upload.</param>
-    ''' <param name="dUpdate">The specific date and time of this usage.</param>
-    ''' <param name="bSlow"><c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.</param>
-    ''' <param name="bFree"><c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.</param>
-    Public Sub New(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
-      m_Down = lDown
-      m_Up = lUp
-      m_DownLim = lDownLim
-      m_UpLim = lUpLim
-      m_Update = dUpdate
-      m_slow = bSlow
-      m_free = bFree
-    End Sub
-    ''' <summary>
-    ''' Number of megabytes used in download.
-    ''' </summary>
-    Public ReadOnly Property Download As Long
-      Get
-        Return m_Down
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes allowed in download.
-    ''' </summary>
-    Public ReadOnly Property DownloadLimit As Long
-      Get
-        Return m_DownLim
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes used in upload.
-    ''' </summary>
-    Public ReadOnly Property Upload As Long
-      Get
-        Return m_Up
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes allowed in upload.
-    ''' </summary>
-    Public ReadOnly Property UploadLimit As Long
-      Get
-        Return m_UpLim
-      End Get
-    End Property
-    ''' <summary>
-    ''' The specific date and time of this usage.
-    ''' </summary>
-    Public ReadOnly Property Update As Date
-      Get
-        Return m_Update
-      End Get
-    End Property
-    ''' <summary>
-    ''' <c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.
-    ''' </summary>
-    Public ReadOnly Property SlowedDetected As Boolean
-      Get
-        Return m_slow
-      End Get
-    End Property
-    ''' <summary>
-    ''' <c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.
-    ''' </summary>
-    Public ReadOnly Property FreeDetected As Boolean
-      Get
-        Return m_free
-      End Get
-    End Property
-  End Class
-  ''' <summary>
-  ''' Result from Type A2 usage meter, containing AnyTime, AnyTime Limit, Off-Peak, and Off-Peak Limit values.
-  ''' </summary>
-  Public Class TYPEA2ResultEventArgs
-    Inherits EventArgs
-    Private m_AnyTime As Long
-    Private m_AnyTimeLim As Long
-    Private m_OffPeak As Long
-    Private m_OffPeakLim As Long
-    Private m_Update As Date
-    Private m_slow As Boolean
-    Private m_free As Boolean
-    ''' <summary>
-    ''' Constructor for a <see cref="TYPEA2ResultEventArgs" /> used in <see cref="SiteConnection.ConnectionDNXResult" /> events.
-    ''' </summary>
-    ''' <param name="lAnyTime">Number of megabytes used during AnyTime hours.</param>
-    ''' <param name="lAnyTimeLim">Number of megabytes allowed during AnyTime hours.</param>
-    ''' <param name="lOffPeak">Number of megabytes used during Off-Peak hours.</param>
-    ''' <param name="lOffPeakLim">Number of megabytes allowed during Off-Peak hours.</param>
-    ''' <param name="dUpdate">The specific date and time of this usage.</param>
-    ''' <param name="bSlow"><c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.</param>
-    ''' <param name="bFree"><c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.</param>
-    Public Sub New(lAnyTime As Long, lAnyTimeLim As Long, lOffPeak As Long, lOffPeakLim As Long, dUpdate As Date, bSlow As Boolean, bFree As Boolean)
-      m_AnyTime = lAnyTime
-      m_AnyTimeLim = lAnyTimeLim
-      m_OffPeak = lOffPeak
-      m_OffPeakLim = lOffPeakLim
-      m_Update = dUpdate
-      m_slow = bSlow
-      m_free = bFree
-    End Sub
-    ''' <summary>
-    ''' Number of megabytes used during AnyTime hours.
-    ''' </summary>
-    Public ReadOnly Property AnyTime As Long
-      Get
-        Return m_AnyTime
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes allowed during AnyTime hours.
-    ''' </summary>
-    Public ReadOnly Property AnyTimeLimit As Long
-      Get
-        Return m_AnyTimeLim
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes used during Off-Peak hours.
-    ''' </summary>
-    Public ReadOnly Property OffPeak As Long
-      Get
-        Return m_OffPeak
-      End Get
-    End Property
-    ''' <summary>
-    ''' Number of megabytes allowed during Off-Peak hours.
-    ''' </summary>
-    Public ReadOnly Property OffPeakLimit As Long
-      Get
-        Return m_OffPeakLim
-      End Get
-    End Property
-    ''' <summary>
-    ''' The specific date and time of this usage.
-    ''' </summary>
-    Public ReadOnly Property Update As Date
-      Get
-        Return m_Update
-      End Get
-    End Property
-    ''' <summary>
-    ''' <c>True</c> if the connection has been reported as restricted, <c>False</c> otherwise.
-    ''' </summary>
-    Public ReadOnly Property SlowedDetected As Boolean
-      Get
-        Return m_slow
-      End Get
-    End Property
-    ''' <summary>
-    ''' <c>True</c> if usage is reported not to count at the moment, <c>False</c> under normal conditions.
-    ''' </summary>
-    Public ReadOnly Property FreeDetected As Boolean
-      Get
-        Return m_free
-      End Get
-    End Property
-  End Class
-  ''' <summary>
-  ''' Result from Type B usage meter, containing Used and Limit values.
-  ''' </summary>
-  Public Class TYPEBResultEventArgs
+  Public Class SiteResultEventArgs
     Inherits EventArgs
     Private m_Used As Long
     Private m_Limit As Long
@@ -355,7 +130,7 @@
     Private m_slow As Boolean
     Private m_free As Boolean
     ''' <summary>
-    ''' Constructor for a <see cref="TYPEBResultEventArgs" /> used in <see cref="SiteConnection.ConnectionWBXResult" />, <see cref="SiteConnection.ConnectionWXRResult" />, and <see cref="SiteConnection.ConnectionRPXResult" /> events.
+    ''' Constructor for a <see cref="SiteResultEventArgs" /> used in <see cref="SiteConnection.ConnectionResult" /> events.
     ''' </summary>
     ''' <param name="lUsed">Total number of megabytes used.</param>
     ''' <param name="lLimit">Total number of megabytes allowed.</param>
@@ -394,7 +169,7 @@
       End Get
     End Property
     ''' <summary>
-    ''' If your connection is restricted, this value will be set to <c>True</c>. Currently only set by <see cref="SatHostTypes.WildBlue_LEGACY" />.
+    ''' If your connection is restricted, this value will be set to <c>True</c>.
     ''' </summary>
     Public ReadOnly Property SlowedDetected As Boolean
       Get
@@ -402,7 +177,7 @@
       End Get
     End Property
     ''' <summary>
-    ''' If the usage isn't being counted, this value will be set to <c>True</c>. Currently rarely used by <see cref="SatHostTypes.WildBlue_LEGACY" />.
+    ''' If the usage isn't being counted, this value will be set to <c>True</c>.
     ''' </summary>
     Public ReadOnly Property FreeDetected As Boolean
       Get
@@ -465,31 +240,9 @@
       End Get
     End Property
   End Class
-  ''' <summary>
-  ''' Class storing information regarding a successful connection without data, which contains the <see cref="SatHostTypes">SatHostType</see> for the connected provider.
-  ''' </summary>
-  Public Class LoginCompletionEventArgs
-    Inherits EventArgs
-    Private m_HostType As SatHostTypes
-    ''' <summary>
-    ''' Constructor for the <see cref="LoginCompletionEventArgs" /> class.
-    ''' </summary>
-    ''' <param name="myHostType">The type of host for this provider.</param>
-    Public Sub New(myHostType As SatHostTypes)
-      m_HostType = myHostType
-    End Sub
-    ''' <summary>
-    ''' The type of host for this provider.
-    ''' </summary>
-    Public ReadOnly Property HostType As SatHostTypes
-      Get
-        Return m_HostType
-      End Get
-    End Property
-  End Class
 
   ''' <summary>
-  ''' Accesses WildBlue, Exede, RuralPortal, and Dish usage pages and handles all communication internally.
+  ''' Accesses usage pages and handles all communication internally.
   ''' </summary>
   Public Class SiteConnection
     Implements IDisposable
@@ -501,41 +254,11 @@
     ''' <param name="e"><see cref="SiteConnectionFailureEventArgs" /> data regarding the failure.</param>
     Public Event ConnectionFailure As EventHandler(Of SiteConnectionFailureEventArgs)
     ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_LEGACY" /> account.
+    ''' Triggered when the server returns data for an account.
     ''' </summary>
     ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionWBLResult As EventHandler(Of TYPEAResultEventArgs)
-    ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE" /> account.
-    ''' </summary>
-    ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionWBXResult As EventHandler(Of TYPEBResultEventArgs)
-    ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.WildBlue_EXEDE_RESELLER" /> account.
-    ''' </summary>
-    ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionWXRResult As EventHandler(Of TYPEBResultEventArgs)
-    ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.Dish_EXEDE" /> account.
-    ''' </summary>
-    ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEA2ResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionDNXResult As EventHandler(Of TYPEA2ResultEventArgs)
-    ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_LEGACY" /> account.
-    ''' </summary>
-    ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEAResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionRPLResult As EventHandler(Of TYPEAResultEventArgs)
-    ''' <summary>
-    ''' Triggered when the server returns data for a <see cref="SatHostTypes.RuralPortal_EXEDE" /> account.
-    ''' </summary>
-    ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="TYPEBResultEventArgs" /> data regarding the result.</param>
-    Public Event ConnectionRPXResult As EventHandler(Of TYPEBResultEventArgs)
+    ''' <param name="e"><see cref="SiteResultEventArgs" /> data regarding the result.</param>
+    Public Event ConnectionResult As EventHandler(Of SiteResultEventArgs)
     ''' <summary>
     ''' Triggered when new information regarding the current connection status is available.
     ''' </summary>
@@ -546,16 +269,13 @@
     ''' Triggered when the server verifies that the account's login information is correct.
     ''' </summary>
     ''' <param name="sender">Instance of the <see cref="SiteConnection" /> class.</param>
-    ''' <param name="e"><see cref="LoginCompletionEventArgs" /> data regarding the <see cref="SatHostTypes">SatHostType</see> of the account.</param>
-    Public Event LoginComplete As EventHandler(Of LoginCompletionEventArgs)
+    ''' <param name="e">Unset</param>
+    Public Event LoginComplete As EventHandler
 #End Region
-    Private acType As DetermineType
     Private mySettings As AppSettings
     Private Const MBPerGB As Integer = 1000
-    Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
-    Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
     Private justATest As Boolean
-    Private sAccount, sUsername, sPassword, sProvider As String
+    Private sUsername, sPassword As String
     Private imSlowed As Boolean
     Private imFree As Boolean
     Private ClosingTime As Boolean
@@ -565,7 +285,6 @@
     Private c_Jar As Net.CookieContainer
     Private c_SendJar As Boolean
     Private c_TLSProxy As Boolean
-    Private c_Protocol As Net.SecurityProtocolType
     Private c_TLSProxyAddr As String
     Private sDataPath As String
     Private wsSocket As WebClientEx
@@ -612,7 +331,6 @@
         Net.ServicePointManager.ServerCertificateValidationCallback = New Net.Security.RemoteCertificateValidationCallback(AddressOf IgnoreCert)
       End If
       Net.ServicePointManager.MaxServicePointIdleTime = iWait
-      sAccount = mySettings.Account
       If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
         If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
           sPassword = StoredPasswordLegacy.DecryptApp(mySettings.PassCrypt)
@@ -620,19 +338,14 @@
           sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
         End If
       End If
-      If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-        sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-        sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
+      Dim Username As String = mySettings.Account
+      If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
+        sUsername = Username.Substring(0, Username.LastIndexOf("@"))
       Else
-        sUsername = String.Empty
-        sAccount = String.Empty
-        sProvider = String.Empty
+        sUsername = Username
       End If
       c_TLSProxy = mySettings.TLSProxy
-      If c_TLSProxy Then
-        c_Protocol = mySettings.SecurityProtocol
-        c_TLSProxyAddr = "http://wb.realityripple.com/tls.php"
-      End If
+      If c_TLSProxy Then c_TLSProxyAddr = "http://wb.realityripple.com/tls.php"
       c_Timeout = mySettings.Timeout
       c_Proxy = mySettings.Proxy
       Dim sFramework As String = srlFunctions.CLRCleanVersion
@@ -658,41 +371,8 @@
       Else
         c_SendJar = False
       End If
-      tConnect = New Threading.Thread(AddressOf Connect)
+      tConnect = New Threading.Thread(AddressOf GetUsage)
       tConnect.Start()
-    End Sub
-    Private Sub Connect()
-      If mySettings.AccountType = SatHostTypes.Other Then
-        If mySettings.Account.Contains("@") Then
-          acType = New DetermineType(AddressOf acType_TypeDetermined)
-          acType.Start(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy)
-        Else
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.UnknownAccountType))
-        End If
-      Else
-        GetUsage()
-      End If
-    End Sub
-    Private Sub acType_TypeDetermined(HostGroup As Local.SatHostGroup)
-      Select Case HostGroup
-        Case Local.SatHostGroup.WildBlue
-          mySettings.AccountType = SatHostTypes.WildBlue_LEGACY
-          GetUsage()
-        Case Local.SatHostGroup.Dish
-          mySettings.AccountType = SatHostTypes.Dish_EXEDE
-          GetUsage()
-        Case Local.SatHostGroup.RuralPortal
-          mySettings.AccountType = SatHostTypes.RuralPortal_EXEDE
-          GetUsage()
-        Case Local.SatHostGroup.Exede
-          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
-          GetUsage()
-        Case Local.SatHostGroup.ExedeReseller
-          mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
-          GetUsage()
-        Case Local.SatHostGroup.Other
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.UnknownAccountType))
-      End Select
     End Sub
 #End Region
 #Region "Login Functions"
@@ -706,305 +386,19 @@
     End Sub
     Private Sub Login()
       c_Jar = New Net.CookieContainer
-      Select Case mySettings.AccountType
-        Case SatHostTypes.WildBlue_LEGACY : LoginWB()
-        Case SatHostTypes.WildBlue_EXEDE
-          If sProvider.ToUpperInvariant = "EXEDE.NET" Then
-            LoginExede()
-          ElseIf sProvider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-            LoginExedeR()
-          Else
-            LoginWB()
-          End If
-        Case SatHostTypes.WildBlue_EXEDE_RESELLER : LoginExedeR()
-        Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : LoginRP()
-        Case SatHostTypes.Dish_EXEDE : LoginDN()
-      End Select
-    End Sub
-    Private Sub LoginWB()
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Prepare))
-      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), "servLogin", IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
-      MakeSocket(False)
-      Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(uriString), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      WB_Login_Response(responseData, responseURI)
-    End Sub
-    Private Sub LoginExede()
       RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Prepare))
       Dim uriString As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/auth"
       EX_Init(uriString)
     End Sub
-    Private Sub LoginExedeR()
-      mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER
-      AJAXOrder = mySettings.AJAXShortOrder
-      AJAXFullOrder = mySettings.AJAXFullOrder
-      If AJAXOrder Is Nothing Or AJAXFullOrder Is Nothing Then
-        RaiseError("Can't determine AJAX order.")
-        Return
-      End If
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Initialize))
-      Dim uriString As String = "https://my." & sProvider & "/"
-      MakeSocket(False)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.ReadLogin))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(uriString), responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Login_Prepare_Response(responseData, responseURI, 0)
-    End Sub
-    Private Sub LoginRP()
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Prepare))
-      If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
-      MakeSocket(False)
-      Dim sSend As String = "warningTrip=false&userName=" & srlFunctions.PercentEncode(sUsername) & "&passwd=" & srlFunctions.PercentEncode(sPassword)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(uriString), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      RP_Login_Response(responseData, responseURI, False)
-    End Sub
-    Private Sub LoginDN()
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Prepare))
-      Dim uriString As String = "https://www.mydish.com/auth/login.ashx"
-      MakeSocket(False)
-      Dim bpf As String = "U"
-      bpf &= TimeZone.CurrentTimeZone.GetUtcOffset(New Date(2010, 12, 30)).TotalMinutes
-      bpf &= My.Computer.Info.InstalledUICulture.Name.Substring(My.Computer.Info.InstalledUICulture.Name.Length - 2)
-      bpf &= "qN|YMDHS|"
-      Dim myID As String = WebClientCore.UserAgent & My.Computer.Screen.WorkingArea.Width & My.Computer.Screen.WorkingArea.Height & My.Computer.Info.OSPlatform & "x86"
-      bpf &= DNHash(myID)
-      Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "&reCaptcha="
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(uriString), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      DN_Login_Response(responseData, responseURI)
-    End Sub
-    Private Shared Function DNHash(inStr As String) As String
-      If String.IsNullOrEmpty(inStr) Then Return 0
-      Dim a As Integer = 0
-      For I As Integer = 0 To inStr.Length - 1
-        Dim lVal As Long = a << 5
-        lVal = lVal - a
-        lVal = lVal + AscW(inStr(I))
-        If lVal > Integer.MaxValue Then
-          lVal -= &HFFFFFFFFUL
-        ElseIf lVal < Integer.MinValue Then
-          lVal += &HFFFFFFFFUL
-        End If
-        a = lVal
-      Next
-      Dim sA As String = a.ToString(Globalization.CultureInfo.InvariantCulture)
-      If sA.Length > 12 Then sA = sA.Substring(0, 12)
-      If sA(0) = "-" Then sA = "A" & sA.Substring(1)
-      Return sA
-    End Function
 #End Region
 #Region "Parsing Functions"
     Private Sub ReadUsage(Table As String)
       RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableRead))
-      Select Case mySettings.AccountType
-        Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
-        Case SatHostTypes.WildBlue_EXEDE
-          If sProvider.ToUpperInvariant = "EXEDE.NET" Then
-            EX_Read_Table(Table)
-          ElseIf sProvider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-            ER_Read_Table(Table)
-          Else
-            WB_Read_Table(Table)
-          End If
-        Case SatHostTypes.WildBlue_EXEDE_RESELLER : ER_Read_Table(Table)
-        Case SatHostTypes.RuralPortal_LEGACY, SatHostTypes.RuralPortal_EXEDE : RP_Read_Table(Table)
-        Case SatHostTypes.Dish_EXEDE : DN_Read_Table(Table)
-      End Select
+      EX_Read_Table(Table)
       c_Jar = New Net.CookieContainer
       srlFunctions.SendSocketErrors(sDataPath)
     End Sub
-#Region "WB"
-    Private Sub WB_Login_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Response.Contains("usage.jsp") Then
-        If justATest Then
-          RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_LEGACY))
-          Return
-        End If
-        WB_Usage("usage")
-      ElseIf Response.Contains("usage_bm.jsp") Then
-        If justATest Then
-          RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE))
-          Return
-        End If
-        WB_Usage("usage_bm")
-      ElseIf Response.Contains("<div class=""error"">") Then
-        Dim sMessage As String = Response.Substring(Response.IndexOf("<div class=""error"">"))
-        If sMessage.Contains("<b>") Then
-          sMessage = sMessage.Substring(sMessage.IndexOf("<b>") + 3)
-          sMessage = sMessage.Substring(0, sMessage.IndexOf("<"))
-          RaiseError("Login Failed: " & sMessage)
-        ElseIf sMessage.Contains("my.exede.net") Then
-          RaiseError("Login Failed: You must create an account at the new Exede Portal.")
-        Else
-          RaiseError("Login Failed: Could not understand error.", True, "WB Login Response", Response, ResponseURI)
-        End If
-      ElseIf Response.Contains("https://my.exede.net/usage") Then
-        mySettings.AccountType = SatHostTypes.WildBlue_EXEDE
-        RaiseError("Login Redirect: Exede account detected.")
-        GetUsage()
-      Else
-        RaiseError("Login Failed: Could not understand response.", True, "WB Login Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Sub WB_Usage(File As String)
-      MakeSocket(False)
-      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), File, IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(uriString), responseURI, responseData)
-      If ClosingTime Then Return
-      WB_Usage_Response(responseData, responseURI)
-    End Sub
-    Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MYACCOUNT." & IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "EXEDE.NET", sProvider.ToUpperInvariant) Then
-        RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Response.Contains("Usage Meter") Then
-        Dim sFind As String = Response.Substring(Response.IndexOf("Usage Meter"))
-        If sFind.Contains("<strong>Slowed Speed</strong>") Then imSlowed = True
-        If sFind.Contains("<table") Then
-          sFind = sFind.Substring(sFind.IndexOf("<table"))
-          Dim iSearch As Integer = 0
-          If sFind.ToUpperInvariant.Contains("BUY MORE") Then
-            iSearch = sFind.ToUpperInvariant.IndexOf("BUY MORE") + 13
-          End If
-          If sFind.Substring(iSearch).Contains("</table>") Then
-            sFind = sFind.Substring(0, sFind.IndexOf("</table>", iSearch))
-            ReadUsage(sFind)
-          Else
-            RaiseError("Usage Failed: Could not parse usage meter.", "WB Usage Response", Response, ResponseURI)
-          End If
-        ElseIf sFind.Contains("FREEDOM") AndAlso sFind.Contains("Current Usage<strong>:") Then
-          sFind = sFind.Substring(sFind.IndexOf("FREEDOM"))
-          If sFind.Contains("</td>") Then
-            sFind = sFind.Substring(0, sFind.IndexOf("</td>"))
-            ReadUsage(sFind)
-          Else
-            RaiseError("Usage Failed: Could not parse usage meter.", "WB Usage Response (Exede Freedom)", Response, ResponseURI)
-          End If
-        ElseIf sFind.Contains("At this time, your usage is not being counted toward your data allowance.") Then
-          imFree = True
-          RaiseError("Your usage is not being metered at this time!")
-        Else
-          RaiseError("Usage Failed: Could not find usage meter.", "WB Usage Response", Response, ResponseURI)
-        End If
-      ElseIf Response.Contains("<div class=""error"">") Then
-        Dim sMessage As String = Response.Substring(Response.IndexOf("<div class=""error"">"))
-        If sMessage.Contains("<b>") Then
-          sMessage = sMessage.Substring(sMessage.IndexOf("<b>") + 3)
-          sMessage = sMessage.Substring(0, sMessage.IndexOf("<"))
-          RaiseError("Usage Failed: " & sMessage)
-        Else
-          RaiseError("Usage Failed: Could not find usage meter.", "WB Usage Response (Error DIV but no BOLD text)", Response, ResponseURI)
-        End If
-      Else
-        Dim sErr As String = "Could not find usage meter."
-        If Response.Contains("Oops") Then
-          sErr = Response.Substring(Response.IndexOf("Oops"))
-          If sErr.Contains("</h3>") Then
-            sErr = sErr.Substring(0, sErr.IndexOf("</h3>"))
-            If sErr = "Oops. We're having a problem displaying your usage information." Or sErr = "Oops. We're having a problem displaying usage data" Then
-              RaiseError("Usage Failed: Data temporarily unavailable.")
-              Return
-            End If
-          ElseIf sErr.Contains("<hr>") Then
-            sErr = sErr.Substring(sErr.IndexOf("<hr>") + 4)
-            sErr = sErr.Substring(0, sErr.IndexOf("<hr>"))
-          End If
-          If sErr.Contains("<!-") Then
-            If sErr.Contains("->") Then
-              sErr = sErr.Substring(0, sErr.IndexOf("<!-")) & sErr.Substring(sErr.IndexOf("->") + 2)
-            End If
-          End If
-          RaiseError("Usage Failed: " & sErr, "WB Usage Response (Oops)", Response, ResponseURI)
-        Else
-          RaiseError("Usage Failed: " & sErr, "WB Usage Response", Response, ResponseURI)
-        End If
-      End If
-    End Sub
-    Private Sub WB_Read_Table(Table As String)
-      Dim sRows As String() = Split(Table, vbLf)
-      Dim sDown As String = String.Empty, sDownT As String = String.Empty, sUp As String = String.Empty, sUpT As String = String.Empty
-      If Table.Contains("threshold") Then
-        For Each row In sRows
-          If Not String.IsNullOrEmpty(row) Then
-            If row.Contains("<b>") And row.Contains("</b>") Then
-              If String.IsNullOrEmpty(sDown) Then
-                sDown = row.Substring(row.IndexOf("<b>") + 3)
-                sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-              ElseIf String.IsNullOrEmpty(sUp) Then
-                sUp = row.Substring(row.IndexOf("<b>") + 3)
-                sUp = sUp.Substring(0, sUp.IndexOf("</b>"))
-              ElseIf String.IsNullOrEmpty(sDownT) Then
-                sDownT = row.Substring(row.IndexOf("<b>") + 3)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf("</b>"))
-              ElseIf String.IsNullOrEmpty(sUpT) Then
-                sUpT = row.Substring(row.IndexOf("<b>") + 3)
-                sUpT = sUpT.Substring(0, sUpT.IndexOf("</b>"))
-                Exit For
-              End If
-            End If
-          End If
-        Next
-        If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
-          RaiseError("Usage Read Failed: Unable to parse data!", "WB Read Table", Table)
-        Else
-          ProviderSurvey("WBL")
-          RaiseEvent ConnectionWBLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
-        End If
-      ElseIf Table.Contains("allowance") Then
-        Dim sPlusT As String = String.Empty
-        For I As Integer = 0 To sRows.Length - 1
-          If Not String.IsNullOrEmpty(sRows(I)) Then
-            If sRows(I).Contains("<strong>") Then
-              If String.IsNullOrEmpty(sDownT) Then
-                sDownT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf("</strong>"))
-              ElseIf sRows(I).Contains("Total usage:") And sRows(I).Contains("</b>") And String.IsNullOrEmpty(sDown) Then
-                If sRows(I).Contains("<b>") And sRows(I).Contains("</b>") Then
-                  sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
-                  sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
-                End If
-              ElseIf sRows(I - 1).ToUpperInvariant.Contains("BUY MORE PURCHASED") And String.IsNullOrEmpty(sPlusT) Then
-                If sRows(I).ToUpperInvariant.Contains("<STRONG>") And sRows(I).ToUpperInvariant.Contains("</STRONG>") Then
-                  sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
-                  sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
-                End If
-              End If
-            End If
-          End If
-        Next
-        If String.IsNullOrEmpty(sDownT) Then
-          RaiseError("Usage Read Failed: Unable to parse data!", "WB-B Read Table", Table)
-        Else
-          ProviderSurvey("WBX")
-          RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sPlusT, MBPerGB), Now, imSlowed, imFree))
-        End If
-      Else
-        RaiseError("Usage Read Failed: Unable to locate data table!", "WB Read Table", Table)
-      End If
-    End Sub
-#End Region
-#Region "EX"
-#Region "Exede Helper Functions"
+#Region "EX Helper Functions"
     Private Shared Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
       Dim gS As Integer = find.IndexOf(groupS)
       If gS = -1 Then Return Nothing
@@ -1123,7 +517,7 @@
       If stateData IsNot Nothing Then ret("state") = stateData(0)
       Return ret
     End Function
-    Private Function EX_Helper_MakeLoginFromStruct(struct As Object, valList As Dictionary(Of String, String)) As Dictionary(Of String, Object)
+    Private Shared Function EX_Helper_MakeLoginFromStruct(struct As Object, valList As Dictionary(Of String, String)) As Dictionary(Of String, Object)
       Dim oRet As New Dictionary(Of String, Object)
       If Not struct.ContainsKey("value") Then Return New Dictionary(Of String, Object)
       If Not IsArray(struct("value")) Then Return New Dictionary(Of String, Object)
@@ -1152,7 +546,7 @@
       Return oRet
     End Function
 #End Region
-
+#Region "EX"
     Private Sub EX_Init(sURI As String)
       MakeSocket(True)
       RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Initialize))
@@ -1409,6 +803,10 @@
         Return
       End If
       If Not sToken.Contains("code=") Then
+        If Response.Contains("Access Forbidden") Then
+          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.TLSTooOld, "PROXY"))
+          Return
+        End If
         RaiseError("Could not log in.", "EX Home Response", Response, ResponseURI)
         Return
       End If
@@ -1476,6 +874,10 @@
         Dim sToken As String = assoc("data")("getTokenUsingCode")("accessToken")
         If String.IsNullOrEmpty(sToken) Then
           RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
+          Return
+        End If
+        If justATest Then
+          RaiseEvent LoginComplete(Me, New EventArgs)
           Return
         End If
         EX_Downlad_Table(sToken)
@@ -1596,1122 +998,14 @@
         If jUsage.ContainsKey("dataLeftText") AndAlso jUsage("dataLeftText") = "NONE" Then imSlowed = True
         sDown = jUsage("dataUsedGB")
         sDownT = jUsage("dataCapGB")
-        ProviderSurvey("VIA")
-        RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
+        RaiseEvent ConnectionResult(Me, New SiteResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
       Catch ex As Exception
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
       End Try
     End Sub
 #End Region
-#Region "ER"
-    Private Sub ER_Login_Prepare_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-      If Response.Contains("To access this website, update your web browser Or upgrade your operating system to support TLS 1.1 Or TLS 1.2.") Or Response.Contains("Stronger security Is required") Or Response = "Error: The server requires a specific SSL/TLS version. Please check your Network Security settings in the Configuration." Then
-        If (c_Protocol And SecurityProtocolTypeEx.Tls11) = SecurityProtocolTypeEx.Tls11 Or (c_Protocol And SecurityProtocolTypeEx.Tls12) = SecurityProtocolTypeEx.Tls12 Or (c_Protocol And SecurityProtocolTypeEx.Tls13) = SecurityProtocolTypeEx.Tls13 Then
-          If c_TLSProxy Then
-            RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "TLS Proxy failed to be of any use!"))
-            Return
-          End If
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.TLSTooOld, "PROXY"))
-          Return
-        End If
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.TLSTooOld, "VER"))
-        Return
-      End If
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MYSSO." & sProvider.ToUpperInvariant And Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
-        RaiseError("Prepare Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Response.ToUpperInvariant.Contains("UNABLE TO PROCESS REQUEST") Then
-        RaiseError("Prepare Failed: The server may be down.")
-        Return
-      End If
-      If Response.ToUpperInvariant.Contains(" DOWN FOR MAINTENANCE") Then
-        RaiseError("Prepare Failed: Server Down for Maintenance.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/FEDERATION/SSOREDIRECT/METAALIAS/WSUBSCRIBER/IDP" Then
-        If Response.Contains("location.href") Then
-          Dim sRedirURI As String = Response.Substring(Response.IndexOf("location.href"))
-          sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-          sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-          If sRedirURI = "/" Then
-            sRedirURI = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-          ElseIf sRedirURI.StartsWith("/") Then
-            sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-          End If
-          Dim response2Data As String = Nothing
-          Dim response2URI As Uri = Nothing
-          SendGET(New Uri(sRedirURI), response2URI, response2Data)
-          If ClosingTime Then Return
-          ER_Login_Prepare_Response(response2Data, response2URI, TryCount)
-        Else
-          RaiseError("Prepare Failed: Could not understand response.", "ER Login Prepare Response", Response, ResponseURI)
-        End If
-        Return
-      End If
-      If Not Response.Contains("<form") Or Not Response.Contains("name=""Login""") Then
-        RaiseError("Prepare Failed: Login form not found.", "ER Login Prepare Response", Response, ResponseURI)
-        Return
-      End If
-      Dim sURI As String = Response.Substring(Response.IndexOf("name=""Login"""))
-      sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-      sURI = sURI.Substring(0, sURI.IndexOf(""""))
-      If sURI.StartsWith("/") Then sURI = "https://" & ResponseURI.Host & sURI
-      Dim sGOTO As String = Nothing
-      If Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
-        sGOTO = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""goto"" value="""))
-        sGOTO = sGOTO.Substring(sGOTO.IndexOf("value=""") + 7)
-        If sGOTO.Contains(""" />") Then
-          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""" />"))
-        ElseIf sGOTO.Contains("""") Then
-          sGOTO = sGOTO.Substring(0, sGOTO.IndexOf(""""))
-        End If
-      End If
-      If String.IsNullOrEmpty(sGOTO) Then
-        RaiseError("Prepare Failed: GOTO value not found.", "ER Login Prepare Response", Response, ResponseURI)
-        Return
-      End If
-      Dim sSQPS As String = Nothing
-      If Response.Contains("<input type=""hidden"" name=""SunQueryParamsString"" value=""") Then
-        sSQPS = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SunQueryParamsString"" value="""))
-        sSQPS = sSQPS.Substring(sSQPS.IndexOf("value=""") + 7)
-        If sSQPS.Contains(""" />") Then
-          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""" />"))
-        ElseIf sSQPS.Contains("""") Then
-          sSQPS = sSQPS.Substring(0, sSQPS.IndexOf(""""))
-        End If
-      End If
-      If String.IsNullOrEmpty(sSQPS) Then
-        RaiseError("Prepare Failed: SunQueryParamsString value not found.", "ER Login Prepare Response", Response, ResponseURI)
-        Return
-      End If
-      ER_Login(sURI, sGOTO, sSQPS, TryCount)
-    End Sub
-    Private Sub ER_Login(sURI As String, sGOTO As String, sSQPS As String, TryCount As Integer)
-      MakeSocket(True)
-      Dim sSend As String = "realm=" & srlFunctions.PercentEncode("wsubscriber") &
-                           "&IDToken1=" & srlFunctions.PercentEncode(sUsername) &
-                           "&IDToken2=" & srlFunctions.PercentEncode(sPassword) &
-                           "&IDButton=Sign+in" &
-                           "&goto=" & srlFunctions.PercentEncode(sGOTO) &
-                           "&SunQueryParamsString=" & srlFunctions.PercentEncode(sSQPS) &
-                           "&encoded=true" &
-                           "&gx_charset=UTF-8"
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate, 0, TryCount))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(sURI), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Login_Response(responseData, responseURI, TryCount)
-    End Sub
-    Private Sub ER_Login2(sURI As String, TryCount As Integer)
-      MakeSocket(True)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate, 1, TryCount))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(sURI), responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Login_Response(responseData, responseURI, TryCount)
-    End Sub
-    Private Sub ER_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MYSSO." & sProvider.ToUpperInvariant Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Response.Contains("login-error-alert") Then
-        If Response.ToUpperInvariant.Contains("YOUR USERNAME AND/OR PASSWORD ARE INCORRECT.") Then
-          RaiseError("Login Failed: Incorrect Password")
-        ElseIf Response.ToUpperInvariant.Contains("YOUR ACCOUNT HAS BEEN LOCKED DUE TO EXCESSIVE FAILED LOG IN ATTEMPTS.") Then
-          RaiseError("Login Failed: Exede Reseller Account Locked. Check your username and password.")
-        ElseIf Response.ToUpperInvariant.Contains("YOUR SESSION HAS TIMED OUT.") Then
-          RaiseError("Login Failed: Session timed out. Please try again.")
-        ElseIf Response.ToUpperInvariant.Contains("THIS USER IS NOT ACTIVE.") Then
-          RaiseError("Login Failed: Exede Reseller Account Inactive. Check your username and password.")
-        Else
-          RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
-        End If
-        Return
-      ElseIf Response.Contains("<div class=""msgerror"">") Then
-        If Response.ToUpperInvariant.Contains("INVALID USER NAME OR PASSWORD") Then
-          RaiseError("Login Failed: Incorrect Password")
-        Else
-          RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
-        End If
-        Return
-      ElseIf Response.ToUpperInvariant.Contains("SORRY, WE'VE ENCOUNTERED AN UNEXPECTED ERROR.") Then
-        RaiseError("Login Failed: Server encountered an unexpected error.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/FEDERATION/UI/LOGIN" Then
-        If Response.Contains("window.location.href") Then
-          TryCount += 1
-          If TryCount > 15 Then
-            RaiseError("Login Failed: Server redirected too many times.")
-            Return
-          End If
-          MakeSocket(True)
-          Dim sRedirURI As String = Nothing
-          If Response.Contains("window.location.href = url + escapedHash;") Then
-            sRedirURI = Response.Substring(Response.IndexOf("var url"))
-          Else
-            sRedirURI = Response.Substring(Response.IndexOf("window.location.href"))
-          End If
-          sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
-          sRedirURI = sRedirURI.Substring(0, sRedirURI.IndexOf("'"))
-          If sRedirURI = "/" Then
-            sRedirURI = ResponseURI.AbsoluteUri.Substring(0, ResponseURI.AbsoluteUri.IndexOf("/", ResponseURI.AbsoluteUri.IndexOf("//") + 2))
-          ElseIf sRedirURI.StartsWith("/") Then
-            sRedirURI = "https://" & ResponseURI.Host & sRedirURI
-          End If
-          RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate, 0, TryCount))
-          Dim response2Data As String = Nothing
-          Dim response2URI As Uri = Nothing
-          SendGET(New Uri(sRedirURI), response2URI, response2Data)
-          If ClosingTime Then Return
-          ER_Login_Response(response2Data, response2URI, TryCount)
-        ElseIf Response.Contains("maintenance") Then
-          RaiseError("Login Failed: Server Down for Maintenance.")
-        ElseIf Response.Contains("https://DOMAIN.my.salesforce.com") Then
-          RaiseError("Login Failed: Server Down for Maintenance.")
-        ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-          RaiseError("Login Failed: Please check your account information and try again.")
-        Else
-          RaiseError("Login Failed: Could not understand response.", True, "ER Login Response", Response, ResponseURI)
-        End If
-        Return
-      End If
-      If Response.Contains("Access rights validated") Then
-        Dim sURI As String = Nothing
-        If Response.Contains("<form method=""post"" action=""") Then
-          sURI = Response.Substring(Response.IndexOf("<form method=""post"" action="""))
-          sURI = sURI.Substring(sURI.IndexOf("action=""") + 8)
-          If sURI.Contains(""">") Then
-            sURI = sURI.Substring(0, sURI.IndexOf(""">"))
-          Else
-            RaiseError("Login Failed: POST URL value cut off. Please try again.", "ER Login Response")
-            Return
-          End If
-          sURI = srlFunctions.HexDecode(sURI)
-        End If
-        If String.IsNullOrEmpty(sURI) Then sURI = ResponseURI.AbsoluteUri
-        Dim sSAMLResponse As String = Nothing
-        If Response.Contains("<input type=""hidden"" name=""SAMLResponse"" value=""") Then
-          sSAMLResponse = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""SAMLResponse"" value="""))
-          sSAMLResponse = sSAMLResponse.Substring(sSAMLResponse.IndexOf("value=""") + 7)
-          If sSAMLResponse.Contains(""" />") Then
-            sSAMLResponse = sSAMLResponse.Substring(0, sSAMLResponse.IndexOf(""" />"))
-          Else
-            RaiseError("Login Failed: SAML Response value cut off. Please try again.", "ER Login Response")
-            Return
-          End If
-        End If
-        If String.IsNullOrEmpty(sSAMLResponse) Then
-          RaiseError("Login Failed: SAML Response value not found.", "ER Login Response", Response, ResponseURI)
-          Return
-        End If
-        Dim sRelay As String = Nothing
-        If Response.Contains("<input type=""hidden"" name=""RelayState"" value=""") Then
-          sRelay = Response.Substring(Response.IndexOf("<input type=""hidden"" name=""RelayState"" value="""))
-          sRelay = sRelay.Substring(sRelay.IndexOf("value=""") + 7)
-          If sRelay.Contains(""" />") Then
-            sRelay = sRelay.Substring(0, sRelay.IndexOf(""" />"))
-          Else
-            RaiseError("Login Failed: Relay State value cut off. Please try again.", "ER Login Response")
-            Return
-          End If
-        End If
-        If String.IsNullOrEmpty(sRelay) Then
-          TryCount += 1
-          ER_Login2(sURI, TryCount)
-          Return
-        End If
-        ER_Authenticate(sURI, sSAMLResponse, sRelay)
-      ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value="""" />") Then
-        RaiseError("Login Failed: Please check your account information and try again.")
-      ElseIf Response.Contains("<input type=""hidden"" name=""goto"" value=""") Then
-        TryCount += 1
-        If TryCount > 15 Then
-          RaiseError("Login Failed: Server redirected too many times.")
-          Return
-        End If
-        ER_Login_Prepare_Response(Response, ResponseURI, TryCount)
-      Else
-        RaiseError("Could not log in.", "ER Login Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Sub ER_Authenticate(sURI As String, SAMLResponse As String, RelayState As String)
-      MakeSocket(True)
-      Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse))
-      If Not String.IsNullOrEmpty(RelayState) Then sSend &= "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadHome))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(sURI), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Authenticate_Response(responseData, responseURI)
-    End Sub
-    Private Sub ER_Authenticate_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
-        RaiseError("Authentication Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If ResponseURI.AbsolutePath.ToUpperInvariant.Contains("/IDENTITY/SAML/SAMLERROR") Or ResponseURI.AbsolutePath.ToUpperInvariant.Contains("/SSOERROR") Then
-        RaiseError("Authentication Failed: The server may be down.")
-        Return
-      End If
-      If ResponseURI.AbsolutePath.ToUpperInvariant = "/SECUR/FRONTDOOR.JSP" Then
-        Dim sURL As String = Nothing
-        If Response.Contains("location.href") Then
-          sURL = Response.Substring(Response.IndexOf("location.href"))
-          sURL = sURL.Substring(sURL.IndexOf("""") + 1)
-          sURL = sURL.Substring(0, sURL.IndexOf(""""))
-          If sURL = "/" Then
-            sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-          ElseIf sURL.StartsWith("/") Then
-            sURL = "https://" & ResponseURI.Host & sURL
-          End If
-        ElseIf Response.Contains("We are down for maintenance.") Then
-          RaiseError("Authentication Failed. If you get this error, please let me know immediately!")
-          Return
-        Else
-          If sProvider = "satelliteinternetco.com" Then
-            sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard"
-          Else
-            RaiseError("Authentication Failed: Unknown Provider - Can't determine Dashboard URL.")
-          End If
-        End If
-        If justATest Then
-          RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.WildBlue_EXEDE_RESELLER))
-          Return
-        End If
-        ER_Download_Homepage(sURL)
-        Return
-      End If
-      If Response.Contains("maintenance") Then
-        RaiseError("Authentication Failed: Server Down for Maintenance.")
-      Else
-        RaiseError("Authentication Failed: Could not understand response.", True, "ER Authenticate Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Structure AjaxEntry
-      Public ID As String
-      Public Iteration As Byte
-      Public Index As Integer
-      Public Sub New(iIdx As Integer, sID As String, bI As Byte)
-        Index = iIdx
-        ID = sID
-        Iteration = bI
-      End Sub
-    End Structure
-    Private AJAXFullOrder() As String
-    Private AJAXOrder() As String
-    Public ReadOnly Property ExedeResellerAJAXFirstTryRequests As Integer
-      Get
-        Return AJAXOrder.Length - 1
-      End Get
-    End Property
-    Public ReadOnly Property ExedeResellerAJAXSecondTryRequests As Integer
-      Get
-        Return AJAXFullOrder.Length - 1
-      End Get
-    End Property
-    Private Sub ER_Download_Homepage(sURI As String)
-      MakeSocket(True)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadAJAX, 1))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(sURI), responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Ajax_Response(responseData, responseURI, New AjaxEntry(0, AJAXOrder(0), 1))
-    End Sub
-    Private Sub ER_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
-        RaiseError("AJAX Load Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/SUBSCRIBER_DASHBOARD" Then
-        If Response.Contains("location.href") Then
-          Dim sURL As String = Nothing
-          sURL = Response.Substring(Response.IndexOf("location.href"))
-          sURL = sURL.Substring(sURL.IndexOf("'") + 1)
-          sURL = sURL.Substring(0, sURL.IndexOf("'"))
-          If sURL = "/" Then
-            sURL = ResponseURI.OriginalString.Substring(0, ResponseURI.OriginalString.IndexOf("/", ResponseURI.OriginalString.IndexOf("//") + 2))
-          ElseIf sURL.StartsWith("/") Then
-            sURL = "https://" & ResponseURI.Host & sURL
-          End If
-          ER_Download_Homepage(sURL)
-        ElseIf Response.Contains("maintenance") Then
-          RaiseError("AJAX Load Failed: Server Down for Maintenance.")
-        Else
-          RaiseError("AJAX Load Failed: Could not understand response.", True, "ER Ajax Response", Response, ResponseURI)
-        End If
-        Return
-      End If
-      If Response.Contains("amount-used") Then
-        If Response.Contains("green red") Then imSlowed = True
-        Dim sTable As String = Response.Substring(Response.LastIndexOf("<div class=""amount-used"""))
-        sTable = sTable.Substring(0, sTable.IndexOf("</p>") + 4)
-        ReadUsage(sTable)
-      ElseIf Response.Contains("<strong>Unable to load Usage information.<br /> Please try again later.</strong>") Then
-        RaiseError("Usage Failed: Data temporarily unavailable.")
-      ElseIf Response.Contains("<span id=""ajax-view-state""") Then
-        Dim AjaxViewState As String = Response.Substring(Response.IndexOf("<span id=""ajax-view-state"""))
-        AjaxViewState = AjaxViewState.Substring(0, AjaxViewState.IndexOf("</span>"))
-        Dim sViewState As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewState"""))
-        sViewState = sViewState.Substring(sViewState.IndexOf("value=""") + 7)
-        sViewState = sViewState.Substring(0, sViewState.IndexOf(""" />"))
-        Dim sVSVersion As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateVersion"""))
-        sVSVersion = sVSVersion.Substring(sVSVersion.IndexOf("value=""") + 7)
-        sVSVersion = sVSVersion.Substring(0, sVSVersion.IndexOf(""" />"))
-        Dim sVSMAC As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateMAC"""))
-        sVSMAC = sVSMAC.Substring(sVSMAC.IndexOf("value=""") + 7)
-        sVSMAC = sVSMAC.Substring(0, sVSMAC.IndexOf(""" />"))
-        Dim sVSCSRF As String = AjaxViewState.Substring(AjaxViewState.IndexOf("""com.salesforce.visualforce.ViewStateCSRF"""))
-        sVSCSRF = sVSCSRF.Substring(sVSCSRF.IndexOf("value=""") + 7)
-        sVSCSRF = sVSCSRF.Substring(0, sVSCSRF.IndexOf(""" />"))
-        Dim sURL As String = Nothing
-        If sProvider = "satelliteinternetco.com" Then
-          sURL = "https://" & ResponseURI.Host & "/subscriber_dashboard?refURL=https%3A%2F%2F" & ResponseURI.Host & "%2Fsubscriber_dashboard"
-        Else
-          RaiseError("AJAX Load Failed: Unknown Provider - Can't determine Dashboard URL.")
-        End If
-        ER_Download_Ajax(sURL, NextAjaxID, sViewState, sVSVersion, sVSMAC, sVSCSRF)
-      ElseIf Response.Contains("https://myexede.force.com/atlasPlanInvalid") Or Response.Contains("https://my." & sProvider & "/atlasPlanInvalid") Then
-        RaiseError("AJAX Load Failed: You no longer have access to MyExede. Please check back again or contact Customer Care [(855) 463-9333] if the problem persists.")
-      ElseIf Response.Contains("Concurrent requests limit exceeded.") Then
-        RaiseError("AJAX Load Failed: Too many requests. Check for usage data less often.")
-      ElseIf Response.Contains("maintenance") Then
-        RaiseError("AJAX Load Failed: Server Down for Maintenance.")
-      ElseIf Response.Contains("window.location.href") Then
-        RaiseError("AJAX Load Failed: Sent back to login page.")
-      ElseIf Response.Contains("Something went wrong.") Then
-        RaiseError("AJAX Load Failed: Server Error - Exede may be having trouble.")
-      Else
-        RaiseError("AJAX Load Failed: Could not find AJAX ViewState variables.", "ER Ajax Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Sub ER_Download_Ajax(sURI As String, AjaxID As AjaxEntry, sViewState As String, sVSVersion As String, sVSMAC As String, sVSCSRF As String)
-      MakeSocket(True)
-      Dim newIDX As Integer = AjaxID.Index
-      Dim newID As String = AjaxID.ID
-      Dim newType As Byte = AjaxID.Iteration
-      If (AjaxID.Iteration = 1 And AjaxID.Index = ExedeResellerAJAXFirstTryRequests) Or (AjaxID.Iteration > 1 And AjaxID.Index = ExedeResellerAJAXSecondTryRequests) Then
-        RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
-        newIDX = 0
-        newID = AJAXFullOrder(0)
-        newType += 1
-      ElseIf AjaxID.Iteration = 1 Then
-        Dim bShown As Boolean = False
-        For I As Integer = 0 To AJAXOrder.Length - 1
-          If AjaxID.ID = AJAXOrder(I) Then
-            RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadAJAX, I + 1))
-            newIDX = I + 1
-            newID = AJAXOrder(I + 1)
-            bShown = True
-            Exit For
-          End If
-        Next
-        If Not bShown Then
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "Unknown AJAX ID: " & AjaxID.ID & "."))
-          Return
-        End If
-      ElseIf AjaxID.Iteration < 4 Then
-        Dim bShown As Boolean = False
-        For I As Integer = 0 To AJAXFullOrder.Length - 1
-          If AjaxID.ID = AJAXFullOrder(I) Then
-            RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadAJAX, I + 1, 1))
-            newIDX = I + 1
-            newID = AJAXFullOrder(I + 1)
-            bShown = True
-            Exit For
-          End If
-        Next
-        If Not bShown Then
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "Unknown AJAX ID: " & AjaxID.ID & "."))
-          Return
-        End If
-      Else
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "AJAX failed to yield data table."))
-        Return
-      End If
-      Dim AJTable As String = AjaxID.ID.Substring(0, AjaxID.ID.LastIndexOf(":"))
-      Dim sSend As String =
-        "AJAXREQUEST=_viewRoot" &
-        "&" & srlFunctions.PercentEncode(AJTable) & "=" & srlFunctions.PercentEncode(AJTable) &
-        "&com.salesforce.visualforce.ViewState=" & srlFunctions.PercentEncode(sViewState) &
-        "&com.salesforce.visualforce.ViewStateVersion=" & srlFunctions.PercentEncode(sVSVersion) &
-        "&com.salesforce.visualforce.ViewStateMAC=" & srlFunctions.PercentEncode(sVSMAC) &
-        "&com.salesforce.visualforce.ViewStateCSRF=" & srlFunctions.PercentEncode(sVSCSRF) &
-        "&" & srlFunctions.PercentEncode(AjaxID.ID) & "=" & srlFunctions.PercentEncode(AjaxID.ID)
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(sURI), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      ER_Ajax_Response(responseData, responseURI, New AjaxEntry(newIDX, newID, newType))
-    End Sub
-    Private Sub ER_Read_Table(Table As String)
-      Dim Used As String = Nothing
-      Dim Total As String = Nothing
-      If Table.Contains("amount-used") Then
-        Used = Table.Substring(Table.IndexOf("amount-used"))
-        Used = Used.Substring(Used.IndexOf(""">") + 2)
-        Used = Used.Substring(0, Used.IndexOf("</"))
-        Total = Nothing
-        If Table.Contains("<strong>") Then
-          Total = Table.Substring(Table.IndexOf("<strong>") + 8)
-          If Total.Contains("</") Then
-            Total = Total.Substring(0, Total.IndexOf("</"))
-          Else
-            RaiseError("Usage Read Failed: Unable to parse Total!", "ER Read Table", Table)
-            Return
-          End If
-        End If
-      Else
-        RaiseError("Usage Read Failed: Unable to locate data table", "ER Read Table", Table)
-        Return
-      End If
-      Dim lUsed As Long = StrToVal(Used, MBPerGB)
-      Dim lTotal As Long = StrToVal(Total, MBPerGB)
-      If lTotal = 0 Then
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "Data temporarily unavailable."))
-      Else
-        ProviderSurvey("WXR")
-        RaiseEvent ConnectionWXRResult(Me, New TYPEBResultEventArgs(lUsed, lTotal, Now, imSlowed, imFree))
-      End If
-    End Sub
-#End Region
-#Region "RP"
-    Private Sub RP_Login_Retry(sURI As String)
-      MakeSocket(False)
-      Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-      Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & srlFunctions.PercentEncode(sPassword)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate, 0, 1))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(sURI), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      RP_Login_Response(responseData, responseURI, True)
-    End Sub
-    Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = sProvider.ToUpperInvariant & ".RURALPORTAL.NET" Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If ResponseURI.AbsolutePath.ToUpperInvariant.StartsWith("/US/HOME.DO") Then
-        RP_Usage("sitemanage")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant.StartsWith("/US/LOGIN.DO") Then
-        RaiseError("Login Failed: Could not understand response.", True, "RP Login Response", Response, ResponseURI)
-        Return
-      End If
-      If Not String.IsNullOrEmpty(ResponseURI.Query) Then
-        If ResponseURI.Query.ToUpperInvariant.Contains("PASS=FALSE") Then
-          RaiseError("Login Failed: Incorrect password.")
-          Return
-        End If
-      End If
-      If Not Response.ToUpperInvariant.Contains("CONFIRMCHANGE(MSG);") Then
-        RaiseError("Login Failed: Sent back to login page.", True)
-        Return
-      End If
-      If String.IsNullOrEmpty(sProvider) Then
-        RaiseError("Login Error: Provider missing. Also, your password is bad. You'll need to change it.")
-        Return
-      End If
-      If Retry Then
-        RaiseError("Login Issue: Your password is bad.")
-        If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-        Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
-        Try
-          Process.Start(uriString)
-        Catch ex As Exception
-        End Try
-      Else
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginIssue, "Your password needs to be changed."))
-        If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-        Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
-        RP_Login_Retry(uriString)
-      End If
-    End Sub
-    Private Sub RP_Usage(File As String)
-      If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, File)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
-      MakeSocket(False)
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(uriString), responseURI, responseData)
-      If ClosingTime Then Return
-      RP_Usage_Response(responseData, responseURI)
-    End Sub
-    Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = sProvider.ToUpperInvariant & ".RURALPORTAL.NET" Then
-        RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Not Response.Contains("Current Usage") Then
-        If Response.Contains("<table width=""100%"" class=""tabpane"" id=""infoTable"" style=""display:"" >") Then
-          Dim sResponseTable As String = Response.Substring(Response.IndexOf("<table width=""100%"" class=""tabpane"" id=""infoTable"" style=""display:"" >") + 69).Trim
-          If String.IsNullOrEmpty(sResponseTable) OrElse sResponseTable.StartsWith("</form>") Then
-            RaiseError("Usage Failed: Data temporarily unavailable.")
-          Else
-            RaiseError("Usage Failed: Could not find usage meter", True, "RP Usage Response", Response, ResponseURI)
-          End If
-        Else
-          RaiseError("Usage Failed: Failed to log in.", True, "RP Usage Response", Response, ResponseURI)
-        End If
-        Return
-      End If
-      If Response.Contains("Usage data is not available.") Then
-        RaiseError("Usage Failed: Data temporarily unavailable.")
-        Return
-      End If
-      If Not Response.Contains("<!-- Start Usage Bar -->") Then
-        RaiseError("Usage Failed: Could not find usage meter.", "RP Usage Response", Response, ResponseURI)
-        Return
-      End If
-      Dim sFind As String = Response.Substring(Response.IndexOf("<!-- Start Usage Bar -->"))
-      If Not sFind.Contains("<table") Then
-        RaiseError("Usage Failed: Could not find usage meter table.", "RP Usage Response", Response, ResponseURI)
-        Return
-      End If
-      sFind = sFind.Substring(sFind.IndexOf("<table"))
-      If sFind.Contains("</table>") And sFind.Contains("<!-- Buy more -->") Then
-        sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- Buy more -->")))
-        ReadUsage(sFind)
-      ElseIf sFind.Contains("</table>") And sFind.Contains("<!-- End up/down stream -->") Then
-        sFind = sFind.Substring(0, sFind.IndexOf("</table>", sFind.IndexOf("<!-- End up/down stream -->")))
-        ReadUsage(sFind)
-      Else
-        RaiseError("Usage Failed: Could not parse usage meter table.", "RP Usage Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Sub RP_Read_Table(Table As String)
-      Table = Replace(Table, vbCr, "")
-      Table = Replace(Table, vbLf, "")
-      Table = Replace(Table, vbTab, " ")
-      Do While Table.Contains("  ")
-        Table = Replace(Table, "  ", " ")
-      Loop
-      Dim CTag As Boolean = False
-      For I As Integer = 0 To Table.Length - 1
-        If Table(I) = "<" Then
-          CTag = False
-        ElseIf Table(I) = "/" Then
-          CTag = True
-        ElseIf Table(I) = ">" And CTag Then
-          Table = Table.Insert(I + 1, vbLf)
-          CTag = False
-        End If
-      Next
-      Table = Replace(Table, "><", ">" & vbLf & "<")
-      Table = Replace(Table, "> <", ">" & vbLf & "<")
-      If Table.Contains("MB)") Then
-        If justATest Then
-          RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_LEGACY))
-          Return
-        End If
-        Dim sRows As String() = Split(Table, vbLf)
-        Dim sDown As String = String.Empty, sDownT As String = String.Empty, sUp As String = String.Empty, sUpT As String = String.Empty
-        For Each row In sRows
-          If Not String.IsNullOrEmpty(row) Then
-            If row.Contains(" MB)") Then
-              If String.IsNullOrEmpty(sUp) Then
-                sUp = row.Substring(row.IndexOf("% (") + 3)
-                sUp = sUp.Substring(0, sUp.IndexOf(" MB)"))
-              ElseIf String.IsNullOrEmpty(sDown) Then
-                sDown = row.Substring(row.IndexOf("% (") + 3)
-                sDown = sDown.Substring(0, sDown.IndexOf(" MB)"))
-              End If
-            ElseIf row.Contains("MB Limit:") Then
-              Dim sLimit As String = row.Substring(row.IndexOf("MB Limit:") + 10)
-              sLimit = sLimit.Substring(0, sLimit.IndexOf("</td>"))
-              sUpT = sLimit.Substring(0, sLimit.IndexOf(" Up"))
-              sDownT = sLimit.Substring(sLimit.IndexOf("Up / ") + 5)
-              sDownT = sDownT.Substring(0, sDownT.IndexOf(" Down"))
-              Exit For
-            End If
-          End If
-        Next
-        If String.IsNullOrEmpty(sDownT) Or String.IsNullOrEmpty(sUpT) Then
-          RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
-        Else
-          ProviderSurvey("RPL")
-          RaiseEvent ConnectionRPLResult(Me, New TYPEAResultEventArgs(StrToVal(sDown), StrToVal(sDownT), StrToVal(sUp), StrToVal(sUpT), Now, imSlowed, imFree))
-        End If
-      ElseIf Table.Contains(" GB (") Then
-        If justATest Then
-          RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.RuralPortal_EXEDE))
-          Return
-        End If
-        Dim sBuyMore As String = "0"
-        Dim sBuyMoreT As String = "0"
-        If Table.Contains("Within Normal Usage") Then
-          imSlowed = False
-        ElseIf Table.Contains("Approaching Package Threshold") Or Table.Contains("Exceeded DAP Threshold") Then
-          imSlowed = True
-        ElseIf Table.Contains("Using Buy More") Then
-          sBuyMore = ""
-          sBuyMoreT = ""
-        Else
-          RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginIssue, "Unknown usage state message. Requesting page source code for assistance improving the next version...", "Issue at RP Read Table: ""Unknown usage state message.""" & vbNewLine & "Data: " & vbNewLine & Table))
-        End If
-        Dim sRows As String() = Split(Table, vbLf)
-        Dim sDown As String = String.Empty, sDownT As String = String.Empty, sOverhead As String = String.Empty
-        For Each row In sRows
-          If Not String.IsNullOrEmpty(row) Then
-            If row.Contains(" GB of ") And row.Contains(" GB (") And row.Contains("%)") Then
-              If String.IsNullOrEmpty(sDown) And String.IsNullOrEmpty(sDownT) Then
-                sDown = row.Substring(0, row.IndexOf(" of ")).Trim
-                If sDown.Contains(">") Then sDown = sDown.Substring(sDown.LastIndexOf(">") + 1)
-                sDownT = row.Substring(row.IndexOf(" of ") + 4)
-                sDownT = sDownT.Substring(0, sDownT.IndexOf(" ("))
-                If Not Table.Contains("Breach:") Then Exit For
-              ElseIf String.IsNullOrEmpty(sBuyMore) And String.IsNullOrEmpty(sBuyMoreT) Then
-                sBuyMore = row.Substring(0, row.IndexOf(" of ")).Trim
-                If sBuyMore.Contains(">") Then sBuyMore = sBuyMore.Substring(sBuyMore.LastIndexOf(">") + 1)
-                sBuyMoreT = row.Substring(row.IndexOf(" of ") + 4)
-                sBuyMoreT = sBuyMoreT.Substring(0, sBuyMoreT.IndexOf(" ("))
-                Exit For
-              End If
-            ElseIf row.Contains("<td class=""red"" colspan=""2"">") Then
-              sOverhead = row.Substring(row.IndexOf(">") + 1)
-              If sOverhead.Contains("<") Then
-                sOverhead = sOverhead.Substring(0, sOverhead.IndexOf("<"))
-              Else
-                sOverhead = String.Empty
-              End If
-              Exit For
-            End If
-          End If
-        Next
-        If String.IsNullOrEmpty(sDownT) Then
-          RaiseError("Usage Read Failed: Unable to parse data!", "RP Read Table", Table)
-        Else
-          ProviderSurvey("RPX")
-          RaiseEvent ConnectionRPXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB) + StrToVal(sOverhead, MBPerGB) + StrToVal(sBuyMore, MBPerGB), StrToVal(sDownT, MBPerGB) + StrToVal(sBuyMoreT, MBPerGB), Now, imSlowed, imFree))
-        End If
-      Else
-        RaiseError("Usage Read Failed: Unable to locate data table!", "RP Read Table", Table)
-      End If
-    End Sub
-#End Region
-#Region "DN"
-    Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "WWW.MYDISH.COM" Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("LOGIN.ASHX") Then
-        RaiseError("Login Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
-        Return
-      End If
-      If Not Response.Contains("""Success"":true") Then
-        Dim sFail As String = Response.Substring(Response.IndexOf("""DisplayMessage"":""") + 18)
-        sFail = sFail.Substring(0, sFail.IndexOf(""","""))
-        RaiseError("Login Failed: " & sFail)
-        Return
-      End If
-      DN_Login_Continue("https://www.mydish.com/auth/saml/login.aspx?relaystate=" & srlFunctions.PercentEncode("/usermanagement/processMyDishResponse.do"))
-    End Sub
-    Private Sub DN_Login_Continue(sURI As String)
-      MakeSocket(False)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Authenticate))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(sURI), responseURI, responseData)
-      If ClosingTime Then Return
-      DN_Login_Continue_Response(responseData, responseURI)
-    End Sub
-    Private Sub DN_Login_Continue_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "WWW.MYDISH.COM" Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("LOGIN.ASPX") Then
-        RaiseError("Login Failed: Could not understand response.", True, "DN Login Continue Response", Response, ResponseURI)
-        Return
-      End If
-      If Response.Contains("SAMLResponse"" value=""") Then
-        Dim SAMLResponse As String
-        SAMLResponse = Response.Substring(Response.IndexOf("SAMLResponse"" value=""") + 21)
-        If SAMLResponse.Contains("""/>") Then
-          SAMLResponse = SAMLResponse.Substring(0, SAMLResponse.IndexOf("""/>"))
-        Else
-          RaiseError("Login Failed: Incomplete SAML Response Data.", "DN Login Continue Response", Response, ResponseURI)
-          Return
-        End If
-        Dim RelayState As String
-        RelayState = Response.Substring(Response.IndexOf("RelayState"" value=""") + 19)
-        If RelayState.Contains("""/>") Then
-          RelayState = RelayState.Substring(0, RelayState.IndexOf("""/>"))
-        Else
-          RaiseError("Login Failed: Incomplete Relay State Data.", "DN Login Continue Response", Response, ResponseURI)
-          Return
-        End If
-        DN_Login_Verify(SAMLResponse, RelayState)
-      ElseIf Response.Contains("The system is currently unavailable. Please try again later.") Then
-        RaiseError("System currently unavailable.")
-      ElseIf Response.Contains("<div class=""custom_message_text"">") Then
-        Dim sErrMsg As String = Response.Substring(Response.IndexOf("<div class=""custom_message_text"">") + 33)
-        sErrMsg = sErrMsg.Substring(0, sErrMsg.IndexOf("<"))
-        RaiseError(sErrMsg.Trim)
-      Else
-        RaiseError("Login Failed: No SAML Response", "DN Login Continue Response", Response, ResponseURI)
-      End If
-    End Sub
-    Private Sub DN_Login_Verify(SAMLResponse As String, RelayState As String)
-      MakeSocket(False)
-      Dim uriString As String = "https://my.dish.com/customercare/saml/post"
-      Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode(RelayState)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Login, SiteConnectionSubStates.Verify))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(uriString), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      DN_Login_Verify_Response(responseData, responseURI, RelayState)
-    End Sub
-    Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri, ExpectedURI As String)
-      If CheckForErrors(Response, ResponseURI, True) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Not ResponseURI.OriginalString.ToUpperInvariant.Contains(ExpectedURI.ToUpperInvariant) Then
-        RaiseError("Login Failed: Could not understand response.", True, "Dish Login Verify Response", Response, ResponseURI)
-        Return
-      End If
-      If justATest Then
-        RaiseEvent LoginComplete(Me, New LoginCompletionEventArgs(SatHostTypes.Dish_EXEDE))
-        Return
-      End If
-      DN_Download_Home()
-    End Sub
-    Private Sub DN_Download_Home()
-      MakeSocket(False)
-      Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
-      Dim sSend As String = "check="
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadHome))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendPOST(New Uri(uriString), sSend, responseURI, responseData)
-      If ClosingTime Then Return
-      DN_Download_Home_Response(responseData, responseURI)
-    End Sub
-    Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI, True) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
-        RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Response.Contains("The requested URL was rejected.") Then
-        RaiseError("Login Failed: The server rejected the request.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("ACCOUNTSUMMARY") Then
-        RaiseError("Home Read Failed: Could not load home page. Redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """.", "DN Download Home Response", Response, ResponseURI)
-        Return
-      End If
-      DN_Download_Table()
-    End Sub
-    Private Sub DN_Download_Table()
-      MakeSocket(False)
-      Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(New Uri(uriString), responseURI, responseData)
-      If ClosingTime Then Return
-      DN_Download_Table_Response(responseData, responseURI)
-    End Sub
-    Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
-      If CheckForErrors(Response, ResponseURI) Then Return
-      If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
-        RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """, check your Internet connection.")
-        Return
-      End If
-      If Response.Contains("The requested URL was rejected.") Then
-        RaiseError("Usage Failed: The server rejected the request.")
-        Return
-      End If
-      If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("INTERNET") Then
-        RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & srlFunctions.TruncateAddress(ResponseURI) & """.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      If Not Response.Contains("widgetLoadUrls[widgetListCount]") Then
-        RaiseError("Usage Failed: Could not find usage meter.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      Dim sUsageDiv As String = Response.Substring(Response.IndexOf("widgetLoadUrls[widgetListCount]"))
-      If Not sUsageDiv.Contains("</form>") Then
-        RaiseError("Usage Failed: Could not parse usage data.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</form>"))
-      If Not sUsageDiv.ToUpperInvariant.Contains("REMAINING CAPACITY") Then
-        RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response", Response, ResponseURI)
-        Return
-      End If
-      ReadUsage(sUsageDiv)
-    End Sub
-    Private Sub DN_Read_Table(Table As String)
-      Dim findCRLF As String = vbLf
-      If Table.Contains(vbNewLine) Then
-        findCRLF = vbNewLine
-      ElseIf Table.Contains(vbLf) Then
-        findCRLF = vbLf
-      ElseIf Table.Contains(vbCr) Then
-        findCRLF = vbCr
-      End If
-      Dim opV As String = Nothing
-      Dim opM As String = Nothing
-      Dim atV As String = Nothing
-      Dim atM As String = Nothing
-      Dim atxV As String = Nothing
-      Dim atxM As String = Nothing
-
-      Dim scriptSegment As String = Nothing
-      If Table.Contains("</script>") Then
-        scriptSegment = Table.Substring(0, Table.IndexOf("</script>"))
-      End If
-      If Not String.IsNullOrEmpty(scriptSegment) Then
-        Dim widgetData() As String = Split(scriptSegment, findCRLF & findCRLF & findCRLF)
-        Dim wMeterData As New Specialized.StringDictionary
-        For Each widget In widgetData
-          Dim widgetLines() As String = Split(widget, findCRLF)
-          Dim isMeter As Boolean = False
-          For Each wLine In widgetLines
-            If wLine.Contains("'/customercare/widgets/loadMeter.do?'") Then
-              isMeter = True
-            End If
-          Next
-          If Not isMeter Then Continue For
-          Dim wID As String = Nothing
-          Dim wAttrs As String = Nothing
-          For Each wLine In widgetLines
-            If wLine.Contains("widgetUniqueIds[widgetListCount]") Then
-              wID = wLine
-              If wID.Contains(" = ") Then wID = wID.Substring(wID.IndexOf(" = ") + 3)
-              If wID.Contains("'") Then
-                wID = wID.Substring(wID.IndexOf("'") + 1)
-                If wID.Contains("'") Then wID = wID.Substring(0, wID.IndexOf("'"))
-              ElseIf wID.Contains("""") Then
-                wID = wID.Substring(wID.IndexOf("""") + 1)
-                If wID.Contains("""") Then wID = wID.Substring(0, wID.IndexOf(""""))
-              ElseIf wID.Contains(";") Then
-                wID = wID.Substring(0, wID.IndexOf(";"))
-              ElseIf wID.Contains(findCRLF) Then
-                wID = wID.Substring(0, wID.IndexOf(findCRLF))
-              End If
-            End If
-            If wLine.Contains("widgetAttrsJsons[widgetListCount]") Then
-              wAttrs = wLine
-              If wAttrs.Contains(" = ") Then wAttrs = wAttrs.Substring(wAttrs.IndexOf(" = ") + 3)
-              If wAttrs.Contains("""") Then
-                wAttrs = wAttrs.Substring(wAttrs.IndexOf("""") + 1)
-                If wAttrs.Contains("""") Then wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(""""))
-              ElseIf wAttrs.Contains("'") Then
-                wAttrs = wAttrs.Substring(wAttrs.IndexOf("'") + 1)
-                If wAttrs.Contains("'") Then wAttrs = wAttrs.Substring(0, wAttrs.IndexOf("'"))
-              ElseIf wAttrs.Contains(";") Then
-                wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(";"))
-              ElseIf wAttrs.Contains(findCRLF) Then
-                wAttrs = wAttrs.Substring(0, wAttrs.IndexOf(findCRLF))
-              End If
-            End If
-            If Not String.IsNullOrEmpty(wID) And Not String.IsNullOrEmpty(wAttrs) Then
-              wMeterData.Add(wID, wAttrs)
-              Exit For
-            End If
-          Next
-        Next
-        If wMeterData.ContainsKey("w_meter_0") Then
-          Dim sJSON As String = wMeterData("w_meter_0")
-          If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
-          If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
-          If sJSON.Contains(",") Then
-            Dim jsLines As New Specialized.StringDictionary
-            Dim sJSLines() As String = Split(sJSON, ",")
-            For Each sJSLine In sJSLines
-              If Not sJSLine.Contains(":") Then Continue For
-              If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
-              Dim sKeyVal() As String = Split(sJSLine, ":", 2)
-              jsLines.Add(sKeyVal(0), sKeyVal(1))
-            Next
-            If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
-              opV = jsLines("progressValueAttr")
-              If opV.Contains("ATTRIBUTE ERROR E11") Then opV = Nothing
-              opM = jsLines("maxValueAttr")
-              If opM.Contains("ATTRIBUTE ERROR E11") Then opM = Nothing
-            End If
-          End If
-        End If
-        If wMeterData.ContainsKey("w_meter_1") Then
-          Dim sJSON As String = wMeterData("w_meter_1")
-          If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
-          If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
-          If sJSON.Contains(",") Then
-            Dim jsLines As New Specialized.StringDictionary
-            Dim sJSLines() As String = Split(sJSON, ",")
-            For Each sJSLine In sJSLines
-              If Not sJSLine.Contains(":") Then Continue For
-              If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
-              Dim sKeyVal() As String = Split(sJSLine, ":", 2)
-              jsLines.Add(sKeyVal(0), sKeyVal(1))
-            Next
-            If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
-              atV = jsLines("progressValueAttr")
-              If atV.Contains("ATTRIBUTE ERROR E11") Then atV = Nothing
-              atM = jsLines("maxValueAttr")
-              If atM.Contains("ATTRIBUTE ERROR E11") Then atM = Nothing
-            End If
-          End If
-        End If
-        If wMeterData.ContainsKey("w_meter_2") Then
-          Dim sJSON As String = wMeterData("w_meter_2")
-          If sJSON.StartsWith("{") Then sJSON = sJSON.Substring(1)
-          If sJSON.EndsWith("}") Then sJSON = sJSON.Substring(0, sJSON.Length - 1)
-          If sJSON.Contains(",") Then
-            Dim jsLines As New Specialized.StringDictionary
-            Dim sJSLines() As String = Split(sJSON, ",")
-            For Each sJSLine In sJSLines
-              If Not sJSLine.Contains(":") Then Continue For
-              If sJSLine.Contains("'") Then sJSLine = Replace(sJSLine, "'", "")
-              Dim sKeyVal() As String = Split(sJSLine, ":", 2)
-              jsLines.Add(sKeyVal(0), sKeyVal(1))
-            Next
-            If jsLines.ContainsKey("progressValueAttr") And jsLines.ContainsKey("maxValueAttr") Then
-              atxV = jsLines("progressValueAttr")
-              If atxV.Contains("ATTRIBUTE ERROR E11") Then atxV = Nothing
-              atxM = jsLines("maxValueAttr")
-              If atxM.Contains("ATTRIBUTE ERROR E11") Then atxM = Nothing
-            End If
-          End If
-        End If
-      End If
-
-      Dim htmlSegment As String = Nothing
-      If Table.Contains("<div class=""row PrimSec bbActive"">") Then
-        htmlSegment = Table.Substring(Table.IndexOf("<div class=""row PrimSec bbActive"">"))
-        If htmlSegment.Contains("<div class=""row""><div class=""col-xs-12 col-lg-12 label"">&nbsp;</div></div>") Then
-          htmlSegment = htmlSegment.Substring(0, htmlSegment.IndexOf("<div class=""row""><div class=""col-xs-12 col-lg-12 label"">&nbsp;</div></div>"))
-        End If
-      End If
-      If Not String.IsNullOrEmpty(htmlSegment) Then
-        If htmlSegment.Contains("<h3 class=""secondaryHeader"">Monthly Capacity</h3>") Then
-          htmlSegment = htmlSegment.Substring(htmlSegment.IndexOf("<h3 class=""secondaryHeader"">Monthly Capacity</h3>"))
-        End If
-        If htmlSegment.Contains(" GB") Then
-          Dim htmlParts() As String = Split(htmlSegment, " GB")
-          If htmlParts.Length >= 5 Then
-            ReDim Preserve htmlParts(4)
-            For I As Integer = 0 To htmlParts.Length - 1
-              htmlParts(I) = htmlParts(I).Substring(htmlParts(I).LastIndexOf(""">") + 2)
-              CleanupResult(htmlParts(I))
-            Next
-            If Not String.IsNullOrEmpty(htmlParts(0)) Then
-              If String.IsNullOrEmpty(opM) Then
-                opM = htmlParts(0)
-              Else
-                If Not opM = htmlParts(0) Then
-                  RaiseError("Not sure about this usage data (Off-Peak Max). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
-                  opM = htmlParts(0)
-                End If
-              End If
-              If opM.Contains("ATTRIBUTE ERROR E11") Then opM = Nothing
-            End If
-            If Not String.IsNullOrEmpty(htmlParts(1)) Then
-              If String.IsNullOrEmpty(atM) Then
-                atM = htmlParts(1)
-              Else
-                If Not atM = htmlParts(1) Then
-                  RaiseError("Not sure about this usage data (Anytime Max). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
-                  atM = htmlParts(1)
-                End If
-              End If
-              If atM.Contains("ATTRIBUTE ERROR E11") Then atM = Nothing
-            End If
-            If Not String.IsNullOrEmpty(htmlParts(2)) Then
-              If String.IsNullOrEmpty(opV) Then
-                opV = htmlParts(2)
-              Else
-                If Not opV = htmlParts(2) Then
-                  RaiseError("Not sure about this usage data (Off-Peak Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
-                  opV = htmlParts(2)
-                End If
-              End If
-              If opV.Contains("ATTRIBUTE ERROR E11") Then opV = Nothing
-            End If
-            If Not String.IsNullOrEmpty(htmlParts(3)) Then
-              If String.IsNullOrEmpty(atV) Then
-                atV = htmlParts(3)
-              Else
-                If Not atV = htmlParts(3) Then
-                  RaiseError("Not sure about this usage data (Anytime Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
-                  atV = htmlParts(3)
-                End If
-              End If
-              If atV.Contains("ATTRIBUTE ERROR E11") Then atV = Nothing
-            End If
-            If Not String.IsNullOrEmpty(htmlParts(4)) Then
-              If String.IsNullOrEmpty(atxV) Then
-                atxV = htmlParts(4)
-              Else
-                If Not atxV = htmlParts(4) Then
-                  RaiseError("Not sure about this usage data (Additional Value). Gonna take a closer look...", False, "DN Read Table", Table, Nothing)
-                  atxV = htmlParts(4)
-                End If
-              End If
-              If atxV.Contains("ATTRIBUTE ERROR E11") Then atxV = Nothing
-            End If
-          End If
-        End If
-      End If
-      If String.IsNullOrEmpty(atM) And String.IsNullOrEmpty(atV) And String.IsNullOrEmpty(opM) And String.IsNullOrEmpty(opV) Then
-        RaiseError("Usage Read Failed: Unable to locate data table!", "DN Read Table", Table)
-        Return
-      End If
-      If String.IsNullOrEmpty(atM) Or String.IsNullOrEmpty(atV) Or String.IsNullOrEmpty(opM) Or String.IsNullOrEmpty(opV) Then
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "Data temporarily unavailable."))
-        Return
-      End If
-      Dim lDown, lDownT, lUp, lUpT As Long
-      lDownT = StrToVal(atM, MBPerGB)
-      lUpT = StrToVal(opM, MBPerGB)
-      If lDownT = 0 Or lUpT = 0 Then
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, "Data temporarily unavailable."))
-        Return
-      End If
-      lDown = lDownT - StrToVal(atV, MBPerGB)
-      lUp = lUpT - StrToVal(opV, MBPerGB)
-      If Not String.IsNullOrEmpty(atxV) And Not String.IsNullOrEmpty(atxM) Then
-        If StrToFloat(atxV) > 0.0 Then
-          lDown += StrToVal(atxV, MBPerGB)
-          lDownT += StrToVal(atxM, MBPerGB)
-        End If
-      End If
-      ProviderSurvey("DNX")
-      RaiseEvent ConnectionDNXResult(Me, New TYPEA2ResultEventArgs(lDown, lDownT, lUp, lUpT, Now, imSlowed, imFree))
-    End Sub
-#End Region
 #End Region
 #Region "Useful Functions"
-    Private Sub ProviderSurvey(s As String)
-      Dim sURI As New Uri("https://wb.realityripple.com/providerSurvey.php?p=" & s)
-      Dim responseData As String = Nothing
-      Dim responseURI As Uri = Nothing
-      SendGET(sURI, responseURI, responseData)
-    End Sub
     Private Sub MakeSocket(KeepAlive As Boolean, Optional ManualRedirect As Boolean = True)
       Dim oldEncoding As System.Text.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
       If wsSocket IsNot Nothing Then
@@ -2767,9 +1061,9 @@
       If cl IsNot Nothing Then
         For Each cookie As Net.Cookie In cl
           sCookieData &= cookie.Domain & vbTab &
-                       (Not cookie.HttpOnly).ToString.ToLowerInvariant & vbTab &
-                       cookie.Secure.ToString.ToLowerInvariant & vbTab &
-                       cookie.Domain.StartsWith(".").ToString.ToLowerInvariant & vbTab &
+                         (Not cookie.HttpOnly).ToString.ToLowerInvariant & vbTab &
+                         cookie.Secure.ToString.ToLowerInvariant & vbTab &
+                         cookie.Domain.StartsWith(".").ToString.ToLowerInvariant & vbTab &
                          cookie.Path & vbTab &
                          (cookie.Expires.ToUniversalTime - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds & vbTab &
                          cookie.Name & vbTab &
@@ -2879,17 +1173,15 @@
       Dim bUTF() As Byte = System.Text.Encoding.UTF8.GetBytes(regularStr)
       Return Convert.ToBase64String(bUTF)
     End Function
-    Private Function CheckForErrors(response As String, responseURI As Uri, Optional IgnoreResponseData As Boolean = False) As Boolean
-      If Not IgnoreResponseData Then
-        If String.IsNullOrEmpty(response) OrElse response = "Error: The server sent an empty response. Please try again." Then
-          RaiseError("The server sent an empty response. Please try again.")
-          Return True
-        End If
-        If response.StartsWith("Error: ") Then
-          Dim sError As String = response.Substring(7)
-          RaiseError(sError)
-          Return True
-        End If
+    Private Function CheckForErrors(response As String, responseURI As Uri) As Boolean
+      If String.IsNullOrEmpty(response) OrElse response = "Error: The server sent an empty response. Please try again." Then
+        RaiseError("The server sent an empty response. Please try again.")
+        Return True
+      End If
+      If response.StartsWith("Error: ") Then
+        Dim sError As String = response.Substring(7)
+        RaiseError(sError)
+        Return True
       End If
       If response = "Connection timed out." Then
         RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.ConnectionTimeout))
@@ -2936,14 +1228,6 @@
       If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
       RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, ErrorMessage))
     End Sub
-    Private Sub RaiseError(ErrorMessage As String, AccountTypeGetsReset As Boolean)
-      If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
-      If AccountTypeGetsReset Then
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.FatalLoginFailure, ErrorMessage))
-      Else
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, ErrorMessage))
-      End If
-    End Sub
     Private Sub RaiseError(ErrorMessage As String, FailureLocation As String, FailureData As String, Optional FailureAddress As Uri = Nothing)
       If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
       Dim FailureText As String
@@ -2954,44 +1238,11 @@
       End If
       RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, ErrorMessage, FailureText))
     End Sub
-    Private Sub RaiseError(ErrorMessage As String, AccountTypeGetsReset As Boolean, FailureLocation As String, FailureData As String, FailureAddress As Uri)
-      If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
-      Dim FailureText As String
-      If FailureAddress Is Nothing Then
-        FailureText = "Error at " & FailureLocation & ": """ & ErrorMessage & """" & vbNewLine & "Data: " & vbNewLine & FailureData
-      Else
-        FailureText = "Error at " & FailureLocation & ": """ & ErrorMessage & """" & vbNewLine & "URL: {" & FailureAddress.OriginalString & "}" & vbNewLine & "Data: " & vbNewLine & FailureData
-      End If
-      If AccountTypeGetsReset Then
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.FatalLoginFailure, ErrorMessage, FailureText))
-      Else
-        RaiseEvent ConnectionFailure(Me, New SiteConnectionFailureEventArgs(SiteConnectionFailureType.LoginFailure, ErrorMessage, FailureText))
-      End If
-    End Sub
     Private Shared Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
       If String.IsNullOrEmpty(str) Then Return 0
       If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
       Return CLng(Val(str.Substring(0, str.IndexOf(" ")).Replace(",", "")) * vMult)
     End Function
-    Private Shared Function StrToFloat(str As String) As Double
-      If String.IsNullOrEmpty(str) Then Return 0.0#
-      If Not str.Contains(" ") Then Return Val(str.Replace(",", ""))
-      Return Val(str.Substring(0, str.IndexOf(" ")).Replace(",", ""))
-    End Function
-    Private Shared Sub CleanupResult(ByRef result As String)
-      If Not String.IsNullOrEmpty(result) Then
-        result = Replace(result, "&nbsp;", " ")
-        result = Replace(result, vbTab, "")
-        result = Replace(result, vbCr, "")
-        result = Replace(result, vbLf, "")
-        Do
-          result = Replace(result, "  ", " ")
-        Loop While result.Contains("  ")
-        result = Trim(result)
-      Else
-        result = ""
-      End If
-    End Sub
     Private Function IgnoreCert(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Net.Security.SslPolicyErrors) As Boolean
       Return True
     End Function

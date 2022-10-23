@@ -1,5 +1,4 @@
-﻿Imports RestrictionLibrary.Local
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Friend NotInheritable Class frmWizard
   <StructLayout(LayoutKind.Explicit)>
   Private Structure DWord
@@ -15,9 +14,8 @@ Friend NotInheritable Class frmWizard
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
   Private WithEvents remoteTest As Remote.ServiceConnection
-  Private WithEvents localTest As SiteConnection
+  Private WithEvents localTest As Local.SiteConnection
   Private pChecker As Threading.Timer
-  Private AccountType As SatHostTypes = SatHostTypes.Other
   Private NeedsTLSProxy As Boolean = False
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Public Shared Sub ClickDrag(hWnd As IntPtr)
@@ -38,11 +36,6 @@ Friend NotInheritable Class frmWizard
   Private Sub cmdNext_Click(sender As System.Object, e As System.EventArgs) Handles cmdNext.Click
     Select Case tbsWizardPages.SelectedIndex
       Case 1
-        If String.IsNullOrEmpty(cmbAccountHost.Text) Then
-          cmbAccountHost.Focus()
-          Beep()
-          Return
-        End If
         If String.IsNullOrEmpty(txtAccountUsername.Text) Then
           txtAccountUsername.Focus()
           Beep()
@@ -53,11 +46,9 @@ Friend NotInheritable Class frmWizard
           Beep()
           Return
         End If
-        If AccountType = SatHostTypes.Other Then
-          DrawStatus(True, "Determining your Account Type...")
-          UsageTest()
-          Return
-        End If
+        If txtAccountPass.ShowContents Then txtAccountPass.ShowContents = False
+        UsageTest()
+        Return
       Case 2
         If Not (optRemote.Checked Or optLocal.Checked Or optNone.Checked) Then
           optNone.Focus()
@@ -103,11 +94,6 @@ Friend NotInheritable Class frmWizard
         Beep()
         txtAccountUsername.Focus()
         Me.DialogResult = Windows.Forms.DialogResult.None
-      ElseIf String.IsNullOrEmpty(cmbAccountHost.Text) Then
-        tbsWizardPages.SelectedIndex = 1
-        Beep()
-        cmbAccountHost.Focus()
-        Me.DialogResult = Windows.Forms.DialogResult.None
       ElseIf String.IsNullOrEmpty(txtAccountPass.Text) Then
         tbsWizardPages.SelectedIndex = 1
         Beep()
@@ -133,8 +119,7 @@ Friend NotInheritable Class frmWizard
         End If
       End If
       Dim newSettings As New AppSettings
-      newSettings.AccountType = AccountType
-      newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
+      newSettings.Account = txtAccountUsername.Text
       Dim newKey() As Byte = StoredPassword.GenerateKey()
       Dim newSalt() As Byte = StoredPassword.GenerateSalt()
       newSettings.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, newKey, newSalt)
@@ -176,7 +161,6 @@ Friend NotInheritable Class frmWizard
       If newSettings.Service Then
         Dim cSave As New SvcSettings
         cSave.Account = newSettings.Account
-        cSave.AccountType = newSettings.AccountType
         cSave.Interval = newSettings.Interval
         If Not String.IsNullOrEmpty(newSettings.PassCrypt) Then
           Dim svcKey() As Byte = StoredPassword.GenerateKey()
@@ -210,13 +194,6 @@ Friend NotInheritable Class frmWizard
         pctLeftBox.Image = My.Resources.wizWelcome
       Case 1
         pctLeftBox.Image = My.Resources.wizAccount
-        If cmbAccountHost.Items.Count = 0 Then
-          DrawStatus(True, "Loading Host List...")
-          cmbAccountHost.Text = ""
-          cmbAccountHost.Enabled = False
-          Dim tPopulate As New Threading.Thread(AddressOf PopulateHostList)
-          tPopulate.Start()
-        End If
       Case 2
         pctLeftBox.Image = My.Resources.wizService
         If My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
@@ -270,16 +247,10 @@ Friend NotInheritable Class frmWizard
     txtKey4.ContextMenu = mnuKey
     txtKey5.ContextMenu = mnuKey
   End Sub
-  Private Sub cmbAccountHost_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbAccountHost.SelectedIndexChanged
-    AccountType = SatHostTypes.Other
-    pnlKey.Tag = 0
-  End Sub
   Private Sub txtAccountUsername_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountUsername.TextChanged
-    AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
   Private Sub txtAccountPass_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountPass.TextChanged
-    AccountType = SatHostTypes.Other
     pnlKey.Tag = 0
   End Sub
   Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
@@ -492,7 +463,6 @@ Friend NotInheritable Class frmWizard
     End If
     If Busy Then
       txtAccountUsername.Enabled = False
-      cmbAccountHost.Enabled = False
       txtAccountPass.Enabled = False
       optRemote.Enabled = False
       txtKey1.Enabled = False
@@ -511,7 +481,6 @@ Friend NotInheritable Class frmWizard
       cmdNext.Enabled = Not tbsWizardPages.SelectedIndex = tbsWizardPages.TabCount - 1
       lblActivity.Text = Nothing
       txtAccountUsername.Enabled = True
-      cmbAccountHost.Enabled = True
       txtAccountPass.Enabled = True
       optRemote.Enabled = True
       txtKey1.Enabled = optRemote.Checked
@@ -528,39 +497,6 @@ Friend NotInheritable Class frmWizard
       End If
     End If
   End Sub
-  Private Sub PopulateHostList()
-    Try
-      Dim sRet As String
-      Dim wsHostList As New WebClientEx
-      wsHostList.KeepAlive = False
-      sRet = wsHostList.DownloadString("http://wb.realityripple.com/hosts/")
-      SetHostListData(sRet)
-    Catch ex As Exception
-      SetHostListData(Nothing)
-    End Try
-  End Sub
-  Private Delegate Sub SetHostListDataCallback(sHosts As String)
-  Private Sub SetHostListData(sHosts As String)
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New SetHostListDataCallback(AddressOf SetHostListData), sHosts)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    DrawStatus(False)
-    cmbAccountHost.Items.Clear()
-    cmbAccountHost.Text = ""
-    cmbAccountHost.Enabled = True
-    If String.IsNullOrEmpty(sHosts) OrElse Not sHosts.Contains(vbLf) Then
-      Dim hostData() As String = Split(My.Resources.HostList, vbNewLine)
-      For I As Integer = 0 To hostData.Length - 1
-        cmbAccountHost.Items.Add(hostData(I))
-      Next
-    Else
-      cmbAccountHost.Items.AddRange(Split(sHosts, vbLf))
-    End If
-  End Sub
   Private sAccount As String
   Private Sub KeyCheck()
     Dim sKeyTest As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
@@ -575,16 +511,7 @@ Friend NotInheritable Class frmWizard
       MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
       Return
     End If
-    If String.IsNullOrEmpty(cmbAccountHost.Text) Then
-      tbsWizardPages.SelectedIndex = 1
-      cmbAccountHost.Focus()
-      DrawStatus(False)
-      MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
-      Return
-    End If
-    If cmbAccountHost.Text.ToUpperInvariant.Contains("EXCEDE") Or cmbAccountHost.Text.ToUpperInvariant.Contains("FORCE") Then cmbAccountHost.Text = "exede.net"
-    If cmbAccountHost.Text.ToUpperInvariant = "DISH.NET" Or cmbAccountHost.Text.ToUpperInvariant = "DISH.COM" Then cmbAccountHost.Text = "mydish.com"
-    sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
+    sAccount = txtAccountUsername.Text
     pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
   End Sub
   Private Sub RunAccountTest(sKey As String)
@@ -658,8 +585,7 @@ Friend NotInheritable Class frmWizard
       localTest = Nothing
     End If
     Dim newSettings As New AppSettings
-    newSettings.AccountType = SatHostTypes.Other
-    newSettings.Account = txtAccountUsername.Text & "@" & cmbAccountHost.Text
+    newSettings.Account = txtAccountUsername.Text
     Dim newKey() As Byte = StoredPassword.GenerateKey()
     Dim newSalt() As Byte = StoredPassword.GenerateSalt()
     newSettings.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, newKey, newSalt)
@@ -673,43 +599,36 @@ Friend NotInheritable Class frmWizard
     newSettings = Nothing
     localTest = New Local.SiteConnection(LocalAppDataDirectory, True)
   End Sub
-  Private Sub LocalComplete(acct As SatHostTypes)
+  Private Sub LocalComplete()
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New ParamaterizedInvoker(AddressOf LocalComplete), acct)
+        Me.Invoke(New MethodInvoker(AddressOf LocalComplete))
       Catch ex As Exception
       End Try
       Return
     End If
     If IO.File.Exists(IO.Path.Combine(LocalAppDataDirectory, "user.config")) Then IO.File.Delete(IO.Path.Combine(LocalAppDataDirectory, "user.config"))
-    AccountType = acct
     DrawStatus(False)
     tbsWizardPages.SelectedIndex += 1
-    Try
-      Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & cmbAccountHost.Text)
-      sckHostList.BeginGetResponse(Nothing, Nothing)
-    Catch ex As Exception
-    End Try
     If localTest IsNot Nothing Then
       localTest.Dispose()
       localTest = Nothing
     End If
   End Sub
-  Private Sub localTest_ConnectionFailure(sender As Object, e As SiteConnectionFailureEventArgs) Handles localTest.ConnectionFailure
+  Private Sub localTest_ConnectionFailure(sender As Object, e As Local.SiteConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of SiteConnectionFailureEventArgs)(AddressOf localTest_ConnectionFailure), sender, e)
+        Me.Invoke(New EventHandler(Of Local.SiteConnectionFailureEventArgs)(AddressOf localTest_ConnectionFailure), sender, e)
       Catch ex As Exception
       End Try
       Return
     End If
     If IO.File.Exists(IO.Path.Combine(LocalAppDataDirectory, "user.config")) Then IO.File.Delete(IO.Path.Combine(LocalAppDataDirectory, "user.config"))
-    AccountType = SatHostTypes.Other
     Dim skipIt As Boolean = False
     Dim forceRetry As Boolean = False
     Select Case e.Type
-      Case SiteConnectionFailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-      Case SiteConnectionFailureType.TLSTooOld
+      Case Local.SiteConnectionFailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+      Case Local.SiteConnectionFailureType.TLSTooOld
         If NeedsTLSProxy = True Then
           skipIt = True
         Else
@@ -727,10 +646,8 @@ Friend NotInheritable Class frmWizard
             End If
           End If
         End If
-      Case SiteConnectionFailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case SiteConnectionFailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case SiteConnectionFailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Case SiteConnectionFailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1
+      Case Local.SiteConnectionFailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case Local.SiteConnectionFailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
     End Select
     If localTest IsNot Nothing Then
       localTest.Dispose()
@@ -743,13 +660,12 @@ Friend NotInheritable Class frmWizard
     End If
     If skipIt Then
       DrawStatus(False)
-      AccountType = SatHostTypes.WildBlue_EXEDE
       tbsWizardPages.SelectedIndex += 1
       Return
     End If
     DrawStatus(False)
   End Sub
-  Private Sub localTest_ConnectionStatus(sender As Object, e As SiteConnectionStatusEventArgs) Handles localTest.ConnectionStatus
+  Private Sub localTest_ConnectionStatus(sender As Object, e As Local.SiteConnectionStatusEventArgs) Handles localTest.ConnectionStatus
     Dim sAppend As String = ""
     If e.Attempt > 0 Then
       If e.Stage > 0 Then
@@ -761,50 +677,28 @@ Friend NotInheritable Class frmWizard
       sAppend = " (Stage " & (e.Stage + 1) & ")"
     End If
     Select Case e.Status
-      Case SiteConnectionStates.Initialize : DrawStatus(True, "Initializing Connection" & sAppend & "...")
-      Case SiteConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In" & sAppend & "...")
-      Case SiteConnectionStates.Login
+      Case Local.SiteConnectionStates.Initialize : DrawStatus(True, "Initializing Connection" & sAppend & "...")
+      Case Local.SiteConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In" & sAppend & "...")
+      Case Local.SiteConnectionStates.Login
         Select Case e.SubState
-          Case SiteConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page" & sAppend & "...")
-          Case SiteConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating" & sAppend & "...")
-          Case SiteConnectionSubStates.Verify : DrawStatus(True, "Verifying" & sAppend & "...")
+          Case Local.SiteConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page" & sAppend & "...")
+          Case Local.SiteConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating" & sAppend & "...")
           Case Else : DrawStatus(True, "Logging In" & sAppend & "...")
         End Select
-      Case SiteConnectionStates.TableDownload
+      Case Local.SiteConnectionStates.TableDownload
         Select Case e.SubState
-          Case SiteConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page" & sAppend & "...")
-          Case SiteConnectionSubStates.LoadAJAX
-            If e.Attempt = 0 Then
-              DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXFirstTryRequests & ")...")
-            Else
-              DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXSecondTryRequests & ")...")
-            End If
-          Case SiteConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
+          Case Local.SiteConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page" & sAppend & "...")
+          Case Local.SiteConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
           Case Else : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
         End Select
-      Case SiteConnectionStates.TableRead : DrawStatus(False, "Complete!")
+      Case Local.SiteConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
   End Sub
-  Private Sub localTest_LoginComplete(sender As Object, e As Local.LoginCompletionEventArgs) Handles localTest.LoginComplete
-    LocalComplete(e.HostType)
+  Private Sub localTest_LoginComplete(sender As Object, e As EventArgs) Handles localTest.LoginComplete
+    LocalComplete()
   End Sub
-  Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult
-    LocalComplete(SatHostTypes.Dish_EXEDE)
-  End Sub
-  Private Sub localTest_ConnectionRPLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionRPLResult
-    LocalComplete(SatHostTypes.RuralPortal_LEGACY)
-  End Sub
-  Private Sub localTest_ConnectionRPXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionRPXResult
-    LocalComplete(SatHostTypes.RuralPortal_EXEDE)
-  End Sub
-  Private Sub localTest_ConnectionWBLResult(sender As Object, e As TYPEAResultEventArgs) Handles localTest.ConnectionWBLResult
-    LocalComplete(SatHostTypes.WildBlue_LEGACY)
-  End Sub
-  Private Sub localTest_ConnectionWBXResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWBXResult
-    LocalComplete(SatHostTypes.WildBlue_EXEDE)
-  End Sub
-  Private Sub localTest_ConnectionWXRResult(sender As Object, e As TYPEBResultEventArgs) Handles localTest.ConnectionWXRResult
-    LocalComplete(SatHostTypes.WildBlue_EXEDE_RESELLER)
+  Private Sub localTest_ConnectionResult(sender As Object, e As Local.SiteResultEventArgs) Handles localTest.ConnectionResult
+    LocalComplete()
   End Sub
 #End Region
 End Class

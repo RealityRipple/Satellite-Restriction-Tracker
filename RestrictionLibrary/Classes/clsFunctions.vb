@@ -798,61 +798,6 @@ Public NotInheritable Class srlFunctions
     Return d.ToString("g", DateFormatProvider)
   End Function
   ''' <summary>
-  ''' Converts a <see cref="Local.SatHostTypes" /> value to a simple string.
-  ''' </summary>
-  ''' <param name="hostType">A Satellite Internet host type enumeration.</param>
-  ''' <returns>If the <paramref name="hostType" /> is a valid <see cref="Local.SatHostTypes" />, the return will be a three-letter value. Otherwise, it will be the letter &quot;O&quot;.</returns>
-  ''' <remarks>
-  '''  <para>WildBlue_LEGACY: &quot;WBL&quot;</para>
-  '''  <para>WildBlue_EXEDE: &quot;WBX&quot;</para>
-  '''  <para>RuralPortal_LEGACY: &quot;RPL&quot;</para>
-  '''  <para>RuralPortal_EXEDE: &quot;RPX&quot;</para>
-  '''  <para>Dish_EXEDE: &quot;DNX&quot;</para>
-  '''  <para>Other Values: &quot;O&quot;</para>
-  '''  <para>See Also: <seealso cref="StringToHostType" /></para>
-  ''' </remarks>
-  Public Shared Function HostTypeToString(hostType As Local.SatHostTypes) As String
-    Select Case hostType
-      Case Local.SatHostTypes.WildBlue_LEGACY : Return "WBL"
-      Case Local.SatHostTypes.WildBlue_EXEDE : Return "WBX"
-      Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : Return "WXR"
-      Case Local.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
-      Case Local.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
-      Case Local.SatHostTypes.Dish_EXEDE : Return "DNX"
-      Case Else : Return "O"
-    End Select
-  End Function
-  ''' <summary>
-  ''' Converts a simple string value to a <see cref="Local.SatHostTypes" />.
-  ''' </summary>
-  ''' <param name="host">The string to be converted to a <see cref="Local.SatHostTypes" /> enumeration value.</param>
-  ''' <returns>The closest <see cref="Local.SatHostTypes" /> match detected.</returns>
-  ''' <remarks>
-  '''  <para>These values are <i>not</i> case-sensitive.</para>
-  '''  <para>&quot;WBL&quot;, &quot;WildBlue&quot;: WildBlue_LEGACY</para>
-  '''  <para>&quot;WBX&quot;, &quot;WBV&quot;, &quot;Exede&quot;: WildBlue_EXEDE</para>
-  '''  <para>&quot;RPL&quot;, &quot;RuralPortal&quot;: RuralPortal_LEGACY</para>
-  '''  <para>&quot;RPX&quot;: RuralPortal_EXEDE</para>
-  '''  <para>&quot;DNX&quot;, &quot;Dish&quot;, &quot;DishNet&quot;: Dish_EXEDE</para>
-  '''  <para>Other Values: Other</para>
-  '''  <para>See Also: <seealso cref="HostTypeToString" /></para>
-  ''' </remarks>
-  Public Shared Function StringToHostType(host As String) As Local.SatHostTypes
-    Select Case host.ToUpperInvariant
-      Case "WBL" : Return Local.SatHostTypes.WildBlue_LEGACY
-      Case "WBX", "WBV" : Return Local.SatHostTypes.WildBlue_EXEDE
-      Case "WXR" : Return Local.SatHostTypes.WildBlue_EXEDE_RESELLER
-      Case "RPL" : Return Local.SatHostTypes.RuralPortal_LEGACY
-      Case "RPX" : Return Local.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return Local.SatHostTypes.Dish_EXEDE
-      Case "WILDBLUE" : Return Local.SatHostTypes.WildBlue_LEGACY
-      Case "EXEDE" : Return Local.SatHostTypes.WildBlue_EXEDE
-      Case "DISH", "DISHNET" : Return Local.SatHostTypes.Dish_EXEDE
-      Case "RURALPORTAL" : Return Local.SatHostTypes.RuralPortal_LEGACY
-      Case Else : Return Local.SatHostTypes.Other
-    End Select
-  End Function
-  ''' <summary>
   ''' Attempts to see if a file is in use, waiting for it to be freed.
   ''' </summary>
   ''' <param name="path">The exact path to the file which needs to be checked.</param>

@@ -1,40 +1,16 @@
 ﻿Friend Module modDB
-  Public Enum SatHostTypes
-    WildBlue
-    Exede
-    ExedeReseller
-    RuralPortal
-    Dish
-    Other
-  End Enum
   Private Const HistoryAge As Long = 1
   Private sFile As String
   Friend wbDB As DataBase
   Private isLoaded As Boolean
   Private isSaving As Boolean
-  Public Sub LOG_Add(ByVal dTime As Date, ByVal lDown As Long, ByVal lDownLim As Long, ByVal lUp As Long, ByVal lUpLim As Long)
+  Public Sub LOG_Add(ByVal dTime As Date, ByVal lUsed As Long, ByVal lLimit As Long)
     If Not isLoaded Then Return
-    If lDownLim <= 0 Then Return
+    If lLimit <= 0 Then Return
     If wbDB Is Nothing Then wbDB = New DataBase
-    wbDB.Add(New DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    wbDB.Add(New DataRow(dTime, lUsed, lLimit))
     LOG_Save()
   End Sub
-  Public Sub LOG_Get(ByVal lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
-    If Not isLoaded Then Return
-    If LOG_GetCount() <= lngIndex Then Return
-    Dim dArr() As DataRow = wbDB.ToArray()
-    Dim dbRow As DataRow = dArr(lngIndex)
-    dtDate = dbRow.DATETIME
-    lngDown = dbRow.DOWNLOAD
-    lngDownLim = dbRow.DOWNLIM
-    lngUp = dbRow.UPLOAD
-    lngUpLim = dbRow.UPLIM
-  End Sub
-  Public Function LOG_GetCount() As Integer
-    If Not isLoaded Then Return 0
-    If wbDB Is Nothing Then Return 0
-    Return wbDB.Count
-  End Function
   Public Sub LOG_Initialize(sPath As String)
     isLoaded = False
     sFile = sPath

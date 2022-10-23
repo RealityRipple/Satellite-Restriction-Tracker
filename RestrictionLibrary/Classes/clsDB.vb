@@ -39,10 +39,8 @@ End Class
 ''' </summary>
 Public Structure DataRow
   Private mDT As Date
-  Private mD As Long
-  Private mDL As Long
   Private mU As Long
-  Private mUL As Long
+  Private mL As Long
   ''' <summary>
   ''' The Date and Time of the data stored in this row.
   ''' </summary>
@@ -55,31 +53,9 @@ Public Structure DataRow
     End Set
   End Property
   ''' <summary>
-  ''' The number of Megabytes used in download activity at the specified date and time.
+  ''' The number of Megabytes used at the specified date and time.
   ''' </summary>
-  Public Property DOWNLOAD As Long
-    Get
-      Return mD
-    End Get
-    Set(value As Long)
-      mD = value
-    End Set
-  End Property
-  ''' <summary>
-  ''' The maximum number of Megabytes allowed in download activity for the plan at the specified date and time.
-  ''' </summary>
-  Public Property DOWNLIM As Long
-    Get
-      Return mDL
-    End Get
-    Set(value As Long)
-      mDL = value
-    End Set
-  End Property
-  ''' <summary>
-  ''' The number of Megabytes used in upload activity at the specified date and time.
-  ''' </summary>
-  Public Property UPLOAD As Long
+  Public Property USED As Long
     Get
       Return mU
     End Get
@@ -88,30 +64,26 @@ Public Structure DataRow
     End Set
   End Property
   ''' <summary>
-  ''' The maximum number of Megabytes allowed in upload activity for the plan at the specified date and time.
+  ''' The maximum number of Megabytes allowed for the plan at the specified date and time.
   ''' </summary>
-  Public Property UPLIM As Long
+  Public Property LIMIT As Long
     Get
-      Return mUL
+      Return mL
     End Get
     Set(value As Long)
-      mUL = value
+      mL = value
     End Set
   End Property
   ''' <summary>
   ''' Create a new DataRow entry.
   ''' </summary>
   ''' <param name="dTime">The Date and Time of the entry.</param>
-  ''' <param name="lDown">The number of Megabytes used in download activity for this entry.</param>
-  ''' <param name="lDownLim">The maximum number of Megabytes allowed in download activity for this entry.</param>
-  ''' <param name="lUp">The number of Megabytes used in upload activity for this entry.</param>
-  ''' <param name="lUpLim">The maximum number of Megabytes allowed in upload activity for this entry.</param>
-  Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
+  ''' <param name="lUsed">The number of Megabytes used for this entry.</param>
+  ''' <param name="lLimit">The maximum number of Megabytes allowed for this entry.</param>
+  Public Sub New(dTime As Date, lUsed As Long, lLimit As Long)
     mDT = dTime
-    mD = lDown
-    mDL = lDownLim
-    mU = lUp
-    mUL = lUpLim
+    mU = lUsed
+    mL = lLimit
   End Sub
   ''' <summary>
   ''' Get a string representation of the Date and Time of the data stored in this row.
@@ -123,54 +95,30 @@ Public Structure DataRow
     End Get
   End Property
   ''' <summary>
-  ''' Get a string representation of the number of Megabytes used in download activity for this row.
+  ''' Get a string representation of the number of Megabytes used for this row.
   ''' </summary>
-  ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
-  Public ReadOnly Property sDOWNLOAD As String
-    Get
-      Return mD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-    End Get
-  End Property
-  ''' <summary>
-  ''' Get a string representation of the number of Megabytes allowed in download activity for this row.
-  ''' </summary>
-  ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
-  Public ReadOnly Property sDOWNLIM As String
-    Get
-      Return mDL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-    End Get
-  End Property
-  ''' <summary>
-  ''' Get a string representation of the number of Megabytes used in upload activity for this row.
-  ''' </summary>
-  ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
-  Public ReadOnly Property sUPLOAD As String
+  ''' <returns>The value is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sUSED As String
     Get
       Return mU.ToString("N0", Globalization.CultureInfo.InvariantCulture)
     End Get
   End Property
   ''' <summary>
-  ''' Get a string representation of the number of Megabytes allowed in upload activity for this row.
+  ''' Get a string representation of the number of Megabytes allowed for this row.
   ''' </summary>
-  ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
-  Public ReadOnly Property sUPLIM As String
+  ''' <returns>The limit is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sLIMIT As String
     Get
-      Return mUL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+      Return mL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
     End Get
   End Property
   ''' <summary>
-  ''' Get a string representation of this row in the format "MM/DD/YYYY HH:MM [Down: 0,000/0,000][, ][Up: 0,000/0,000]".
+  ''' Get a string representation of this row in the format "MM/DD/YYYY HH:MM [0,000/0,000]".
   ''' </summary>
-  ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with Download and/or Upload values if either the value or limit is greater than 0.</returns>
+  ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with usage if either the value or limit is greater than 0.</returns>
   Public Overrides Function ToString() As String
     Dim sRet As String = sDATETIME
-    If mD > 0 Or mDL > 0 Then
-      sRet &= " Down: " & sDOWNLOAD & "/" & sDOWNLIM
-    End If
-    If mU > 0 Or mUL > 0 Then
-      If sRet.Contains(" Down: ") Then sRet &= ","
-      sRet &= " Up: " & sUPLOAD & "/" & sUPLIM
-    End If
+    If mU > 0 Or mL > 0 Then sRet &= " " & sUSED & "/" & sLIMIT
     Return sRet
   End Function
   ''' <summary>
@@ -179,7 +127,7 @@ Public Structure DataRow
   ''' <returns></returns>
   Public Shared ReadOnly Property Empty() As DataRow
     Get
-      Return New DataRow(Date.FromBinary(0), 0, 0, 0, 0)
+      Return New DataRow(Date.FromBinary(0), 0, 0)
     End Get
   End Property
   ''' <summary>
@@ -188,14 +136,14 @@ Public Structure DataRow
   ''' <param name="dRow">The <see cref="DataRow" /> entry you wish to check.</param>
   ''' <returns>A boolean value of <c>True</c> is returned if the <paramref name="dRow" /> entry is empty, <c>False</c> otherwise.</returns>
   Public Shared Function IsEmpty(dRow As DataRow) As Boolean
-    Return (dRow.DATETIME.ToBinary = 0 And dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0)
+    Return (dRow.DATETIME.ToBinary = 0 And dRow.USED = 0 And dRow.LIMIT = 0)
   End Function
   ''' <summary>
   ''' Check this <see cref="DataRow" /> entry to see if it is empty or unset.
   ''' </summary>
   ''' <returns>A boolean value of <c>True</c> is returned if this entry is empty, <c>False</c> otherwise.</returns>
   Public Function IsEmpty() As Boolean
-    Return (mDT.ToBinary = 0 And mD = 0 And mU = 0 And mDL = 0 And mUL = 0)
+    Return (mDT.ToBinary = 0 And mU = 0 And mL = 0)
   End Function
   Public Overrides Function GetHashCode() As Integer
     Return mDT.GetHashCode
@@ -268,23 +216,21 @@ Public Class DataBase
           For Each m_node As XmlNode In m_nodelist
             I += 1
             If bWithDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I, iMax))
-            Dim sDT, sD, sDL, sU, sUL As String : sDT = "0" : sD = "0" : sDL = "0" : sU = "0" : sUL = "0"
+            Dim sDT, sU, sL As String : sDT = "0" : sU = "0" : sL = "0"
             For Each m_child As XmlNode In m_node.ChildNodes
               Select Case m_child.Name
                 Case "DATETIME" : sDT = m_child.InnerText
-                Case "DOWNLOAD" : sD = m_child.InnerText
-                Case "DOWNLIM" : sDL = m_child.InnerText
-                Case "UPLOAD" : sU = m_child.InnerText
-                Case "UPLIM" : sUL = m_child.InnerText
+                Case "DOWNLOAD" : sU = m_child.InnerText
+                Case "DOWNLIM" : sL = m_child.InnerText
+                Case "USED" : sU = m_child.InnerText
+                Case "LIMIT" : sL = m_child.InnerText
               End Select
             Next
             Dim DT As Date = Xml.XmlConvert.ToDateTime(sDT, Xml.XmlDateTimeSerializationMode.RoundtripKind)
-            Dim Down As Long = Long.Parse(sD, Globalization.CultureInfo.InvariantCulture)
-            Dim DownLim As Long = Long.Parse(sDL, Globalization.CultureInfo.InvariantCulture)
-            Dim Up As Long = Long.Parse(sU, Globalization.CultureInfo.InvariantCulture)
-            Dim UpLim As Long = Long.Parse(sUL, Globalization.CultureInfo.InvariantCulture)
+            Dim Used As Long = Long.Parse(sU, Globalization.CultureInfo.InvariantCulture)
+            Dim Lim As Long = Long.Parse(sL, Globalization.CultureInfo.InvariantCulture)
             If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-            Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+            Add(New DataRow(DT, Used, Lim))
             If mStopNew Then Return
           Next
           m_xmld = Nothing
@@ -297,10 +243,10 @@ Public Class DataBase
               Dim DT As Date = LOAD_ReadDate(nIn)
               Dim Down As Long = LOAD_ReadLong(nIn)
               Dim DownLim As Long = LOAD_ReadLong(nIn)
-              Dim Up As Long = LOAD_ReadLong(nIn)
-              Dim UpLim As Long = LOAD_ReadLong(nIn)
+              LOAD_ReadLong(nIn)
+              LOAD_ReadLong(nIn)
               If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+              Add(New DataRow(DT, Down, DownLim))
               If mStopNew Then Return
             Next
           End Using
@@ -308,25 +254,23 @@ Public Class DataBase
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Dim nIn As New IO.StreamReader(nRead)
             Dim firstLine As String = nIn.ReadLine
-            If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
+            If String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
+            ElseIf String.Compare(firstLine, "Time,Usage,Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
+            Else
               Dim firstData() As String = Split(firstLine, ",")
               Dim DT As Date = Date.Parse(firstData(0), Globalization.CultureInfo.InvariantCulture)
-              Dim Down As Long = firstData(1)
-              Dim DownLim As Long = firstData(2)
-              Dim Up As Long = firstData(3)
-              Dim UpLim As Long = firstData(4)
+              Dim Used As Long = firstData(1)
+              Dim Lim As Long = firstData(2)
               If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+              Add(New DataRow(DT, Used, Lim))
             End If
             Do Until nIn.EndOfStream
               Dim rowData() As String = Split(nIn.ReadLine, ",")
               Dim DT As Date = Date.Parse(rowData(0), Globalization.CultureInfo.InvariantCulture)
-              Dim Down As Long = rowData(1)
-              Dim DownLim As Long = rowData(2)
-              Dim Up As Long = rowData(3)
-              Dim UpLim As Long = rowData(4)
+              Dim Used As Long = rowData(1)
+              Dim Lim As Long = rowData(2)
               If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
-              Add(New DataRow(DT, Down, DownLim, Up, UpLim))
+              Add(New DataRow(DT, Used, Lim))
               If mStopNew Then Return
             Loop
           End Using
@@ -386,10 +330,8 @@ Public Class DataBase
   Public Function Contains(item As KeyValuePair(Of UInt64, DataRow)) As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).Contains
     If Not data.ContainsKey(item.Key) Then Return False
     If Not data(item.Key).DATETIME = item.Value.DATETIME Then Return False
-    If Not data(item.Key).DOWNLOAD = item.Value.DOWNLOAD Then Return False
-    If Not data(item.Key).DOWNLIM = item.Value.DOWNLIM Then Return False
-    If Not data(item.Key).UPLOAD = item.Value.UPLOAD Then Return False
-    If Not data(item.Key).UPLIM = item.Value.UPLIM Then Return False
+    If Not data(item.Key).USED = item.Value.USED Then Return False
+    If Not data(item.Key).LIMIT = item.Value.LIMIT Then Return False
     Return True
   End Function
   Public Function ContainsKey(key As UInt64) As Boolean Implements System.Collections.Generic.IDictionary(Of UInt64, DataRow).ContainsKey
@@ -523,10 +465,8 @@ Public Class DataBase
     For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
       sDB &= "  <History>" & vbNewLine &
              "    <DATETIME>" & dRow.Value.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.Value.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>" & vbNewLine &
+             "    <USED>" & dRow.Value.USED.ToString(Globalization.CultureInfo.InvariantCulture) & "</USED>" & vbNewLine &
+             "    <LIMIT>" & dRow.Value.LIMIT.ToString(Globalization.CultureInfo.InvariantCulture) & "</LIMIT>" & vbNewLine &
              "  </History>" & vbNewLine
     Next
     sDB &= "</RestrictionTrackerUsage>"
@@ -547,10 +487,8 @@ Public Class DataBase
       If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uLen))
       sDB &= "  <History>" & vbNewLine &
              "    <DATETIME>" & dRow.Value.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.Value.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>" & vbNewLine &
+             "    <USED>" & dRow.Value.USED.ToString(Globalization.CultureInfo.InvariantCulture) & "</USED>" & vbNewLine &
+             "    <LIMIT>" & dRow.Value.LIMIT.ToString(Globalization.CultureInfo.InvariantCulture) & "</LIMIT>" & vbNewLine &
              "  </History>" & vbNewLine
       I += 1
     Next
@@ -576,7 +514,7 @@ Public Class DataBase
     If sample > 15 Then sample = 15
     For I As UInt64 = 0 To sample
       Dim dRow As DataRow = dVals(I)
-      If Not (dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then
+      If Not dRow.LIMIT = 150000 Then
         bFreedom = False
         Exit For
       End If
@@ -591,14 +529,12 @@ Public Class DataBase
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
             If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
-            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            If dRow.USED = 0 And dRow.LIMIT = 0 Then Continue For
+            If Not bFreedom And (dRow.USED = 0 And dRow.LIMIT = 150000) Then Continue For
             nOut.WriteLine("  <History>")
             nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>")
-            nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>")
-            nOut.WriteLine("    <DOWNLIM>" & dRow.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>")
-            nOut.WriteLine("    <UPLOAD>" & dRow.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>")
-            nOut.WriteLine("    <UPLIM>" & dRow.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>")
+            nOut.WriteLine("    <USED>" & dRow.USED.ToString(Globalization.CultureInfo.InvariantCulture) & "</USED>")
+            nOut.WriteLine("    <LIMIT>" & dRow.LIMIT.ToString(Globalization.CultureInfo.InvariantCulture) & "</LIMIT>")
             nOut.WriteLine("  </History>")
           Next
           nOut.Write("</RestrictionTrackerUsage>")
@@ -610,21 +546,21 @@ Public Class DataBase
           Dim truData As UInt64 = 0
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
-            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            If dRow.USED = 0 And dRow.LIMIT = 0 Then Continue For
+            If Not bFreedom And (dRow.USED = 0 And dRow.LIMIT = 150000) Then Continue For
             truData += 1
           Next
           SAVE_Write(nOut, truData)
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
             If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
-            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
+            If dRow.USED = 0 And dRow.LIMIT = 0 Then Continue For
+            If Not bFreedom And (dRow.USED = 0 And dRow.LIMIT = 150000) Then Continue For
             SAVE_Write(nOut, dRow.DATETIME)
-            SAVE_Write(nOut, dRow.DOWNLOAD)
-            SAVE_Write(nOut, dRow.DOWNLIM)
-            SAVE_Write(nOut, dRow.UPLOAD)
-            SAVE_Write(nOut, dRow.UPLIM)
+            SAVE_Write(nOut, dRow.USED)
+            SAVE_Write(nOut, dRow.LIMIT)
+            SAVE_Write(nOut, 0L)
+            SAVE_Write(nOut, 0L)
           Next
         End Using
       ElseIf IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".CSV") = 0 Then
@@ -635,9 +571,9 @@ Public Class DataBase
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
             If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
-            If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
-            If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-            nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
+            If dRow.USED = 0 And dRow.LIMIT = 0 Then Continue For
+            If Not bFreedom And (dRow.USED = 0 And dRow.LIMIT = 150000) Then Continue For
+            nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.USED & "," & dRow.LIMIT)
           Next
         End Using
       Else

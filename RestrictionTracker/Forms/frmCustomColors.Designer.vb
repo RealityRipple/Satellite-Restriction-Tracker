@@ -28,48 +28,28 @@ Partial Class frmCustomColors
     Me.pctHistory = New System.Windows.Forms.PictureBox()
     Me.grpTray = New System.Windows.Forms.GroupBox()
     Me.pnlTray = New System.Windows.Forms.TableLayoutPanel()
-    Me.grpTrayDown = New System.Windows.Forms.GroupBox()
-    Me.pnlTrayDown = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblTrayDownA = New System.Windows.Forms.Label()
-    Me.pctTrayDownA = New System.Windows.Forms.PictureBox()
-    Me.pctTrayDownB = New System.Windows.Forms.PictureBox()
-    Me.lblTrayDownC = New System.Windows.Forms.Label()
-    Me.pctTrayDownC = New System.Windows.Forms.PictureBox()
-    Me.chkTrayDownB = New System.Windows.Forms.CheckBox()
-    Me.grpTrayUp = New System.Windows.Forms.GroupBox()
-    Me.pnlTrayUp = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblTrayUpA = New System.Windows.Forms.Label()
-    Me.pctTrayUpA = New System.Windows.Forms.PictureBox()
-    Me.pctTrayUpB = New System.Windows.Forms.PictureBox()
-    Me.lblTrayUpC = New System.Windows.Forms.Label()
-    Me.pctTrayUpC = New System.Windows.Forms.PictureBox()
-    Me.chkTrayUpB = New System.Windows.Forms.CheckBox()
+    Me.grpTrayUsed = New System.Windows.Forms.GroupBox()
+    Me.pnlTrayUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblTrayUsedA = New System.Windows.Forms.Label()
+    Me.pctTrayUsedA = New System.Windows.Forms.PictureBox()
+    Me.pctTrayUsedB = New System.Windows.Forms.PictureBox()
+    Me.lblTrayUsedC = New System.Windows.Forms.Label()
+    Me.pctTrayUsedC = New System.Windows.Forms.PictureBox()
+    Me.chkTrayUsedB = New System.Windows.Forms.CheckBox()
     Me.grpHistory = New System.Windows.Forms.GroupBox()
     Me.pnlHistory = New System.Windows.Forms.TableLayoutPanel()
-    Me.grpHistoryDown = New System.Windows.Forms.GroupBox()
-    Me.pnlHistoryDown = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctHistoryDownLine = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryDownA = New System.Windows.Forms.Label()
-    Me.pctHistoryDownA = New System.Windows.Forms.PictureBox()
-    Me.pctHistoryDownB = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryDownC = New System.Windows.Forms.Label()
-    Me.pctHistoryDownC = New System.Windows.Forms.PictureBox()
-    Me.chkHistoryDownB = New System.Windows.Forms.CheckBox()
-    Me.lblHistoryDownMax = New System.Windows.Forms.Label()
-    Me.pctHistoryDownMax = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryDownLine = New System.Windows.Forms.Label()
-    Me.grpHistoryUp = New System.Windows.Forms.GroupBox()
-    Me.pnlHistoryUp = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctHistoryUpLine = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryUpA = New System.Windows.Forms.Label()
-    Me.pctHistoryUpA = New System.Windows.Forms.PictureBox()
-    Me.pctHistoryUpB = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryUpC = New System.Windows.Forms.Label()
-    Me.pctHistoryUpC = New System.Windows.Forms.PictureBox()
-    Me.chkHistoryUpB = New System.Windows.Forms.CheckBox()
-    Me.pctHistoryUpMax = New System.Windows.Forms.PictureBox()
-    Me.lblHistoryUpMax = New System.Windows.Forms.Label()
-    Me.lblHistoryUpLine = New System.Windows.Forms.Label()
+    Me.grpHistoryUsed = New System.Windows.Forms.GroupBox()
+    Me.pnlHistoryUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.pctHistoryUsedLine = New System.Windows.Forms.PictureBox()
+    Me.lblHistoryUsedA = New System.Windows.Forms.Label()
+    Me.pctHistoryUsedA = New System.Windows.Forms.PictureBox()
+    Me.pctHistoryUsedB = New System.Windows.Forms.PictureBox()
+    Me.lblHistoryUsedC = New System.Windows.Forms.Label()
+    Me.pctHistoryUsedC = New System.Windows.Forms.PictureBox()
+    Me.chkHistoryUsedB = New System.Windows.Forms.CheckBox()
+    Me.lblHistoryUsedMax = New System.Windows.Forms.Label()
+    Me.pctHistoryUsedMax = New System.Windows.Forms.PictureBox()
+    Me.lblHistoryUsedLine = New System.Windows.Forms.Label()
     Me.pnlHistoryStyle = New System.Windows.Forms.TableLayoutPanel()
     Me.pctHistoryGridD = New System.Windows.Forms.PictureBox()
     Me.pctHistoryGridL = New System.Windows.Forms.PictureBox()
@@ -81,22 +61,14 @@ Partial Class frmCustomColors
     Me.lblHistoryGridD = New System.Windows.Forms.Label()
     Me.grpMain = New System.Windows.Forms.GroupBox()
     Me.pnlMain = New System.Windows.Forms.TableLayoutPanel()
-    Me.grpMainDown = New System.Windows.Forms.GroupBox()
-    Me.pnlMainDown = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblMainDownA = New System.Windows.Forms.Label()
-    Me.pctMainDownA = New System.Windows.Forms.PictureBox()
-    Me.pctMainDownB = New System.Windows.Forms.PictureBox()
-    Me.lblMainDownC = New System.Windows.Forms.Label()
-    Me.pctMainDownC = New System.Windows.Forms.PictureBox()
-    Me.chkMainDownB = New System.Windows.Forms.CheckBox()
-    Me.grpMainUp = New System.Windows.Forms.GroupBox()
-    Me.pnlMainUp = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblMainUpA = New System.Windows.Forms.Label()
-    Me.pctMainUpA = New System.Windows.Forms.PictureBox()
-    Me.pctMainUpB = New System.Windows.Forms.PictureBox()
-    Me.lblMainUpC = New System.Windows.Forms.Label()
-    Me.pctMainUpC = New System.Windows.Forms.PictureBox()
-    Me.chkMainUpB = New System.Windows.Forms.CheckBox()
+    Me.grpMainUsed = New System.Windows.Forms.GroupBox()
+    Me.pnlMainUsed = New System.Windows.Forms.TableLayoutPanel()
+    Me.lblMainUsedA = New System.Windows.Forms.Label()
+    Me.pctMainUsedA = New System.Windows.Forms.PictureBox()
+    Me.pctMainUsedB = New System.Windows.Forms.PictureBox()
+    Me.lblMainUsedC = New System.Windows.Forms.Label()
+    Me.pctMainUsedC = New System.Windows.Forms.PictureBox()
+    Me.chkMainUsedB = New System.Windows.Forms.CheckBox()
     Me.pnlMainStyle = New System.Windows.Forms.TableLayoutPanel()
     Me.pctMainBG = New System.Windows.Forms.PictureBox()
     Me.lblMainText = New System.Windows.Forms.Label()
@@ -118,32 +90,20 @@ Partial Class frmCustomColors
     CType(Me.pctHistory, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpTray.SuspendLayout()
     Me.pnlTray.SuspendLayout()
-    Me.grpTrayDown.SuspendLayout()
-    Me.pnlTrayDown.SuspendLayout()
-    CType(Me.pctTrayDownA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctTrayDownB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctTrayDownC, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.grpTrayUp.SuspendLayout()
-    Me.pnlTrayUp.SuspendLayout()
-    CType(Me.pctTrayUpA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctTrayUpB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctTrayUpC, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.grpTrayUsed.SuspendLayout()
+    Me.pnlTrayUsed.SuspendLayout()
+    CType(Me.pctTrayUsedA, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctTrayUsedB, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctTrayUsedC, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpHistory.SuspendLayout()
     Me.pnlHistory.SuspendLayout()
-    Me.grpHistoryDown.SuspendLayout()
-    Me.pnlHistoryDown.SuspendLayout()
-    CType(Me.pctHistoryDownLine, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryDownA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryDownB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryDownC, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryDownMax, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.grpHistoryUp.SuspendLayout()
-    Me.pnlHistoryUp.SuspendLayout()
-    CType(Me.pctHistoryUpLine, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryUpA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryUpB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryUpC, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctHistoryUpMax, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.grpHistoryUsed.SuspendLayout()
+    Me.pnlHistoryUsed.SuspendLayout()
+    CType(Me.pctHistoryUsedLine, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctHistoryUsedA, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctHistoryUsedB, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctHistoryUsedC, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctHistoryUsedMax, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlHistoryStyle.SuspendLayout()
     CType(Me.pctHistoryGridD, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctHistoryGridL, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -151,16 +111,11 @@ Partial Class frmCustomColors
     CType(Me.pctHistoryText, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.grpMain.SuspendLayout()
     Me.pnlMain.SuspendLayout()
-    Me.grpMainDown.SuspendLayout()
-    Me.pnlMainDown.SuspendLayout()
-    CType(Me.pctMainDownA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctMainDownB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctMainDownC, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.grpMainUp.SuspendLayout()
-    Me.pnlMainUp.SuspendLayout()
-    CType(Me.pctMainUpA, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctMainUpB, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctMainUpC, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.grpMainUsed.SuspendLayout()
+    Me.pnlMainUsed.SuspendLayout()
+    CType(Me.pctMainUsedA, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctMainUsedB, System.ComponentModel.ISupportInitialize).BeginInit()
+    CType(Me.pctMainUsedC, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlMainStyle.SuspendLayout()
     CType(Me.pctMainBG, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.pctMainText, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -171,63 +126,22 @@ Partial Class frmCustomColors
     '
     Me.pnlCustomColors.AutoSize = True
     Me.pnlCustomColors.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlCustomColors.ColumnCount = 2
-    Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlCustomColors.ColumnCount = 3
     Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlCustomColors.Controls.Add(Me.pctTray, 1, 1)
-    Me.pnlCustomColors.Controls.Add(Me.pctMain, 1, 0)
-    Me.pnlCustomColors.Controls.Add(Me.pctHistory, 1, 2)
-    Me.pnlCustomColors.Controls.Add(Me.grpTray, 0, 1)
-    Me.pnlCustomColors.Controls.Add(Me.grpHistory, 0, 2)
+    Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlCustomColors.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlCustomColors.Controls.Add(Me.grpTray, 1, 0)
+    Me.pnlCustomColors.Controls.Add(Me.grpHistory, 2, 0)
     Me.pnlCustomColors.Controls.Add(Me.grpMain, 0, 0)
-    Me.pnlCustomColors.Controls.Add(Me.pnlButtons, 0, 3)
+    Me.pnlCustomColors.Controls.Add(Me.pnlButtons, 0, 1)
     Me.pnlCustomColors.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlCustomColors.Location = New System.Drawing.Point(0, 0)
     Me.pnlCustomColors.Name = "pnlCustomColors"
-    Me.pnlCustomColors.RowCount = 4
+    Me.pnlCustomColors.RowCount = 2
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlCustomColors.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlCustomColors.Size = New System.Drawing.Size(397, 576)
+    Me.pnlCustomColors.Size = New System.Drawing.Size(630, 276)
     Me.pnlCustomColors.TabIndex = 0
-    '
-    'pctTray
-    '
-    Me.pctTray.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.pctTray.BackColor = System.Drawing.Color.Black
-    Me.pctTray.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTray.Location = New System.Drawing.Point(319, 180)
-    Me.pctTray.Name = "pctTray"
-    Me.pctTray.Size = New System.Drawing.Size(75, 75)
-    Me.pctTray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
-    Me.pctTray.TabIndex = 7
-    Me.pctTray.TabStop = False
-    '
-    'pctMain
-    '
-    Me.pctMain.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.pctMain.BackColor = System.Drawing.Color.Black
-    Me.pctMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMain.Location = New System.Drawing.Point(319, 39)
-    Me.pctMain.Name = "pctMain"
-    Me.pctMain.Size = New System.Drawing.Size(75, 75)
-    Me.pctMain.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
-    Me.pctMain.TabIndex = 2
-    Me.pctMain.TabStop = False
-    '
-    'pctHistory
-    '
-    Me.pctHistory.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.pctHistory.BackColor = System.Drawing.Color.Black
-    Me.pctHistory.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistory.Location = New System.Drawing.Point(319, 360)
-    Me.pctHistory.Name = "pctHistory"
-    Me.pctHistory.Size = New System.Drawing.Size(75, 75)
-    Me.pctHistory.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
-    Me.pctHistory.TabIndex = 8
-    Me.pctHistory.TabStop = False
     '
     'grpTray
     '
@@ -236,238 +150,147 @@ Partial Class frmCustomColors
     Me.grpTray.Controls.Add(Me.pnlTray)
     Me.grpTray.Dock = System.Windows.Forms.DockStyle.Fill
     Me.grpTray.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpTray.Location = New System.Drawing.Point(3, 157)
+    Me.grpTray.Location = New System.Drawing.Point(152, 3)
     Me.grpTray.Name = "grpTray"
-    Me.grpTray.Size = New System.Drawing.Size(310, 122)
+    Me.grpTray.Size = New System.Drawing.Size(143, 230)
     Me.grpTray.TabIndex = 12
     Me.grpTray.TabStop = False
-    Me.grpTray.Text = "&Tray Icon Current Usage Graph Overlay"
+    Me.grpTray.Text = "&Tray Icon Graph"
     '
     'pnlTray
     '
     Me.pnlTray.AutoSize = True
     Me.pnlTray.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlTray.ColumnCount = 2
-    Me.pnlTray.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlTray.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlTray.Controls.Add(Me.grpTrayDown, 0, 0)
-    Me.pnlTray.Controls.Add(Me.grpTrayUp, 1, 0)
+    Me.pnlTray.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTray.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlTray.Controls.Add(Me.pctTray, 0, 0)
+    Me.pnlTray.Controls.Add(Me.grpTrayUsed, 0, 1)
     Me.pnlTray.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlTray.Location = New System.Drawing.Point(3, 16)
     Me.pnlTray.Name = "pnlTray"
-    Me.pnlTray.RowCount = 1
+    Me.pnlTray.RowCount = 3
     Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 103.0!))
-    Me.pnlTray.Size = New System.Drawing.Size(304, 103)
+    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTray.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTray.Size = New System.Drawing.Size(137, 211)
     Me.pnlTray.TabIndex = 4
     '
-    'grpTrayDown
+    'pctTray
     '
-    Me.grpTrayDown.AutoSize = True
-    Me.grpTrayDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpTrayDown.Controls.Add(Me.pnlTrayDown)
-    Me.grpTrayDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpTrayDown.Location = New System.Drawing.Point(3, 3)
-    Me.grpTrayDown.Name = "grpTrayDown"
-    Me.grpTrayDown.Size = New System.Drawing.Size(146, 97)
-    Me.grpTrayDown.TabIndex = 1
-    Me.grpTrayDown.TabStop = False
-    Me.grpTrayDown.Text = "Download Colors"
+    Me.pctTray.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.pctTray.BackColor = System.Drawing.Color.Black
+    Me.pctTray.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTray.Location = New System.Drawing.Point(18, 3)
+    Me.pctTray.Name = "pctTray"
+    Me.pctTray.Size = New System.Drawing.Size(100, 50)
+    Me.pctTray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+    Me.pctTray.TabIndex = 7
+    Me.pctTray.TabStop = False
     '
-    'pnlTrayDown
+    'grpTrayUsed
     '
-    Me.pnlTrayDown.AutoSize = True
-    Me.pnlTrayDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlTrayDown.ColumnCount = 3
-    Me.pnlTrayDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlTrayDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlTrayDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlTrayDown.Controls.Add(Me.lblTrayDownA, 0, 0)
-    Me.pnlTrayDown.Controls.Add(Me.pctTrayDownA, 2, 0)
-    Me.pnlTrayDown.Controls.Add(Me.pctTrayDownB, 2, 1)
-    Me.pnlTrayDown.Controls.Add(Me.lblTrayDownC, 0, 2)
-    Me.pnlTrayDown.Controls.Add(Me.pctTrayDownC, 2, 2)
-    Me.pnlTrayDown.Controls.Add(Me.chkTrayDownB, 0, 1)
-    Me.pnlTrayDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlTrayDown.Location = New System.Drawing.Point(3, 16)
-    Me.pnlTrayDown.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlTrayDown.Name = "pnlTrayDown"
-    Me.pnlTrayDown.RowCount = 3
-    Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayDown.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlTrayDown.Size = New System.Drawing.Size(140, 78)
-    Me.pnlTrayDown.TabIndex = 0
+    Me.grpTrayUsed.AutoSize = True
+    Me.grpTrayUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.grpTrayUsed.Controls.Add(Me.pnlTrayUsed)
+    Me.grpTrayUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.grpTrayUsed.Location = New System.Drawing.Point(3, 59)
+    Me.grpTrayUsed.Name = "grpTrayUsed"
+    Me.grpTrayUsed.Size = New System.Drawing.Size(131, 97)
+    Me.grpTrayUsed.TabIndex = 1
+    Me.grpTrayUsed.TabStop = False
+    Me.grpTrayUsed.Text = "Icon Gradient"
     '
-    'lblTrayDownA
+    'pnlTrayUsed
     '
-    Me.lblTrayDownA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblTrayDownA.AutoSize = True
-    Me.lblTrayDownA.Location = New System.Drawing.Point(29, 6)
-    Me.lblTrayDownA.Name = "lblTrayDownA"
-    Me.lblTrayDownA.Size = New System.Drawing.Size(27, 13)
-    Me.lblTrayDownA.TabIndex = 0
-    Me.lblTrayDownA.Text = "0% :"
+    Me.pnlTrayUsed.AutoSize = True
+    Me.pnlTrayUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlTrayUsed.ColumnCount = 3
+    Me.pnlTrayUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
+    Me.pnlTrayUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
+    Me.pnlTrayUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlTrayUsed.Controls.Add(Me.lblTrayUsedA, 0, 0)
+    Me.pnlTrayUsed.Controls.Add(Me.pctTrayUsedA, 2, 0)
+    Me.pnlTrayUsed.Controls.Add(Me.pctTrayUsedB, 2, 1)
+    Me.pnlTrayUsed.Controls.Add(Me.lblTrayUsedC, 0, 2)
+    Me.pnlTrayUsed.Controls.Add(Me.pctTrayUsedC, 2, 2)
+    Me.pnlTrayUsed.Controls.Add(Me.chkTrayUsedB, 0, 1)
+    Me.pnlTrayUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlTrayUsed.Location = New System.Drawing.Point(3, 16)
+    Me.pnlTrayUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlTrayUsed.Name = "pnlTrayUsed"
+    Me.pnlTrayUsed.RowCount = 3
+    Me.pnlTrayUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTrayUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTrayUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlTrayUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlTrayUsed.Size = New System.Drawing.Size(125, 78)
+    Me.pnlTrayUsed.TabIndex = 0
     '
-    'pctTrayDownA
+    'lblTrayUsedA
     '
-    Me.pctTrayDownA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayDownA.BackColor = System.Drawing.Color.Blue
-    Me.pctTrayDownA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayDownA.Location = New System.Drawing.Point(72, 3)
-    Me.pctTrayDownA.Name = "pctTrayDownA"
-    Me.pctTrayDownA.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayDownA.TabIndex = 1
-    Me.pctTrayDownA.TabStop = False
+    Me.lblTrayUsedA.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTrayUsedA.AutoSize = True
+    Me.lblTrayUsedA.Location = New System.Drawing.Point(29, 6)
+    Me.lblTrayUsedA.Name = "lblTrayUsedA"
+    Me.lblTrayUsedA.Size = New System.Drawing.Size(27, 13)
+    Me.lblTrayUsedA.TabIndex = 0
+    Me.lblTrayUsedA.Text = "0% :"
     '
-    'pctTrayDownB
+    'pctTrayUsedA
     '
-    Me.pctTrayDownB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayDownB.BackColor = System.Drawing.Color.Yellow
-    Me.pctTrayDownB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayDownB.Enabled = False
-    Me.pctTrayDownB.Location = New System.Drawing.Point(72, 29)
-    Me.pctTrayDownB.Name = "pctTrayDownB"
-    Me.pctTrayDownB.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayDownB.TabIndex = 3
-    Me.pctTrayDownB.TabStop = False
+    Me.pctTrayUsedA.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctTrayUsedA.BackColor = System.Drawing.Color.Blue
+    Me.pctTrayUsedA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTrayUsedA.Location = New System.Drawing.Point(72, 3)
+    Me.pctTrayUsedA.Name = "pctTrayUsedA"
+    Me.pctTrayUsedA.Size = New System.Drawing.Size(50, 20)
+    Me.pctTrayUsedA.TabIndex = 1
+    Me.pctTrayUsedA.TabStop = False
     '
-    'lblTrayDownC
+    'pctTrayUsedB
     '
-    Me.lblTrayDownC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblTrayDownC.AutoSize = True
-    Me.lblTrayDownC.Location = New System.Drawing.Point(17, 58)
-    Me.lblTrayDownC.Name = "lblTrayDownC"
-    Me.lblTrayDownC.Size = New System.Drawing.Size(39, 13)
-    Me.lblTrayDownC.TabIndex = 4
-    Me.lblTrayDownC.Text = "100% :"
+    Me.pctTrayUsedB.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctTrayUsedB.BackColor = System.Drawing.Color.Yellow
+    Me.pctTrayUsedB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTrayUsedB.Enabled = False
+    Me.pctTrayUsedB.Location = New System.Drawing.Point(72, 29)
+    Me.pctTrayUsedB.Name = "pctTrayUsedB"
+    Me.pctTrayUsedB.Size = New System.Drawing.Size(50, 20)
+    Me.pctTrayUsedB.TabIndex = 3
+    Me.pctTrayUsedB.TabStop = False
     '
-    'pctTrayDownC
+    'lblTrayUsedC
     '
-    Me.pctTrayDownC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayDownC.BackColor = System.Drawing.Color.Red
-    Me.pctTrayDownC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayDownC.Location = New System.Drawing.Point(72, 55)
-    Me.pctTrayDownC.Name = "pctTrayDownC"
-    Me.pctTrayDownC.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayDownC.TabIndex = 5
-    Me.pctTrayDownC.TabStop = False
+    Me.lblTrayUsedC.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblTrayUsedC.AutoSize = True
+    Me.lblTrayUsedC.Location = New System.Drawing.Point(17, 58)
+    Me.lblTrayUsedC.Name = "lblTrayUsedC"
+    Me.lblTrayUsedC.Size = New System.Drawing.Size(39, 13)
+    Me.lblTrayUsedC.TabIndex = 4
+    Me.lblTrayUsedC.Text = "100% :"
     '
-    'chkTrayDownB
+    'pctTrayUsedC
     '
-    Me.chkTrayDownB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkTrayDownB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkTrayDownB.Location = New System.Drawing.Point(10, 30)
-    Me.chkTrayDownB.Name = "chkTrayDownB"
-    Me.chkTrayDownB.Size = New System.Drawing.Size(46, 18)
-    Me.chkTrayDownB.TabIndex = 6
-    Me.chkTrayDownB.Text = "50% :"
-    Me.chkTrayDownB.UseVisualStyleBackColor = True
+    Me.pctTrayUsedC.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctTrayUsedC.BackColor = System.Drawing.Color.Red
+    Me.pctTrayUsedC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctTrayUsedC.Location = New System.Drawing.Point(72, 55)
+    Me.pctTrayUsedC.Name = "pctTrayUsedC"
+    Me.pctTrayUsedC.Size = New System.Drawing.Size(50, 20)
+    Me.pctTrayUsedC.TabIndex = 5
+    Me.pctTrayUsedC.TabStop = False
     '
-    'grpTrayUp
+    'chkTrayUsedB
     '
-    Me.grpTrayUp.AutoSize = True
-    Me.grpTrayUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpTrayUp.Controls.Add(Me.pnlTrayUp)
-    Me.grpTrayUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpTrayUp.Location = New System.Drawing.Point(155, 3)
-    Me.grpTrayUp.Name = "grpTrayUp"
-    Me.grpTrayUp.Size = New System.Drawing.Size(146, 97)
-    Me.grpTrayUp.TabIndex = 2
-    Me.grpTrayUp.TabStop = False
-    Me.grpTrayUp.Text = "Upload Colors"
-    '
-    'pnlTrayUp
-    '
-    Me.pnlTrayUp.AutoSize = True
-    Me.pnlTrayUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlTrayUp.ColumnCount = 3
-    Me.pnlTrayUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlTrayUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlTrayUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlTrayUp.Controls.Add(Me.lblTrayUpA, 0, 0)
-    Me.pnlTrayUp.Controls.Add(Me.pctTrayUpA, 2, 0)
-    Me.pnlTrayUp.Controls.Add(Me.pctTrayUpB, 2, 1)
-    Me.pnlTrayUp.Controls.Add(Me.lblTrayUpC, 0, 2)
-    Me.pnlTrayUp.Controls.Add(Me.pctTrayUpC, 2, 2)
-    Me.pnlTrayUp.Controls.Add(Me.chkTrayUpB, 0, 1)
-    Me.pnlTrayUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlTrayUp.Location = New System.Drawing.Point(3, 16)
-    Me.pnlTrayUp.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlTrayUp.Name = "pnlTrayUp"
-    Me.pnlTrayUp.RowCount = 3
-    Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlTrayUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlTrayUp.Size = New System.Drawing.Size(140, 78)
-    Me.pnlTrayUp.TabIndex = 0
-    '
-    'lblTrayUpA
-    '
-    Me.lblTrayUpA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblTrayUpA.AutoSize = True
-    Me.lblTrayUpA.Location = New System.Drawing.Point(29, 6)
-    Me.lblTrayUpA.Name = "lblTrayUpA"
-    Me.lblTrayUpA.Size = New System.Drawing.Size(27, 13)
-    Me.lblTrayUpA.TabIndex = 0
-    Me.lblTrayUpA.Text = "0% :"
-    '
-    'pctTrayUpA
-    '
-    Me.pctTrayUpA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayUpA.BackColor = System.Drawing.Color.Blue
-    Me.pctTrayUpA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayUpA.Location = New System.Drawing.Point(72, 3)
-    Me.pctTrayUpA.Name = "pctTrayUpA"
-    Me.pctTrayUpA.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayUpA.TabIndex = 1
-    Me.pctTrayUpA.TabStop = False
-    '
-    'pctTrayUpB
-    '
-    Me.pctTrayUpB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayUpB.BackColor = System.Drawing.Color.Yellow
-    Me.pctTrayUpB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayUpB.Enabled = False
-    Me.pctTrayUpB.Location = New System.Drawing.Point(72, 29)
-    Me.pctTrayUpB.Name = "pctTrayUpB"
-    Me.pctTrayUpB.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayUpB.TabIndex = 3
-    Me.pctTrayUpB.TabStop = False
-    '
-    'lblTrayUpC
-    '
-    Me.lblTrayUpC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblTrayUpC.AutoSize = True
-    Me.lblTrayUpC.Location = New System.Drawing.Point(17, 58)
-    Me.lblTrayUpC.Name = "lblTrayUpC"
-    Me.lblTrayUpC.Size = New System.Drawing.Size(39, 13)
-    Me.lblTrayUpC.TabIndex = 4
-    Me.lblTrayUpC.Text = "100% :"
-    '
-    'pctTrayUpC
-    '
-    Me.pctTrayUpC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctTrayUpC.BackColor = System.Drawing.Color.Red
-    Me.pctTrayUpC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctTrayUpC.Location = New System.Drawing.Point(72, 55)
-    Me.pctTrayUpC.Name = "pctTrayUpC"
-    Me.pctTrayUpC.Size = New System.Drawing.Size(50, 20)
-    Me.pctTrayUpC.TabIndex = 5
-    Me.pctTrayUpC.TabStop = False
-    '
-    'chkTrayUpB
-    '
-    Me.chkTrayUpB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkTrayUpB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkTrayUpB.Location = New System.Drawing.Point(10, 30)
-    Me.chkTrayUpB.Name = "chkTrayUpB"
-    Me.chkTrayUpB.Size = New System.Drawing.Size(46, 18)
-    Me.chkTrayUpB.TabIndex = 6
-    Me.chkTrayUpB.Text = "50% :"
-    Me.chkTrayUpB.UseVisualStyleBackColor = True
+    Me.chkTrayUsedB.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.chkTrayUsedB.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkTrayUsedB.Location = New System.Drawing.Point(10, 30)
+    Me.chkTrayUsedB.Name = "chkTrayUsedB"
+    Me.chkTrayUsedB.Size = New System.Drawing.Size(46, 18)
+    Me.chkTrayUsedB.TabIndex = 6
+    Me.chkTrayUsedB.Text = "50% :"
+    Me.chkTrayUsedB.UseVisualStyleBackColor = True
     '
     'grpHistory
     '
@@ -476,337 +299,200 @@ Partial Class frmCustomColors
     Me.grpHistory.Controls.Add(Me.pnlHistory)
     Me.grpHistory.Dock = System.Windows.Forms.DockStyle.Fill
     Me.grpHistory.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpHistory.Location = New System.Drawing.Point(3, 285)
+    Me.grpHistory.Location = New System.Drawing.Point(301, 3)
     Me.grpHistory.Name = "grpHistory"
-    Me.grpHistory.Size = New System.Drawing.Size(310, 226)
+    Me.grpHistory.Size = New System.Drawing.Size(326, 230)
     Me.grpHistory.TabIndex = 13
     Me.grpHistory.TabStop = False
-    Me.grpHistory.Text = "&History Window Graphs"
+    Me.grpHistory.Text = "&History Window Graph"
     '
     'pnlHistory
     '
     Me.pnlHistory.AutoSize = True
     Me.pnlHistory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlHistory.ColumnCount = 2
-    Me.pnlHistory.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlHistory.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlHistory.Controls.Add(Me.grpHistoryDown, 0, 0)
-    Me.pnlHistory.Controls.Add(Me.grpHistoryUp, 1, 0)
-    Me.pnlHistory.Controls.Add(Me.pnlHistoryStyle, 0, 1)
+    Me.pnlHistory.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlHistory.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlHistory.Controls.Add(Me.pctHistory, 0, 0)
+    Me.pnlHistory.Controls.Add(Me.grpHistoryUsed, 0, 1)
+    Me.pnlHistory.Controls.Add(Me.pnlHistoryStyle, 0, 2)
     Me.pnlHistory.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlHistory.Location = New System.Drawing.Point(3, 16)
     Me.pnlHistory.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistory.Name = "pnlHistory"
-    Me.pnlHistory.RowCount = 2
+    Me.pnlHistory.RowCount = 3
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlHistory.Size = New System.Drawing.Size(304, 207)
+    Me.pnlHistory.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistory.Size = New System.Drawing.Size(320, 211)
     Me.pnlHistory.TabIndex = 2
     '
-    'grpHistoryDown
+    'pctHistory
     '
-    Me.grpHistoryDown.AutoSize = True
-    Me.grpHistoryDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpHistoryDown.Controls.Add(Me.pnlHistoryDown)
-    Me.grpHistoryDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpHistoryDown.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpHistoryDown.Location = New System.Drawing.Point(3, 3)
-    Me.grpHistoryDown.Name = "grpHistoryDown"
-    Me.grpHistoryDown.Size = New System.Drawing.Size(146, 149)
-    Me.grpHistoryDown.TabIndex = 0
-    Me.grpHistoryDown.TabStop = False
-    Me.grpHistoryDown.Text = "Download Colors"
+    Me.pctHistory.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.pctHistory.BackColor = System.Drawing.Color.Black
+    Me.pctHistory.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistory.Location = New System.Drawing.Point(110, 3)
+    Me.pctHistory.Name = "pctHistory"
+    Me.pctHistory.Size = New System.Drawing.Size(100, 50)
+    Me.pctHistory.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+    Me.pctHistory.TabIndex = 8
+    Me.pctHistory.TabStop = False
     '
-    'pnlHistoryDown
+    'grpHistoryUsed
     '
-    Me.pnlHistoryDown.AutoSize = True
-    Me.pnlHistoryDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlHistoryDown.ColumnCount = 3
-    Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlHistoryDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownLine, 2, 0)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownA, 0, 1)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownA, 2, 1)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownB, 2, 2)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownC, 0, 3)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownC, 2, 3)
-    Me.pnlHistoryDown.Controls.Add(Me.chkHistoryDownB, 0, 2)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownMax, 0, 4)
-    Me.pnlHistoryDown.Controls.Add(Me.pctHistoryDownMax, 2, 4)
-    Me.pnlHistoryDown.Controls.Add(Me.lblHistoryDownLine, 0, 0)
-    Me.pnlHistoryDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlHistoryDown.Location = New System.Drawing.Point(3, 16)
-    Me.pnlHistoryDown.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlHistoryDown.Name = "pnlHistoryDown"
-    Me.pnlHistoryDown.RowCount = 5
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryDown.Size = New System.Drawing.Size(140, 130)
-    Me.pnlHistoryDown.TabIndex = 0
+    Me.grpHistoryUsed.AutoSize = True
+    Me.grpHistoryUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.grpHistoryUsed.Controls.Add(Me.pnlHistoryUsed)
+    Me.grpHistoryUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.grpHistoryUsed.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.grpHistoryUsed.Location = New System.Drawing.Point(3, 59)
+    Me.grpHistoryUsed.Name = "grpHistoryUsed"
+    Me.grpHistoryUsed.Size = New System.Drawing.Size(314, 97)
+    Me.grpHistoryUsed.TabIndex = 0
+    Me.grpHistoryUsed.TabStop = False
+    Me.grpHistoryUsed.Text = "History Colors and Gradient"
     '
-    'pctHistoryDownLine
+    'pnlHistoryUsed
     '
-    Me.pctHistoryDownLine.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryDownLine.BackColor = System.Drawing.Color.Blue
-    Me.pctHistoryDownLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownLine.Location = New System.Drawing.Point(72, 3)
-    Me.pctHistoryDownLine.Name = "pctHistoryDownLine"
-    Me.pctHistoryDownLine.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryDownLine.TabIndex = 10
-    Me.pctHistoryDownLine.TabStop = False
+    Me.pnlHistoryUsed.AutoSize = True
+    Me.pnlHistoryUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlHistoryUsed.ColumnCount = 6
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
+    Me.pnlHistoryUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlHistoryUsed.Controls.Add(Me.pctHistoryUsedLine, 2, 0)
+    Me.pnlHistoryUsed.Controls.Add(Me.lblHistoryUsedA, 3, 0)
+    Me.pnlHistoryUsed.Controls.Add(Me.pctHistoryUsedA, 6, 0)
+    Me.pnlHistoryUsed.Controls.Add(Me.pctHistoryUsedB, 6, 1)
+    Me.pnlHistoryUsed.Controls.Add(Me.lblHistoryUsedC, 3, 2)
+    Me.pnlHistoryUsed.Controls.Add(Me.pctHistoryUsedC, 6, 2)
+    Me.pnlHistoryUsed.Controls.Add(Me.chkHistoryUsedB, 3, 1)
+    Me.pnlHistoryUsed.Controls.Add(Me.lblHistoryUsedMax, 0, 2)
+    Me.pnlHistoryUsed.Controls.Add(Me.pctHistoryUsedMax, 2, 2)
+    Me.pnlHistoryUsed.Controls.Add(Me.lblHistoryUsedLine, 0, 0)
+    Me.pnlHistoryUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlHistoryUsed.Location = New System.Drawing.Point(3, 16)
+    Me.pnlHistoryUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlHistoryUsed.Name = "pnlHistoryUsed"
+    Me.pnlHistoryUsed.RowCount = 3
+    Me.pnlHistoryUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlHistoryUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlHistoryUsed.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlHistoryUsed.Size = New System.Drawing.Size(308, 78)
+    Me.pnlHistoryUsed.TabIndex = 0
     '
-    'lblHistoryDownA
+    'pctHistoryUsedLine
     '
-    Me.lblHistoryDownA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryDownA.AutoSize = True
-    Me.lblHistoryDownA.Location = New System.Drawing.Point(29, 32)
-    Me.lblHistoryDownA.Name = "lblHistoryDownA"
-    Me.lblHistoryDownA.Size = New System.Drawing.Size(27, 13)
-    Me.lblHistoryDownA.TabIndex = 0
-    Me.lblHistoryDownA.Text = "0% :"
+    Me.pctHistoryUsedLine.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUsedLine.BackColor = System.Drawing.Color.Blue
+    Me.pctHistoryUsedLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUsedLine.Location = New System.Drawing.Point(72, 3)
+    Me.pctHistoryUsedLine.Name = "pctHistoryUsedLine"
+    Me.pctHistoryUsedLine.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUsedLine.TabIndex = 10
+    Me.pctHistoryUsedLine.TabStop = False
     '
-    'pctHistoryDownA
+    'lblHistoryUsedA
     '
-    Me.pctHistoryDownA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryDownA.BackColor = System.Drawing.Color.Blue
-    Me.pctHistoryDownA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownA.Location = New System.Drawing.Point(72, 29)
-    Me.pctHistoryDownA.Name = "pctHistoryDownA"
-    Me.pctHistoryDownA.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryDownA.TabIndex = 1
-    Me.pctHistoryDownA.TabStop = False
+    Me.lblHistoryUsedA.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryUsedA.AutoSize = True
+    Me.lblHistoryUsedA.Location = New System.Drawing.Point(183, 6)
+    Me.lblHistoryUsedA.Name = "lblHistoryUsedA"
+    Me.lblHistoryUsedA.Size = New System.Drawing.Size(27, 13)
+    Me.lblHistoryUsedA.TabIndex = 0
+    Me.lblHistoryUsedA.Text = "0% :"
     '
-    'pctHistoryDownB
+    'pctHistoryUsedA
     '
-    Me.pctHistoryDownB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryDownB.BackColor = System.Drawing.Color.Transparent
-    Me.pctHistoryDownB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownB.Enabled = False
-    Me.pctHistoryDownB.Location = New System.Drawing.Point(72, 55)
-    Me.pctHistoryDownB.Name = "pctHistoryDownB"
-    Me.pctHistoryDownB.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryDownB.TabIndex = 3
-    Me.pctHistoryDownB.TabStop = False
+    Me.pctHistoryUsedA.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUsedA.BackColor = System.Drawing.Color.Blue
+    Me.pctHistoryUsedA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUsedA.Location = New System.Drawing.Point(226, 3)
+    Me.pctHistoryUsedA.Name = "pctHistoryUsedA"
+    Me.pctHistoryUsedA.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUsedA.TabIndex = 1
+    Me.pctHistoryUsedA.TabStop = False
     '
-    'lblHistoryDownC
+    'pctHistoryUsedB
     '
-    Me.lblHistoryDownC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryDownC.AutoSize = True
-    Me.lblHistoryDownC.Location = New System.Drawing.Point(17, 84)
-    Me.lblHistoryDownC.Name = "lblHistoryDownC"
-    Me.lblHistoryDownC.Size = New System.Drawing.Size(39, 13)
-    Me.lblHistoryDownC.TabIndex = 4
-    Me.lblHistoryDownC.Text = "100% :"
+    Me.pctHistoryUsedB.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUsedB.BackColor = System.Drawing.Color.Transparent
+    Me.pctHistoryUsedB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUsedB.Enabled = False
+    Me.pctHistoryUsedB.Location = New System.Drawing.Point(226, 29)
+    Me.pctHistoryUsedB.Name = "pctHistoryUsedB"
+    Me.pctHistoryUsedB.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUsedB.TabIndex = 3
+    Me.pctHistoryUsedB.TabStop = False
     '
-    'pctHistoryDownC
+    'lblHistoryUsedC
     '
-    Me.pctHistoryDownC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryDownC.BackColor = System.Drawing.Color.Red
-    Me.pctHistoryDownC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownC.Location = New System.Drawing.Point(72, 81)
-    Me.pctHistoryDownC.Name = "pctHistoryDownC"
-    Me.pctHistoryDownC.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryDownC.TabIndex = 5
-    Me.pctHistoryDownC.TabStop = False
+    Me.lblHistoryUsedC.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryUsedC.AutoSize = True
+    Me.lblHistoryUsedC.Location = New System.Drawing.Point(171, 58)
+    Me.lblHistoryUsedC.Name = "lblHistoryUsedC"
+    Me.lblHistoryUsedC.Size = New System.Drawing.Size(39, 13)
+    Me.lblHistoryUsedC.TabIndex = 4
+    Me.lblHistoryUsedC.Text = "100% :"
     '
-    'chkHistoryDownB
+    'pctHistoryUsedC
     '
-    Me.chkHistoryDownB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkHistoryDownB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkHistoryDownB.Location = New System.Drawing.Point(10, 56)
-    Me.chkHistoryDownB.Name = "chkHistoryDownB"
-    Me.chkHistoryDownB.Size = New System.Drawing.Size(46, 18)
-    Me.chkHistoryDownB.TabIndex = 6
-    Me.chkHistoryDownB.Text = "50% :"
-    Me.chkHistoryDownB.UseVisualStyleBackColor = True
+    Me.pctHistoryUsedC.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUsedC.BackColor = System.Drawing.Color.Red
+    Me.pctHistoryUsedC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUsedC.Location = New System.Drawing.Point(226, 55)
+    Me.pctHistoryUsedC.Name = "pctHistoryUsedC"
+    Me.pctHistoryUsedC.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUsedC.TabIndex = 5
+    Me.pctHistoryUsedC.TabStop = False
     '
-    'lblHistoryDownMax
+    'chkHistoryUsedB
     '
-    Me.lblHistoryDownMax.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryDownMax.AutoSize = True
-    Me.lblHistoryDownMax.Location = New System.Drawing.Point(23, 110)
-    Me.lblHistoryDownMax.Name = "lblHistoryDownMax"
-    Me.lblHistoryDownMax.Size = New System.Drawing.Size(33, 13)
-    Me.lblHistoryDownMax.TabIndex = 7
-    Me.lblHistoryDownMax.Text = "Max :"
+    Me.chkHistoryUsedB.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.chkHistoryUsedB.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkHistoryUsedB.Location = New System.Drawing.Point(164, 30)
+    Me.chkHistoryUsedB.Name = "chkHistoryUsedB"
+    Me.chkHistoryUsedB.Size = New System.Drawing.Size(46, 18)
+    Me.chkHistoryUsedB.TabIndex = 6
+    Me.chkHistoryUsedB.Text = "50% :"
+    Me.chkHistoryUsedB.UseVisualStyleBackColor = True
     '
-    'pctHistoryDownMax
+    'lblHistoryUsedMax
     '
-    Me.pctHistoryDownMax.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryDownMax.BackColor = System.Drawing.Color.Yellow
-    Me.pctHistoryDownMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryDownMax.Location = New System.Drawing.Point(72, 107)
-    Me.pctHistoryDownMax.Name = "pctHistoryDownMax"
-    Me.pctHistoryDownMax.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryDownMax.TabIndex = 8
-    Me.pctHistoryDownMax.TabStop = False
+    Me.lblHistoryUsedMax.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryUsedMax.AutoSize = True
+    Me.lblHistoryUsedMax.Location = New System.Drawing.Point(23, 58)
+    Me.lblHistoryUsedMax.Name = "lblHistoryUsedMax"
+    Me.lblHistoryUsedMax.Size = New System.Drawing.Size(33, 13)
+    Me.lblHistoryUsedMax.TabIndex = 7
+    Me.lblHistoryUsedMax.Text = "Max :"
     '
-    'lblHistoryDownLine
+    'pctHistoryUsedMax
     '
-    Me.lblHistoryDownLine.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryDownLine.AutoSize = True
-    Me.lblHistoryDownLine.Location = New System.Drawing.Point(23, 6)
-    Me.lblHistoryDownLine.Name = "lblHistoryDownLine"
-    Me.lblHistoryDownLine.Size = New System.Drawing.Size(33, 13)
-    Me.lblHistoryDownLine.TabIndex = 9
-    Me.lblHistoryDownLine.Text = "Line :"
+    Me.pctHistoryUsedMax.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryUsedMax.BackColor = System.Drawing.Color.Yellow
+    Me.pctHistoryUsedMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryUsedMax.Location = New System.Drawing.Point(72, 55)
+    Me.pctHistoryUsedMax.Name = "pctHistoryUsedMax"
+    Me.pctHistoryUsedMax.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryUsedMax.TabIndex = 8
+    Me.pctHistoryUsedMax.TabStop = False
     '
-    'grpHistoryUp
+    'lblHistoryUsedLine
     '
-    Me.grpHistoryUp.AutoSize = True
-    Me.grpHistoryUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpHistoryUp.Controls.Add(Me.pnlHistoryUp)
-    Me.grpHistoryUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpHistoryUp.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpHistoryUp.Location = New System.Drawing.Point(155, 3)
-    Me.grpHistoryUp.Name = "grpHistoryUp"
-    Me.grpHistoryUp.Size = New System.Drawing.Size(146, 149)
-    Me.grpHistoryUp.TabIndex = 1
-    Me.grpHistoryUp.TabStop = False
-    Me.grpHistoryUp.Text = "Upload Colors"
-    '
-    'pnlHistoryUp
-    '
-    Me.pnlHistoryUp.AutoSize = True
-    Me.pnlHistoryUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlHistoryUp.ColumnCount = 3
-    Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlHistoryUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpLine, 2, 0)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpA, 0, 1)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpA, 2, 1)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpB, 2, 2)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpC, 0, 3)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpC, 2, 3)
-    Me.pnlHistoryUp.Controls.Add(Me.chkHistoryUpB, 0, 2)
-    Me.pnlHistoryUp.Controls.Add(Me.pctHistoryUpMax, 2, 4)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpMax, 0, 4)
-    Me.pnlHistoryUp.Controls.Add(Me.lblHistoryUpLine, 0, 0)
-    Me.pnlHistoryUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlHistoryUp.Location = New System.Drawing.Point(3, 16)
-    Me.pnlHistoryUp.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlHistoryUp.Name = "pnlHistoryUp"
-    Me.pnlHistoryUp.RowCount = 5
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryUp.Size = New System.Drawing.Size(140, 130)
-    Me.pnlHistoryUp.TabIndex = 0
-    '
-    'pctHistoryUpLine
-    '
-    Me.pctHistoryUpLine.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryUpLine.BackColor = System.Drawing.Color.Blue
-    Me.pctHistoryUpLine.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpLine.Location = New System.Drawing.Point(72, 3)
-    Me.pctHistoryUpLine.Name = "pctHistoryUpLine"
-    Me.pctHistoryUpLine.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryUpLine.TabIndex = 10
-    Me.pctHistoryUpLine.TabStop = False
-    '
-    'lblHistoryUpA
-    '
-    Me.lblHistoryUpA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryUpA.AutoSize = True
-    Me.lblHistoryUpA.Location = New System.Drawing.Point(29, 32)
-    Me.lblHistoryUpA.Name = "lblHistoryUpA"
-    Me.lblHistoryUpA.Size = New System.Drawing.Size(27, 13)
-    Me.lblHistoryUpA.TabIndex = 0
-    Me.lblHistoryUpA.Text = "0% :"
-    '
-    'pctHistoryUpA
-    '
-    Me.pctHistoryUpA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryUpA.BackColor = System.Drawing.Color.Blue
-    Me.pctHistoryUpA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpA.Location = New System.Drawing.Point(72, 29)
-    Me.pctHistoryUpA.Name = "pctHistoryUpA"
-    Me.pctHistoryUpA.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryUpA.TabIndex = 1
-    Me.pctHistoryUpA.TabStop = False
-    '
-    'pctHistoryUpB
-    '
-    Me.pctHistoryUpB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryUpB.BackColor = System.Drawing.Color.Transparent
-    Me.pctHistoryUpB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpB.Enabled = False
-    Me.pctHistoryUpB.Location = New System.Drawing.Point(72, 55)
-    Me.pctHistoryUpB.Name = "pctHistoryUpB"
-    Me.pctHistoryUpB.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryUpB.TabIndex = 3
-    Me.pctHistoryUpB.TabStop = False
-    '
-    'lblHistoryUpC
-    '
-    Me.lblHistoryUpC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryUpC.AutoSize = True
-    Me.lblHistoryUpC.Location = New System.Drawing.Point(17, 84)
-    Me.lblHistoryUpC.Name = "lblHistoryUpC"
-    Me.lblHistoryUpC.Size = New System.Drawing.Size(39, 13)
-    Me.lblHistoryUpC.TabIndex = 4
-    Me.lblHistoryUpC.Text = "100% :"
-    '
-    'pctHistoryUpC
-    '
-    Me.pctHistoryUpC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryUpC.BackColor = System.Drawing.Color.Red
-    Me.pctHistoryUpC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpC.Location = New System.Drawing.Point(72, 81)
-    Me.pctHistoryUpC.Name = "pctHistoryUpC"
-    Me.pctHistoryUpC.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryUpC.TabIndex = 5
-    Me.pctHistoryUpC.TabStop = False
-    '
-    'chkHistoryUpB
-    '
-    Me.chkHistoryUpB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkHistoryUpB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkHistoryUpB.Location = New System.Drawing.Point(10, 56)
-    Me.chkHistoryUpB.Name = "chkHistoryUpB"
-    Me.chkHistoryUpB.Size = New System.Drawing.Size(46, 18)
-    Me.chkHistoryUpB.TabIndex = 6
-    Me.chkHistoryUpB.Text = "50% :"
-    Me.chkHistoryUpB.UseVisualStyleBackColor = True
-    '
-    'pctHistoryUpMax
-    '
-    Me.pctHistoryUpMax.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryUpMax.BackColor = System.Drawing.Color.Yellow
-    Me.pctHistoryUpMax.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryUpMax.Location = New System.Drawing.Point(72, 107)
-    Me.pctHistoryUpMax.Name = "pctHistoryUpMax"
-    Me.pctHistoryUpMax.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryUpMax.TabIndex = 9
-    Me.pctHistoryUpMax.TabStop = False
-    '
-    'lblHistoryUpMax
-    '
-    Me.lblHistoryUpMax.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryUpMax.AutoSize = True
-    Me.lblHistoryUpMax.Location = New System.Drawing.Point(23, 110)
-    Me.lblHistoryUpMax.Name = "lblHistoryUpMax"
-    Me.lblHistoryUpMax.Size = New System.Drawing.Size(33, 13)
-    Me.lblHistoryUpMax.TabIndex = 8
-    Me.lblHistoryUpMax.Text = "Max :"
-    '
-    'lblHistoryUpLine
-    '
-    Me.lblHistoryUpLine.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblHistoryUpLine.AutoSize = True
-    Me.lblHistoryUpLine.Location = New System.Drawing.Point(23, 6)
-    Me.lblHistoryUpLine.Name = "lblHistoryUpLine"
-    Me.lblHistoryUpLine.Size = New System.Drawing.Size(33, 13)
-    Me.lblHistoryUpLine.TabIndex = 10
-    Me.lblHistoryUpLine.Text = "Line :"
+    Me.lblHistoryUsedLine.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblHistoryUsedLine.AutoSize = True
+    Me.lblHistoryUsedLine.Location = New System.Drawing.Point(23, 6)
+    Me.lblHistoryUsedLine.Name = "lblHistoryUsedLine"
+    Me.lblHistoryUsedLine.Size = New System.Drawing.Size(33, 13)
+    Me.lblHistoryUsedLine.TabIndex = 9
+    Me.lblHistoryUsedLine.Text = "Line :"
     '
     'pnlHistoryStyle
     '
@@ -819,21 +505,22 @@ Partial Class frmCustomColors
     Me.pnlHistoryStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75.0!))
     Me.pnlHistoryStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryGridD, 3, 1)
-    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryGridL, 1, 1)
-    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryBG, 3, 0)
     Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryText, 0, 0)
-    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryBG, 2, 0)
     Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryText, 1, 0)
-    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryGridL, 0, 1)
     Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryGridD, 2, 1)
+    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryBG, 0, 1)
+    Me.pnlHistoryStyle.Controls.Add(Me.lblHistoryGridL, 2, 0)
+    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryBG, 1, 1)
+    Me.pnlHistoryStyle.Controls.Add(Me.pctHistoryGridL, 3, 0)
     Me.pnlHistoryStyle.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlHistoryStyle.Location = New System.Drawing.Point(0, 155)
+    Me.pnlHistoryStyle.Location = New System.Drawing.Point(0, 159)
     Me.pnlHistoryStyle.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlHistoryStyle.Name = "pnlHistoryStyle"
     Me.pnlHistoryStyle.RowCount = 2
     Me.pnlHistoryStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlHistoryStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlHistoryStyle.Size = New System.Drawing.Size(304, 52)
+    Me.pnlHistoryStyle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlHistoryStyle.Size = New System.Drawing.Size(320, 52)
     Me.pnlHistoryStyle.TabIndex = 2
     '
     'pctHistoryGridD
@@ -841,32 +528,11 @@ Partial Class frmCustomColors
     Me.pctHistoryGridD.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctHistoryGridD.BackColor = System.Drawing.Color.DarkGray
     Me.pctHistoryGridD.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryGridD.Location = New System.Drawing.Point(230, 29)
+    Me.pctHistoryGridD.Location = New System.Drawing.Point(238, 29)
     Me.pctHistoryGridD.Name = "pctHistoryGridD"
     Me.pctHistoryGridD.Size = New System.Drawing.Size(50, 20)
     Me.pctHistoryGridD.TabIndex = 8
     Me.pctHistoryGridD.TabStop = False
-    '
-    'pctHistoryGridL
-    '
-    Me.pctHistoryGridL.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctHistoryGridL.BackColor = System.Drawing.Color.LightGray
-    Me.pctHistoryGridL.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryGridL.Location = New System.Drawing.Point(78, 29)
-    Me.pctHistoryGridL.Name = "pctHistoryGridL"
-    Me.pctHistoryGridL.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryGridL.TabIndex = 7
-    Me.pctHistoryGridL.TabStop = False
-    '
-    'pctHistoryBG
-    '
-    Me.pctHistoryBG.BackColor = System.Drawing.Color.White
-    Me.pctHistoryBG.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctHistoryBG.Location = New System.Drawing.Point(230, 3)
-    Me.pctHistoryBG.Name = "pctHistoryBG"
-    Me.pctHistoryBG.Size = New System.Drawing.Size(50, 20)
-    Me.pctHistoryBG.TabIndex = 3
-    Me.pctHistoryBG.TabStop = False
     '
     'lblHistoryText
     '
@@ -877,16 +543,6 @@ Partial Class frmCustomColors
     Me.lblHistoryText.Size = New System.Drawing.Size(58, 13)
     Me.lblHistoryText.TabIndex = 0
     Me.lblHistoryText.Text = "Text Color:"
-    '
-    'lblHistoryBG
-    '
-    Me.lblHistoryBG.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblHistoryBG.AutoSize = True
-    Me.lblHistoryBG.Location = New System.Drawing.Point(155, 6)
-    Me.lblHistoryBG.Name = "lblHistoryBG"
-    Me.lblHistoryBG.Size = New System.Drawing.Size(68, 13)
-    Me.lblHistoryBG.TabIndex = 4
-    Me.lblHistoryBG.Text = "Background:"
     '
     'pctHistoryText
     '
@@ -899,25 +555,56 @@ Partial Class frmCustomColors
     Me.pctHistoryText.TabIndex = 1
     Me.pctHistoryText.TabStop = False
     '
+    'lblHistoryGridD
+    '
+    Me.lblHistoryGridD.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblHistoryGridD.AutoSize = True
+    Me.lblHistoryGridD.Location = New System.Drawing.Point(163, 32)
+    Me.lblHistoryGridD.Name = "lblHistoryGridD"
+    Me.lblHistoryGridD.Size = New System.Drawing.Size(55, 13)
+    Me.lblHistoryGridD.TabIndex = 6
+    Me.lblHistoryGridD.Text = "Dark Grid:"
+    '
+    'lblHistoryBG
+    '
+    Me.lblHistoryBG.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblHistoryBG.AutoSize = True
+    Me.lblHistoryBG.Location = New System.Drawing.Point(3, 32)
+    Me.lblHistoryBG.Name = "lblHistoryBG"
+    Me.lblHistoryBG.Size = New System.Drawing.Size(68, 13)
+    Me.lblHistoryBG.TabIndex = 4
+    Me.lblHistoryBG.Text = "Background:"
+    '
     'lblHistoryGridL
     '
     Me.lblHistoryGridL.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblHistoryGridL.AutoSize = True
-    Me.lblHistoryGridL.Location = New System.Drawing.Point(3, 32)
+    Me.lblHistoryGridL.Location = New System.Drawing.Point(163, 6)
     Me.lblHistoryGridL.Name = "lblHistoryGridL"
     Me.lblHistoryGridL.Size = New System.Drawing.Size(55, 13)
     Me.lblHistoryGridL.TabIndex = 5
     Me.lblHistoryGridL.Text = "Light Grid:"
     '
-    'lblHistoryGridD
+    'pctHistoryBG
     '
-    Me.lblHistoryGridD.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblHistoryGridD.AutoSize = True
-    Me.lblHistoryGridD.Location = New System.Drawing.Point(155, 32)
-    Me.lblHistoryGridD.Name = "lblHistoryGridD"
-    Me.lblHistoryGridD.Size = New System.Drawing.Size(55, 13)
-    Me.lblHistoryGridD.TabIndex = 6
-    Me.lblHistoryGridD.Text = "Dark Grid:"
+    Me.pctHistoryBG.BackColor = System.Drawing.Color.White
+    Me.pctHistoryBG.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryBG.Location = New System.Drawing.Point(78, 29)
+    Me.pctHistoryBG.Name = "pctHistoryBG"
+    Me.pctHistoryBG.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryBG.TabIndex = 3
+    Me.pctHistoryBG.TabStop = False
+    '
+    'pctHistoryGridL
+    '
+    Me.pctHistoryGridL.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctHistoryGridL.BackColor = System.Drawing.Color.LightGray
+    Me.pctHistoryGridL.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctHistoryGridL.Location = New System.Drawing.Point(238, 3)
+    Me.pctHistoryGridL.Name = "pctHistoryGridL"
+    Me.pctHistoryGridL.Size = New System.Drawing.Size(50, 20)
+    Me.pctHistoryGridL.TabIndex = 7
+    Me.pctHistoryGridL.TabStop = False
     '
     'grpMain
     '
@@ -928,274 +615,173 @@ Partial Class frmCustomColors
     Me.grpMain.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.grpMain.Location = New System.Drawing.Point(3, 3)
     Me.grpMain.Name = "grpMain"
-    Me.grpMain.Size = New System.Drawing.Size(310, 148)
+    Me.grpMain.Size = New System.Drawing.Size(143, 230)
     Me.grpMain.TabIndex = 11
     Me.grpMain.TabStop = False
-    Me.grpMain.Text = "&Main Window Current Usage Graphs"
+    Me.grpMain.Text = "&Main Window Graph"
     '
     'pnlMain
     '
     Me.pnlMain.AutoSize = True
     Me.pnlMain.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlMain.ColumnCount = 2
-    Me.pnlMain.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlMain.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlMain.Controls.Add(Me.grpMainDown, 0, 0)
-    Me.pnlMain.Controls.Add(Me.grpMainUp, 1, 0)
-    Me.pnlMain.Controls.Add(Me.pnlMainStyle, 0, 1)
+    Me.pnlMain.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlMain.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlMain.Controls.Add(Me.grpMainUsed, 0, 1)
+    Me.pnlMain.Controls.Add(Me.pctMain, 0, 0)
+    Me.pnlMain.Controls.Add(Me.pnlMainStyle, 0, 3)
     Me.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlMain.Location = New System.Drawing.Point(3, 16)
     Me.pnlMain.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlMain.Name = "pnlMain"
-    Me.pnlMain.RowCount = 2
+    Me.pnlMain.RowCount = 5
     Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlMain.Size = New System.Drawing.Size(304, 129)
+    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+    Me.pnlMain.Size = New System.Drawing.Size(137, 211)
     Me.pnlMain.TabIndex = 1
     '
-    'grpMainDown
+    'grpMainUsed
     '
-    Me.grpMainDown.AutoSize = True
-    Me.grpMainDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpMainDown.Controls.Add(Me.pnlMainDown)
-    Me.grpMainDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpMainDown.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpMainDown.Location = New System.Drawing.Point(3, 3)
-    Me.grpMainDown.Name = "grpMainDown"
-    Me.grpMainDown.Size = New System.Drawing.Size(146, 97)
-    Me.grpMainDown.TabIndex = 0
-    Me.grpMainDown.TabStop = False
-    Me.grpMainDown.Text = "Download Colors"
+    Me.grpMainUsed.AutoSize = True
+    Me.grpMainUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.grpMainUsed.Controls.Add(Me.pnlMainUsed)
+    Me.grpMainUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.grpMainUsed.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.grpMainUsed.Location = New System.Drawing.Point(3, 59)
+    Me.grpMainUsed.Name = "grpMainUsed"
+    Me.grpMainUsed.Size = New System.Drawing.Size(131, 95)
+    Me.grpMainUsed.TabIndex = 0
+    Me.grpMainUsed.TabStop = False
+    Me.grpMainUsed.Text = "Usage Gradient"
     '
-    'pnlMainDown
+    'pnlMainUsed
     '
-    Me.pnlMainDown.AutoSize = True
-    Me.pnlMainDown.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlMainDown.ColumnCount = 3
-    Me.pnlMainDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlMainDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlMainDown.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlMainDown.Controls.Add(Me.lblMainDownA, 0, 0)
-    Me.pnlMainDown.Controls.Add(Me.pctMainDownA, 2, 0)
-    Me.pnlMainDown.Controls.Add(Me.pctMainDownB, 2, 1)
-    Me.pnlMainDown.Controls.Add(Me.lblMainDownC, 0, 2)
-    Me.pnlMainDown.Controls.Add(Me.pctMainDownC, 2, 2)
-    Me.pnlMainDown.Controls.Add(Me.chkMainDownB, 0, 1)
-    Me.pnlMainDown.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlMainDown.Location = New System.Drawing.Point(3, 16)
-    Me.pnlMainDown.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlMainDown.Name = "pnlMainDown"
-    Me.pnlMainDown.RowCount = 3
-    Me.pnlMainDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainDown.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainDown.Size = New System.Drawing.Size(140, 78)
-    Me.pnlMainDown.TabIndex = 0
+    Me.pnlMainUsed.AutoSize = True
+    Me.pnlMainUsed.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+    Me.pnlMainUsed.ColumnCount = 3
+    Me.pnlMainUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
+    Me.pnlMainUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
+    Me.pnlMainUsed.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlMainUsed.Controls.Add(Me.lblMainUsedA, 0, 0)
+    Me.pnlMainUsed.Controls.Add(Me.pctMainUsedA, 2, 0)
+    Me.pnlMainUsed.Controls.Add(Me.pctMainUsedB, 2, 1)
+    Me.pnlMainUsed.Controls.Add(Me.lblMainUsedC, 0, 2)
+    Me.pnlMainUsed.Controls.Add(Me.pctMainUsedC, 2, 2)
+    Me.pnlMainUsed.Controls.Add(Me.chkMainUsedB, 0, 1)
+    Me.pnlMainUsed.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pnlMainUsed.Location = New System.Drawing.Point(3, 16)
+    Me.pnlMainUsed.Margin = New System.Windows.Forms.Padding(0)
+    Me.pnlMainUsed.Name = "pnlMainUsed"
+    Me.pnlMainUsed.RowCount = 3
+    Me.pnlMainUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMainUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMainUsed.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMainUsed.Size = New System.Drawing.Size(125, 76)
+    Me.pnlMainUsed.TabIndex = 0
     '
-    'lblMainDownA
+    'lblMainUsedA
     '
-    Me.lblMainDownA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblMainDownA.AutoSize = True
-    Me.lblMainDownA.Location = New System.Drawing.Point(29, 6)
-    Me.lblMainDownA.Name = "lblMainDownA"
-    Me.lblMainDownA.Size = New System.Drawing.Size(27, 13)
-    Me.lblMainDownA.TabIndex = 0
-    Me.lblMainDownA.Text = "0% :"
+    Me.lblMainUsedA.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblMainUsedA.AutoSize = True
+    Me.lblMainUsedA.Location = New System.Drawing.Point(29, 6)
+    Me.lblMainUsedA.Name = "lblMainUsedA"
+    Me.lblMainUsedA.Size = New System.Drawing.Size(27, 13)
+    Me.lblMainUsedA.TabIndex = 0
+    Me.lblMainUsedA.Text = "0% :"
     '
-    'pctMainDownA
+    'pctMainUsedA
     '
-    Me.pctMainDownA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainDownA.BackColor = System.Drawing.Color.Blue
-    Me.pctMainDownA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainDownA.Location = New System.Drawing.Point(72, 3)
-    Me.pctMainDownA.Name = "pctMainDownA"
-    Me.pctMainDownA.Size = New System.Drawing.Size(50, 19)
-    Me.pctMainDownA.TabIndex = 1
-    Me.pctMainDownA.TabStop = False
+    Me.pctMainUsedA.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctMainUsedA.BackColor = System.Drawing.Color.Blue
+    Me.pctMainUsedA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctMainUsedA.Location = New System.Drawing.Point(72, 3)
+    Me.pctMainUsedA.Name = "pctMainUsedA"
+    Me.pctMainUsedA.Size = New System.Drawing.Size(50, 19)
+    Me.pctMainUsedA.TabIndex = 1
+    Me.pctMainUsedA.TabStop = False
     '
-    'pctMainDownB
+    'pctMainUsedB
     '
-    Me.pctMainDownB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainDownB.BackColor = System.Drawing.Color.Transparent
-    Me.pctMainDownB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainDownB.Enabled = False
-    Me.pctMainDownB.Location = New System.Drawing.Point(72, 28)
-    Me.pctMainDownB.Name = "pctMainDownB"
-    Me.pctMainDownB.Size = New System.Drawing.Size(50, 19)
-    Me.pctMainDownB.TabIndex = 3
-    Me.pctMainDownB.TabStop = False
+    Me.pctMainUsedB.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctMainUsedB.BackColor = System.Drawing.Color.Transparent
+    Me.pctMainUsedB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctMainUsedB.Enabled = False
+    Me.pctMainUsedB.Location = New System.Drawing.Point(72, 28)
+    Me.pctMainUsedB.Name = "pctMainUsedB"
+    Me.pctMainUsedB.Size = New System.Drawing.Size(50, 19)
+    Me.pctMainUsedB.TabIndex = 3
+    Me.pctMainUsedB.TabStop = False
     '
-    'lblMainDownC
+    'lblMainUsedC
     '
-    Me.lblMainDownC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblMainDownC.AutoSize = True
-    Me.lblMainDownC.Location = New System.Drawing.Point(17, 57)
-    Me.lblMainDownC.Name = "lblMainDownC"
-    Me.lblMainDownC.Size = New System.Drawing.Size(39, 13)
-    Me.lblMainDownC.TabIndex = 4
-    Me.lblMainDownC.Text = "100% :"
+    Me.lblMainUsedC.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.lblMainUsedC.AutoSize = True
+    Me.lblMainUsedC.Location = New System.Drawing.Point(17, 56)
+    Me.lblMainUsedC.Name = "lblMainUsedC"
+    Me.lblMainUsedC.Size = New System.Drawing.Size(39, 13)
+    Me.lblMainUsedC.TabIndex = 4
+    Me.lblMainUsedC.Text = "100% :"
     '
-    'pctMainDownC
+    'pctMainUsedC
     '
-    Me.pctMainDownC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainDownC.BackColor = System.Drawing.Color.Red
-    Me.pctMainDownC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainDownC.Location = New System.Drawing.Point(72, 54)
-    Me.pctMainDownC.Name = "pctMainDownC"
-    Me.pctMainDownC.Size = New System.Drawing.Size(50, 20)
-    Me.pctMainDownC.TabIndex = 5
-    Me.pctMainDownC.TabStop = False
+    Me.pctMainUsedC.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctMainUsedC.BackColor = System.Drawing.Color.Red
+    Me.pctMainUsedC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctMainUsedC.Location = New System.Drawing.Point(72, 53)
+    Me.pctMainUsedC.Name = "pctMainUsedC"
+    Me.pctMainUsedC.Size = New System.Drawing.Size(50, 20)
+    Me.pctMainUsedC.TabIndex = 5
+    Me.pctMainUsedC.TabStop = False
     '
-    'chkMainDownB
+    'chkMainUsedB
     '
-    Me.chkMainDownB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkMainDownB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkMainDownB.Location = New System.Drawing.Point(10, 28)
-    Me.chkMainDownB.Name = "chkMainDownB"
-    Me.chkMainDownB.Size = New System.Drawing.Size(46, 18)
-    Me.chkMainDownB.TabIndex = 6
-    Me.chkMainDownB.Text = "50% : "
-    Me.chkMainDownB.UseVisualStyleBackColor = True
+    Me.chkMainUsedB.Anchor = System.Windows.Forms.AnchorStyles.Right
+    Me.chkMainUsedB.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkMainUsedB.Location = New System.Drawing.Point(10, 28)
+    Me.chkMainUsedB.Name = "chkMainUsedB"
+    Me.chkMainUsedB.Size = New System.Drawing.Size(46, 18)
+    Me.chkMainUsedB.TabIndex = 6
+    Me.chkMainUsedB.Text = "50% : "
+    Me.chkMainUsedB.UseVisualStyleBackColor = True
     '
-    'grpMainUp
+    'pctMain
     '
-    Me.grpMainUp.AutoSize = True
-    Me.grpMainUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.grpMainUp.Controls.Add(Me.pnlMainUp)
-    Me.grpMainUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.grpMainUp.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.grpMainUp.Location = New System.Drawing.Point(155, 3)
-    Me.grpMainUp.Name = "grpMainUp"
-    Me.grpMainUp.Size = New System.Drawing.Size(146, 97)
-    Me.grpMainUp.TabIndex = 3
-    Me.grpMainUp.TabStop = False
-    Me.grpMainUp.Text = "Upload Colors"
-    '
-    'pnlMainUp
-    '
-    Me.pnlMainUp.AutoSize = True
-    Me.pnlMainUp.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlMainUp.ColumnCount = 3
-    Me.pnlMainUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59.0!))
-    Me.pnlMainUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10.0!))
-    Me.pnlMainUp.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlMainUp.Controls.Add(Me.lblMainUpA, 0, 0)
-    Me.pnlMainUp.Controls.Add(Me.pctMainUpA, 2, 0)
-    Me.pnlMainUp.Controls.Add(Me.pctMainUpB, 2, 1)
-    Me.pnlMainUp.Controls.Add(Me.lblMainUpC, 0, 2)
-    Me.pnlMainUp.Controls.Add(Me.pctMainUpC, 2, 2)
-    Me.pnlMainUp.Controls.Add(Me.chkMainUpB, 0, 1)
-    Me.pnlMainUp.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlMainUp.Location = New System.Drawing.Point(3, 16)
-    Me.pnlMainUp.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlMainUp.Name = "pnlMainUp"
-    Me.pnlMainUp.RowCount = 3
-    Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainUp.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlMainUp.Size = New System.Drawing.Size(140, 78)
-    Me.pnlMainUp.TabIndex = 0
-    '
-    'lblMainUpA
-    '
-    Me.lblMainUpA.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblMainUpA.AutoSize = True
-    Me.lblMainUpA.Location = New System.Drawing.Point(29, 6)
-    Me.lblMainUpA.Name = "lblMainUpA"
-    Me.lblMainUpA.Size = New System.Drawing.Size(27, 13)
-    Me.lblMainUpA.TabIndex = 0
-    Me.lblMainUpA.Text = "0% :"
-    '
-    'pctMainUpA
-    '
-    Me.pctMainUpA.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainUpA.BackColor = System.Drawing.Color.Blue
-    Me.pctMainUpA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainUpA.Location = New System.Drawing.Point(72, 3)
-    Me.pctMainUpA.Name = "pctMainUpA"
-    Me.pctMainUpA.Size = New System.Drawing.Size(50, 20)
-    Me.pctMainUpA.TabIndex = 1
-    Me.pctMainUpA.TabStop = False
-    '
-    'pctMainUpB
-    '
-    Me.pctMainUpB.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainUpB.BackColor = System.Drawing.Color.Transparent
-    Me.pctMainUpB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainUpB.Enabled = False
-    Me.pctMainUpB.Location = New System.Drawing.Point(72, 29)
-    Me.pctMainUpB.Name = "pctMainUpB"
-    Me.pctMainUpB.Size = New System.Drawing.Size(50, 20)
-    Me.pctMainUpB.TabIndex = 3
-    Me.pctMainUpB.TabStop = False
-    '
-    'lblMainUpC
-    '
-    Me.lblMainUpC.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.lblMainUpC.AutoSize = True
-    Me.lblMainUpC.Location = New System.Drawing.Point(17, 58)
-    Me.lblMainUpC.Name = "lblMainUpC"
-    Me.lblMainUpC.Size = New System.Drawing.Size(39, 13)
-    Me.lblMainUpC.TabIndex = 4
-    Me.lblMainUpC.Text = "100% :"
-    '
-    'pctMainUpC
-    '
-    Me.pctMainUpC.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainUpC.BackColor = System.Drawing.Color.Red
-    Me.pctMainUpC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainUpC.Location = New System.Drawing.Point(72, 55)
-    Me.pctMainUpC.Name = "pctMainUpC"
-    Me.pctMainUpC.Size = New System.Drawing.Size(50, 20)
-    Me.pctMainUpC.TabIndex = 5
-    Me.pctMainUpC.TabStop = False
-    '
-    'chkMainUpB
-    '
-    Me.chkMainUpB.Anchor = System.Windows.Forms.AnchorStyles.Right
-    Me.chkMainUpB.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkMainUpB.Location = New System.Drawing.Point(10, 30)
-    Me.chkMainUpB.Name = "chkMainUpB"
-    Me.chkMainUpB.Size = New System.Drawing.Size(46, 18)
-    Me.chkMainUpB.TabIndex = 6
-    Me.chkMainUpB.Text = "50% :"
-    Me.chkMainUpB.UseVisualStyleBackColor = True
+    Me.pctMain.Anchor = System.Windows.Forms.AnchorStyles.None
+    Me.pctMain.BackColor = System.Drawing.Color.Black
+    Me.pctMain.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctMain.Location = New System.Drawing.Point(18, 3)
+    Me.pctMain.Name = "pctMain"
+    Me.pctMain.Size = New System.Drawing.Size(100, 50)
+    Me.pctMain.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
+    Me.pctMain.TabIndex = 2
+    Me.pctMain.TabStop = False
     '
     'pnlMainStyle
     '
     Me.pnlMainStyle.AutoSize = True
     Me.pnlMainStyle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlMainStyle.ColumnCount = 4
+    Me.pnlMainStyle.ColumnCount = 2
     Me.pnlMain.SetColumnSpan(Me.pnlMainStyle, 2)
-    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75.0!))
-    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75.0!))
-    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlMainStyle.Controls.Add(Me.pctMainBG, 3, 0)
+    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlMainStyle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlMainStyle.Controls.Add(Me.lblMainText, 0, 0)
-    Me.pnlMainStyle.Controls.Add(Me.lblMainBG, 2, 0)
     Me.pnlMainStyle.Controls.Add(Me.pctMainText, 1, 0)
+    Me.pnlMainStyle.Controls.Add(Me.lblMainBG, 0, 1)
+    Me.pnlMainStyle.Controls.Add(Me.pctMainBG, 1, 1)
     Me.pnlMainStyle.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.pnlMainStyle.Location = New System.Drawing.Point(0, 103)
+    Me.pnlMainStyle.Location = New System.Drawing.Point(0, 158)
     Me.pnlMainStyle.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlMainStyle.Name = "pnlMainStyle"
-    Me.pnlMainStyle.RowCount = 1
+    Me.pnlMainStyle.RowCount = 2
     Me.pnlMainStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlMainStyle.Size = New System.Drawing.Size(304, 26)
+    Me.pnlMainStyle.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlMainStyle.Size = New System.Drawing.Size(137, 52)
     Me.pnlMainStyle.TabIndex = 2
-    '
-    'pctMainBG
-    '
-    Me.pctMainBG.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pctMainBG.BackColor = System.Drawing.Color.Black
-    Me.pctMainBG.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainBG.Location = New System.Drawing.Point(230, 3)
-    Me.pctMainBG.Name = "pctMainBG"
-    Me.pctMainBG.Size = New System.Drawing.Size(50, 20)
-    Me.pctMainBG.TabIndex = 3
-    Me.pctMainBG.TabStop = False
     '
     'lblMainText
     '
@@ -1207,26 +793,37 @@ Partial Class frmCustomColors
     Me.lblMainText.TabIndex = 0
     Me.lblMainText.Text = "Text Color:"
     '
-    'lblMainBG
-    '
-    Me.lblMainBG.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblMainBG.AutoSize = True
-    Me.lblMainBG.Location = New System.Drawing.Point(155, 6)
-    Me.lblMainBG.Name = "lblMainBG"
-    Me.lblMainBG.Size = New System.Drawing.Size(68, 13)
-    Me.lblMainBG.TabIndex = 4
-    Me.lblMainBG.Text = "Background:"
-    '
     'pctMainText
     '
     Me.pctMainText.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.pctMainText.BackColor = System.Drawing.Color.White
     Me.pctMainText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-    Me.pctMainText.Location = New System.Drawing.Point(78, 3)
+    Me.pctMainText.Location = New System.Drawing.Point(77, 3)
     Me.pctMainText.Name = "pctMainText"
     Me.pctMainText.Size = New System.Drawing.Size(50, 20)
     Me.pctMainText.TabIndex = 1
     Me.pctMainText.TabStop = False
+    '
+    'lblMainBG
+    '
+    Me.lblMainBG.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.lblMainBG.AutoSize = True
+    Me.lblMainBG.Location = New System.Drawing.Point(3, 32)
+    Me.lblMainBG.Name = "lblMainBG"
+    Me.lblMainBG.Size = New System.Drawing.Size(68, 13)
+    Me.lblMainBG.TabIndex = 4
+    Me.lblMainBG.Text = "Background:"
+    '
+    'pctMainBG
+    '
+    Me.pctMainBG.Anchor = System.Windows.Forms.AnchorStyles.Left
+    Me.pctMainBG.BackColor = System.Drawing.Color.Black
+    Me.pctMainBG.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pctMainBG.Location = New System.Drawing.Point(77, 29)
+    Me.pctMainBG.Name = "pctMainBG"
+    Me.pctMainBG.Size = New System.Drawing.Size(50, 20)
+    Me.pctMainBG.TabIndex = 3
+    Me.pctMainBG.TabStop = False
     '
     'pnlButtons
     '
@@ -1234,12 +831,12 @@ Partial Class frmCustomColors
     Me.pnlButtons.AutoSize = True
     Me.pnlButtons.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlButtons.ColumnCount = 2
-    Me.pnlCustomColors.SetColumnSpan(Me.pnlButtons, 2)
+    Me.pnlCustomColors.SetColumnSpan(Me.pnlButtons, 3)
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlButtons.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlButtons.Controls.Add(Me.cmdSave, 0, 0)
     Me.pnlButtons.Controls.Add(Me.cmdClose, 1, 0)
-    Me.pnlButtons.Location = New System.Drawing.Point(235, 531)
+    Me.pnlButtons.Location = New System.Drawing.Point(468, 242)
     Me.pnlButtons.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.RowCount = 1
@@ -1316,7 +913,7 @@ Partial Class frmCustomColors
     Me.AutoSize = True
     Me.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.CancelButton = Me.cmdClose
-    Me.ClientSize = New System.Drawing.Size(397, 576)
+    Me.ClientSize = New System.Drawing.Size(630, 276)
     Me.Controls.Add(Me.pnlCustomColors)
     Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
     Me.Icon = Global.RestrictionTracker.My.Resources.Resources.sat
@@ -1336,42 +933,26 @@ Partial Class frmCustomColors
     Me.grpTray.PerformLayout()
     Me.pnlTray.ResumeLayout(False)
     Me.pnlTray.PerformLayout()
-    Me.grpTrayDown.ResumeLayout(False)
-    Me.grpTrayDown.PerformLayout()
-    Me.pnlTrayDown.ResumeLayout(False)
-    Me.pnlTrayDown.PerformLayout()
-    CType(Me.pctTrayDownA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctTrayDownB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctTrayDownC, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.grpTrayUp.ResumeLayout(False)
-    Me.grpTrayUp.PerformLayout()
-    Me.pnlTrayUp.ResumeLayout(False)
-    Me.pnlTrayUp.PerformLayout()
-    CType(Me.pctTrayUpA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctTrayUpB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctTrayUpC, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.grpTrayUsed.ResumeLayout(False)
+    Me.grpTrayUsed.PerformLayout()
+    Me.pnlTrayUsed.ResumeLayout(False)
+    Me.pnlTrayUsed.PerformLayout()
+    CType(Me.pctTrayUsedA, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctTrayUsedB, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctTrayUsedC, System.ComponentModel.ISupportInitialize).EndInit()
     Me.grpHistory.ResumeLayout(False)
     Me.grpHistory.PerformLayout()
     Me.pnlHistory.ResumeLayout(False)
     Me.pnlHistory.PerformLayout()
-    Me.grpHistoryDown.ResumeLayout(False)
-    Me.grpHistoryDown.PerformLayout()
-    Me.pnlHistoryDown.ResumeLayout(False)
-    Me.pnlHistoryDown.PerformLayout()
-    CType(Me.pctHistoryDownLine, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryDownA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryDownB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryDownC, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryDownMax, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.grpHistoryUp.ResumeLayout(False)
-    Me.grpHistoryUp.PerformLayout()
-    Me.pnlHistoryUp.ResumeLayout(False)
-    Me.pnlHistoryUp.PerformLayout()
-    CType(Me.pctHistoryUpLine, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryUpA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryUpB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryUpC, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctHistoryUpMax, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.grpHistoryUsed.ResumeLayout(False)
+    Me.grpHistoryUsed.PerformLayout()
+    Me.pnlHistoryUsed.ResumeLayout(False)
+    Me.pnlHistoryUsed.PerformLayout()
+    CType(Me.pctHistoryUsedLine, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctHistoryUsedA, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctHistoryUsedB, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctHistoryUsedC, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctHistoryUsedMax, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlHistoryStyle.ResumeLayout(False)
     Me.pnlHistoryStyle.PerformLayout()
     CType(Me.pctHistoryGridD, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1382,20 +963,13 @@ Partial Class frmCustomColors
     Me.grpMain.PerformLayout()
     Me.pnlMain.ResumeLayout(False)
     Me.pnlMain.PerformLayout()
-    Me.grpMainDown.ResumeLayout(False)
-    Me.grpMainDown.PerformLayout()
-    Me.pnlMainDown.ResumeLayout(False)
-    Me.pnlMainDown.PerformLayout()
-    CType(Me.pctMainDownA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctMainDownB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctMainDownC, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.grpMainUp.ResumeLayout(False)
-    Me.grpMainUp.PerformLayout()
-    Me.pnlMainUp.ResumeLayout(False)
-    Me.pnlMainUp.PerformLayout()
-    CType(Me.pctMainUpA, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctMainUpB, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctMainUpC, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.grpMainUsed.ResumeLayout(False)
+    Me.grpMainUsed.PerformLayout()
+    Me.pnlMainUsed.ResumeLayout(False)
+    Me.pnlMainUsed.PerformLayout()
+    CType(Me.pctMainUsedA, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctMainUsedB, System.ComponentModel.ISupportInitialize).EndInit()
+    CType(Me.pctMainUsedC, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlMainStyle.ResumeLayout(False)
     Me.pnlMainStyle.PerformLayout()
     CType(Me.pctMainBG, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1414,77 +988,51 @@ Partial Class frmCustomColors
   Friend WithEvents pnlMain As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pctMainBG As System.Windows.Forms.PictureBox
   Friend WithEvents lblMainBG As System.Windows.Forms.Label
-  Friend WithEvents grpMainDown As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlMainDown As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblMainDownA As System.Windows.Forms.Label
-  Friend WithEvents pctMainDownA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctMainDownB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblMainDownC As System.Windows.Forms.Label
-  Friend WithEvents pctMainDownC As System.Windows.Forms.PictureBox
+  Friend WithEvents grpMainUsed As System.Windows.Forms.GroupBox
+  Friend WithEvents pnlMainUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblMainUsedA As System.Windows.Forms.Label
+  Friend WithEvents pctMainUsedA As System.Windows.Forms.PictureBox
+  Friend WithEvents pctMainUsedB As System.Windows.Forms.PictureBox
+  Friend WithEvents lblMainUsedC As System.Windows.Forms.Label
+  Friend WithEvents pctMainUsedC As System.Windows.Forms.PictureBox
   Friend WithEvents pnlMainStyle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblMainText As System.Windows.Forms.Label
   Friend WithEvents pctMainText As System.Windows.Forms.PictureBox
   Friend WithEvents grpTray As System.Windows.Forms.GroupBox
   Friend WithEvents pnlTray As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents grpTrayUp As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlTrayUp As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblTrayUpA As System.Windows.Forms.Label
-  Friend WithEvents pctTrayUpA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctTrayUpB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblTrayUpC As System.Windows.Forms.Label
-  Friend WithEvents pctTrayUpC As System.Windows.Forms.PictureBox
-  Friend WithEvents grpTrayDown As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlTrayDown As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblTrayDownA As System.Windows.Forms.Label
-  Friend WithEvents pctTrayDownA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctTrayDownB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblTrayDownC As System.Windows.Forms.Label
-  Friend WithEvents pctTrayDownC As System.Windows.Forms.PictureBox
+  Friend WithEvents grpTrayUsed As System.Windows.Forms.GroupBox
+  Friend WithEvents pnlTrayUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblTrayUsedA As System.Windows.Forms.Label
+  Friend WithEvents pctTrayUsedA As System.Windows.Forms.PictureBox
+  Friend WithEvents pctTrayUsedB As System.Windows.Forms.PictureBox
+  Friend WithEvents lblTrayUsedC As System.Windows.Forms.Label
+  Friend WithEvents pctTrayUsedC As System.Windows.Forms.PictureBox
   Friend WithEvents grpHistory As System.Windows.Forms.GroupBox
   Friend WithEvents pnlHistory As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents pctHistoryBG As System.Windows.Forms.PictureBox
   Friend WithEvents lblHistoryBG As System.Windows.Forms.Label
-  Friend WithEvents grpHistoryUp As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlHistoryUp As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblHistoryUpA As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryUpA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctHistoryUpB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblHistoryUpC As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryUpC As System.Windows.Forms.PictureBox
-  Friend WithEvents grpHistoryDown As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlHistoryDown As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblHistoryDownA As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryDownA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctHistoryDownB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblHistoryDownC As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryDownC As System.Windows.Forms.PictureBox
+  Friend WithEvents grpHistoryUsed As System.Windows.Forms.GroupBox
+  Friend WithEvents pnlHistoryUsed As System.Windows.Forms.TableLayoutPanel
+  Friend WithEvents lblHistoryUsedA As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryUsedA As System.Windows.Forms.PictureBox
+  Friend WithEvents pctHistoryUsedB As System.Windows.Forms.PictureBox
+  Friend WithEvents lblHistoryUsedC As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryUsedC As System.Windows.Forms.PictureBox
   Friend WithEvents pnlHistoryStyle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblHistoryText As System.Windows.Forms.Label
   Friend WithEvents pctHistoryText As System.Windows.Forms.PictureBox
   Friend WithEvents cmdSave As System.Windows.Forms.Button
-  Friend WithEvents grpMainUp As System.Windows.Forms.GroupBox
-  Friend WithEvents pnlMainUp As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblMainUpA As System.Windows.Forms.Label
-  Friend WithEvents pctMainUpA As System.Windows.Forms.PictureBox
-  Friend WithEvents pctMainUpB As System.Windows.Forms.PictureBox
-  Friend WithEvents lblMainUpC As System.Windows.Forms.Label
-  Friend WithEvents pctMainUpC As System.Windows.Forms.PictureBox
-  Friend WithEvents chkMainDownB As System.Windows.Forms.CheckBox
-  Friend WithEvents chkTrayUpB As System.Windows.Forms.CheckBox
-  Friend WithEvents chkTrayDownB As System.Windows.Forms.CheckBox
-  Friend WithEvents chkHistoryUpB As System.Windows.Forms.CheckBox
-  Friend WithEvents chkHistoryDownB As System.Windows.Forms.CheckBox
-  Friend WithEvents chkMainUpB As System.Windows.Forms.CheckBox
+  Friend WithEvents chkMainUsedB As System.Windows.Forms.CheckBox
+  Friend WithEvents chkTrayUsedB As System.Windows.Forms.CheckBox
+  Friend WithEvents chkHistoryUsedB As System.Windows.Forms.CheckBox
   Friend WithEvents mnuColorOpts As System.Windows.Forms.ContextMenu
   Friend WithEvents mnuChoose As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSpace As System.Windows.Forms.MenuItem
   Friend WithEvents mnuThisDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAllDefault As System.Windows.Forms.MenuItem
   Friend WithEvents pctTray As System.Windows.Forms.PictureBox
-  Friend WithEvents pctHistoryUpMax As System.Windows.Forms.PictureBox
-  Friend WithEvents lblHistoryUpMax As System.Windows.Forms.Label
-  Friend WithEvents lblHistoryDownMax As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryDownMax As System.Windows.Forms.PictureBox
+  Friend WithEvents lblHistoryUsedMax As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryUsedMax As System.Windows.Forms.PictureBox
   Friend WithEvents mnuGraphDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
   Friend WithEvents pnlButtons As System.Windows.Forms.TableLayoutPanel
@@ -1492,8 +1040,6 @@ Partial Class frmCustomColors
   Friend WithEvents lblHistoryGridD As System.Windows.Forms.Label
   Friend WithEvents pctHistoryGridD As System.Windows.Forms.PictureBox
   Friend WithEvents pctHistoryGridL As System.Windows.Forms.PictureBox
-  Friend WithEvents pctHistoryDownLine As System.Windows.Forms.PictureBox
-  Friend WithEvents lblHistoryDownLine As System.Windows.Forms.Label
-  Friend WithEvents pctHistoryUpLine As System.Windows.Forms.PictureBox
-  Friend WithEvents lblHistoryUpLine As System.Windows.Forms.Label
+  Friend WithEvents pctHistoryUsedLine As System.Windows.Forms.PictureBox
+  Friend WithEvents lblHistoryUsedLine As System.Windows.Forms.Label
 End Class

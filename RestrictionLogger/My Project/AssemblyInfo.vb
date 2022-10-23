@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("Satellite Restriction Logger")> 
-<Assembly: AssemblyDescription("The RestrictionLogger service logs ViaSat network usage and limits. It is to be used in conjunction with Satellite Restriction Tracker. This application is not endorsed by ViaSat, WildBlue, Exede, or any affiliate companies.")> 
+<Assembly: AssemblyDescription("The RestrictionLogger service logs ViaSat network usage and limits. It is to be used in conjunction with Satellite Restriction Tracker. This application is not endorsed by ViaSat, Exede, or any affiliate companies.")> 
 <Assembly: AssemblyCompany("RealityRipple Software")> 
 <Assembly: AssemblyProduct("Satellite Restriction Tracker")> 
 <Assembly: AssemblyCopyright("http://srt.realityripple.com")> 

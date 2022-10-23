@@ -11,29 +11,27 @@
       Return 1
     End Get
   End Property
-  Public Sub LOG_Add(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, Optional Save As Boolean = True)
+  Public Sub LOG_Add(dTime As Date, lUsed As Long, lLimit As Long, Optional Save As Boolean = True)
     If Not isLoaded Then Return
-    If lDownLim <= 0 Then Return
+    If lLimit <= 0 Then Return
     If usageDB Is Nothing Then
       usageDB = New DataBase
       usageDB.StartNew()
     End If
-    usageDB.Add(New DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    usageDB.Add(New DataRow(dTime, lUsed, lLimit))
     If Save Then
       Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
       tX.Start(False)
     End If
   End Sub
-  Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
+  Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngUsed As Long, ByRef lngLimit As Long)
     If Not isLoaded Then Return
     If LOG_GetCount() <= lngIndex Then Return
     Dim dArr() As DataRow = usageDB.ToArray()
     Dim dbRow As DataRow = dArr(lngIndex)
     dtDate = dbRow.DATETIME
-    lngDown = dbRow.DOWNLOAD
-    lngDownLim = dbRow.DOWNLIM
-    lngUp = dbRow.UPLOAD
-    lngUpLim = dbRow.UPLIM
+    lngUsed = dbRow.USED
+    lngLimit = dbRow.LIMIT
   End Sub
   Public Function LOG_GetRange(dtStart As Date, dtEnd As Date) As DataRow()
     Dim lRet As New Collections.Generic.List(Of DataRow)
@@ -58,6 +56,13 @@
   End Function
   Public Sub LOG_Initialize(sAccount As String, withDisplay As Boolean)
     isLoaded = False
+    If Not IO.File.Exists(IO.Path.Combine(MySaveDir(False), "History-" & sAccount & ".wb")) AndAlso IO.File.Exists(IO.Path.Combine(MySaveDir(False), "History-" & sAccount & "@exede.net.wb")) Then
+      Try
+        IO.File.Move(IO.Path.Combine(MySaveDir(False), "History-" & sAccount & "@exede.net.wb"), IO.Path.Combine(MySaveDir(False), "History-" & sAccount & ".wb"))
+      Catch ex As Exception
+        MsgDlg(Nothing, "Your history file could not be renamed because another program is using it!", "History could not be renamed.", "File in Use", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+      End Try
+    End If
     sFile = IO.Path.Combine(MySaveDir(True), "History-" & sAccount & ".wb")
     If Not My.Computer.FileSystem.FileExists(sFile) Then sFile = IO.Path.Combine(MySaveDir(True), "History-" & sAccount & ".xml")
     If My.Computer.FileSystem.FileExists(sFile) Then

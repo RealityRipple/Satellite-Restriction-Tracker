@@ -181,46 +181,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to exede.net
-        '''exede.com
-        '''wildblue.net
-        '''mydish.com
-        '''dishmail.net
-        '''directv.net
-        '''satelliteinternetco.com
-        '''kitcarson.net
-        '''plateauwb.net
-        '''wbaccess.net
-        '''novecnet.com
-        '''northlc.com
-        '''oecblue.net
-        '''seidata.com
-        '''oecblue.com
-        '''hcecwildblue.com
-        '''trueband.net
-        '''trueband.com
-        '''fhrd.net
-        '''scpwildblue.com
-        '''oeccwildblue.com
-        '''bessi.net
-        '''mlecwb.net
-        '''erec.net
-        '''winntelwb.coop
-        '''coopsone.com
-        '''kiamichiwb.org
-        '''kmwb.net
-        '''bcremc.net
-        '''t3cnet.com
-        '''cotcwb.net
-        '''nesloncable.com.
-        '''</summary>
-        Friend ReadOnly Property HostList() As String
-            Get
-                Return ResourceManager.GetString("HostList", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property ico_err() As System.Drawing.Bitmap

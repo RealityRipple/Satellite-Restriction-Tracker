@@ -1,22 +1,19 @@
-﻿Imports RestrictionLibrary.Local
-Public NotInheritable Class frmHistory
+﻿Public NotInheritable Class frmHistory
   Friend mySettings As AppSettings
   Private lastRect As Rectangle
   Private bSizeBegin As Boolean
   Private bSizeChange As Boolean
-  Private graphSpaceD, graphSpaceU As Rectangle
+  Private graphSpace As Rectangle
   Private graphMinX, graphMaxX As Date
   Private Delegate Sub ParameterizedInvoker(parameter As Object)
   Private Delegate Sub ParameterizedInvoker2(param1 As Object, param2 As Object)
   Private WithEvents usageTmp As DataBase
-  Private useStyle As SatHostTypes
   Private fDB As frmDBProgress
 #Region "Form Events"
   Private Sub frmHistory_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     mySettings = New AppSettings
     If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
-    useStyle = mySettings.AccountType
-    ScreenDefaultColors(mySettings.Colors, useStyle)
+    ScreenDefaultColors(mySettings.Colors)
     ResetDates()
     dtpFrom.Value = dtpFrom.MinDate
     dtpTo.Value = dtpTo.MaxDate
@@ -46,8 +43,7 @@ Public NotInheritable Class frmHistory
   End Sub
   Private Sub frmHistory_Resize(sender As Object, e As System.EventArgs) Handles Me.Resize
     bSizeChange = True
-    pctDld.Image = ResizingNote(pctDld.Size)
-    pctUld.Image = ResizingNote(pctUld.Size)
+    pctGraph.Image = ResizingNote(pctGraph.Size)
   End Sub
   Public Sub frmHistory_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.SizeChanged
     If bSizeChange And Not bSizeBegin Then
@@ -88,64 +84,33 @@ Public NotInheritable Class frmHistory
       End Try
       Return
     End If
-    Select Case useStyle
-      Case SatHostTypes.Dish_EXEDE
-        cmd30Days.Text = "T&his Period"
-        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-        cmd60Days.Text = "&Last Period"
-        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-        dgvUsage.Columns.Clear()
-        colDOWNLOAD.HeaderText = "Anytime"
-        colUPLOAD.HeaderText = "Off-Peak"
-        dgvUsage.Columns.Add(colDATETIME)
-        dgvUsage.Columns.Add(colDOWNLOAD)
-        dgvUsage.Columns.Add(colUPLOAD)
-      Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
-        cmd30Days.Text = "T&his Period"
-        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
-        cmd60Days.Text = "&Last Period"
-        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
-        dgvUsage.Columns.Clear()
-        colDOWNLOAD.HeaderText = "Used"
-        colUPLOAD.HeaderText = "Total"
-        dgvUsage.Columns.Add(colDATETIME)
-        dgvUsage.Columns.Add(colDOWNLOAD)
-        dgvUsage.Columns.Add(colUPLOAD)
-      Case Else
-        cmd30Days.Text = "&30 Days"
-        ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of the last 30 days.")
-        cmd60Days.Text = "&60 Days"
-        ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of the last 60 days.")
-        dgvUsage.Columns.Clear()
-        colDOWNLOAD.HeaderText = "Download"
-        colUPLOAD.HeaderText = "Upload"
-        dgvUsage.Columns.Add(colDATETIME)
-        dgvUsage.Columns.Add(colDOWNLOAD)
-        dgvUsage.Columns.Add(colUPLOAD)
-    End Select
+    cmd30Days.Text = "T&his Period"
+    ttHistory.SetToolTip(cmd30Days, "Query the database to get the history of this usage period.")
+    cmd60Days.Text = "&Last Period"
+    ttHistory.SetToolTip(cmd60Days, "Query the database to get the history of this usage period and the previous usage period.")
+    dgvUsage.Columns.Clear()
+    colUSED.HeaderText = "Used"
+    colLIMIT.HeaderText = "Total"
+    dgvUsage.Columns.Add(colDATETIME)
+    dgvUsage.Columns.Add(colUSED)
+    dgvUsage.Columns.Add(colLIMIT)
   End Sub
 #End Region
 #Region "Graph"
-  Private Sub DidResize(downRet As Bitmap, upRet As Bitmap)
+  Private Sub DidResize(downRet As Bitmap)
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), downRet, upRet)
+        Me.Invoke(New ParameterizedInvoker(AddressOf DidResize), downRet)
       Catch ex As Exception
       End Try
       Return
     End If
     If downRet Is Nothing Then
-      pctDld.Image = Nothing
-    ElseIf pctDld.Size.Equals(downRet.Size) Then
-      pctDld.Image = downRet
+      pctGraph.Image = Nothing
+    ElseIf pctGraph.Size.Equals(downRet.Size) Then
+      pctGraph.Image = downRet
     End If
-    If upRet Is Nothing Then
-      pctUld.Image = Nothing
-    ElseIf pctUld.Size.Equals(upRet.Size) Then
-      pctUld.Image = upRet
-    End If
-    graphSpaceD = GetGraphRect(True, graphMinX, graphMaxX)
-    graphSpaceU = GetGraphRect(False, Nothing, Nothing)
+    graphSpace = GetGraphRect(graphMinX, graphMaxX)
     If fDB IsNot Nothing Then
       If fDB.Visible Then fDB.Close()
       fDB.Dispose()
@@ -153,66 +118,48 @@ Public NotInheritable Class frmHistory
     End If
   End Sub
   Private Sub DoGraph(state As Object)
-    Dim graphStyle As Byte = state(0)
-    Dim graphData As DataRow() = state(1)
-    Dim downSize As Size = state(2)
-    Select Case graphStyle
-      Case 0
-        Dim upSize As Size = state(3)
-        Dim bDown As Bitmap = DrawLineGraph(graphData, True, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        Dim bUp As Bitmap = DrawLineGraph(pnlGraph.Tag, False, upSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryUpA, mySettings.Colors.HistoryUpB, mySettings.Colors.HistoryUpC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryUpMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        If Me.IsDisposed OrElse Me.Disposing Then Return
-        Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bDown, bUp)
-      Case 1
-        Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        If Me.IsDisposed OrElse Me.Disposing Then Return
-        Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bGraph, Nothing)
-    End Select
+    Dim graphData As DataRow() = state(0)
+    Dim downSize As Size = state(1)
+    Dim bGraph As Bitmap = DrawRGraph(graphData, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
+    If Me.IsDisposed OrElse Me.Disposing Then Return
+    Dim tResize As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf DidResize))
+    tResize.Start(bGraph)
   End Sub
   Friend Sub DoResize(Optional ByVal Forced As Boolean = False)
     If Me.IsHandleCreated And Not Me.IsDisposed Then
-      If pnlGraph.Visible Then
+      If pctGraph.Visible Then
         If Not (Me.Bounds.Equals(lastRect)) Or Forced Then
           If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
             fDB.Show(Me)
             fDB.SetAction("Drawing Graph...", "Collecting data, estimating, and resizing...")
           End If
-          Dim lItems() As DataRow = pnlGraph.Tag
+          Dim lItems() As DataRow = pctGraph.Tag
           If usageDB Is Nothing OrElse usageDB.Count = 0 Then
-            pnlGraph.RowStyles(0).Height = 100
-            pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
-            pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            pctGraph.Image = BadDataNote(BadDataNotes.Null, pctGraph.Size)
             ClearGraphData()
-            graphSpaceD = Nothing
-            graphSpaceU = Nothing
+            graphSpace = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
               fDB = Nothing
             End If
           ElseIf lItems Is Nothing OrElse lItems.Count = 0 Then
-            pnlGraph.RowStyles(0).Height = 100
-            pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
-            pctDld.Image = BadDataNote(BadDataNotes.Null, pctDld.Size)
+            pctGraph.Image = BadDataNote(BadDataNotes.Null, pctGraph.Size)
             ClearGraphData()
-            graphSpaceD = Nothing
-            graphSpaceU = Nothing
+            graphSpace = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
               fDB = Nothing
             End If
           ElseIf lItems.Count = 1 Then
-            pnlGraph.RowStyles(0).Height = 100
-            pnlGraph.RowStyles(1).Height = 0
             lastRect = Me.Bounds
-            pctDld.Image = BadDataNote(BadDataNotes.One, pctDld.Size)
+            pctGraph.Image = BadDataNote(BadDataNotes.One, pctGraph.Size)
             ClearGraphData()
-            graphSpaceD = Nothing
-            graphSpaceU = Nothing
+            graphSpace = Nothing
             If fDB.Visible Then fDB.Close()
             If fDB IsNot Nothing Then
               fDB.Dispose()
@@ -220,82 +167,28 @@ Public NotInheritable Class frmHistory
             End If
           Else
             Dim GraphInvoker As New ParameterizedInvoker(AddressOf DoGraph)
-            Dim bDisplayed As Boolean = False
-            Select Case useStyle
-              Case SatHostTypes.Dish_EXEDE
-                pnlGraph.RowStyles(0).Height = 50
-                pnlGraph.RowStyles(1).Height = 50
-                lastRect = Me.Bounds
-                pctDld.Image = ResizingNote(pctDld.Size)
-                pctUld.Image = ResizingNote(pctUld.Size)
-                GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
-                bDisplayed = True
-              Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
-                pnlGraph.RowStyles(0).Height = 100
-                pnlGraph.RowStyles(1).Height = 0
-                lastRect = Me.Bounds
-                pctDld.Image = ResizingNote(pctDld.Size)
-                GraphInvoker.BeginInvoke({1, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
-                bDisplayed = True
-              Case SatHostTypes.WildBlue_LEGACY, SatHostTypes.RuralPortal_LEGACY
-                pnlGraph.RowStyles(0).Height = 50
-                pnlGraph.RowStyles(1).Height = 50
-                lastRect = Me.Bounds
-                pctDld.Image = ResizingNote(pctDld.Size)
-                pctUld.Image = ResizingNote(pctUld.Size)
-                GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
-                bDisplayed = True
-            End Select
-            If Not bDisplayed Then
-              If usageDB.LastRow.DOWNLIM = usageDB.LastRow.UPLIM Then
-                pnlGraph.RowStyles(0).Height = 100
-                pnlGraph.RowStyles(1).Height = 0
-                lastRect = Me.Bounds
-                pctDld.Image = ResizingNote(pctDld.Size)
-                GraphInvoker.BeginInvoke({1, pnlGraph.Tag, pctDld.Size}, Nothing, Nothing)
-              Else
-                pnlGraph.RowStyles(0).Height = 50
-                pnlGraph.RowStyles(1).Height = 50
-                lastRect = Me.Bounds
-                pctDld.Image = ResizingNote(pctDld.Size)
-                pctUld.Image = ResizingNote(pctUld.Size)
-                GraphInvoker.BeginInvoke({0, pnlGraph.Tag, pctDld.Size, pctUld.Size}, Nothing, Nothing)
-              End If
-            End If
+            lastRect = Me.Bounds
+            pctGraph.Image = ResizingNote(pctGraph.Size)
+            GraphInvoker.BeginInvoke({pctGraph.Tag, pctGraph.Size}, Nothing, Nothing)
           End If
         End If
       End If
     End If
   End Sub
-  Private Sub pctDld_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctDld.MouseMove
-    If graphSpaceD = Nothing Then Return
-    If graphSpaceD.Contains(e.Location) Then
-      Dim dNow As Date = CalculateNow(graphSpaceD, graphMinX, graphMaxX, e.Location)
+  Private Sub pctGraph_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctGraph.MouseMove
+    If graphSpace = Nothing Then Return
+    If graphSpace.Contains(e.Location) Then
+      Dim dNow As Date = CalculateNow(graphSpace, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
-      Dim gShow As DataRow = GetGraphData(dNow, True)
+      Dim gShow As DataRow = GetGraphData(dNow)
       If gShow.IsEmpty Then Return
       Dim showTime As String = gShow.sDATETIME
-      Dim Show As String = showTime & " : " & gShow.sDOWNLOAD & " MB / " & gShow.sDOWNLIM & " MB"
+      Dim Show As String = showTime & " : " & gShow.sUSED & " MB / " & gShow.sLIMIT & " MB"
       If lastShow = Show Then Return
       lastShow = Show
-      ttHistory.Show(Show, pctDld, e.X + 16, e.Y + 32)
+      ttHistory.Show(Show, pctGraph, e.X + 16, e.Y + 32)
     Else
-      ttHistory.Hide(pctDld)
-    End If
-  End Sub
-  Private Sub pctUld_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctUld.MouseMove
-    If graphSpaceU = Nothing Then Return
-    If graphSpaceU.Contains(e.Location) Then
-      Dim dNow As Date = CalculateNow(graphSpaceU, graphMinX, graphMaxX, e.Location)
-      Static lastShow As String
-      Dim gShow As DataRow = GetGraphData(dNow, False)
-      If gShow.IsEmpty Then Return
-      Dim Show As String = gShow.sDATETIME & " : " & gShow.sUPLOAD & " MB / " & gShow.sUPLIM & " MB"
-      If lastShow = Show Then Return
-      lastShow = Show
-      ttHistory.Show(Show, pctUld, e.X + 16, e.Y + 32)
-    Else
-      ttHistory.Hide(pctUld)
+      ttHistory.Hide(pctGraph)
     End If
   End Sub
   Private Shared Function CalculateNow(GraphSpace As Rectangle, StartX As Date, EndX As Date, MyLoc As Point) As Date
@@ -317,92 +210,27 @@ Public NotInheritable Class frmHistory
     fDB.SetAction("Querying DataBase...", "Reading Rows...")
     If optGraph.Checked Then
       dgvUsage.Visible = False
-      pnlGraph.Visible = True
+      pctGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
         Dim lItems() As DataRow = LOG_GetRange(dFrom, dTo)
-        pnlGraph.Tag = lItems
+        pctGraph.Tag = lItems
         DoResize(True)
       Else
-        pnlGraph.Tag = Nothing
+        pctGraph.Tag = Nothing
         DoResize(True)
       End If
       bClose = False
     Else
-      pnlGraph.Visible = False
+      pctGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
         Dim lItems() As DataRow = LOG_GetRange(dFrom, dTo)
         dgvUsage.Rows.Clear()
-        Dim SameLim As Boolean = True
         ChangeStyle()
         If fDB IsNot Nothing Then fDB.SetAction("Querying DataBase...", "Populating Table...")
-        Select Case useStyle
-          Case SatHostTypes.Dish_EXEDE
-            Dim myDLim As Long = 0
-            Dim myULim As Long = 0
-            For Each lItem As DataRow In lItems
-              If myDLim = 0 Then
-                myDLim = lItem.DOWNLIM
-              Else
-                If Not myDLim = lItem.DOWNLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-              If myULim = 0 Then
-                myULim = lItem.UPLIM
-              Else
-                If Not myULim = lItem.UPLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-            Next
-            If SameLim Then
-              For Each lItem As DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
-              Next lItem
-            Else
-              For Each lItem As DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
-              Next lItem
-            End If
-          Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
-
-            For Each lItem As DataRow In lItems
-              dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)
-            Next lItem
-          Case Else
-            Dim myDLim As Long = 0
-            Dim myULim As Long = 0
-            For Each lItem As DataRow In lItems
-              If myDLim = 0 Then
-                myDLim = lItem.DOWNLIM
-              Else
-                If Not myDLim = lItem.DOWNLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-              If myULim = 0 Then
-                myULim = lItem.UPLIM
-              Else
-                If Not myULim = lItem.UPLIM Then
-                  SameLim = False
-                  Exit For
-                End If
-              End If
-            Next
-            If SameLim Then
-              For Each lItem As DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
-              Next lItem
-            Else
-              For Each lItem As DataRow In lItems
-                dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
-              Next lItem
-            End If
-        End Select
+        For Each lItem As DataRow In lItems
+          dgvUsage.Rows.Add(lItem.DATETIME, lItem.sUSED, lItem.sLIMIT)
+        Next lItem
       Else
         dgvUsage.Rows.Clear()
       End If
@@ -446,64 +274,53 @@ Public NotInheritable Class frmHistory
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From30DaysAgo As Date
     Dim bClose As Boolean = False
-    If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
-      If DateAdd(DateInterval.Day, -30, RightNow) > dtpFrom.MaxDate Then
-        From30DaysAgo = dtpFrom.MaxDate
-      ElseIf DateAdd(DateInterval.Day, -30, RightNow) < dtpFrom.MinDate Then
-        From30DaysAgo = dtpFrom.MinDate
-      Else
-        From30DaysAgo = DateAdd(DateInterval.Day, -30, RightNow)
-      End If
-    Else
-      If usageDB IsNot Nothing Then
-        Dim dbValues() As DataRow = usageDB.ToArray()
-        If dbValues.Length > 1 Then
-          If fDB Is Nothing Then fDB = New frmDBProgress
-          If Not fDB.Visible Then
-            fDB.Show(Me)
-            bClose = True
-          End If
-          fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
-          For I As Integer = dbValues.Length - 1 To 1 Step -1
-            Try
-              fDB.SetProgress(dbValues.Length - I, dbValues.Length)
-            Catch
-            End Try
-            Dim thisDB As DataRow = dbValues(I)
-            Dim lastDB As DataRow = thisDB
-            If I > 0 Then lastDB = dbValues(I - 1)
-            Dim nextDB As DataRow = thisDB
-            If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
-            If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
-              ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
-              Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
-              Not (nextDB.DOWNLOAD = lastDB.DOWNLOAD And nextDB.UPLOAD = lastDB.UPLOAD) Then
-              If DateDiff(DateInterval.Day, thisDB.DATETIME, Today) > 0 Then
-                If thisDB.DATETIME > dtpFrom.MaxDate Then
-                  From30DaysAgo = dtpFrom.MaxDate
-                ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
-                  From30DaysAgo = dtpFrom.MinDate
-                Else
-                  From30DaysAgo = thisDB.DATETIME
-                End If
-                Exit For
+    If usageDB IsNot Nothing Then
+      Dim dbValues() As DataRow = usageDB.ToArray()
+      If dbValues.Length > 1 Then
+        If fDB Is Nothing Then fDB = New frmDBProgress
+        If Not fDB.Visible Then
+          fDB.Show(Me)
+          bClose = True
+        End If
+        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
+        For I As Integer = dbValues.Length - 1 To 1 Step -1
+          Try
+            fDB.SetProgress(dbValues.Length - I, dbValues.Length)
+          Catch
+          End Try
+          Dim thisDB As DataRow = dbValues(I)
+          Dim lastDB As DataRow = thisDB
+          If I > 0 Then lastDB = dbValues(I - 1)
+          Dim nextDB As DataRow = thisDB
+          If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
+          If ((thisDB.USED < lastDB.USED) Or (thisDB.USED = 0 And lastDB.USED = 0)) And
+            Not (lastDB.USED = 0) And
+            Not (nextDB.USED = lastDB.USED) Then
+            If DateDiff(DateInterval.Day, thisDB.DATETIME, Today) > 0 Then
+              If thisDB.DATETIME > dtpFrom.MaxDate Then
+                From30DaysAgo = dtpFrom.MaxDate
+              ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
+                From30DaysAgo = dtpFrom.MinDate
+              Else
+                From30DaysAgo = thisDB.DATETIME
               End If
+              Exit For
             End If
-          Next
-        ElseIf dbValues.Length > 0 Then
-          If dbValues(0).DATETIME > dtpFrom.MaxDate Then
-            From30DaysAgo = dtpFrom.MaxDate
-          ElseIf dbValues(0).DATETIME < dtpFrom.MinDate Then
-            From30DaysAgo = dtpFrom.MinDate
-          Else
-            From30DaysAgo = dbValues(0).DATETIME
           End If
-        Else
+        Next
+      ElseIf dbValues.Length > 0 Then
+        If dbValues(0).DATETIME > dtpFrom.MaxDate Then
+          From30DaysAgo = dtpFrom.MaxDate
+        ElseIf dbValues(0).DATETIME < dtpFrom.MinDate Then
           From30DaysAgo = dtpFrom.MinDate
+        Else
+          From30DaysAgo = dbValues(0).DATETIME
         End If
       Else
         From30DaysAgo = dtpFrom.MinDate
       End If
+    Else
+      From30DaysAgo = dtpFrom.MinDate
     End If
     Dim ToNow As Date
     If RightNow > dtpTo.MaxDate Then
@@ -530,69 +347,58 @@ Public NotInheritable Class frmHistory
     Dim RightNow As Date = New Date(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, 0)
     Dim From60DaysAgo As Date
     Dim bClose As Boolean = False
-    If useStyle = SatHostTypes.WildBlue_LEGACY Or useStyle = SatHostTypes.RuralPortal_LEGACY Then
-      If DateAdd(DateInterval.Day, -60, RightNow) > dtpFrom.MaxDate Then
-        From60DaysAgo = dtpFrom.MaxDate
-      ElseIf DateAdd(DateInterval.Day, -60, RightNow) < dtpFrom.MinDate Then
-        From60DaysAgo = dtpFrom.MinDate
-      Else
-        From60DaysAgo = DateAdd(DateInterval.Day, -60, RightNow)
-      End If
-    Else
-      If usageDB IsNot Nothing Then
-        Dim dbValues() As DataRow = usageDB.ToArray()
-        If dbValues.Length > 1 Then
-          If fDB Is Nothing Then fDB = New frmDBProgress
-          If Not fDB.Visible Then
-            fDB.Show(Me)
-            bClose = True
-          End If
-          fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
-          Dim Finds As Integer = 0
-          For I As Integer = dbValues.Length - 1 To 1 Step -1
-            Try
-              fDB.SetProgress(dbValues.Length - I, dbValues.Length)
-            Catch
-            End Try
-            Dim thisDB As DataRow = dbValues(I)
-            Dim lastDB As DataRow = thisDB
-            If I > 0 Then lastDB = dbValues(I - 1)
-            Dim nextDB As DataRow = thisDB
-            If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
-            If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
-              ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
-              Not (lastDB.DOWNLOAD = 0 And lastDB.UPLOAD = 0) And
-              Not (nextDB.DOWNLOAD = lastDB.DOWNLOAD And nextDB.UPLOAD = lastDB.UPLOAD) Then
-              If DateDiff(DateInterval.Day, usageDB(usageDB.Keys(I)).DATETIME, Today) > 0 Then
-                Finds += 1
-                If Finds = 2 Then
-                  If thisDB.DATETIME > dtpFrom.MaxDate Then
-                    From60DaysAgo = dtpFrom.MaxDate
-                  ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
-                    From60DaysAgo = dtpFrom.MinDate
-                  Else
-                    From60DaysAgo = thisDB.DATETIME
-                  End If
-                  Exit For
+    If usageDB IsNot Nothing Then
+      Dim dbValues() As DataRow = usageDB.ToArray()
+      If dbValues.Length > 1 Then
+        If fDB Is Nothing Then fDB = New frmDBProgress
+        If Not fDB.Visible Then
+          fDB.Show(Me)
+          bClose = True
+        End If
+        fDB.SetAction("Querying DataBase...", "Scanning for Resets...")
+        Dim Finds As Integer = 0
+        For I As Integer = dbValues.Length - 1 To 1 Step -1
+          Try
+            fDB.SetProgress(dbValues.Length - I, dbValues.Length)
+          Catch
+          End Try
+          Dim thisDB As DataRow = dbValues(I)
+          Dim lastDB As DataRow = thisDB
+          If I > 0 Then lastDB = dbValues(I - 1)
+          Dim nextDB As DataRow = thisDB
+          If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
+          If ((thisDB.USED < lastDB.USED) Or (thisDB.USED = 0 And lastDB.USED = 0)) And
+            Not (lastDB.USED = 0) And
+            Not (nextDB.USED = lastDB.USED) Then
+            If DateDiff(DateInterval.Day, usageDB(usageDB.Keys(I)).DATETIME, Today) > 0 Then
+              Finds += 1
+              If Finds = 2 Then
+                If thisDB.DATETIME > dtpFrom.MaxDate Then
+                  From60DaysAgo = dtpFrom.MaxDate
+                ElseIf thisDB.DATETIME < dtpFrom.MinDate Then
+                  From60DaysAgo = dtpFrom.MinDate
+                Else
+                  From60DaysAgo = thisDB.DATETIME
                 End If
+                Exit For
               End If
             End If
-          Next
-          If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
-        ElseIf dbValues.Length > 0 Then
-          If usageDB.First.Value.DATETIME > dtpFrom.MaxDate Then
-            From60DaysAgo = dtpFrom.MaxDate
-          ElseIf usageDB.First.Value.DATETIME < dtpFrom.MinDate Then
-            From60DaysAgo = dtpFrom.MinDate
-          Else
-            From60DaysAgo = usageDB.First.Value.DATETIME
           End If
-        Else
+        Next
+        If Finds < 2 Then From60DaysAgo = dtpFrom.MinDate
+      ElseIf dbValues.Length > 0 Then
+        If usageDB.First.Value.DATETIME > dtpFrom.MaxDate Then
+          From60DaysAgo = dtpFrom.MaxDate
+        ElseIf usageDB.First.Value.DATETIME < dtpFrom.MinDate Then
           From60DaysAgo = dtpFrom.MinDate
+        Else
+          From60DaysAgo = usageDB.First.Value.DATETIME
         End If
       Else
         From60DaysAgo = dtpFrom.MinDate
       End If
+    Else
+      From60DaysAgo = dtpFrom.MinDate
     End If
     Dim ToNow As Date
     If RightNow > dtpTo.MaxDate Then
@@ -741,7 +547,7 @@ Public NotInheritable Class frmHistory
   End Sub
   Private Sub ResetDates()
     Dim dMin, dMax As Date
-    LOG_Get(0, dMin, 0, 0, 0, 0)
+    LOG_Get(0, dMin, 0, 0)
     Dim fDate As Date = New Date(2000, 1, 1)
     If DateDiff(DateInterval.Year, fDate, dMin) < 0 Then dMin = fDate
     If DateDiff(DateInterval.Second, dMin, Now) < 0 Then

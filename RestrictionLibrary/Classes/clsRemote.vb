@@ -101,81 +101,37 @@ Namespace Remote
         Return mTime
       End Get
     End Property
-    Private mDown As Integer
+    Private mUsed As Integer
     ''' <summary>
-    ''' Number of megabytes used in download.
+    ''' Number of megabytes used.
     ''' </summary>
-    Public ReadOnly Property Down As Integer
+    Public ReadOnly Property Used As Integer
       Get
-        Return mDown
+        Return mUsed
       End Get
     End Property
-    Private mDownMax As Integer
+    Private mLimit As Integer
     ''' <summary>
-    ''' Number of megabytes allowed in download.
+    ''' Number of megabytes allowed.
     ''' </summary>
-    Public ReadOnly Property DownMax As Integer
+    Public ReadOnly Property Limit As Integer
       Get
-        Return mDownMax
+        Return mLimit
       End Get
     End Property
-    Private mUp As Integer
-    ''' <summary>
-    ''' Number of megabytes used in upload.
-    ''' </summary>
-    Public ReadOnly Property Up As Integer
-      Get
-        Return mUp
-      End Get
-    End Property
-    Private mUpMax As Integer
-    ''' <summary>
-    ''' Number of megabytes allowed in upload.
-    ''' </summary>
-    Public ReadOnly Property UpMax As Integer
-      Get
-        Return mUpMax
-      End Get
-    End Property
-    Private Ditto As Boolean
     Public Overrides Function ToString() As String
-      If Ditto Then
-        Return mTime.ToString("G", srlFunctions.DateFormatProvider) & ":" & mDown & "/" & mDownMax
-      Else
-        Return mTime.ToString("G", srlFunctions.DateFormatProvider) & ":" & mDown & "/" & mDownMax & ", " & mUp & "/" & mUpMax
-      End If
+      Return mTime.ToString("G", srlFunctions.DateFormatProvider) & ":" & mUsed & "/" & mLimit
     End Function
     ''' <summary>
-    ''' Generate a new <see cref="ServiceResult" /> using a <see cref="Local.TYPEBResultEventArgs">Type B</see> history.
+    ''' Generate a new <see cref="ServiceResult" />.
     ''' </summary>
     ''' <param name="AtTime">The specific date and time of this usage.</param>
     ''' <param name="iUsed">Total number of megabytes used.</param>
     ''' <param name="iMax">Total number of megabytes allowed.</param>
-    ''' <remarks><see cref="Local.TYPEBResultEventArgs">Type B</see> history data does not separate Download and Upload data, and stores the Used and Max values in both Down and Up variables.</remarks>
     Public Sub New(AtTime As DateTime, iUsed As Integer, iMax As Integer)
-      Ditto = True
       mTime = AtTime
-      mDown = iUsed
-      mUp = iUsed
-      mDownMax = iMax
-      mUpMax = iMax
-    End Sub
-    ''' <summary>
-    ''' Generate a new <see cref="ServiceResult" /> using a <see cref="Local.TYPEAResultEventArgs">Type A</see> history.
-    ''' </summary>
-    ''' <param name="AtTime">The specific date and time of this usage.</param>
-    ''' <param name="iDown">Number of megabytes used in download.</param>
-    ''' <param name="iDownMax">Number of megabytes allowed in download.</param>
-    ''' <param name="iUp">Number of megabytes used in upload.</param>
-    ''' <param name="iUpMax">Number of megabytes allowed in upload.</param>
-    ''' <remarks><see cref="Local.TYPEAResultEventArgs">Type A</see> history data separates Download and Upload data, providing a more accurate breakdown of usage.</remarks>
-    Public Sub New(AtTime As DateTime, iDown As Integer, iDownMax As Integer, iUp As Integer, iUpMax As Integer)
-      Ditto = False
-      mTime = AtTime
-      mDown = iDown
-      mUp = iUp
-      mDownMax = iDownMax
-      mUpMax = iUpMax
+      mUsed = iUsed
+      mLimit = iMax
     End Sub
     Public Overrides Function GetHashCode() As Integer
       Return mTime.GetHashCode
@@ -198,15 +154,6 @@ Namespace Remote
   ''' </summary>
   Public Class ServiceSuccessEventArgs
     Inherits EventArgs
-    Private mProvider As Local.SatHostTypes
-    ''' <summary>
-    ''' The type of provider which this account uses.
-    ''' </summary>
-    Public ReadOnly Property Provider As Local.SatHostTypes
-      Get
-        Return mProvider
-      End Get
-    End Property
     Private mResults As ServiceResult()
     ''' <summary>
     ''' List of <see cref="ServiceResult" /> values in an array. This contains all the results which fit the range requested in the UpdateFrom param in the <see cref="ServiceConnection" /> constructor.
@@ -219,10 +166,8 @@ Namespace Remote
     ''' <summary>
     ''' Generate a success message containing the data received from the server.
     ''' </summary>
-    ''' <param name="tProvider">The type of provider which this account uses.</param>
     ''' <param name="aResults">An array of <see cref="ServiceResult" /> values containing all the responses from the server.</param>
-    Public Sub New(tProvider As Local.SatHostTypes, aResults() As ServiceResult)
-      mProvider = tProvider
+    Public Sub New(aResults() As ServiceResult)
       mResults = aResults
     End Sub
   End Class
@@ -242,7 +187,6 @@ Namespace Remote
     Private Secret() As Byte
     Private Const URLPath As String = "http://wb.realityripple.com/login.php"
     Private sUsername As String
-    Private sServer As String
     Private sPassword As String
     Private dFrom As Date
     ''' <summary>
@@ -283,12 +227,10 @@ Namespace Remote
     ''' <param name="ConfigPath">The directory where configuration data is stored. This is used for reporting socket errors. If this value is null, then socket errors are not reported.</param>
     Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As Net.IWebProxy, Timeout As Integer, UpdateFrom As Date, ConfigPath As String)
       ClosingTime = False
-      If Username.Contains("@") Then
-        sUsername = Split(Username, "@", 2)(0)
-        sServer = Split(Username, "@", 2)(1)
+      If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
+        sUsername = Username.Substring(0, Username.LastIndexOf("@"))
       Else
         sUsername = Username
-        sServer = Nothing
       End If
       sPassword = Password
       dFrom = UpdateFrom
@@ -327,7 +269,7 @@ Namespace Remote
     Private Sub Login()
       c_Jar = New Net.CookieContainer
       MakeSocket()
-      Dim sPost As String = "s=init&user=" & sUsername & "@" & sServer & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
+      Dim sPost As String = "s=init&user=" & sUsername & "@exede.net" & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
       Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
       If ClosingTime Then Return
       If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
@@ -435,88 +377,35 @@ Namespace Remote
       ElseIf sRet = "" Then
         RaiseEvent Success(Me, Nothing)
       ElseIf sRet.Contains(vbLf) Then
-        Dim iProv As Local.SatHostTypes
         Dim sRows() As String = sRet.Split(vbLf)
         Dim rData As New Collections.Generic.List(Of ServiceResult)
         For Each row In sRows
           If row.Contains("PROVIDER ") Then
-            iProv = srlFunctions.StringToHostType(row.Substring(9))
           ElseIf row.Contains(":") And row.Contains("|") Then
             Dim sTime As String = Split(row, ":", 2)(0)
-            Dim dish As Boolean = False
-            If sTime.StartsWith("d", StringComparison.Ordinal) Then
-              dish = True
-              sTime = sTime.Substring(1)
-            End If
+            If sTime.StartsWith("d", StringComparison.Ordinal) Then sTime = sTime.Substring(1)
             Dim sData() As String = Split(Split(row, ":", 2)(1), "|")
             Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-            If sData.Length = 5 Then
-              If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_EXEDE
-              Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
-              Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
-              rData.Add(New ServiceResult(tTime, iUsed, iTotal))
-            ElseIf sData.Length = 4 Then
-              If dish Then
-                If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.Dish_EXEDE
-                rData.Add(New ServiceResult(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
-              Else
-                If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_LEGACY
-                rData.Add(New ServiceResult(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
-              End If
-            ElseIf sData.Length = 3 Then
-              If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.RuralPortal_EXEDE
-              Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
-              Dim iTotal As Integer = StrToVal(sData(2), 1000)
-              rData.Add(New ServiceResult(tTime, iUsed, iTotal))
-            ElseIf sData.Length = 2 Then
-              If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_EXEDE
-              rData.Add(New ServiceResult(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
-            End If
-          End If
-        Next
-        If rData.Count > 0 Then
-          RaiseEvent Success(Me, New ServiceSuccessEventArgs(iProv, rData.ToArray))
-        Else
-          RaiseEvent Failure(Me, New ServiceFailureEventArgs(ServiceFailType.NoData, sRet))
-        End If
-      ElseIf sRet.Contains(":") And sRet.Contains("|") Then
-        Dim iProv As Local.SatHostTypes
-        Dim sRows() As String = sRet.Split(vbLf)
-        Dim rData As New Collections.Generic.List(Of ServiceResult)
-        For Each sRow As String In sRows
-          Dim sTime As String = Split(sRow, ":", 2)(0)
-          Dim dish As Boolean = False
-          If sTime.StartsWith("d", StringComparison.Ordinal) Then
-            dish = True
-            sTime = sTime.Substring(1)
-          End If
-          Dim sData() As String = Split(Split(sRow, ":", 2)(1), "|")
-          Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
-          If sData.Length = 5 Then
-            If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_EXEDE
-            Dim iUsed As Integer = StrToVal(sData(0), 1000) + StrToVal(sData(2), 1000)
-            Dim iTotal As Integer = StrToVal(sData(1), 1000) + StrToVal(sData(3), 1000) + (StrToVal(sData(4), 1000))
-            rData.Add(New ServiceResult(tTime, iUsed, iTotal))
-          ElseIf sData.Length = 4 Then
-            If dish Then
-              If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.Dish_EXEDE
-              rData.Add(New ServiceResult(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000), StrToVal(sData(2), 1000), StrToVal(sData(3), 1000)))
-            Else
-              If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_LEGACY
-              rData.Add(New ServiceResult(tTime, StrToVal(sData(0)), StrToVal(sData(1)), StrToVal(sData(2)), StrToVal(sData(3))))
-            End If
-          ElseIf sData.Length = 3 Then
-            If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.RuralPortal_LEGACY
-            Dim iUsed As Integer = StrToVal(sData(0), 1000) + (StrToVal(sData(1), 1000))
-            Dim iTotal As Integer = StrToVal(sData(2), 1000)
-            rData.Add(New ServiceResult(tTime, iUsed, iTotal))
-          ElseIf sData.Length = 2 Then
-            If iProv = Local.SatHostTypes.Other Then iProv = Local.SatHostTypes.WildBlue_EXEDE
             rData.Add(New ServiceResult(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
           End If
         Next
         If rData.Count > 0 Then
-          RaiseEvent Success(Me, New ServiceSuccessEventArgs(iProv, rData.ToArray))
+          RaiseEvent Success(Me, New ServiceSuccessEventArgs(rData.ToArray))
+        Else
+          RaiseEvent Failure(Me, New ServiceFailureEventArgs(ServiceFailType.NoData, sRet))
+        End If
+      ElseIf sRet.Contains(":") And sRet.Contains("|") Then
+        Dim sRows() As String = sRet.Split(vbLf)
+        Dim rData As New Collections.Generic.List(Of ServiceResult)
+        For Each sRow As String In sRows
+          Dim sTime As String = Split(sRow, ":", 2)(0)
+          If sTime.StartsWith("d", StringComparison.Ordinal) Then sTime = sTime.Substring(1)
+          Dim sData() As String = Split(Split(sRow, ":", 2)(1), "|")
+          Dim tTime As DateTime = DateAdd(DateInterval.Second, Val(sTime), (New DateTime(1970, 1, 1, 0, 0, 0, 0))).ToLocalTime
+          rData.Add(New ServiceResult(tTime, StrToVal(sData(0), 1000), StrToVal(sData(1), 1000)))
+        Next
+        If rData.Count > 0 Then
+          RaiseEvent Success(Me, New ServiceSuccessEventArgs(rData.ToArray))
         Else
           RaiseEvent Failure(Me, New ServiceFailureEventArgs(ServiceFailType.NoData, sRet))
         End If

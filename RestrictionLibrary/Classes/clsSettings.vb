@@ -2,7 +2,6 @@
 Class AppSettings
   Private m_Config As String
   Private m_Account As String
-  Private m_AccountType As Local.SatHostTypes
   Private m_Interval As Integer
   Private m_PassCrypt As String
   Private m_PassKey As String
@@ -12,8 +11,6 @@ Class AppSettings
   Private m_ProxySetting As String
   Private m_SecurProtocol As Net.SecurityProtocolType
   Private m_SecurEnforced As Boolean
-  Private m_AJAXShort As String
-  Private m_AJAXFull As String
   Private ReadOnly Property ConfigFile As String
     Get
       Return m_Config
@@ -39,11 +36,6 @@ Class AppSettings
                   Dim xValue = m_node.FirstChild.InnerText
                   If xName.CompareTo("Account") = 0 Then
                     m_Account = xValue
-                    If m_node.Attributes.Count > 1 Then
-                      m_AccountType = srlFunctions.StringToHostType(m_node.Attributes(1).InnerText)
-                    Else
-                      m_AccountType = Local.SatHostTypes.Other
-                    End If
                   ElseIf xName.CompareTo("Interval") = 0 Then
                     If Not Integer.TryParse(xValue, m_Interval) Then m_Interval = 15
                   ElseIf xName.CompareTo("PassCrypt") = 0 Then
@@ -70,16 +62,6 @@ Class AppSettings
                     If xValue.Contains("TLS") And Not xValue.Contains("TLS1") Then m_SecurProtocol = m_SecurProtocol Or SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
                   ElseIf xName.CompareTo("EnforcedSecurity") = 0 Then
                     m_SecurEnforced = (xValue = "True")
-                  ElseIf xName.CompareTo("AJAXOrder") = 0 Then
-                    For Each m_child As XmlNode In m_node.ChildNodes
-                      Dim xMName = m_child.Attributes(0).InnerText
-                      Dim xMValue = m_child.FirstChild.InnerText
-                      If xMName.CompareTo("Short") = 0 Then
-                        m_AJAXShort = xMValue
-                      ElseIf xMName.CompareTo("Full") = 0 Then
-                        m_AJAXFull = xMValue
-                      End If
-                    Next
                   End If
                 Next
               Else
@@ -108,7 +90,6 @@ Class AppSettings
   End Sub
   Private Sub Reset()
     m_Account = Nothing
-    m_AccountType = Local.SatHostTypes.Other
     m_Interval = 15
     m_PassCrypt = Nothing
     m_PassKey = ""
@@ -118,21 +99,11 @@ Class AppSettings
     m_ProxySetting = "None"
     m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     m_SecurEnforced = False
-    m_AJAXFull = Nothing
-    m_AJAXShort = Nothing
   End Sub
   Public ReadOnly Property Account As String
     Get
       Return m_Account
     End Get
-  End Property
-  Public Property AccountType As Local.SatHostTypes
-    Get
-      Return m_AccountType
-    End Get
-    Set(value As Local.SatHostTypes)
-      m_AccountType = value
-    End Set
   End Property
   Public ReadOnly Property PassCrypt As String
     Get
@@ -216,56 +187,6 @@ Class AppSettings
   Public ReadOnly Property SecurityEnforced As Boolean
     Get
       Return m_SecurEnforced
-    End Get
-  End Property
-  Public ReadOnly Property AJAXFullOrder As String()
-    Get
-      If Not m_AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
-      If String.IsNullOrEmpty(m_AJAXFull) Then
-        If String.IsNullOrEmpty(m_Account) Then Return Nothing
-        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant
-        If sHost = "SATELLITEINTERNETCO.COM" Then
-          Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
-        Else
-          Return Nothing
-        End If
-      End If
-      If Not m_AJAXFull.Contains(",") Then
-        If m_AJAXFull.StartsWith("""") Or m_AJAXFull.StartsWith("'") Then m_AJAXFull = m_AJAXFull.Substring(1)
-        If m_AJAXFull.EndsWith("""") Or m_AJAXFull.EndsWith("'") Then m_AJAXFull = m_AJAXFull.Substring(0, m_AJAXFull.Length - 1)
-        Return {m_AJAXFull}
-      End If
-      Dim sParts() As String = Split(m_AJAXFull, ",")
-      Dim sCleanParts As New List(Of String)
-      For Each sPart In sParts
-        If sPart.StartsWith("""") Or sPart.StartsWith("'") Then sPart = sPart.Substring(1)
-        If sPart.EndsWith("""") Or sPart.EndsWith("'") Then sPart = sPart.Substring(0, sPart.Length - 1)
-        sCleanParts.Add(sPart)
-      Next
-      Return sCleanParts.ToArray
-    End Get
-  End Property
-  Public ReadOnly Property AJAXShortOrder As String()
-    Get
-      If Not m_AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
-      If String.IsNullOrEmpty(m_AJAXFull) Then
-        If String.IsNullOrEmpty(m_Account) Then Return Nothing
-        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant
-        If sHost = "SATELLITEINTERNETCO.COM" Then
-          Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
-        Else
-          Return Nothing
-        End If
-      End If
-      If Not m_AJAXShort.Contains(", ") Then
-        Return {m_AJAXShort}
-      End If
-      Dim sParts() As String = Split(m_AJAXShort, ", ")
-      Dim sCleanParts As New List(Of String)
-      For Each sPart In sParts
-        sCleanParts.Add(sPart)
-      Next
-      Return sCleanParts.ToArray
     End Get
   End Property
 End Class
