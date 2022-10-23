@@ -51,7 +51,7 @@ Public Class DataBase
     ''' <returns>The date and time are returned in the format "MM/DD/YYYY HH:MM", or the standard "g".</returns>
     Public ReadOnly Property sDATETIME As String
       Get
-        Return DATETIME.ToString("g")
+        Return srlFunctions.TimeToString(DATETIME)
       End Get
     End Property
     ''' <summary>
@@ -60,7 +60,7 @@ Public Class DataBase
     ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sDOWNLOAD As String
       Get
-        Return DOWNLOAD.ToString("N0")
+        Return DOWNLOAD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -69,7 +69,7 @@ Public Class DataBase
     ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sDOWNLIM As String
       Get
-        Return DOWNLIM.ToString("N0")
+        Return DOWNLIM.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -78,7 +78,7 @@ Public Class DataBase
     ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sUPLOAD As String
       Get
-        Return UPLOAD.ToString("N0")
+        Return UPLOAD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -87,7 +87,7 @@ Public Class DataBase
     ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sUPLIM As String
       Get
-        Return UPLIM.ToString("N0")
+        Return UPLIM.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -219,10 +219,10 @@ Public Class DataBase
               End Select
             Next
             Dim DT As Date = Xml.XmlConvert.ToDateTime(sDT, Xml.XmlDateTimeSerializationMode.RoundtripKind)
-            Dim Down As Long = Long.Parse(sD)
-            Dim DownLim As Long = Long.Parse(sDL)
-            Dim Up As Long = Long.Parse(sU)
-            Dim UpLim As Long = Long.Parse(sUL)
+            Dim Down As Long = Long.Parse(sD, Globalization.CultureInfo.InvariantCulture)
+            Dim DownLim As Long = Long.Parse(sDL, Globalization.CultureInfo.InvariantCulture)
+            Dim Up As Long = Long.Parse(sU, Globalization.CultureInfo.InvariantCulture)
+            Dim UpLim As Long = Long.Parse(sUL, Globalization.CultureInfo.InvariantCulture)
             If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
             Add(New DataRow(DT, Down, DownLim, Up, UpLim))
             If StopNew Then Return
@@ -252,7 +252,7 @@ Public Class DataBase
               Dim firstLine As String = nIn.ReadLine
               If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
                 Dim firstData() As String = Split(firstLine, ",")
-                Dim DT As Date = Date.Parse(firstData(0))
+                Dim DT As Date = Date.Parse(firstData(0), Globalization.CultureInfo.InvariantCulture)
                 Dim Down As Long = firstData(1)
                 Dim DownLim As Long = firstData(2)
                 Dim Up As Long = firstData(3)
@@ -262,7 +262,7 @@ Public Class DataBase
               End If
               Do Until nIn.EndOfStream
                 Dim rowData() As String = Split(nIn.ReadLine, ",")
-                Dim DT As Date = Date.Parse(rowData(0))
+                Dim DT As Date = Date.Parse(rowData(0), Globalization.CultureInfo.InvariantCulture)
                 Dim Down As Long = rowData(1)
                 Dim DownLim As Long = rowData(2)
                 Dim Up As Long = rowData(3)
@@ -464,11 +464,11 @@ Public Class DataBase
                         "<RestrictionTrackerUsage>" & vbNewLine
     For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
       sDB &= "  <History>" & vbNewLine &
-             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.Value.UPLIM.ToString & "</UPLIM>" & vbNewLine &
+             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>" & vbNewLine &
+             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>" & vbNewLine &
+             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>" & vbNewLine &
+             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>" & vbNewLine &
+             "    <UPLIM>" & dRow.Value.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>" & vbNewLine &
              "  </History>" & vbNewLine
     Next
     sDB &= "</RestrictionTrackerUsage>"
@@ -488,11 +488,11 @@ Public Class DataBase
     For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
       If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uLen))
       sDB &= "  <History>" & vbNewLine &
-             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o") & "</DATETIME>" & vbNewLine &
-             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString & "</DOWNLOAD>" & vbNewLine &
-             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString & "</DOWNLIM>" & vbNewLine &
-             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString & "</UPLOAD>" & vbNewLine &
-             "    <UPLIM>" & dRow.Value.UPLIM.ToString & "</UPLIM>" & vbNewLine &
+             "    <DATETIME>" & dRow.Value.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>" & vbNewLine &
+             "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>" & vbNewLine &
+             "    <DOWNLIM>" & dRow.Value.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>" & vbNewLine &
+             "    <UPLOAD>" & dRow.Value.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>" & vbNewLine &
+             "    <UPLIM>" & dRow.Value.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>" & vbNewLine &
              "  </History>" & vbNewLine
       I += 1
     Next
@@ -536,11 +536,11 @@ Public Class DataBase
               If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
               If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
               nOut.WriteLine("  <History>")
-              nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o") & "</DATETIME>")
-              nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString & "</DOWNLOAD>")
-              nOut.WriteLine("    <DOWNLIM>" & dRow.DOWNLIM.ToString & "</DOWNLIM>")
-              nOut.WriteLine("    <UPLOAD>" & dRow.UPLOAD.ToString & "</UPLOAD>")
-              nOut.WriteLine("    <UPLIM>" & dRow.UPLIM.ToString & "</UPLIM>")
+              nOut.WriteLine("    <DATETIME>" & dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>")
+              nOut.WriteLine("    <DOWNLOAD>" & dRow.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>")
+              nOut.WriteLine("    <DOWNLIM>" & dRow.DOWNLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLIM>")
+              nOut.WriteLine("    <UPLOAD>" & dRow.UPLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLOAD>")
+              nOut.WriteLine("    <UPLIM>" & dRow.UPLIM.ToString(Globalization.CultureInfo.InvariantCulture) & "</UPLIM>")
               nOut.WriteLine("  </History>")
             Next
             nOut.Write("</RestrictionTrackerUsage>")
@@ -582,7 +582,7 @@ Public Class DataBase
               If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
               If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
               If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
-              nOut.WriteLine(dRow.DATETIME.ToString("o") & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
+              nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)
             Next
             nOut.Close()
           End Using

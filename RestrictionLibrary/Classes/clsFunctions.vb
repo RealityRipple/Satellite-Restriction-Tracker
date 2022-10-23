@@ -770,6 +770,31 @@ Public Class srlFunctions
     End If
     Return addr
   End Function
+  Public Shared ReadOnly Property DateFormatProvider As IFormatProvider
+    Get
+      Dim dP As New Globalization.CultureInfo(String.Empty, True)
+      dP.DateTimeFormat.DateSeparator = "/"
+      dP.DateTimeFormat.TimeSeparator = ":"
+      dP.DateTimeFormat.AMDesignator = "AM"
+      dP.DateTimeFormat.PMDesignator = "PM"
+      dP.DateTimeFormat.FullDateTimePattern = "dddd, MMMM d, yyyy HH:mm:ss"
+      dP.DateTimeFormat.LongDatePattern = "dddd, MMMM d, yyyy"
+      dP.DateTimeFormat.LongTimePattern = "h:mm:ss tt"
+      dP.DateTimeFormat.MonthDayPattern = "MMMM d"
+      dP.DateTimeFormat.ShortDatePattern = "M/d/yyyy"
+      dP.DateTimeFormat.ShortTimePattern = "h:mm tt"
+      dP.DateTimeFormat.YearMonthPattern = "MMMM, yyyy"
+      dP.DateTimeFormat.AbbreviatedDayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+      dP.DateTimeFormat.AbbreviatedMonthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", ""}
+      dP.DateTimeFormat.DayNames = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+      dP.DateTimeFormat.MonthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ""}
+      dP.DateTimeFormat.FirstDayOfWeek = DayOfWeek.Sunday
+      Return dP
+    End Get
+  End Property
+  Public Shared Function TimeToString(d As Date) As String
+    Return d.ToString("g", DateFormatProvider)
+  End Function
   ''' <summary>
   ''' Converts a <see cref="localRestrictionTracker.SatHostTypes" /> value to a simple string.
   ''' </summary>
@@ -960,7 +985,7 @@ Public Class srlFunctions
   ''' </summary>
   Public Shared Function GetCLRCleanVersion() As String
     Dim sVer As String = GetCLRVersion()
-    If Not sVer.Substring(0, 9) = "4.0.30319" Then Return String.Format("Unknown Runtime ({0})", sVer)
+    If Not sVer.Substring(0, 9) = "4.0.30319" Then Return "Unknown Runtime (" & sVer & ")"
     Dim clrID, clrID2 As Integer
     Dim monoID As String = Nothing
     If Not sVer.Substring(10).Contains("_") Then
@@ -975,7 +1000,7 @@ Public Class srlFunctions
       monoID = clrRel
     End If
     If clrID = 17020 Then
-      If Not String.IsNullOrEmpty(monoID) Then Return String.Format("MONO {0}", monoID)
+      If Not String.IsNullOrEmpty(monoID) Then Return "MONO " & monoID
       Return "MONO"
     End If
     If clrID < 17929 Then
@@ -989,24 +1014,24 @@ Public Class srlFunctions
       If clrID = 1022 Then Return ".NET 4.0 + MS14-009 GDR"
       If clrID = 1026 Then Return ".NET 4.0 + MS14-057 GDR"
       If clrID = 2034 Then Return ".NET 4.0 + MS14-009 LDR"
-      Return String.Format(".NET 4.0 ({0})", clrID)
+      Return ".NET 4.0 (" & clrID & ")"
     End If
     If clrID < 18408 Then
       If clrID = 17929 Then Return ".NET 4.5 RTM"
       If clrID = 18063 Then Return ".NET 4.5 + MS14-009"
-      Return String.Format(".NET 4.5 ({0})", clrID)
+      Return ".NET 4.5 (" & clrID & ")"
     End If
     If clrID < 34209 Then
       If clrID = 18408 Then Return ".NET 4.5.1"
       If clrID = 18444 Then Return ".NET 4.5.1 + MS14-009"
       If clrID = 34011 Then Return ".NET 4.5.1 for Windows 8 + MS14-009"
       If clrID = 34014 Then Return ".NET 4.5.1 for Windows 8.1"
-      Return String.Format(".NET 4.5.1 ({0})", clrID)
+      Return ".NET 4.5.1 (" & clrID & ")"
     End If
     If clrID < 42000 Then
       If clrID = 34209 Then Return ".NET 4.5.2"
       If clrID = 35312 Then Return ".NET 4.5.2 (35312)"
-      Return String.Format(".NET 4.5.2 ({0})", clrID)
+      Return ".NET 4.5.2 (" & clrID & ")"
     End If
     If clrID = 42000 Then
       If clrID2 = 0 Then Return ".NET 4.6"
@@ -1018,20 +1043,20 @@ Public Class srlFunctions
       If clrID2 = 461808 Or clrID2 = 461814 Then Return ".NET 4.7.2" '70BF0 70BF6
       If clrID2 = 528040 Or clrID2 = 528049 Or clrID2 = 528209 Or clrID2 = 528449 Then Return ".NET 4.8" '  80EA8 80EB1
 
-      If clrID2 < 393297 Then Return String.Format(".NET 4.6 ({0})", clrID2)
-      If clrID2 < 394271 Then Return String.Format(".NET 4.6.1 ({0})", clrID2)
-      If clrID2 < 394806 Then Return String.Format(".NET 4.6.2 ({0})", clrID2)
-      If clrID2 < 460805 Then Return String.Format(".NET 4.7 ({0})", clrID2)
-      If clrID2 < 461310 Then Return String.Format(".NET 4.7.1 ({0})", clrID2)
-      If clrID2 < 461814 Then Return String.Format(".NET 4.7.2 ({0})", clrID2)
-      If clrID2 < 528049 Then Return String.Format(".NET 4.8 ({0})", clrID2)
+      If clrID2 < 393297 Then Return ".NET 4.6 (" & clrID2 & ")"
+      If clrID2 < 394271 Then Return ".NET 4.6.1 (" & clrID2 & ")"
+      If clrID2 < 394806 Then Return ".NET 4.6.2 (" & clrID2 & ")"
+      If clrID2 < 460805 Then Return ".NET 4.7 (" & clrID2 & ")"
+      If clrID2 < 461310 Then Return ".NET 4.7.1 (" & clrID2 & ")"
+      If clrID2 < 461814 Then Return ".NET 4.7.2 (" & clrID2 & ")"
+      If clrID2 < 528049 Then Return ".NET 4.8 (" & clrID2 & ")"
 
       Dim clrAttempt As String = Hex(clrID2)
       clrAttempt = clrAttempt.Substring(0, clrAttempt.Length - 4)
-      Dim iAVer As Integer = Integer.Parse(clrAttempt, Globalization.NumberStyles.HexNumber)
-      Return (String.Format(".NET 4.{1} ({0})", clrID2, iAVer))
+      Dim iAVer As Integer = Integer.Parse(clrAttempt, Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
+      Return ".NET 4." & iAVer & " (" & clrID2 & ")"
     End If
-    If clrID2 > 0 Then Return String.Format(".NET Future Version ({0}.{1})", clrID, clrID2)
-    Return String.Format(".NET Future Version ({0})", clrID)
+    If clrID2 > 0 Then Return ".NET Future Version (" & clrID & "." & clrID2 & ")"
+    Return ".NET Future Version (" & clrID & ")"
   End Function
 End Class

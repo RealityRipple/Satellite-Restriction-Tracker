@@ -725,7 +725,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), "servLogin", IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
+    Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), "servLogin", IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
     MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, uriString)
@@ -761,7 +761,7 @@ Public Class localRestrictionTracker
   Private Sub LoginRP()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-    Dim uriString As String = String.Format(sRP, sProvider, "login")
+    Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
     MakeSocket(False)
     Dim sSend As String = "warningTrip=false&userName=" & srlFunctions.PercentEncode(sUsername) & "&passwd=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, uriString)
@@ -803,7 +803,7 @@ Public Class localRestrictionTracker
       End If
       a = lVal
     Next
-    Dim sA As String = a.ToString
+    Dim sA As String = a.ToString(Globalization.CultureInfo.InvariantCulture)
     If sA.Length > 12 Then sA = sA.Substring(0, 12)
     If sA(0) = "-" Then sA = "A" & sA.Substring(1)
     Return sA
@@ -865,7 +865,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub WB_Usage(File As String)
     MakeSocket(False)
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), File, IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
+    Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), File, IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -2130,7 +2130,7 @@ Public Class localRestrictionTracker
     If Retry Then
       RaiseError("Login Issue: Your password is bad.")
       If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-      Dim uriString As String = String.Format(sRP, sProvider, "login")
+      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
       Try
         Process.Start(uriString)
       Catch ex As Exception
@@ -2138,13 +2138,13 @@ Public Class localRestrictionTracker
     Else
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginIssue, "Your password needs to be changed."))
       If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-      Dim uriString As String = String.Format(sRP, sProvider, "login")
+      Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
       RP_Login_Retry(uriString)
     End If
   End Sub
   Private Sub RP_Usage(File As String)
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
-    Dim uriString As String = String.Format(sRP, sProvider, File)
+    Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, File)
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
     MakeSocket(False)
     Dim responseData As String = Nothing

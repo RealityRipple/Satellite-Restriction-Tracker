@@ -306,8 +306,8 @@ Public Class frmHistory
 #Region "Buttons"
   Private Sub cmdQuery_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdQuery.Click
     ToggleInterface(False)
-    Dim dFrom As Date = Date.Parse(dtpFrom.Value.Date & " 00:00:00 AM")
-    Dim dTo As Date = Date.Parse(dtpTo.Value.Date & " 11:59:59 PM")
+    Dim dFrom As New Date(dtpFrom.Value.Year, dtpFrom.Value.Month, dtpFrom.Value.Day, 0, 0, 0)
+    Dim dTo As New Date(dtpTo.Value.Year, dtpTo.Value.Month, dtpTo.Value.Day, 23, 59, 59)
     Dim bClose As Boolean = False
     If fDB Is Nothing Then fDB = New frmDBProgress
     If Not fDB.Visible Then
@@ -672,8 +672,8 @@ Public Class frmHistory
       fDB.Show(Me)
       fDB.SetAction("Exporting DataBase...", "Saving File...")
       If chkExportRange.Checked Then
-        Dim dFrom As Date = Date.Parse(dtpFrom.Value.Date & " 00:00:00 AM")
-        Dim dTo As Date = Date.Parse(dtpTo.Value.Date & " 11:59:59 PM")
+        Dim dFrom As New Date(dtpFrom.Value.Year, dtpFrom.Value.Month, dtpFrom.Value.Day, 0, 0, 0)
+        Dim dTo As New Date(dtpTo.Value.Year, dtpTo.Value.Month, dtpTo.Value.Day, 23, 59, 59)
         usageTmp = New DataBase
         For Each satRow In usageDB
           If satRow.Value.DATETIME.CompareTo(dFrom) >= 0 And satRow.Value.DATETIME.CompareTo(dTo) <= 0 Then

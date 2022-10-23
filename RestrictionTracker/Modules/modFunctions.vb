@@ -132,9 +132,9 @@ Module modFunctions
     Private Function ColorIDToColor(ID As String) As Color
       Try
         If ID.StartsWith("#") Then ID = ID.Substring(1)
-        Dim iR As Integer = Integer.Parse(ID.Substring(0, 2), Globalization.NumberStyles.HexNumber)
-        Dim iG As Integer = Integer.Parse(ID.Substring(2, 2), Globalization.NumberStyles.HexNumber)
-        Dim iB As Integer = Integer.Parse(ID.Substring(4, 2), Globalization.NumberStyles.HexNumber)
+        Dim iR As Integer = Integer.Parse(ID.Substring(0, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
+        Dim iG As Integer = Integer.Parse(ID.Substring(2, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
+        Dim iB As Integer = Integer.Parse(ID.Substring(4, 2), Globalization.NumberStyles.HexNumber, Globalization.CultureInfo.InvariantCulture)
         Return Color.FromArgb(iR, iG, iB)
       Catch ex As Exception
         Return Color.Transparent
@@ -144,10 +144,10 @@ Module modFunctions
       Try
         ID = ID.Replace(" ", "")
         Dim IDs() As String = Split(ID, ",")
-        Dim x As Integer = Integer.Parse(IDs(0))
-        Dim y As Integer = Integer.Parse(IDs(1))
-        Dim w As Integer = Integer.Parse(IDs(2))
-        Dim h As Integer = Integer.Parse(IDs(3))
+        Dim x As Integer = Integer.Parse(IDs(0), Globalization.CultureInfo.InvariantCulture)
+        Dim y As Integer = Integer.Parse(IDs(1), Globalization.CultureInfo.InvariantCulture)
+        Dim w As Integer = Integer.Parse(IDs(2), Globalization.CultureInfo.InvariantCulture)
+        Dim h As Integer = Integer.Parse(IDs(3), Globalization.CultureInfo.InvariantCulture)
         Return New Rectangle(x, y, w, h)
       Catch ex As Exception
         Return Rectangle.Empty
@@ -157,8 +157,8 @@ Module modFunctions
       Try
         ID = ID.Replace(" ", "")
         Dim IDs() As String = Split(ID, ",")
-        Dim x As Integer = Integer.Parse(IDs(0))
-        Dim y As Integer = Integer.Parse(IDs(1))
+        Dim x As Integer = Integer.Parse(IDs(0), Globalization.CultureInfo.InvariantCulture)
+        Dim y As Integer = Integer.Parse(IDs(1), Globalization.CultureInfo.InvariantCulture)
         Return New Point(x, y)
       Catch ex As Exception
         Return Point.Empty
@@ -253,7 +253,7 @@ Module modFunctions
     Private Function ReadBByte(inBytes() As Byte) As Byte
       Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
-        Return Byte.Parse(sRet)
+        Return Byte.Parse(sRet, Globalization.CultureInfo.InvariantCulture)
       Else
         Return 0
       End If
@@ -261,7 +261,7 @@ Module modFunctions
     Private Function ReadBInt(inBytes() As Byte) As UInt32
       Dim sRet As String = ReadBString(inBytes)
       If Not String.IsNullOrEmpty(sRet) Then
-        Return UInt32.Parse(sRet)
+        Return UInt32.Parse(sRet, Globalization.CultureInfo.InvariantCulture)
       Else
         Return 0
       End If
@@ -944,8 +944,8 @@ Module modFunctions
     Dim g As Graphics = Graphics.FromImage(iPic)
     Dim tFont As New Font(FontFamily.GenericSansSerif, 7)
     g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-    Dim lYWidth As Integer = g.MeasureString(yMax.ToString.Trim & " MB", tFont).Width + 10
-    Dim lXHeight As Integer = g.MeasureString(Now.ToString("g"), tFont).Height + 10
+    Dim lYWidth As Integer = g.MeasureString(yMax.ToString(Globalization.CultureInfo.InvariantCulture) & " MB", tFont).Width + 10
+    Dim lXHeight As Integer = g.MeasureString(srlFunctions.TimeToString(Now), tFont).Height + 10
     Dim lLineWidth As Long = (ImgSize.Width - 4) - lYWidth - 1
     g.Clear(ColorBG)
     Dim yTop As Integer = lXHeight / 2
@@ -963,7 +963,7 @@ Module modFunctions
     newDate = Data.Last.DATETIME
     For I As Integer = 0 To lMax Step (((lMax \ (yHeight \ (tFont.Size + 12)))) \ 100) * 100
       Dim iY As Integer = yTop + yHeight - (I / lMax * yHeight)
-      g.DrawString(I.ToString.Trim & " MB", tFont, New SolidBrush(ColorText), lYWidth - g.MeasureString(I.ToString.Trim & " MB", tFont).Width, iY - (g.MeasureString(I.ToString.Trim & " MB", tFont).Height / 2))
+      g.DrawString(I.ToString(Globalization.CultureInfo.InvariantCulture) & " MB", tFont, New SolidBrush(ColorText), lYWidth - g.MeasureString(I.ToString(Globalization.CultureInfo.InvariantCulture) & " MB", tFont).Width, iY - (g.MeasureString(I.ToString(Globalization.CultureInfo.InvariantCulture) & " MB", tFont).Height / 2))
       g.DrawLine(New Pen(ColorText), lYWidth - 3, iY, lYWidth, iY)
     Next I
     For I As Integer = 0 To lMax Step (lMax \ 10)
@@ -1140,7 +1140,7 @@ Module modFunctions
     Next I
     Dim lastI As Long = lYWidth + (lMaxAxisTime * dAxisCompInter)
     If lastI >= (ImgSize.Width - 4) Then lastI = (ImgSize.Width - 4)
-    Dim sLastDisp As String = lEnd.ToString(sDispV)
+    Dim sLastDisp As String = lEnd.ToString(sDispV, srlFunctions.DateFormatProvider)
     Dim iLastDispWidth As Single = g.MeasureString(sLastDisp, tFont).Width
     For I As Long = 0 To lMaxAxisTime Step lAxisLabelInterval
       Dim lX As Integer = lYWidth + (I * dAxisCompInter) + 1
@@ -1157,7 +1157,7 @@ Module modFunctions
           dDisp = New Date(dDisp.Year, dDisp.Month, dDisp.Day, dDisp.Hour, 45, 0)
         End If
       End If
-      Dim sDisp As String = dDisp.ToString(sDispV)
+      Dim sDisp As String = dDisp.ToString(sDispV, srlFunctions.DateFormatProvider)
       If sDisp.Contains(":00") Then sDisp = sDisp.Replace(":00", "")
       g.DrawLine(New Pen(ColorText), lX, ImgSize.Height - (lXHeight - 5), lX, ImgSize.Height - lXHeight)
       If lX >= (ImgSize.Width - (g.MeasureString(sDisp, tFont).Width / 2)) Then

@@ -11,10 +11,10 @@
     Else
       ApplicationTitle = System.IO.Path.GetFileNameWithoutExtension(My.Application.Info.AssemblyName)
     End If
-    Me.Text = String.Format("About {0}", ApplicationTitle)
+    Me.Text = "About " & ApplicationTitle
     lblProduct.Text = My.Application.Info.ProductName
-    lblVersion.Text = String.Format("Version {0}", DisplayVersion(Application.ProductVersion))
-    lblCLR.Text = String.Format("on {0}", srlFunctions.GetCLRCleanVersion)
+    lblVersion.Text = "Version " & DisplayVersion(Application.ProductVersion)
+    lblCLR.Text = "on " & srlFunctions.GetCLRCleanVersion
     lblCompany.Text = My.Application.Info.CompanyName
     txtDescription.Text = My.Application.Info.Description
     ResetUpdateButton()

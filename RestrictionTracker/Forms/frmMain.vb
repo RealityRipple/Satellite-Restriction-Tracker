@@ -171,7 +171,7 @@ Public Class frmMain
       End If
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       mySettings.Save()
-      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
       If localData IsNot Nothing Then
         localData.Dispose()
         localData = Nothing
@@ -192,12 +192,12 @@ Public Class frmMain
     If HostType = SatHostTypes.Other Then
       iconStop = True
       DisplayUsage(False, True)
-      SetStatusText(LOG_GetLast.ToString("g"), "Please connect to the Internet.", True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please connect to the Internet.", True)
     Else
       mySettings.AccountType = HostType
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       mySettings.Save()
-      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
       If localData IsNot Nothing Then
         localData.Dispose()
         localData = Nothing
@@ -727,7 +727,7 @@ Public Class frmMain
       LOG_Initialize(sAccount, False)
       If ClosingTime Then Return
       DisplayUsage(False, False)
-      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
       Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
       UsageInvoker.BeginInvoke(Nothing, Nothing)
     End If
@@ -774,7 +774,7 @@ Public Class frmMain
     If ClosingTime Then Return
     If mySettings.AccountType = SatHostTypes.Other Then
       If mySettings.AccountTypeForced Then
-        SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
       Else
         SetStatusText("Analyzing Account", "Determining your account type...", False)
         Dim TypeDetermination As New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy, AddressOf TypeDetermination_TypeDetermined)
@@ -835,10 +835,10 @@ Public Class frmMain
                 PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
                 If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER Then
-                  SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
+                  SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
                   Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
                 Else
-                  SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+                  SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
                   Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
                   UsageInvoker.BeginInvoke(Nothing, Nothing)
                 End If
@@ -888,7 +888,7 @@ Public Class frmMain
           localData = Nothing
         End If
         Application.DoEvents()
-        SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), String.Empty, False)
         DisplayUsage(False, False)
         NextGrabTick = srlFunctions.TickCount() + 5000
       End If
@@ -938,7 +938,7 @@ Public Class frmMain
       Dim lUp As Long
       Dim lULim As Long
       LOG_Get(LOG_GetCount() - 1, dtDate, lDown, lDLim, lUp, lULim)
-      If bStatusText Then SetStatusText(dtDate.ToString("g"), String.Empty, False)
+      If bStatusText Then SetStatusText(srlFunctions.TimeToString(dtDate), String.Empty, False)
       DisplayResults(lDown, lDLim, lUp, lULim)
     End If
   End Sub
@@ -979,28 +979,28 @@ Public Class frmMain
       sAppend = " (Stage " & (e.Stage + 1) & ")"
     End If
     Select Case e.Status
-      Case ConnectionStates.Initialize : SetStatusText(LOG_GetLast.ToString("g"), "Initializing Connection" & sAppend & "...", False)
-      Case ConnectionStates.Prepare : SetStatusText(LOG_GetLast.ToString("g"), "Preparing to Log In" & sAppend & "...", False)
+      Case ConnectionStates.Initialize : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Initializing Connection" & sAppend & "...", False)
+      Case ConnectionStates.Prepare : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing to Log In" & sAppend & "...", False)
       Case ConnectionStates.Login
         Select Case e.SubState
-          Case ConnectionSubStates.ReadLogin : SetStatusText(LOG_GetLast.ToString("g"), "Reading Login Page" & sAppend & "...", False)
-          Case ConnectionSubStates.Authenticate : SetStatusText(LOG_GetLast.ToString("g"), "Authenticating" & sAppend & "...", False)
-          Case ConnectionSubStates.Verify : SetStatusText(LOG_GetLast.ToString("g"), "Verifying" & sAppend & "...", False)
-          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Logging In" & sAppend & "...", False)
+          Case ConnectionSubStates.ReadLogin : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Login Page" & sAppend & "...", False)
+          Case ConnectionSubStates.Authenticate : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Authenticating" & sAppend & "...", False)
+          Case ConnectionSubStates.Verify : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Verifying" & sAppend & "...", False)
+          Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Logging In" & sAppend & "...", False)
         End Select
       Case ConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Home Page" & sAppend & "...", False)
+          Case ConnectionSubStates.LoadHome : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Home Page" & sAppend & "...", False)
           Case ConnectionSubStates.LoadAJAX
             If e.Attempt = 0 Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
+              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
             Else
-              SetStatusText(LOG_GetLast.ToString("g"), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
+              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
             End If
-          Case ConnectionSubStates.LoadTable : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table" & sAppend & "...", False)
-          Case Else : SetStatusText(LOG_GetLast.ToString("g"), "Downloading Usage Table" & sAppend & "...", False)
+          Case ConnectionSubStates.LoadTable : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
+          Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
         End Select
-      Case ConnectionStates.TableRead : SetStatusText(LOG_GetLast.ToString("g"), "Reading Usage Table" & sAppend & "...", False)
+      Case ConnectionStates.TableRead : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Usage Table" & sAppend & "...", False)
     End Select
   End Sub
   Private Sub localData_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localData.ConnectionFailure
@@ -1014,7 +1014,7 @@ Public Class frmMain
     Select Case e.Type
       Case ConnectionFailureEventArgs.FailureType.LoginIssue
         GrabAttempt = 0
-        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail, True)
         DisplayUsage(False, False)
         Return
@@ -1022,7 +1022,7 @@ Public Class frmMain
         If GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
           Dim sMessage As String = "Connection Timed Out! Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
-          SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), sMessage, True)
           If localData IsNot Nothing Then
             localData.Dispose()
             localData = Nothing
@@ -1036,26 +1036,26 @@ Public Class frmMain
           localData = New localRestrictionTracker(LocalAppDataDirectory)
           Return
         End If
-        SetStatusText(LOG_GetLast.ToString("g"), "Connection Timed Out!", True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Connection Timed Out!", True)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.TLSTooOld
         GrabAttempt = 0
         If mySettings.TLSProxy Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
           DisplayUsage(False, False)
         Else
           If (Environment.OSVersion.Version.Major < 6 Or (Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor = 0)) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to connect.", True)
+            SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Security Protocol not supported on this Operating System. Please use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to connect.", True)
             DisplayUsage(False, False)
           ElseIf (Environment.Version.Major = 4 And Environment.Version.Minor = 0 And Environment.Version.Build = 30319 And Environment.Version.Revision < 17929) Then
-            SetStatusText(LOG_GetLast.ToString("g"), "Security Protocol requires .NET Framework 4.5 or newer. Please update your .NET Framework version through Windows Updates or the Microsoft website. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
+            SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Security Protocol requires .NET Framework 4.5 or newer. Please update your .NET Framework version through Windows Updates or the Microsoft website. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
             DisplayUsage(False, False)
           Else
             If e.Message = "VER" Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
+              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
               DisplayUsage(False, False)
             ElseIf e.Message = "PROXY" Then
-              SetStatusText(LOG_GetLast.ToString("g"), "Even though TLS 1.1 or 1.2 was enabled, the server still didin't like the request. Please let me know you got this message. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
+              SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Even though TLS 1.1 or 1.2 was enabled, the server still didin't like the request. Please let me know you got this message. You can use the TLS Proxy feature under Security Protocol in the Network tab of the Config window to bypass this problem for now.", True)
               DisplayUsage(False, False)
             End If
           End If
@@ -1065,7 +1065,7 @@ Public Class frmMain
         If e.Message.EndsWith("Please try again.") And GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
           Dim sMessage As String = e.Message.Substring(0, e.Message.IndexOf("Please try again.")) & "Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
-          SetStatusText(LOG_GetLast.ToString("g"), sMessage, True)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), sMessage, True)
           If localData IsNot Nothing Then
             localData.Dispose()
             localData = Nothing
@@ -1086,21 +1086,21 @@ Public Class frmMain
             localData = Nothing
           End If
           Dim sMessage As String = e.Message & " Attempting to Update AJAX Lists..."
-          SetStatusText(LOG_GetLast.ToString("g"), sMessage, False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), sMessage, False)
           Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, GrabAttempt, AddressOf UpdateAJAXLists_ListUpdated)
           Return
         End If
-        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         DisplayUsage(False, True)
       Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure
         GrabAttempt = 0
         If Not mySettings.AccountTypeForced Then mySettings.AccountType = SatHostTypes.Other
-        SetStatusText(LOG_GetLast.ToString("g"), e.Message, True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, False)
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
         GrabAttempt = 0
-        SetStatusText(LOG_GetLast.ToString("g"), "Please enter your account details in the Config window.", True)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enter your account details in the Config window.", True)
         DisplayUsage(False, False)
         RestoreWindow()
         cmdConfig.Focus()
@@ -1108,7 +1108,7 @@ Public Class frmMain
       Case ConnectionFailureEventArgs.FailureType.UnknownAccountType
         GrabAttempt = 0
         If mySettings.AccountTypeForced Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Unknown Account Type.", True)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
         Else
           SetStatusText("Analyzing Account", "Determining your account type...", False)
           Dim TypeDetermination As New DetermineType(sProvider, mySettings.Timeout, mySettings.Proxy, AddressOf TypeDetermination_TypeDetermined)
@@ -1128,7 +1128,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
     myPanel = SatHostTypes.Dish_EXEDE
@@ -1154,7 +1154,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.RuralPortal_EXEDE
@@ -1180,7 +1180,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
     myPanel = SatHostTypes.RuralPortal_LEGACY
@@ -1206,7 +1206,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
     myPanel = SatHostTypes.WildBlue_LEGACY
@@ -1232,7 +1232,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.WildBlue_EXEDE
@@ -1258,7 +1258,7 @@ Public Class frmMain
       Return
     End If
     GrabAttempt = 0
-    SetStatusText(e.Update.ToString("g"), "Saving History...", False)
+    SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
     myPanel = SatHostTypes.WildBlue_EXEDE_RESELLER
@@ -1337,7 +1337,7 @@ Public Class frmMain
       remoteData.Dispose()
       remoteData = Nothing
     End If
-    SetStatusText(LOG_GetLast.ToString("g"), "Service Failure: " & sErr, True)
+    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Service Failure: " & sErr, True)
     DisplayUsage(False, True)
   End Sub
   Private Sub remoteData_OKKey(sender As Object, e As System.EventArgs) Handles remoteData.OKKey
@@ -1349,7 +1349,7 @@ Public Class frmMain
       Return
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    SetStatusText(LOG_GetLast.ToString("g"), "Account Accessed! Getting Usage...", False)
+    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Account Accessed! Getting Usage...", False)
   End Sub
   Private Sub remoteData_Success(sender As Object, e As remoteRestrictionTracker.SuccessEventArgs) Handles remoteData.Success
     If Me.InvokeRequired Then
@@ -1360,7 +1360,7 @@ Public Class frmMain
       Return
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    Dim LastTime As String = LOG_GetLast.ToString("g")
+    Dim LastTime As String = srlFunctions.TimeToString(LOG_GetLast)
     If FullCheck Then
       SetStatusText(LastTime, "Synchronizing History...", False)
     Else
@@ -1471,7 +1471,7 @@ Public Class frmMain
       Dim tmpStr As String = lblTemp.Text.Substring(0, lblTemp.Text.LastIndexOf(" "))
       If tmpStr.Contains(",") Then tmpStr = tmpStr.Replace(",", "")
       If IsNumeric(tmpStr) Then
-        tmpVal = Long.Parse(tmpStr)
+        tmpVal = Long.Parse(tmpStr, Globalization.CultureInfo.InvariantCulture)
       Else
         tmpVal = 0
       End If
@@ -1498,16 +1498,16 @@ Public Class frmMain
       End Select
       If tmpVal > toVal Then
         tmpVal -= majorDif
-        lblTemp.Text = tmpVal.ToString("N0") & " MB"
+        lblTemp.Text = tmpVal.ToString("N0", Globalization.CultureInfo.InvariantCulture) & " MB"
       ElseIf tmpVal < toVal Then
         tmpVal += majorDif
-        lblTemp.Text = tmpVal.ToString("N0") & " MB"
+        lblTemp.Text = tmpVal.ToString("N0", Globalization.CultureInfo.InvariantCulture) & " MB"
       Else
-        lblTemp.Text = toVal.ToString("N0") & " MB"
+        lblTemp.Text = toVal.ToString("N0", Globalization.CultureInfo.InvariantCulture) & " MB"
         toVal = 0
       End If
     Else
-      lblTemp.Text = toVal.ToString("N0") & " MB"
+      lblTemp.Text = toVal.ToString("N0", Globalization.CultureInfo.InvariantCulture) & " MB"
       toVal = 0
     End If
   End Sub
@@ -1753,7 +1753,7 @@ Public Class frmMain
   Private Sub DisplayResults(lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
     If lDownLim > 0 Or lUpLim > 0 Then
       Dim lastUpdate As Date = LOG_GetLast()
-      Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt")
+      Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt", Globalization.CultureInfo.InvariantCulture)
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
         Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
@@ -1844,10 +1844,10 @@ Public Class frmMain
         cmdRefresh.Enabled = True
       End If
       If Not CheckedAJAX And mySettings.AccountType = SatHostTypes.WildBlue_EXEDE_RESELLER Then
-        SetStatusText(LOG_GetLast.ToString("g"), "Checking for AJAX List Update...", False)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
         Dim AJAXUpdate As New UpdateAJAXLists(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage", AddressOf UpdateAJAXLists_UpdateChecked)
       Else
-        SetStatusText(LOG_GetLast.ToString("g"), "Beginning Usage Request...", False)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Beginning Usage Request...", False)
         Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
         UsageInvoker.BeginInvoke(Nothing, Nothing)
       End If
@@ -1909,7 +1909,7 @@ Public Class frmMain
         If bReRun Then
           SetNextLoginTime()
           EnableProgressIcon()
-          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
           Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
           UsageInvoker.BeginInvoke(Nothing, Nothing)
         Else
@@ -1929,7 +1929,7 @@ Public Class frmMain
         If bReRun Then
           SetNextLoginTime()
           EnableProgressIcon()
-          SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
           Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
           UsageInvoker.BeginInvoke(Nothing, Nothing)
         Else
@@ -2171,7 +2171,7 @@ Public Class frmMain
 #Region "Update Events"
   Private Sub CheckForUpdates()
     If Not frmAbout.Visible Then
-      SetStatusText(LOG_GetLast.ToString("g"), "Checking for Software Update...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for Software Update...", False)
       NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
       If updateChecker IsNot Nothing Then
         updateChecker.Dispose()
@@ -2286,7 +2286,7 @@ Public Class frmMain
               End Select
             End If
           Case Else
-            SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
+            SetStatusText(srlFunctions.TimeToString(LOG_GetLast), String.Empty, False)
             If updateChecker IsNot Nothing Then
               updateChecker.Dispose()
               updateChecker = Nothing
@@ -2316,7 +2316,7 @@ Public Class frmMain
               updateChecker.DownloadUpdate(sEXEPath)
             End If
           Case Else
-            SetStatusText(LOG_GetLast.ToString("g"), String.Empty, False)
+            SetStatusText(srlFunctions.TimeToString(LOG_GetLast), String.Empty, False)
             If updateChecker IsNot Nothing Then
               updateChecker.Dispose()
               updateChecker = Nothing
@@ -2335,7 +2335,7 @@ Public Class frmMain
       Return
     End If
     tmrSpeed.Enabled = True
-    SetStatusText(LOG_GetLast.ToString("g"), "Downloading Software Update...", False)
+    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Software Update...", False)
   End Sub
   Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
@@ -2347,21 +2347,21 @@ Public Class frmMain
     End If
     tmrSpeed.Enabled = False
     If e.Error IsNot Nothing Then
-      SetStatusText(LOG_GetLast.ToString("g"), "Software Update Error: " & e.Error.Message, True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Software Update Error: " & e.Error.Message, True)
       NextGrabTick = Long.MinValue
     ElseIf e.Cancelled Then
       If updateChecker IsNot Nothing Then
         updateChecker.Dispose()
         updateChecker = Nothing
       End If
-      SetStatusText(LOG_GetLast.ToString("g"), "Software Update Cancelled!", True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Software Update Cancelled!", True)
       NextGrabTick = Long.MinValue
     Else
       If updateChecker IsNot Nothing Then
         updateChecker.Dispose()
         updateChecker = Nothing
       End If
-      SetStatusText(LOG_GetLast.ToString("g"), "Software Update Download Complete", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Software Update Download Complete", False)
       Dim RecheckOnMissing As Boolean = False
       Do
         Application.DoEvents()
@@ -2381,7 +2381,7 @@ Public Class frmMain
           RecheckOnMissing = True
         End Try
       Loop
-      SetStatusText(LOG_GetLast.ToString("g"), "Software Update Failure!", True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Software Update Failure!", True)
       NextGrabTick = Long.MinValue
     End If
   End Sub
@@ -2419,19 +2419,19 @@ Public Class frmMain
   End Sub
   Private Sub UpdateAJAXLists_ListUpdated(asyncState As Object, shortList As String, fullList As String)
     If String.IsNullOrEmpty(shortList) Or String.IsNullOrEmpty(fullList) Then
-      SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists.", True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists.", True)
       DisplayUsage(False, True)
       Return
     End If
     If mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
-      SetStatusText(LOG_GetLast.ToString("g"), "AJAX failed to yield data table. A fix should be available soon.", True)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "AJAX failed to yield data table. A fix should be available soon.", True)
       DisplayUsage(False, True)
       Return
     End If
     mySettings.AJAXOrderShort = shortList
     mySettings.AJAXOrderFull = fullList
     mySettings.Save()
-    SetStatusText(LOG_GetLast.ToString("g"), "Updated AJAX Lists. Reconnecting...", True)
+    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Updated AJAX Lists. Reconnecting...", True)
     If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
@@ -2444,29 +2444,29 @@ Public Class frmMain
       'Error
       If Not String.IsNullOrEmpty(shortList) Then
         If shortList.StartsWith("ERR_") Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Error Updating AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList.Substring(4), False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Error Updating AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList.Substring(4), False)
         ElseIf shortList.StartsWith("URL_") Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirected to " & shortList.Substring(4) & ".", False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirected to " & shortList.Substring(4) & ".", False)
         ElseIf shortList = "DATA_EMPTY" Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "No Data from Server.", False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "No Data from Server.", False)
         ElseIf shortList.StartsWith("DATA_REDIR_") Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirection to new URL." & vbNewLine & shortList.Substring(11), False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Redirection to new URL." & vbNewLine & shortList.Substring(11), False)
         ElseIf shortList.StartsWith("DATA_SEP_") Then
-          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Malformed Data from Server." & vbNewLine & shortList.Substring(9), False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & "Malformed Data from Server." & vbNewLine & shortList.Substring(9), False)
         Else
-          SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList, False)
+          SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway..." & vbNewLine & shortList, False)
         End If
       Else
-        SetStatusText(LOG_GetLast.ToString("g"), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
+        SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unable to Update AJAX Lists. Preparing Connection anyway...", False)
       End If
     ElseIf mySettings.AJAXOrderShort = shortList And mySettings.AJAXOrderFull = fullList Then
       'No Change
-      SetStatusText(LOG_GetLast.ToString("g"), "Preparing Connection...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
     Else
       mySettings.AJAXOrderShort = shortList
       mySettings.AJAXOrderFull = fullList
       mySettings.Save()
-      SetStatusText(LOG_GetLast.ToString("g"), "AJAX Lists Updated. Preparing Connection...", False)
+      SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "AJAX Lists Updated. Preparing Connection...", False)
     End If
     Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
     UsageInvoker.BeginInvoke(Nothing, Nothing)

@@ -140,9 +140,9 @@ Public Class remoteRestrictionTracker
       Private Ditto As Boolean
       Public Overrides Function ToString() As String
         If Ditto Then
-          Return Time.ToString("G") & ":" & Down & "/" & DownMax
+          Return Time.ToString("G", srlFunctions.DateFormatProvider) & ":" & Down & "/" & DownMax
         Else
-          Return Time.ToString("G") & ":" & Down & "/" & DownMax & ", " & Up & "/" & UpMax
+          Return Time.ToString("G", srlFunctions.DateFormatProvider) & ":" & Down & "/" & DownMax & ", " & Up & "/" & UpMax
         End If
       End Function
       ''' <summary>
