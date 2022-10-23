@@ -494,7 +494,7 @@
     End Function
     Private Shared Function EX_Helper_Parse_scope(body As String) As String
       Dim ret As String = "openid profle email offline_access"
-      Dim scopeData As String() = EX_Helper_FindBetween(body, "c=[", "]", """"c, """"c)
+      Dim scopeData As String() = EX_Helper_FindBetween(body, "d=[", "]", """"c, """"c)
       If scopeData IsNot Nothing Then ret = Join(scopeData)
       Return ret
     End Function
