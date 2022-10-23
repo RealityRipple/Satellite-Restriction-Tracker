@@ -575,7 +575,7 @@ Public Class frmMain
   Private Sub pctNetTest_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles pctNetTest.KeyUp
     If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then
       Try
-        If mySettings.NetTestURL.Contains("://") Then
+        If mySettings.NetTestURL.Contains(Uri.SchemeDelimiter) Then
           Process.Start(mySettings.NetTestURL)
         Else
           Process.Start("http://" & mySettings.NetTestURL)
@@ -589,7 +589,7 @@ Public Class frmMain
   Private Sub pctNetTest_MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctNetTest.MouseClick
     If e.Button = Windows.Forms.MouseButtons.Left Then
       Try
-        If mySettings.NetTestURL.Contains("://") Then
+        If mySettings.NetTestURL.Contains(Uri.SchemeDelimiter) Then
           Process.Start(mySettings.NetTestURL)
         Else
           Process.Start("http://" & mySettings.NetTestURL)
@@ -704,7 +704,7 @@ Public Class frmMain
         Dim wsFavicon As New clsFavicon(mySettings.NetTestURL, AddressOf wsFavicon_DownloadIconCompleted, mySettings.NetTestURL)
       End If
       Dim sNetTestTitle As String = mySettings.NetTestURL
-      If sNetTestTitle.Contains("://") Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf("://") + 3)
+      If sNetTestTitle.Contains(Uri.SchemeDelimiter) Then sNetTestTitle = sNetTestTitle.Substring(sNetTestTitle.IndexOf(Uri.SchemeDelimiter) + Uri.SchemeDelimiter.Length)
       If sNetTestTitle.StartsWith("www.") Then sNetTestTitle = sNetTestTitle.Substring(4)
       If sNetTestTitle.Contains("/") Then sNetTestTitle = sNetTestTitle.Substring(0, sNetTestTitle.IndexOf("/"))
       If sNetTestTitle = "192.168.100.1" Or CompareImages(pctNetTest.Image, My.Resources.modem16) Then sNetTestTitle = "ViaSat Modem"

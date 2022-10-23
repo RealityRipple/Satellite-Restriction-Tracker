@@ -106,7 +106,7 @@ Public Class svcRL
     End Function
     Private Shared Function CheckURL(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy) As Boolean
       Dim sAddr As String = HostAddress
-      If HostAddress.IndexOf("://") < 0 Then HostAddress = "http://" & HostAddress
+      If HostAddress.IndexOf(Uri.SchemeDelimiter) < 0 Then HostAddress = "http://" & HostAddress
       Dim wRequest As Net.WebRequest
       wRequest = System.Net.WebRequest.Create(HostAddress)
       wRequest.Timeout = iTimeout

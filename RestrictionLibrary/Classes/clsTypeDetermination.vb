@@ -46,7 +46,7 @@ Public Class DetermineType
     Private Delegate Sub BeginCheckInvoker(Addr As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
     Private Sub BeginCheck(Addr As String, Timeout As Integer, Proxy As Net.IWebProxy, state As Object)
       sAddr = Addr
-      If Addr.IndexOf("://") < 0 Then Addr = "http://" & Addr
+      If Addr.IndexOf(Uri.SchemeDelimiter) < 0 Then Addr = "http://" & Addr
       wRequest = System.Net.HttpWebRequest.Create(Addr)
       wRequest.Timeout = Timeout * 1000
       wRequest.Proxy = Proxy

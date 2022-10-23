@@ -12,14 +12,14 @@
   Private Sub BeginConnection(obj As Object)
     Dim URL As String = obj(0)
     Dim token As Object = obj(1)
-    If Not URL.Contains("://") Then URL = "http://" & URL
-    Dim URI As Uri
+    If Not URL.Contains(Uri.SchemeDelimiter) Then URL = "http://" & URL
+    Dim uURI As Uri
     Try
-      URI = New Uri(URL)
+      uURI = New Uri(URL)
     Catch ex As Exception
       Return
     End Try
-    ConnectToURL(URI, token)
+    ConnectToURL(uURI, token)
   End Sub
   Private Sub ConnectToURL(URI As Uri, token As Object)
     If URI.Host = "192.168.100.1" Then
@@ -43,7 +43,7 @@
       Dim sRet As String = wsString.DownloadString(URI.OriginalString)
       If sRet.StartsWith("Error: ") Then
         Try
-          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, False)
+          ConnectToFile(New Uri(URI.Scheme & URI.SchemeDelimiter & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, False)
         Catch ex As Exception
         End Try
         Return
@@ -62,11 +62,11 @@
                   sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
                   If sHTML.Contains("""") Then
                     Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
-                    If URL.Contains("://") Then
+                    If URL.Contains(URI.SchemeDelimiter) Then
 
                     ElseIf URL.Contains("//") Then
                       Dim oldURL As String = URI.OriginalString
-                      If oldURL.Contains("://") Then oldURL = oldURL.Substring(0, oldURL.IndexOf("://") + 1)
+                      If oldURL.Contains(URI.SchemeDelimiter) Then oldURL = oldURL.Substring(0, oldURL.IndexOf(URI.SchemeDelimiter) + 1)
                       URL = oldURL & URL
                     Else
                       Dim oldURL As String = URI.OriginalString
@@ -95,7 +95,7 @@
       Catch ex As Exception
       End Try
       Try
-        ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
+        ConnectToFile(New Uri(URI.Scheme & URI.SchemeDelimiter & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
       Catch ex As Exception
       End Try
     Catch ex As Exception
@@ -148,7 +148,7 @@
         c_callback.Invoke(Nothing, Nothing, Token, New Exception("Failed to get an icon."))
       Else
         Try
-          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), Token, False)
+          ConnectToFile(New Uri(URI.Scheme & URI.SchemeDelimiter & URI.Host & "/favicon.ico"), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), Token, False)
         Catch ex As Exception
         End Try
       End If
@@ -197,7 +197,7 @@
         c_callback.Invoke(Nothing, Nothing, Token, New Exception("Failed to read the icon."))
       Else
         Try
-          ConnectToFile(New Uri(URI.Scheme & "://" & URI.Host & "/favicon.ico"), imgFile, Token, False)
+          ConnectToFile(New Uri(URI.Scheme & URI.SchemeDelimiter & URI.Host & "/favicon.ico"), imgFile, Token, False)
         Catch ex As Exception
           Return
         End Try
