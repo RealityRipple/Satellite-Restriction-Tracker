@@ -437,6 +437,11 @@ Public Class JSONAssociator
       sRet &= "["
       Dim isFirst As Boolean = True
       For Each oValue As Object In oIn
+        If isFirst Then
+          isFirst = False
+        Else
+          sRet &= ","
+        End If
         If oValue.GetType Is GetType(Boolean) Then
           If oValue.Value Then
             sRet &= "true"
