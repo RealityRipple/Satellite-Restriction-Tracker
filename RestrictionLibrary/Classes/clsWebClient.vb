@@ -253,7 +253,7 @@
       If c_Events Then
         RaiseEvent Failure(Me, New ErrorEventArgs(ex))
       Else
-        Throw ex
+        Throw
       End If
       Return Nothing
     End Try
@@ -271,7 +271,7 @@
       If c_Events Then
         RaiseEvent Failure(Me, New ErrorEventArgs(ex))
       Else
-        Throw ex
+        Throw
       End If
       Return Nothing
     End Try
@@ -286,7 +286,7 @@
       If c_Events Then
         RaiseEvent Failure(Me, New ErrorEventArgs(ex))
       Else
-        Throw ex
+        Throw
       End If
       Return Nothing
     End Try
@@ -733,17 +733,12 @@ Public Class WebClientEx
 #Region "Download"
   Private c_DownloadResults As New Specialized.NameValueCollection
   Private DownloadResultSync As New Object
-  Private Property DownloadResults As Specialized.NameValueCollection
+  Private ReadOnly Property DownloadResults As Specialized.NameValueCollection
     Get
       SyncLock DownloadResultSync
         Return c_DownloadResults
       End SyncLock
     End Get
-    Set(value As Specialized.NameValueCollection)
-      SyncLock DownloadResultSync
-        c_DownloadResults = value
-      End SyncLock
-    End Set
   End Property
 #Region "Download String"
 #Region "Function"
@@ -908,17 +903,12 @@ Public Class WebClientEx
 #Region "Upload"
   Private c_UploadResults As New Specialized.NameValueCollection
   Private UploadResultSync As New Object
-  Private Property UploadResults As Specialized.NameValueCollection
+  Private ReadOnly Property UploadResults As Specialized.NameValueCollection
     Get
       SyncLock UploadResultSync
         Return c_UploadResults
       End SyncLock
     End Get
-    Set(value As Specialized.NameValueCollection)
-      SyncLock UploadResultSync
-        c_UploadResults = value
-      End SyncLock
-    End Set
   End Property
 #Region "Upload String"
 #Region "Function"

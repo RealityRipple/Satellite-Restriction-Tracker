@@ -36,10 +36,14 @@ Public Class DetermineType
     Private c_callback As CheckCallback
     Private wRequest As Net.HttpWebRequest
     Private sAddr As String
-    Public Sub New(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object, callback As CheckCallback)
+    Public Sub New(callback As CheckCallback)
+      c_callback = callback
       wRequest = Nothing
       sAddr = String.Empty
-      c_callback = callback
+    End Sub
+    Public Sub Start(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object)
+      wRequest = Nothing
+      sAddr = String.Empty
       Dim beginInvoker As New BeginCheckInvoker(AddressOf BeginCheck)
       beginInvoker.BeginInvoke(HostAddress, iTimeout, pProxy, asyncState, Nothing, Nothing)
     End Sub
@@ -92,16 +96,23 @@ Public Class DetermineType
   Private pProxy As Net.IWebProxy
   Private c_callback As TypeDeterminedCallback
   ''' <summary>
-  ''' Constructor for <see cref="DetermineType" /> class, which also begins the determination procedure.
+  ''' Constructor for <see cref="DetermineType" /> class.
+  ''' </summary>
+  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
+  Public Sub New(callback As TypeDeterminedCallback)
+    iTimeout = 5000
+    pProxy = Nothing
+    c_callback = callback
+  End Sub
+  ''' <summary>
+  ''' Begins the determination procedure.
   ''' </summary>
   ''' <param name="Provider">URL to determine the type of.</param>
   ''' <param name="Timeout">Number of seconds to wait for a response from the server while testing the connection.</param>
   ''' <param name="Proxy">Proxy settings for testing the servers.</param>
-  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
-  Public Sub New(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy, callback As TypeDeterminedCallback)
+  Public Sub Start(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy)
     iTimeout = Timeout * 1000
     pProxy = Proxy
-    c_callback = callback
     Dim beginInvoker As New BeginTestInvoker(AddressOf BeginTest)
     beginInvoker.BeginInvoke(Provider, Nothing, Nothing)
   End Sub
@@ -116,14 +127,16 @@ Public Class DetermineType
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       sProvider = Provider
-      Dim check As New URLChecker("wildblue.com", iTimeout, pProxy, "NET", AddressOf uChecker_CheckResult)
+      Dim check As New URLChecker(AddressOf uChecker_CheckResult)
+      check.Start("wildblue.com", iTimeout, pProxy, "NET")
     End If
   End Sub
   Private Sub uChecker_CheckResult(asyncState As Object, success As Boolean)
     Select Case asyncState
       Case "NET"
         If success Then
-          Dim check As New URLChecker(sProvider & ".ruralportal.net", iTimeout, pProxy, "RP", AddressOf uChecker_CheckResult)
+          Dim check As New URLChecker(AddressOf uChecker_CheckResult)
+          check.Start(sProvider & ".ruralportal.net", iTimeout, pProxy, "RP")
         Else
           c_callback.Invoke(SatHostGroup.Other)
         End If
@@ -131,7 +144,8 @@ Public Class DetermineType
         If success Then
           c_callback.Invoke(SatHostGroup.RuralPortal)
         Else
-          Dim check As New URLChecker("myaccount." & sProvider & ".net", iTimeout, pProxy, "MYA", AddressOf uChecker_CheckResult)
+          Dim check As New URLChecker(AddressOf uChecker_CheckResult)
+          check.Start("myaccount." & sProvider & ".net", iTimeout, pProxy, "MYA")
         End If
       Case "MYA"
         If success Then
@@ -155,16 +169,23 @@ Public Class UpdateAJAXLists
   Private wRequest As Net.HttpWebRequest
   Private sAddr As String
   ''' <summary>
-  ''' Constructor for <see cref="UpdateAJAXLists" /> class, which also begins the update procedure.
+  ''' Constructor for <see cref="UpdateAJAXLists" /> class.
+  ''' </summary>
+  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
+  Public Sub New(callback As UpdateCallback)
+    wRequest = Nothing
+    sAddr = String.Empty
+    c_callback = callback
+  End Sub
+  ''' <summary>
+  ''' Begins the update procedure.
   ''' </summary>
   ''' <param name="HostAddress">Host to determine the AJAX Lists of.</param>
   ''' <param name="iTimeout">Number of seconds to wait for a response from the server while testing the connection.</param>
   ''' <param name="pProxy">Proxy settings for testing the servers.</param>
-  ''' <param name="callback">Callback subroutine to be triggered when the type has been determined.</param>
-  Public Sub New(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object, callback As UpdateCallback)
+  Public Sub Start(HostAddress As String, iTimeout As Integer, pProxy As Net.IWebProxy, asyncState As Object)
     wRequest = Nothing
     sAddr = String.Empty
-    c_callback = callback
     Dim beginInvoker As New BeginCheckInvoker(AddressOf BeginCheck)
     beginInvoker.BeginInvoke(HostAddress, iTimeout, pProxy, asyncState, Nothing, Nothing)
   End Sub

@@ -1,4 +1,4 @@
-﻿Public Module modDB
+﻿Friend Module modDB
   Private Const HistoryAge As Long = 1
   Private sFile As String
   Friend WithEvents usageDB As DataBase
@@ -9,11 +9,6 @@
       If Not isLoaded Then Return 0
       If isSaving Then Return 2
       Return 1
-    End Get
-  End Property
-  ReadOnly Property HistoryPath As String
-    Get
-      Return sFile
     End Get
   End Property
   Public Sub LOG_Add(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long, Optional Save As Boolean = True)
@@ -106,10 +101,6 @@
       isSaving = False
     End If
   End Sub
-  Private Function FileLen(Path As String) As Long
-    If My.Computer.FileSystem.FileExists(Path) Then Return My.Computer.FileSystem.GetFileInfo(Path).Length
-    Return -1
-  End Function
   Private Sub usageDB_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageDB.ProgressState
     If frmDBProgress.Visible Then frmDBProgress.SetProgress(e.Value, e.Total)
   End Sub

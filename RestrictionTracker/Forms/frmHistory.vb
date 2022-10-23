@@ -160,7 +160,7 @@ Public Class frmHistory
       Case 0
         Dim upSize As Size = state(3)
         Dim bDown As Bitmap = DrawLineGraph(graphData, True, downSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryDownA, mySettings.Colors.HistoryDownB, mySettings.Colors.HistoryDownC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryDownMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
-        Dim bUp As Bitmap = DrawLineGraph(pnlGraph.Tag, False, pctUld.Size, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryUpA, mySettings.Colors.HistoryUpB, mySettings.Colors.HistoryUpC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryUpMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
+        Dim bUp As Bitmap = DrawLineGraph(pnlGraph.Tag, False, upSize, mySettings.Colors.HistoryDownLine, mySettings.Colors.HistoryUpA, mySettings.Colors.HistoryUpB, mySettings.Colors.HistoryUpC, mySettings.Colors.HistoryText, mySettings.Colors.HistoryBackground, mySettings.Colors.HistoryUpMax, mySettings.Colors.HistoryLightGrid, mySettings.Colors.HistoryDarkGrid)
         If Me.IsDisposed OrElse Me.Disposing Then Return
         Me.Invoke(New ParameterizedInvoker2(AddressOf DidResize), bDown, bUp)
       Case 1

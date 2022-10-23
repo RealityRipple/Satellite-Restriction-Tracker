@@ -886,7 +886,8 @@
       txtNetTestCustom.Enabled = False
       Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
       SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
-      Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
+      Dim wsFavicon As New clsFavicon(AddressOf wsFavicon_DownloadIconCompleted)
+      wsFavicon.Start(txtNetTestCustom.Text, token)
       cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
@@ -896,7 +897,8 @@
       txtNetTestCustom.Enabled = False
       Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
       SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
-      Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
+      Dim wsFavicon As New clsFavicon(AddressOf wsFavicon_DownloadIconCompleted)
+      wsFavicon.Start(txtNetTestCustom.Text, token)
       cmdSave.Enabled = SettingsChanged()
     End If
   End Sub
@@ -915,7 +917,8 @@
         If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
           Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
           SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
-          Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
+          Dim wsFavicon As New clsFavicon(AddressOf wsFavicon_DownloadIconCompleted)
+          wsFavicon.Start(txtNetTestCustom.Text, token)
         End If
       End If
     End If
@@ -1108,7 +1111,8 @@
       If Not String.IsNullOrEmpty(txtNetTestCustom.Text) Then
         Dim token As Integer = MakeAToken(txtNetTestCustom.Text)
         SetNetTestImage(pctAdvancedNetTestIcon.InitialImage, False, token)
-        Dim wsFavicon As New clsFavicon(txtNetTestCustom.Text, AddressOf wsFavicon_DownloadIconCompleted, token)
+        Dim wsFavicon As New clsFavicon(AddressOf wsFavicon_DownloadIconCompleted)
+        wsFavicon.Start(txtNetTestCustom.Text, token)
       Else
         SetNetTestImage(My.Resources.advanced_nettest_edit)
       End If
@@ -1416,7 +1420,7 @@
        cmbProvider.Text.ToUpperInvariant.Contains("MY.EXEDE") Then cmbProvider.Text = "exede.net"
     If cmbProvider.Text.ToUpperInvariant = "DISH.NET" Or
        cmbProvider.Text.ToUpperInvariant = "DISH.COM" Then cmbProvider.Text = "mydish.com"
-    If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
+    If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, Global.System.StringComparison.OrdinalIgnoreCase) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
     End If

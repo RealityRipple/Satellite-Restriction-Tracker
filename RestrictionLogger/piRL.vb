@@ -1,6 +1,4 @@
-﻿Imports System.ComponentModel
-Imports System.Configuration.Install
-Public Class piRL
+﻿Public Class piRL
   Public Sub New()
     MyBase.New()
     InitializeComponent()

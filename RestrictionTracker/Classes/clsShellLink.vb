@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Text
-Public Class ShellLink
+Friend Class ShellLink
   Implements IDisposable
 #Region "ComInterop for IShellLink"
 #Region "IPersistFile Interface"
@@ -168,70 +168,7 @@ Public Class ShellLink
   End Sub
 #End Region
 #Region "Implementation"
-  Public Property IconPath() As String
-    Get
-      Dim icoPath As New StringBuilder(260, 260)
-      Dim iconIndex As Integer = 0
-      If linkA Is Nothing Then
-        linkW.GetIconLocation(icoPath, icoPath.Capacity, iconIndex)
-      Else
-        linkA.GetIconLocation(icoPath, icoPath.Capacity, iconIndex)
-      End If
-      Return icoPath.ToString()
-    End Get
-    Set(value As String)
-      Dim iconPath As New StringBuilder(260, 260)
-      Dim iconIndex As Integer = 0
-      If linkA Is Nothing Then
-        linkW.GetIconLocation(iconPath, iconPath.Capacity, iconIndex)
-      Else
-        linkA.GetIconLocation(iconPath, iconPath.Capacity, iconIndex)
-      End If
-      If linkA Is Nothing Then
-        linkW.SetIconLocation(value, iconIndex)
-      Else
-        linkA.SetIconLocation(value, iconIndex)
-      End If
-    End Set
-  End Property
-  Public Property IconIndex() As Integer
-    Get
-      Dim iconPath As New StringBuilder(260, 260)
-      Dim icoIndex As Integer = 0
-      If linkA Is Nothing Then
-        linkW.GetIconLocation(iconPath, iconPath.Capacity, icoIndex)
-      Else
-        linkA.GetIconLocation(iconPath, iconPath.Capacity, icoIndex)
-      End If
-      Return icoIndex
-    End Get
-    Set(value As Integer)
-      Dim iconPath As New StringBuilder(260, 260)
-      Dim iconIndex As Integer = 0
-      If linkA Is Nothing Then
-        linkW.GetIconLocation(iconPath, iconPath.Capacity, iconIndex)
-      Else
-        linkA.GetIconLocation(iconPath, iconPath.Capacity, iconIndex)
-      End If
-      If linkA Is Nothing Then
-        linkW.SetIconLocation(iconPath.ToString(), value)
-      Else
-        linkA.SetIconLocation(iconPath.ToString(), value)
-      End If
-    End Set
-  End Property
-  Public Property Target() As String
-    Get
-      Dim sbtarget As New StringBuilder(260, 260)
-      If linkA Is Nothing Then
-        Dim fd As New _WIN32_FIND_DATAW()
-        linkW.GetPath(sbtarget, sbtarget.Capacity, fd, CUInt(EShellLinkGP.SLGP_UNCPRIORITY))
-      Else
-        Dim fd As New _WIN32_FIND_DATAA()
-        linkA.GetPath(sbtarget, sbtarget.Capacity, fd, CUInt(EShellLinkGP.SLGP_UNCPRIORITY))
-      End If
-      Return sbtarget.ToString()
-    End Get
+  Public WriteOnly Property Target() As String
     Set(value As String)
       If linkA Is Nothing Then
         linkW.SetPath(value)
@@ -240,16 +177,7 @@ Public Class ShellLink
       End If
     End Set
   End Property
-  Public Property WorkingDirectory() As String
-    Get
-      Dim path As New StringBuilder(260, 260)
-      If linkA Is Nothing Then
-        linkW.GetWorkingDirectory(path, path.Capacity)
-      Else
-        linkA.GetWorkingDirectory(path, path.Capacity)
-      End If
-      Return path.ToString()
-    End Get
+  Public WriteOnly Property WorkingDirectory() As String
     Set(value As String)
       If linkA Is Nothing Then
         linkW.SetWorkingDirectory(value)
@@ -258,16 +186,7 @@ Public Class ShellLink
       End If
     End Set
   End Property
-  Public Property Description() As String
-    Get
-      Dim sdescription As New StringBuilder(1024, 1024)
-      If linkA Is Nothing Then
-        linkW.GetDescription(sdescription, sdescription.Capacity)
-      Else
-        linkA.GetDescription(sdescription, sdescription.Capacity)
-      End If
-      Return sdescription.ToString()
-    End Get
+  Public WriteOnly Property Description() As String
     Set(value As String)
       If linkA Is Nothing Then
         linkW.SetDescription(value)
@@ -276,57 +195,12 @@ Public Class ShellLink
       End If
     End Set
   End Property
-  Public Property Arguments() As String
-    Get
-      Dim sbarguments As New StringBuilder(260, 260)
-      If linkA Is Nothing Then
-        linkW.GetArguments(sbarguments, sbarguments.Capacity)
-      Else
-        linkA.GetArguments(sbarguments, sbarguments.Capacity)
-      End If
-      Return sbarguments.ToString()
-    End Get
-    Set(value As String)
-      If linkA Is Nothing Then
-        linkW.SetArguments(value)
-      Else
-        linkA.SetArguments(value)
-      End If
-    End Set
-  End Property
-  Public Property DisplayMode() As LinkDisplayMode
-    Get
-      Dim cmd As UInteger = 0
-      If linkA Is Nothing Then
-        linkW.GetShowCmd(cmd)
-      Else
-        linkA.GetShowCmd(cmd)
-      End If
-      Return DirectCast(cmd, LinkDisplayMode)
-    End Get
+  Public WriteOnly Property DisplayMode() As LinkDisplayMode
     Set(value As LinkDisplayMode)
       If linkA Is Nothing Then
         linkW.SetShowCmd(CUInt(value))
       Else
         linkA.SetShowCmd(CUInt(value))
-      End If
-    End Set
-  End Property
-  Public Property HotKey() As Keys
-    Get
-      Dim key As Short = 0
-      If linkA Is Nothing Then
-        linkW.GetHotkey(key)
-      Else
-        linkA.GetHotkey(key)
-      End If
-      Return DirectCast(CInt(key), Keys)
-    End Get
-    Set(value As Keys)
-      If linkA Is Nothing Then
-        linkW.SetHotkey(CShort(value))
-      Else
-        linkA.SetHotkey(CShort(value))
       End If
     End Set
   End Property

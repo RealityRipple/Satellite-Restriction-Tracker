@@ -1,4 +1,4 @@
-Public Class TaskbarNotifier
+Friend Class TaskbarNotifier
   Inherits System.Windows.Forms.Form
 #Region "TaskbarNotifier Protected Members"
   Protected BackgroundBitmap As Bitmap = Nothing
@@ -69,115 +69,22 @@ Public Class TaskbarNotifier
   End Sub
 #End Region
 #Region "TaskbarNotifier Properties"
-  Public ReadOnly Property TaskbarState() As TaskbarStates
-    Get
-      Return m_taskbarState
-    End Get
-  End Property
-  Public Property TitleText() As String
-    Get
-      Return m_titleText
-    End Get
-    Set(value As String)
-      m_titleText = value
-      Refresh()
-    End Set
-  End Property
-  Public Property ContentText() As String
-    Get
-      Return m_contentText
-    End Get
-    Set(value As String)
-      m_contentText = value
-      Refresh()
-    End Set
-  End Property
-  Public Property NormalTitleColor() As Color
-    Get
-      Return m_normalTitleColor
-    End Get
+  Public WriteOnly Property NormalTitleColor() As Color
     Set(value As Color)
       m_normalTitleColor = value
       Refresh()
     End Set
   End Property
-  Public Property HoverTitleColor() As Color
-    Get
-      Return m_hoverTitleColor
-    End Get
-    Set(value As Color)
-      m_hoverTitleColor = value
-      Refresh()
-    End Set
-  End Property
-  Public Property NormalContentColor() As Color
-    Get
-      Return m_normalContentColor
-    End Get
+  Public WriteOnly Property NormalContentColor() As Color
     Set(value As Color)
       m_normalContentColor = value
       Refresh()
     End Set
   End Property
-  Public Property HoverContentColor() As Color
-    Get
-      Return m_hoverContentColor
-    End Get
+  Public WriteOnly Property HoverContentColor() As Color
     Set(value As Color)
       m_hoverContentColor = value
       Refresh()
-    End Set
-  End Property
-  Public Property NormalTitleFont() As Font
-    Get
-      Return m_normalTitleFont
-    End Get
-    Set(value As Font)
-      m_normalTitleFont = value
-      Refresh()
-    End Set
-  End Property
-  Public Property HoverTitleFont() As Font
-    Get
-      Return m_hoverTitleFont
-    End Get
-    Set(value As Font)
-      m_hoverTitleFont = value
-      Refresh()
-    End Set
-  End Property
-  Public Property NormalContentFont() As Font
-    Get
-      Return m_normalContentFont
-    End Get
-    Set(value As Font)
-      m_normalContentFont = value
-      Refresh()
-    End Set
-  End Property
-  Public Property HoverContentFont() As Font
-    Get
-      Return m_hoverContentFont
-    End Get
-    Set(value As Font)
-      m_hoverContentFont = value
-      Refresh()
-    End Set
-  End Property
-  Public Property KeepVisibleOnMousOver() As Boolean
-    Get
-      Return bKeepVisibleOnMouseOver
-    End Get
-    Set(value As Boolean)
-      bKeepVisibleOnMouseOver = value
-    End Set
-  End Property
-  Public Property ReShowOnMouseOver() As Boolean
-    Get
-      Return bReShowOnMouseOver
-    End Get
-    Set(value As Boolean)
-      bReShowOnMouseOver = value
     End Set
   End Property
 #End Region
@@ -264,26 +171,12 @@ Public Class TaskbarNotifier
     m_taskbarState = TaskbarStates.disappearing
     timer.Start()
   End Sub
-  Public Sub SetBackgroundBitmap(strFilename As String, transparencyColor As Color)
-    BackgroundBitmap = New Bitmap(strFilename)
-    Width = BackgroundBitmap.Width
-    Height = BackgroundBitmap.Height
-    Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
-    If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
-  End Sub
   Public Sub SetBackgroundBitmap(image As Image, transparencyColor As Color)
     BackgroundBitmap = New Bitmap(image)
     Width = BackgroundBitmap.Width
     Height = BackgroundBitmap.Height
     Region = BitmapToRegion(BackgroundBitmap, transparencyColor)
     If BackgroundBitmap Is Nothing Then SetDefaultBitmaps()
-  End Sub
-  Public Sub SetCloseBitmap(strFilename As String, transparencyColor As Color, position As Point)
-    CloseBitmap = New Bitmap(strFilename)
-    CloseBitmap.MakeTransparent(transparencyColor)
-    CloseBitmapSize = New Size(CloseBitmap.Width \ 3, CloseBitmap.Height)
-    CloseBitmapLocation = position
-    If CloseBitmap Is Nothing Or CloseBitmapSize.IsEmpty Then SetDefaultBitmaps()
   End Sub
   Public Sub SetCloseBitmap(image As Image, transparencyColor As Color, position As Point)
     CloseBitmap = New Bitmap(image)
@@ -380,9 +273,9 @@ Public Class TaskbarNotifier
     End If
     RealContentRectangle.Inflate(0, 2)
   End Sub
-  Protected Function BitmapToRegion(bitmap As Bitmap, transparencyColor As Color) As Region
+  Protected Shared Function BitmapToRegion(bitmap As Bitmap, transparencyColor As Color) As Region
     If bitmap Is Nothing Then
-      Throw New ArgumentNullException("Bitmap", "Bitmap cannot be null!")
+      Throw New ArgumentNullException("bitmap", "Bitmap cannot be null!")
     End If
     Dim height As Integer = bitmap.Height
     Dim width As Integer = bitmap.Width
@@ -537,7 +430,7 @@ Public Class TaskbarNotifier
   End Sub
 #End Region
 End Class
-Public Class TaskBarPosition
+Friend Class TaskBarPosition
   Shared Function GetTaskBarPosition(ByRef CoordinateRectangle As Rectangle, ByVal hwnd As IntPtr) As Boolean
     Try
       Dim abd As New NativeMethods.APPBARDATA

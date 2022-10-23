@@ -392,7 +392,6 @@ Public Class frmCustomColors
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub mnuAllDefault_Click(sender As System.Object, e As System.EventArgs) Handles mnuAllDefault.Click
-    Dim pctColor As PictureBox = mnuColorOpts.Tag
     Dim ColorList As PictureBox()
     ColorList = {pctMainDownA, pctMainDownB, pctMainDownC,
                  pctMainUpA, pctMainUpB, pctMainUpC,

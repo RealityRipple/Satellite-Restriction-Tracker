@@ -3,9 +3,11 @@
   Private WithEvents wsFile As WebClientCore
   Public Delegate Sub DownloadIconCompletedCallback(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
   Private c_callback As DownloadIconCompletedCallback
-  Public Sub New(sAddr As String, callback As DownloadIconCompletedCallback, token As Object)
-    If String.IsNullOrEmpty(sAddr) Then Return
+  Public Sub New(callback As DownloadIconCompletedCallback)
     c_callback = callback
+  End Sub
+  Public Sub Start(sAddr As String, token As Object)
+    If String.IsNullOrEmpty(sAddr) Then Return
     Dim connectThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf BeginConnection))
     connectThread.Start({sAddr, token})
   End Sub
@@ -107,7 +109,8 @@
       wsFile = New WebClientCore
       wsFile.ManualRedirect = False
       wsFile.KeepAlive = False
-      Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf DownloadFile), New Object() {URL, Filename, token, trySimpler}, 250, System.Threading.Timeout.Infinite)
+      Dim tSocket As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf DownloadFile))
+      tSocket.Start({URL, Filename, token, trySimpler})
     Catch ex As Exception
       c_callback.Invoke(My.Resources.ico_err, My.Resources.advanced_nettest_error, token, New Exception("Failed to initialize connection to """ & URL.OriginalString & """!"))
     End Try

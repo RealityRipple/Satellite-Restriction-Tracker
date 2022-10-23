@@ -19,7 +19,6 @@ Public Class frmWizard
   Private pChecker As Threading.Timer
   Private AccountType As SatHostTypes = SatHostTypes.Other
   Private NeedsTLSProxy As Boolean = False
-  Private keyPasting As Boolean = False
   Private Delegate Sub ParamaterizedInvoker(parameter As Object)
   Public Sub ClickDrag(hWnd As IntPtr)
     If clsGlass.IsCompositionEnabled Then
@@ -290,13 +289,11 @@ Public Class frmWizard
         If sKey.Contains("-") Then
           Dim sKeys() As String = Split(sKey, "-")
           If sKeys.Length = 5 Then
-            keyPasting = True
             txtKey1.Text = sKeys(0)
             txtKey2.Text = sKeys(1)
             txtKey3.Text = sKeys(2)
             txtKey4.Text = sKeys(3)
             txtKey5.Text = sKeys(4)
-            keyPasting = False
             e.Handled = True
           Else
             sender.Text = sKey
@@ -371,12 +368,10 @@ Public Class frmWizard
       If sKey.Contains("-") Then
         Dim sKeys() As String = Split(sKey, "-")
         If sKeys.Length = 5 Then
-          keyPasting = True
           txtKey1.Text = sKeys(0)
           txtKey2.Text = sKeys(1)
           txtKey3.Text = sKeys(2)
           txtKey4.Text = sKeys(3)
-          keyPasting = False
           txtKey5.Text = sKeys(4)
         Else
           If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
@@ -573,7 +568,6 @@ Public Class frmWizard
       pChecker.Dispose()
       pChecker = Nothing
     End If
-
     If String.IsNullOrEmpty(txtAccountUsername.Text) Then
       tbsWizardPages.SelectedIndex = 1
       txtAccountUsername.Focus()

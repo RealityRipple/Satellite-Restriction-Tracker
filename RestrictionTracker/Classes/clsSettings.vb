@@ -41,18 +41,12 @@ Class SvcSettings
     m_Timeout = 120
     m_ProxySetting = "None"
   End Sub
-  Public Property Account As String
-    Get
-      Return m_Account
-    End Get
+  Public WriteOnly Property Account As String
     Set(value As String)
       m_Account = value
     End Set
   End Property
-  Public Property AccountType As SatHostTypes
-    Get
-      Return m_AccountType
-    End Get
+  Public WriteOnly Property AccountType As SatHostTypes
     Set(value As SatHostTypes)
       m_AccountType = value
     End Set
@@ -81,68 +75,17 @@ Class SvcSettings
       m_PassSalt = value
     End Set
   End Property
-  Public Property Interval As Integer
-    Get
-      Return m_Interval
-    End Get
+  Public WriteOnly Property Interval As Integer
     Set(value As Integer)
       m_Interval = value
     End Set
   End Property
-  Public Property Timeout As Integer
-    Get
-      Return m_Timeout
-    End Get
+  Public WriteOnly Property Timeout As Integer
     Set(value As Integer)
       m_Timeout = value
     End Set
   End Property
-  Public Property Proxy As Net.IWebProxy
-    Get
-      If m_ProxySetting.Contains(":"c) Then
-        Dim myProxySettings() As String = Split(m_ProxySetting, ":")
-        Dim pType As String = myProxySettings(0)
-        Select Case pType.ToUpperInvariant
-          Case "IP"
-            Dim pIP As String = myProxySettings(1)
-            Dim pPort As Integer = myProxySettings(2)
-            If myProxySettings.Length > 3 Then
-              Dim pUser As String = myProxySettings(3)
-              Dim pPass As String = myProxySettings(4)
-              If myProxySettings.Length > 5 Then
-                Dim pDomain As String = myProxySettings(5)
-                Return New Net.WebProxy(pIP, pPort) With {.Credentials = New Net.NetworkCredential(pUser, pPass, pDomain)}
-              Else
-                Return New Net.WebProxy(pIP, pPort) With {.Credentials = New Net.NetworkCredential(pUser, pPass)}
-              End If
-            Else
-              Return New Net.WebProxy(pIP, pPort)
-            End If
-          Case "URL"
-            Dim pURL As String = myProxySettings(1)
-            If myProxySettings.Length > 2 Then
-              Dim pUser As String = myProxySettings(2)
-              Dim pPass As String = myProxySettings(3)
-              If myProxySettings.Length > 4 Then
-                Dim pDomain As String = myProxySettings(4)
-                Return New Net.WebProxy(pURL, False, Nothing, New Net.NetworkCredential(pUser, pPass, pDomain))
-              Else
-                Return New Net.WebProxy(pURL, False, Nothing, New Net.NetworkCredential(pUser, pPass))
-              End If
-            Else
-              Return New Net.WebProxy(pURL)
-            End If
-          Case Else
-            Return Nothing
-        End Select
-      Else
-        Select Case m_ProxySetting.ToUpperInvariant
-          Case "NONE" : Return Nothing
-          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
-          Case Else : Return Nothing
-        End Select
-      End If
-    End Get
+  Public WriteOnly Property Proxy As Net.IWebProxy
     Set(value As Net.IWebProxy)
       If value Is Nothing Then
         m_ProxySetting = "None"
@@ -1335,6 +1278,7 @@ Class AppSettings
         Try
           xConfig = XElement.Load(ConfigFile)
           Dim xuserSettings As XElement = xConfig.Element("userSettings")
+          If xuserSettings Is Nothing Then My.Computer.FileSystem.CopyFile(ConfigFileBackup, ConfigFile, True)
         Catch ex As Exception
           My.Computer.FileSystem.CopyFile(ConfigFileBackup, ConfigFile, True)
         Finally

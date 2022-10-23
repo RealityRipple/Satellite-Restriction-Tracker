@@ -391,9 +391,6 @@ Public Class JSONAssociator
     Dim jEl As JSONReader.JSElement = jsIn.Serial(index)
     Return MakeAssoc(jEl)
   End Function
-  Public Shared Function Associate(jEl As JSONReader.JSElement) As Object
-    Return MakeAssoc(jEl)
-  End Function
   Public Shared Function MakeString(dIn As Dictionary(Of String, Object)) As String
     Dim sRet As String = "{"
     Dim isFirst As Boolean = True

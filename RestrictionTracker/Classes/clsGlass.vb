@@ -25,10 +25,10 @@ Friend Class clsGlass
   Public Shared Sub DrawTextOnGlass(ByVal hwnd As IntPtr, ByVal text As String, ByVal Font As Font, ByVal ctlRct As Rectangle, ByVal Margin As Integer, ByVal iGlowSize As Integer)
     If IsCompositionEnabled() Then
       Dim TextRect As New NativeMethods.RECT
-      TextRect.top = Margin
-      TextRect.left = Margin
-      TextRect.bottom = ctlRct.Bottom - ctlRct.Top - Margin
-      TextRect.right = ctlRct.Right - ctlRct.Left - Margin
+      TextRect.Top = Margin
+      TextRect.Left = Margin
+      TextRect.Bottom = ctlRct.Bottom - ctlRct.Top - Margin
+      TextRect.Right = ctlRct.Right - ctlRct.Left - Margin
       Dim destdc As IntPtr = NativeMethods.GetDC(hwnd)
       Dim Memdc As IntPtr = NativeMethods.CreateCompatibleDC(destdc)
       Dim bitmap As IntPtr

@@ -228,9 +228,9 @@
     Try
       Process.Start("http://srt.realityripple.com/Alert-Styles/")
     Catch ex As Exception
-      Dim taskNotifier As TaskbarNotifier = Nothing
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to srt.realityripple.com/changes.php!" & vbNewLine & ex.Message, 200, 3000, 100)
+      Dim tNotifier As TaskbarNotifier = Nothing
+      MakeNotifier(tNotifier, False)
+      If tNotifier IsNot Nothing Then tNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to srt.realityripple.com/changes.php!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
 End Class

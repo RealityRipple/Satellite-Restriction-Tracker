@@ -83,9 +83,10 @@
     myS = Nothing
     wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
     RaiseEvent CheckingVersion(Me, New EventArgs)
-    Dim tmrSocket As New Threading.Timer(New Threading.TimerCallback(AddressOf BeginCheck), Nothing, 300, System.Threading.Timeout.Infinite)
+    Dim tSocket As New Threading.Thread(New Threading.ThreadStart(AddressOf BeginCheck))
+    tSocket.Start()
   End Sub
-  Private Sub BeginCheck(state As Object)
+  Private Sub BeginCheck()
     wsVer.DownloadStringAsync(New Uri(VersionURL), "INFO")
   End Sub
   Public Shared Function QuickCheckVersion() As CheckEventArgs.ResultType

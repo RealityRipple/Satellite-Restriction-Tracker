@@ -553,14 +553,8 @@ Public Class localRestrictionTracker
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
   Private justATest As Boolean
   Private sAccount, sUsername, sPassword, sProvider As String
-  Private sAttemptedURL As String
-  Private AttemptedTag As ConnectionStates
-  Private AttemptedSub As ConnectionSubStates
-  Private AttemptedStage As Integer
-  Private AttemptedTry As Integer
   Private imSlowed As Boolean
   Private imFree As Boolean
-  Private FullCheck As Boolean = True
   Private ClosingTime As Boolean
   Private tConnect As Threading.Thread
   Private c_Timeout As Integer
@@ -667,7 +661,8 @@ Public Class localRestrictionTracker
   Private Sub Connect()
     If mySettings.AccountType = SatHostTypes.Other Then
       If mySettings.Account.Contains("@") Then
-        acType = New DetermineType(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy, AddressOf acType_TypeDetermined)
+        acType = New DetermineType(AddressOf acType_TypeDetermined)
+        acType.Start(mySettings.Account.Substring(mySettings.Account.IndexOf("@") + 1), mySettings.Timeout, mySettings.Proxy)
       Else
         RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.UnknownAccountType))
       End If
@@ -728,7 +723,7 @@ Public Class localRestrictionTracker
     Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), "servLogin", IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
     MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -751,7 +746,7 @@ Public Class localRestrictionTracker
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Initialize))
     Dim uriString As String = "https://my." & sProvider & "/"
     MakeSocket(False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.ReadLogin))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
@@ -764,7 +759,7 @@ Public Class localRestrictionTracker
     Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, "login")
     MakeSocket(False)
     Dim sSend As String = "warningTrip=false&userName=" & srlFunctions.PercentEncode(sUsername) & "&passwd=" & srlFunctions.PercentEncode(sPassword)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -782,7 +777,7 @@ Public Class localRestrictionTracker
     Dim myID As String = WebClientCore.UserAgent & My.Computer.Screen.WorkingArea.Width & My.Computer.Screen.WorkingArea.Height & My.Computer.Info.OSPlatform & "x86"
     bpf &= DNHash(myID)
     Dim sSend As String = "action=loginuser&onlineid=" & srlFunctions.PercentEncode(sUsername) & "&pw=" & srlFunctions.PercentEncode(sPassword) & "&bfp=" & bpf & "&reCaptcha="
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.None, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -866,7 +861,7 @@ Public Class localRestrictionTracker
   Private Sub WB_Usage(File As String)
     MakeSocket(False)
     Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), File, IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
@@ -1157,7 +1152,7 @@ Public Class localRestrictionTracker
 
   Private Sub EX_Init(sURI As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Initialize, ConnectionSubStates.None, 0, 0, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Initialize))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
@@ -1195,7 +1190,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_OAuth(sURI As Uri)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Prepare, ConnectionSubStates.None, 0, 0, sURI.OriginalString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(sURI, responseURI, responseData)
@@ -1217,7 +1212,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_ReadLogin(sURI As Uri)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.ReadLogin, 0, 0, sURI.OriginalString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.ReadLogin))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(sURI, responseURI, responseData)
@@ -1276,7 +1271,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Login(sURI As Uri, POSTData As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.None, 0, 0, sURI.OriginalString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     Dim aHeader As New Net.WebHeaderCollection()
@@ -1345,7 +1340,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Auth(sURI As Uri, aHeaders As Net.WebHeaderCollection, POSTData As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, sURI.OriginalString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(sURI, POSTData, responseURI, responseData, aHeaders)
@@ -1396,7 +1391,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub EX_Home(sURI As Uri)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, 0, sURI.OriginalString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(sURI, responseURI, responseData)
@@ -1439,7 +1434,7 @@ Public Class localRestrictionTracker
     Dim hdrs As New Net.WebHeaderCollection
     hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, tURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
@@ -1509,7 +1504,7 @@ Public Class localRestrictionTracker
     hdrs.Add("x-auth-type", "Okta")
     hdrs.Add("x-auth-token", sToken)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 1, 0, tURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 1))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
@@ -1587,17 +1582,17 @@ Public Class localRestrictionTracker
         Return
       End If
       Dim jUsage As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")
-      If Not assoc("data")("getPlanData")("usage").ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(assoc("data")("getPlanData")("usage")("dataCapGB")) Then
+      If Not jUsage.ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(jUsage("dataCapGB")) Then
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
         Return
       End If
-      If Not assoc("data")("getPlanData")("usage").ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(assoc("data")("getPlanData")("usage")("dataUsedGB")) Then
+      If Not jUsage.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jUsage("dataUsedGB")) Then
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
         Return
       End If
-      If assoc("data")("getPlanData")("usage").ContainsKey("dataLeftText") AndAlso assoc("data")("getPlanData")("usage")("dataLeftText") = "NONE" Then imSlowed = True
-      sDown = assoc("data")("getPlanData")("usage")("dataUsedGB")
-      sDownT = assoc("data")("getPlanData")("usage")("dataCapGB")
+      If jUsage.ContainsKey("dataLeftText") AndAlso jUsage("dataLeftText") = "NONE" Then imSlowed = True
+      sDown = jUsage("dataUsedGB")
+      sDownT = jUsage("dataCapGB")
       ProviderSurvey("VIA")
       RaiseEvent ConnectionWBXResult(Me, New TYPEBResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
     Catch ex As Exception
@@ -1700,7 +1695,7 @@ Public Class localRestrictionTracker
                          "&SunQueryParamsString=" & srlFunctions.PercentEncode(sSQPS) &
                          "&encoded=true" &
                          "&gx_charset=UTF-8"
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, TryCount, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, TryCount))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
@@ -1709,7 +1704,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub ER_Login2(sURI As String, TryCount As Integer)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 1, TryCount, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate, 1, TryCount))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
@@ -1767,7 +1762,7 @@ Public Class localRestrictionTracker
         ElseIf sRedirURI.StartsWith("/") Then
           sRedirURI = "https://" & ResponseURI.Host & sRedirURI
         End If
-        BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, TryCount, sRedirURI)
+        RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, TryCount))
         Dim response2Data As String = Nothing
         Dim response2URI As Uri = Nothing
         SendGET(New Uri(sRedirURI), response2URI, response2Data)
@@ -1847,7 +1842,7 @@ Public Class localRestrictionTracker
     MakeSocket(True)
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(SAMLResponse))
     If Not String.IsNullOrEmpty(RelayState) Then sSend &= "&RelayState=" & srlFunctions.PercentEncode(srlFunctions.HexDecode(RelayState))
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, 0, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
@@ -1922,7 +1917,7 @@ Public Class localRestrictionTracker
   End Property
   Private Sub ER_Download_Homepage(sURI As String)
     MakeSocket(True)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1, 0, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, 1))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
@@ -2003,7 +1998,7 @@ Public Class localRestrictionTracker
     Dim newID As String = AjaxID.ID
     Dim newType As Byte = AjaxID.Iteration
     If (AjaxID.Iteration = 1 And AjaxID.Index = ExedeResellerAJAXFirstTryRequests) Or (AjaxID.Iteration > 1 And AjaxID.Index = ExedeResellerAJAXSecondTryRequests) Then
-      BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, sURI)
+      RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable))
       newIDX = 0
       newID = AJAXFullOrder(0)
       newType += 1
@@ -2011,7 +2006,7 @@ Public Class localRestrictionTracker
       Dim bShown As Boolean = False
       For I As Integer = 0 To AJAXOrder.Length - 1
         If AjaxID.ID = AJAXOrder(I) Then
-          BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, 0, sURI)
+          RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1))
           newIDX = I + 1
           newID = AJAXOrder(I + 1)
           bShown = True
@@ -2026,7 +2021,7 @@ Public Class localRestrictionTracker
       Dim bShown As Boolean = False
       For I As Integer = 0 To AJAXFullOrder.Length - 1
         If AjaxID.ID = AJAXFullOrder(I) Then
-          BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, 1, sURI)
+          RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadAJAX, I + 1, 1))
           newIDX = I + 1
           newID = AJAXFullOrder(I + 1)
           bShown = True
@@ -2092,7 +2087,7 @@ Public Class localRestrictionTracker
     MakeSocket(False)
     Dim sUser As String = sAccount.Substring(0, sAccount.LastIndexOf("@"))
     Dim sSend As String = "warningTrip=true&userName=" & sUser & "&passwd=" & srlFunctions.PercentEncode(sPassword)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 1, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 1))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(sURI), sSend, responseURI, responseData)
@@ -2145,7 +2140,7 @@ Public Class localRestrictionTracker
   Private Sub RP_Usage(File As String)
     If sProvider.Contains(".") Then sProvider = sProvider.Substring(0, sProvider.LastIndexOf("."))
     Dim uriString As String = String.Format(Globalization.CultureInfo.InvariantCulture, sRP, sProvider, File)
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable))
     MakeSocket(False)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -2327,7 +2322,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub DN_Login_Continue(sURI As String)
     MakeSocket(False)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, sURI)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Authenticate))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(sURI), responseURI, responseData)
@@ -2376,7 +2371,7 @@ Public Class localRestrictionTracker
     MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/saml/post"
     Dim sSend As String = "SAMLResponse=" & srlFunctions.PercentEncode(SAMLResponse) & "&RelayState=" & srlFunctions.PercentEncode(RelayState)
-    BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Verify, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Login, ConnectionSubStates.Verify))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -2403,7 +2398,7 @@ Public Class localRestrictionTracker
     MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/usermanagement/getAccountNumberByUUID.do"
     Dim sSend As String = "check="
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadHome))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendPOST(New Uri(uriString), sSend, responseURI, responseData)
@@ -2429,7 +2424,7 @@ Public Class localRestrictionTracker
   Private Sub DN_Download_Table()
     MakeSocket(False)
     Dim uriString As String = "https://my.dish.com/customercare/myaccount/myinternet"
-    BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
+    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable))
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
     SendGET(New Uri(uriString), responseURI, responseData)
@@ -2938,7 +2933,6 @@ Public Class localRestrictionTracker
   End Function
   Private Sub RaiseError(ErrorMessage As String)
     If String.IsNullOrEmpty(Trim(ErrorMessage)) Then Return
-    Dim FailureText As String = Nothing
     RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage))
   End Sub
   Private Sub RaiseError(ErrorMessage As String, AccountTypeGetsReset As Boolean)
@@ -2973,14 +2967,6 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.LoginFailure, ErrorMessage, FailureText))
     End If
   End Sub
-  Private Sub BeginAttempt(state As ConnectionStates, substate As ConnectionSubStates, stage As Integer, attempt As Integer, sAddr As String)
-    sAttemptedURL = sAddr
-    AttemptedTag = state
-    AttemptedSub = substate
-    AttemptedStage = stage
-    AttemptedTry = attempt
-    RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(state, substate, stage, attempt))
-  End Sub
   Private Function StrToVal(str As String, Optional vMult As Integer = 1) As Long
     If String.IsNullOrEmpty(str) Then Return 0
     If Not str.Contains(" ") Then Return CLng(Val(str.Replace(",", "")) * vMult)
@@ -2990,19 +2976,6 @@ Public Class localRestrictionTracker
     If String.IsNullOrEmpty(str) Then Return 0.0#
     If Not str.Contains(" ") Then Return Val(str.Replace(",", ""))
     Return Val(str.Substring(0, str.IndexOf(" ")).Replace(",", ""))
-  End Function
-  Private Function StripXMLTags(text As String) As String
-    Dim sText As String = text
-    Do While sText.Contains("<")
-      Dim sPre As String = sText.Substring(0, sText.IndexOf("<"))
-      Dim sPost As String = Nothing
-      If sText.Substring(sText.IndexOf("<")).Contains(">") Then
-        sPost = sText.Substring(sText.IndexOf("<"))
-        sPost = sPost.Substring(sPost.IndexOf(">") + 1)
-      End If
-      sText = sPre & sPost
-    Loop
-    Return sText
   End Function
   Private Sub CleanupResult(ByRef result As String)
     If Not String.IsNullOrEmpty(result) Then
@@ -3042,6 +3015,7 @@ Public Class localRestrictionTracker
   End Sub
 #End Region
   Protected Overrides Sub Finalize()
+    Dispose(False)
     MyBase.Finalize()
   End Sub
 End Class

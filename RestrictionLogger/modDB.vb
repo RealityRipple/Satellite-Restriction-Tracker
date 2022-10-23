@@ -1,4 +1,4 @@
-﻿Public Module modDB
+﻿Friend Module modDB
   Public Enum SatHostTypes
     WildBlue
     Exede
@@ -12,11 +12,6 @@
   Friend wbDB As DataBase
   Private isLoaded As Boolean
   Private isSaving As Boolean
-  ReadOnly Property HistoryPath As String
-    Get
-      Return sFile
-    End Get
-  End Property
   Public Sub LOG_Add(ByVal dTime As Date, ByVal lDown As Long, ByVal lDownLim As Long, ByVal lUp As Long, ByVal lUpLim As Long)
     If Not isLoaded Then Return
     If lDownLim <= 0 Then Return
@@ -40,11 +35,6 @@
     If wbDB Is Nothing Then Return 0
     Return wbDB.Count
   End Function
-  Public Function LOG_GetLast() As Date
-    If Not isLoaded Then Return New Date(1970, 1, 1)
-    If LOG_GetCount() < 1 Then Return New Date(1970, 1, 1)
-    Return wbDB.GetLast.DATETIME
-  End Function
   Public Sub LOG_Initialize(sPath As String)
     isLoaded = False
     sFile = sPath
@@ -59,7 +49,7 @@
       wbDB = Nothing
     End If
   End Sub
-  Private Sub LOG_Save(Optional SecondTry As Boolean = False)
+  Private Sub LOG_Save()
     If Not isLoaded Then Return
     If Not String.IsNullOrEmpty(sFile) Then
       isSaving = True
@@ -68,10 +58,6 @@
       isSaving = False
     End If
   End Sub
-  Private Function FileLen(Path As String) As Long
-    If My.Computer.FileSystem.FileExists(Path) Then Return My.Computer.FileSystem.GetFileInfo(Path).Length
-    Return -1
-  End Function
   Public Function InUseChecker(Filename As String, access As IO.FileAccess) As Boolean
     If Not My.Computer.FileSystem.FileExists(Filename) Then Return True
     Dim iStart As Long = TickCount()

@@ -28,16 +28,8 @@ Module modFunctions
       Dim sCommand As String = "close all wait"
       NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
-    Public Sub Pause()
-      Dim sCommand As String = "pause " & sAlias
-      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
-    End Sub
     Public Sub Play(Optional Repeat As Boolean = False)
       Dim sCommand As String = "play " & sAlias & IIf(Repeat, " repeat", String.Empty)
-      NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
-    End Sub
-    Public Sub [Resume]()
-      Dim sCommand As String = "play " & sAlias & " from " & CLng(Status())
       NativeMethods.mciSendString(sCommand, Nothing, 0, IntPtr.Zero)
     End Sub
     Public Sub [Stop]()
@@ -213,26 +205,21 @@ Module modFunctions
   End Sub
   Private Class TarFileData
     Public FileName As String
-    Public FileMode As UInt32
-    Public OwnerID As UInt32
-    Public GroupID As UInt32
     Public FileSize As UInt64
     Public LastMod As UInt64
-    Public Checksum As UInt32
     Public LinkIndicator As Byte
-    Public LinkedFile As String
     Public FileData() As Byte
     Public Sub New(bIn As IO.BinaryReader)
       Dim startAt As Long = bIn.BaseStream.Position
       FileName = ReadBString(bIn.ReadBytes(100))
-      FileMode = ReadBInt(bIn.ReadBytes(8))
-      OwnerID = ReadBInt(bIn.ReadBytes(8))
-      GroupID = ReadBInt(bIn.ReadBytes(8))
+      ReadBInt(bIn.ReadBytes(8))
+      ReadBInt(bIn.ReadBytes(8))
+      ReadBInt(bIn.ReadBytes(8))
       FileSize = ReadBOct(bIn.ReadBytes(12))
       LastMod = ReadBOct(bIn.ReadBytes(12))
-      Checksum = ReadBInt(bIn.ReadBytes(8))
+      ReadBInt(bIn.ReadBytes(8))
       LinkIndicator = ReadBByte(bIn.ReadBytes(1))
-      LinkedFile = ReadBString(bIn.ReadBytes(100))
+      ReadBString(bIn.ReadBytes(100))
       bIn.BaseStream.Seek(startAt, IO.SeekOrigin.Begin)
       bIn.BaseStream.Seek(512, IO.SeekOrigin.Current)
       If FileSize > 0 Then
@@ -310,11 +297,6 @@ Module modFunctions
     taskNotifier.HoverContentColor = customStyle.ContentHoverColor
   End Sub
 #End Region
-  Public ReadOnly Property IsSongPlaying As Boolean
-    Get
-      Return Song IsNot Nothing
-    End Get
-  End Property
   Public Sub ToggleSong()
     If Song Is Nothing Then
       PlaySong()
@@ -1532,92 +1514,6 @@ Module modFunctions
       Return bmpTmp
     End If
   End Function
-  Public Function DisplayEProgress(ImgSize As Size, Down As Long, Up As Long, Over As Long, Total As Long, Accuracy As Integer, ColorDA As Color, ColorDB As Color, ColorDC As Color, ColorUA As Color, ColorUB As Color, ColorUC As Color, ColorText As Color, ColorBG As Color) As Image
-    If ImgSize.IsEmpty Then Return Nothing
-    Dim Msg As String
-    Dim bmpTmp As Image = New Bitmap(ImgSize.Width, ImgSize.Height)
-    Dim fontSize As Single = 8
-    If ImgSize.Width < ImgSize.Height Then
-      If ImgSize.Width / 12 > 8 Then
-        fontSize = ImgSize.Width / 12
-      Else
-        fontSize = 8
-      End If
-    Else
-      If ImgSize.Height / 12 > 8 Then
-        fontSize = ImgSize.Height / 12
-      Else
-        fontSize = 8
-      End If
-    End If
-    Dim fFont As Font = MonospaceFont(fontSize)
-    Dim downBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorDC, ColorDB, ColorDA)
-    Dim upBrush As Drawing2D.LinearGradientBrush = TriGradientBrush(New Point(0, 0), New Point(ImgSize.Width, 0), ColorUC, ColorUB, ColorUA)
-    If Down + Up + Over < Total Then
-      Using g As Graphics = Graphics.FromImage(bmpTmp)
-        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-        g.Clear(ColorBG)
-        If Total > 0 And (Down > 0 Or Up > 0) Then
-          Dim upWidth As Long = ImgSize.Width - ((Total - Up) / Total * ImgSize.Width)
-          g.FillRectangle(upBrush, 0, 0, upWidth, ImgSize.Height)
-          Dim downWidth As Long = ImgSize.Width - ((Total - Down) / Total * ImgSize.Width)
-          g.FillRectangle(downBrush, upWidth, 0, downWidth, ImgSize.Height)
-          For I As Double = -1 To ImgSize.Width + 1 Step ((ImgSize.Width + 2.0) / 10.0)
-            g.DrawLine(New Pen(ColorBG), CInt(I), 0, CInt(I), ImgSize.Height)
-          Next I
-          If Over > 0 Then
-            Msg = "Down:  " & FormatPercent(Down / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Up:    " & FormatPercent(Up / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Over:  " & FormatPercent(Over / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Total: " & FormatPercent((Down + Up + Over) / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          Else
-            Msg = "Down:  " & FormatPercent(Down / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Up:    " & FormatPercent(Up / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Total: " & FormatPercent((Down + Up) / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          End If
-        Else
-          Msg = "0%"
-        End If
-        Dim pF As New PointF(ImgSize.Width / 2 - g.MeasureString(Msg, fFont).Width / 2, ImgSize.Height / 2 - g.MeasureString(Msg, fFont).Height / 2)
-        g.DrawString(Msg, fFont, New SolidBrush(Color.FromArgb(128, ColorBG)), pF.X + 2, pF.Y + 2)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorBG), pF.X + 1, pF.Y + 1)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorText), pF)
-      End Using
-    Else
-      Using g As Graphics = Graphics.FromImage(bmpTmp)
-        g.TextRenderingHint = Drawing.Text.TextRenderingHint.AntiAliasGridFit
-        g.Clear(ColorBG)
-        If Total > 0 And (Down > 0 Or Up > 0) Then
-          Dim fillT As Long = Down + Up
-          Dim upWidth As Long = ImgSize.Width - ((fillT - Up) / fillT * ImgSize.Width)
-          g.FillRectangle(upBrush, 0, 0, upWidth, ImgSize.Height)
-          Dim downWidth As Long = ImgSize.Width - ((fillT - Down) / fillT * ImgSize.Width)
-          g.FillRectangle(downBrush, upWidth, 0, downWidth, ImgSize.Height)
-          For I As Double = -1 To ImgSize.Width + 1 Step ((ImgSize.Width + 2.0) / 10.0)
-            g.DrawLine(New Pen(ColorBG), CInt(I), 0, CInt(I), ImgSize.Height)
-          Next I
-          If Over > 0 Then
-            Msg = "Down:  " & FormatPercent(Down / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Up:    " & FormatPercent(Up / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Over:  " & FormatPercent(Over / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Total: " & FormatPercent((Down + Up + Over) / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          Else
-            Msg = "Down:  " & FormatPercent(Down / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Up:    " & FormatPercent(Up / Total, Accuracy, TriState.True, TriState.False, TriState.False) & vbLf &
-                  "Total: " & FormatPercent((Down + Up) / Total, Accuracy, TriState.True, TriState.False, TriState.False)
-          End If
-
-        Else
-          Msg = "0%"
-        End If
-        Dim pF As New PointF(ImgSize.Width / 2 - g.MeasureString(Msg, fFont).Width / 2, ImgSize.Height / 2 - g.MeasureString(Msg, fFont).Height / 2)
-        g.DrawString(Msg, fFont, New SolidBrush(Color.FromArgb(128, ColorBG)), pF.X + 2, pF.Y + 2)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorBG), pF.X + 1, pF.Y + 1)
-        g.DrawString(Msg, fFont, New SolidBrush(ColorText), pF)
-      End Using
-    End If
-    Return bmpTmp
-  End Function
   Public Function DisplayRProgress(ImgSize As Size, Down As Long, Total As Long, Accuracy As Integer, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color) As Image
     If ImgSize.IsEmpty Then Return Nothing
     Dim Msg As String
@@ -2362,28 +2258,6 @@ Module modFunctions
     Else
       Return MessageBox.Show(owner, Content, Caption, Buttons, Icon, DefaultButton, Nothing, Link, HelpNavigator.Index)
     End If
-  End Function
-  Private Function LinkSplitPath(Path As String, Optional Separator As String = "\") As String
-    If Path.EndsWith(Separator) Then Path = Path.Substring(0, Path.Length - Separator.Length)
-    Dim PathStr As String = Nothing
-    Dim sParts() As String = Split(Path, Separator)
-    Dim Chunk As String = Nothing
-    For Each part In sParts
-      Chunk &= part & Separator
-      If Not String.IsNullOrEmpty(part) Then
-        If part = "http:" Or
-          part = "ftp:" Or
-          part = "file:" Then
-          PathStr &= part & Separator
-        Else
-          PathStr &= "<a href=""explorer " & Chunk & """>" & part & Separator & "</a>"
-        End If
-      Else
-        PathStr &= Separator
-      End If
-    Next
-    If PathStr.EndsWith(Separator & "</a>") Then PathStr = PathStr.Substring(0, PathStr.Length - (4 + Separator.Length)) & "</a>"
-    Return PathStr
   End Function
 #End Region
 End Module

@@ -4,7 +4,6 @@ Class AppSettings
   Private m_Account As String
   Private m_AccountType As localRestrictionTracker.SatHostTypes
   Private m_Interval As Integer
-  Private m_HistoryDir As String
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
@@ -15,18 +14,13 @@ Class AppSettings
   Private m_SecurEnforced As Boolean
   Private m_AJAXShort As String
   Private m_AJAXFull As String
-  Public Loaded As Boolean
-  Private Property ConfigFile As String
+  Private ReadOnly Property ConfigFile As String
     Get
       Return m_Config
     End Get
-    Set(value As String)
-      m_Config = value
-    End Set
   End Property
   Public Sub New(Config As String)
     m_Config = Config
-    Loaded = False
     If My.Computer.FileSystem.FileExists(m_Config) Then
       Dim m_xmld As New XmlDocument
       m_xmld.Load(ConfigFile)
@@ -52,8 +46,6 @@ Class AppSettings
                     End If
                   ElseIf xName.CompareTo("Interval") = 0 Then
                     If Not Integer.TryParse(xValue, m_Interval) Then m_Interval = 15
-                  ElseIf xName.CompareTo("HistoryDir") = 0 Then
-                    m_HistoryDir = xValue
                   ElseIf xName.CompareTo("PassCrypt") = 0 Then
                     If m_node.Attributes.Count > 1 Then
                       For I As Integer = 0 To m_node.Attributes.Count - 1
@@ -90,7 +82,6 @@ Class AppSettings
                     Next
                   End If
                 Next
-                Loaded = True
               Else
                 Reset()
                 Return
@@ -119,7 +110,6 @@ Class AppSettings
     m_Account = Nothing
     m_AccountType = localRestrictionTracker.SatHostTypes.Other
     m_Interval = 15
-    m_HistoryDir = Nothing
     m_PassCrypt = Nothing
     m_PassKey = ""
     m_PassSalt = ""
@@ -157,16 +147,6 @@ Class AppSettings
   Public ReadOnly Property PassSalt As String
     Get
       Return m_PassSalt
-    End Get
-  End Property
-  Public ReadOnly Property Interval As Integer
-    Get
-      Return m_Interval
-    End Get
-  End Property
-  Public ReadOnly Property HistoryDir As String
-    Get
-      Return m_HistoryDir
     End Get
   End Property
   Public ReadOnly Property Timeout As Integer

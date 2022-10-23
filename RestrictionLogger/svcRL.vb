@@ -7,7 +7,6 @@ Public Class svcRL
   Private myLog As EventLog
   Private DataPath As String
   Private WithEvents tracker As localRestrictionTracker
-  Private typeDetermination As DetermineType
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
       If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then Return SatHostTypes.Dish
