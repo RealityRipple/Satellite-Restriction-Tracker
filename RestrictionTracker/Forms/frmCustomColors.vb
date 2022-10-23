@@ -445,7 +445,7 @@ Public Class frmCustomColors
   Private Function getControlFromName(ByRef containerObj As Object, ByVal name As String) As Control
     Try
       For Each tempCtrl As Control In containerObj.Controls
-        If tempCtrl.Name.ToUpper.Trim = name.ToUpper.Trim Then
+        If String.Compare(tempCtrl.Name.Trim, name.Trim, StringComparison.OrdinalIgnoreCase) = 0 Then
           Return tempCtrl
         Else
           Dim tC As Control = getControlFromName(tempCtrl, name)

@@ -312,8 +312,8 @@
         Catch ex As Exception
           Me.Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
         End Try
-      ElseIf response.ContentType.ToLower.Contains("charset=") Then
-        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToLower.IndexOf("charset"))
+      ElseIf response.ContentType.ToUpperInvariant.Contains("CHARSET=") Then
+        Dim charSet As String = response.ContentType.Substring(response.ContentType.ToUpperInvariant.IndexOf("CHARSET"))
         charSet = charSet.Substring(charSet.IndexOf("=") + 1)
         If charSet.Contains(";") Then charSet = charSet.Substring(0, charSet.IndexOf(";"))
         Try
@@ -406,7 +406,7 @@
         Dim sSegment As String = sCookieData.Substring(0, sCookieData.IndexOf(";") + 1)
         If sSegment.Contains("=") And sSegment.Contains(",") Then
           Dim sSegID As String = sSegment.Substring(0, sSegment.IndexOf("="))
-          If sSegID.ToLower = "expires" Then
+          If sSegID.ToUpperInvariant = "EXPIRES" Then
             If sSegment.IndexOf(",") < sSegment.IndexOf("=") Then Exit Do
             If sSegment.Substring(sSegment.IndexOf(",") + 1).Contains(",") Then Exit Do
           Else
@@ -419,7 +419,7 @@
       If Not String.IsNullOrEmpty(sCookieData) Then
         If sCookieData.Contains("=") And sCookieData.Contains(",") Then
           Dim sSegID As String = sCookieData.Substring(0, sCookieData.IndexOf("="))
-          If sSegID.ToLower = "expires" Then
+          If sSegID.ToUpperInvariant = "EXPIRES" Then
             If sCookieData.IndexOf(",") < sCookieData.IndexOf("=") Then
               cExtra &= sCookieData.Substring(0, sCookieData.IndexOf(","))
               sCookieData = sCookieData.Substring(sCookieData.IndexOf(",") + 1).TrimStart
@@ -453,25 +453,25 @@
         For Each sExtra In Extras
           If sExtra.Contains("=") Then
             Dim sExtraKV() As String = Split(sExtra.Trim, "=", 2)
-            Select Case sExtraKV(0).ToLower
-              Case "path"
+            Select Case sExtraKV(0).ToUpperInvariant
+              Case "PATH"
                 sPath = sExtraKV(1)
-              Case "domain"
+              Case "DOMAIN"
                 sDomain = sExtraKV(1)
-              Case "expires"
+              Case "EXPIRES"
                 sExpires = sExtraKV(1)
-              Case "max-age"
+              Case "MAX-AGE"
                 sMaxAge = sExtraKV(1)
-              Case "version"
+              Case "VERSION"
                 iVersion = Val(sExtraKV(1))
               Case Else
                 Debug.Print("Unknown Cookie Key: " & sExtraKV(0))
             End Select
           Else
-            Select Case sExtra.Trim.ToLower
-              Case "http"
+            Select Case sExtra.Trim.ToUpperInvariant
+              Case "HTTP"
                 bHTTP = True
-              Case "secure"
+              Case "SECURE"
                 bSecure = True
             End Select
           End If
@@ -931,10 +931,10 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" Then
+        If method.ToUpperInvariant = "POST" Then
           Dim hasCT As Boolean = False
           For Each hdr In wsUpload.Headers.AllKeys
-            If hdr.ToLower = "content-type" Then
+            If hdr.ToUpperInvariant = "CONTENT-TYPE" Then
               hasCT = True
               Exit For
             End If
@@ -1068,10 +1068,10 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" Then
+        If method.ToUpperInvariant = "POST" Then
           Dim hasCT As Boolean = False
           For Each hdr In wsUpload.Headers.AllKeys
-            If hdr.ToLower = "content-type" Then
+            If hdr.ToUpperInvariant = "CONTENT-TYPE" Then
               hasCT = True
               Exit For
             End If
@@ -1159,7 +1159,7 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" And (data IsNot Nothing AndAlso data.Count > 0) Then
+        If method.ToUpperInvariant = "POST" And (data IsNot Nothing AndAlso data.Count > 0) Then
           Dim uriAddr As Uri
           Try
             uriAddr = New Uri(address)
@@ -1288,7 +1288,7 @@ Public Class WebClientEx
           Next
         End If
         Dim sRet As String = Nothing
-        If method.ToLower = "post" And (data IsNot Nothing AndAlso data.Count > 0) Then
+        If method.ToUpperInvariant = "POST" And (data IsNot Nothing AndAlso data.Count > 0) Then
           Dim bRet() As Byte = Nothing
           Try
             bRet = wsUpload.UploadValues(address, method, data)
@@ -1351,7 +1351,7 @@ Public Class WebClientEx
 #End Region
   Private Function CheckHeaderRedirect(HeaderData As Net.WebHeaderCollection, SourceAddr As String) As String
     For Each Key In HeaderData.AllKeys
-      If Key.ToLower = "location" Then
+      If Key.ToUpperInvariant = "LOCATION" Then
         Dim sNewPath As String = HeaderData.Item(Key)
         If sNewPath.StartsWith("/") Then
           sNewPath = SourceAddr.Substring(0, SourceAddr.IndexOf("/", SourceAddr.IndexOf("//") + 2)) & sNewPath

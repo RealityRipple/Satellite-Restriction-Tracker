@@ -810,7 +810,7 @@ Public Class srlFunctions
   '''  <para>See Also: <seealso cref="HostTypeToString" /></para>
   ''' </remarks>
   Public Shared Function StringToHostType(host As String) As localRestrictionTracker.SatHostTypes
-    Select Case host.ToUpper
+    Select Case host.ToUpperInvariant
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER

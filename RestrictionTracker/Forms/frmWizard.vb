@@ -588,8 +588,8 @@ Public Class frmWizard
       MsgDlg(Me, "You must choose a Provider domain name before validating your Product Key!", "You did not select your Provider.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.InternetNetwork, MessageBoxIcon.Error)
       Return
     End If
-    If cmbAccountHost.Text.ToLower.Contains("excede") Or cmbAccountHost.Text.ToLower.Contains("force") Then cmbAccountHost.Text = "exede.net"
-    If cmbAccountHost.Text.ToLower = "dish.net" Or cmbAccountHost.Text.ToLower = "dish.com" Then cmbAccountHost.Text = "mydish.com"
+    If cmbAccountHost.Text.ToUpperInvariant.Contains("EXCEDE") Or cmbAccountHost.Text.ToUpperInvariant.Contains("FORCE") Then cmbAccountHost.Text = "exede.net"
+    If cmbAccountHost.Text.ToUpperInvariant = "DISH.NET" Or cmbAccountHost.Text.ToUpperInvariant = "DISH.COM" Then cmbAccountHost.Text = "mydish.com"
     sAccount = txtAccountUsername.Text & "@" & cmbAccountHost.Text
     pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
   End Sub

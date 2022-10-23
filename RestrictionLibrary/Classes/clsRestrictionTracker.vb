@@ -625,7 +625,7 @@ Public Class localRestrictionTracker
     End If
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
       sUsername = sAccount.Substring(0, sAccount.LastIndexOf("@"))
-      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
+      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
     Else
       sUsername = String.Empty
       sAccount = String.Empty
@@ -711,9 +711,9 @@ Public Class localRestrictionTracker
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : LoginWB()
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Then
+        If sProvider.ToUpperInvariant = "EXEDE.NET" Then
           LoginExede()
-        ElseIf sProvider.ToLower = "satelliteinternetco.com" Then
+        ElseIf sProvider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
           LoginExedeR()
         Else
           LoginWB()
@@ -725,7 +725,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub LoginWB()
     RaiseEvent ConnectionStatus(Me, New ConnectionStatusEventArgs(ConnectionStates.Prepare))
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), "servLogin", IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), "servLogin", IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
     MakeSocket(False)
     Dim sSend As String = "uid=" & srlFunctions.PercentEncode(sUsername) & "&userPassword=" & srlFunctions.PercentEncode(sPassword)
     BeginAttempt(ConnectionStates.Login, ConnectionSubStates.Authenticate, 0, 0, uriString)
@@ -815,9 +815,9 @@ Public Class localRestrictionTracker
     Select Case mySettings.AccountType
       Case SatHostTypes.WildBlue_LEGACY : WB_Read_Table(Table)
       Case SatHostTypes.WildBlue_EXEDE
-        If sProvider.ToLower = "exede.net" Then
+        If sProvider.ToUpperInvariant = "EXEDE.NET" Then
           EX_Read_Table(Table)
-        ElseIf sProvider.ToLower = "satelliteinternetco.com" Then
+        ElseIf sProvider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
           ER_Read_Table(Table)
         Else
           WB_Read_Table(Table)
@@ -865,7 +865,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub WB_Usage(File As String)
     MakeSocket(False)
-    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider), File, IIf(sProvider.ToLower = "exede.net", "exede.com", sProvider))
+    Dim uriString As String = String.Format(sWB, IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "exede.net", sProvider), File, IIf(sProvider.ToUpperInvariant = "EXEDE.NET", "exede.com", sProvider))
     BeginAttempt(ConnectionStates.TableDownload, ConnectionSubStates.LoadTable, 0, 0, uriString)
     Dim responseData As String = Nothing
     Dim responseURI As Uri = Nothing
@@ -875,7 +875,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub WB_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "myaccount." & IIf(sProvider.ToLower = "exede.com", "exede.net", sProvider.ToLower) Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MYACCOUNT." & IIf(sProvider.ToUpperInvariant = "EXEDE.COM", "EXEDE.NET", sProvider.ToUpperInvariant) Then
       RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -885,8 +885,8 @@ Public Class localRestrictionTracker
       If sFind.Contains("<table") Then
         sFind = sFind.Substring(sFind.IndexOf("<table"))
         Dim iSearch As Integer = 0
-        If sFind.ToLower.Contains("buy more") Then
-          iSearch = sFind.ToLower.IndexOf("buy more") + 13
+        If sFind.ToUpperInvariant.Contains("BUY MORE") Then
+          iSearch = sFind.ToUpperInvariant.IndexOf("BUY MORE") + 13
         End If
         If sFind.Substring(iSearch).Contains("</table>") Then
           sFind = sFind.Substring(0, sFind.IndexOf("</table>", iSearch))
@@ -985,8 +985,8 @@ Public Class localRestrictionTracker
                 sDown = sRows(I).Substring(sRows(I).IndexOf("<b>") + 3)
                 sDown = sDown.Substring(0, sDown.IndexOf("</b>"))
               End If
-            ElseIf sRows(I - 1).ToLower.Contains("buy more purchased") And String.IsNullOrEmpty(sPlusT) Then
-              If sRows(I).ToLower.Contains("<strong>") And sRows(I).ToLower.Contains("</strong>") Then
+            ElseIf sRows(I - 1).ToUpperInvariant.Contains("BUY MORE PURCHASED") And String.IsNullOrEmpty(sPlusT) Then
+              If sRows(I).ToUpperInvariant.Contains("<STRONG>") And sRows(I).ToUpperInvariant.Contains("</STRONG>") Then
                 sPlusT = sRows(I).Substring(sRows(I).IndexOf("<strong>") + 8)
                 sPlusT = sPlusT.Substring(0, sPlusT.IndexOf("</strong>"))
               End If
@@ -1062,7 +1062,7 @@ Public Class localRestrictionTracker
   End Function
   Private Function EX_Helper_Unescape(d As String)
     For I As Integer = 0 To 255
-      Dim h As String = srlFunctions.PadHex(I, 2).ToUpper
+      Dim h As String = srlFunctions.PadHex(I, 2).ToUpperInvariant
       Dim c As Char = ChrW(I)
       d = d.Replace("\x" & h, c)
     Next
@@ -1620,19 +1620,19 @@ Public Class localRestrictionTracker
       Return
     End If
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso." & sProvider And Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MYSSO." & sProvider.ToUpperInvariant And Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
       RaiseError("Prepare Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Response.ToLower.Contains("unable to process request") Then
+    If Response.ToUpperInvariant.Contains("UNABLE TO PROCESS REQUEST") Then
       RaiseError("Prepare Failed: The server may be down.")
       Return
     End If
-    If Response.ToLower.Contains(" down for maintenance") Then
+    If Response.ToUpperInvariant.Contains(" DOWN FOR MAINTENANCE") Then
       RaiseError("Prepare Failed: Server Down for Maintenance.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ssoredirect/metaalias/wsubscriber/idp" Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/FEDERATION/SSOREDIRECT/METAALIAS/WSUBSCRIBER/IDP" Then
       If Response.Contains("location.href") Then
         Dim sRedirURI As String = Response.Substring(Response.IndexOf("location.href"))
         sRedirURI = sRedirURI.Substring(sRedirURI.IndexOf("'") + 1)
@@ -1718,35 +1718,35 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub ER_Login_Response(Response As String, ResponseURI As Uri, TryCount As Integer)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "mysso." & sProvider Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MYSSO." & sProvider.ToUpperInvariant Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
     If Response.Contains("login-error-alert") Then
-      If Response.ToLower.Contains("your username and/or password are incorrect.") Then
+      If Response.ToUpperInvariant.Contains("YOUR USERNAME AND/OR PASSWORD ARE INCORRECT.") Then
         RaiseError("Login Failed: Incorrect Password")
-      ElseIf Response.ToLower.Contains("your account has been locked due to excessive failed log in attempts.") Then
+      ElseIf Response.ToUpperInvariant.Contains("YOUR ACCOUNT HAS BEEN LOCKED DUE TO EXCESSIVE FAILED LOG IN ATTEMPTS.") Then
         RaiseError("Login Failed: Exede Reseller Account Locked. Check your username and password.")
-      ElseIf Response.ToLower.Contains("your session has timed out.") Then
+      ElseIf Response.ToUpperInvariant.Contains("YOUR SESSION HAS TIMED OUT.") Then
         RaiseError("Login Failed: Session timed out. Please try again.")
-      ElseIf Response.ToLower.Contains("this user is not active.") Then
+      ElseIf Response.ToUpperInvariant.Contains("THIS USER IS NOT ACTIVE.") Then
         RaiseError("Login Failed: Exede Reseller Account Inactive. Check your username and password.")
       Else
         RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
       End If
       Return
     ElseIf Response.Contains("<div class=""msgerror"">") Then
-      If Response.ToLower.Contains("invalid user name or password") Then
+      If Response.ToUpperInvariant.Contains("INVALID USER NAME OR PASSWORD") Then
         RaiseError("Login Failed: Incorrect Password")
       Else
         RaiseError("Unknown Login Error.", "ER Login Response", Response, ResponseURI)
       End If
       Return
-    ElseIf Response.ToLower.Contains("sorry, we've encountered an unexpected error.") Then
+    ElseIf Response.ToUpperInvariant.Contains("SORRY, WE'VE ENCOUNTERED AN UNEXPECTED ERROR.") Then
       RaiseError("Login Failed: Server encountered an unexpected error.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/federation/ui/login" Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/FEDERATION/UI/LOGIN" Then
       If Response.Contains("window.location.href") Then
         TryCount += 1
         If TryCount > 15 Then
@@ -1856,15 +1856,15 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub ER_Authenticate_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
       RaiseError("Authentication Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If ResponseURI.AbsolutePath.ToLower.Contains("/identity/saml/samlerror") Or ResponseURI.AbsolutePath.ToLower.Contains("/ssoerror") Then
+    If ResponseURI.AbsolutePath.ToUpperInvariant.Contains("/IDENTITY/SAML/SAMLERROR") Or ResponseURI.AbsolutePath.ToUpperInvariant.Contains("/SSOERROR") Then
       RaiseError("Authentication Failed: The server may be down.")
       Return
     End If
-    If ResponseURI.AbsolutePath.ToLower = "/secur/frontdoor.jsp" Then
+    If ResponseURI.AbsolutePath.ToUpperInvariant = "/SECUR/FRONTDOOR.JSP" Then
       Dim sURL As String = Nothing
       If Response.Contains("location.href") Then
         sURL = Response.Substring(Response.IndexOf("location.href"))
@@ -1931,11 +1931,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub ER_Ajax_Response(Response As String, ResponseURI As Uri, NextAjaxID As AjaxEntry)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "my." & sProvider Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MY." & sProvider.ToUpperInvariant Then
       RaiseError("AJAX Load Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower = "/subscriber_dashboard" Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant = "/SUBSCRIBER_DASHBOARD" Then
       If Response.Contains("location.href") Then
         Dim sURL As String = Nothing
         sURL = Response.Substring(Response.IndexOf("location.href"))
@@ -2101,25 +2101,25 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub RP_Login_Response(Response As String, ResponseURI As Uri, Retry As Boolean)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
+    If Not ResponseURI.Host.ToUpperInvariant = sProvider.ToUpperInvariant & ".RURALPORTAL.NET" Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If ResponseURI.AbsolutePath.ToLower.StartsWith("/us/home.do") Then
+    If ResponseURI.AbsolutePath.ToUpperInvariant.StartsWith("/US/HOME.DO") Then
       RP_Usage("sitemanage")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.StartsWith("/us/login.do") Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant.StartsWith("/US/LOGIN.DO") Then
       RaiseError("Login Failed: Could not understand response.", True, "RP Login Response", Response, ResponseURI)
       Return
     End If
     If Not String.IsNullOrEmpty(ResponseURI.Query) Then
-      If ResponseURI.Query.ToLower.Contains("pass=false") Then
+      If ResponseURI.Query.ToUpperInvariant.Contains("PASS=FALSE") Then
         RaiseError("Login Failed: Incorrect password.")
         Return
       End If
     End If
-    If Not Response.ToLower.Contains("confirmchange(msg);") Then
+    If Not Response.ToUpperInvariant.Contains("CONFIRMCHANGE(MSG);") Then
       RaiseError("Login Failed: Sent back to login page.", True)
       Return
     End If
@@ -2155,7 +2155,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub RP_Usage_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = sProvider & ".ruralportal.net" Then
+    If Not ResponseURI.Host.ToUpperInvariant = sProvider.ToUpperInvariant & ".RURALPORTAL.NET" Then
       RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -2309,11 +2309,11 @@ Public Class localRestrictionTracker
 #Region "DN"
   Private Sub DN_Login_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
+    If Not ResponseURI.Host.ToUpperInvariant = "WWW.MYDISH.COM" Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("login.ashx") Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("LOGIN.ASHX") Then
       RaiseError("Login Failed: Could not understand response.", True, "DN Login Response", Response, ResponseURI)
       Return
     End If
@@ -2336,11 +2336,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub DN_Login_Continue_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "www.mydish.com" Then
+    If Not ResponseURI.Host.ToUpperInvariant = "WWW.MYDISH.COM" Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("login.aspx") Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("LOGIN.ASPX") Then
       RaiseError("Login Failed: Could not understand response.", True, "DN Login Continue Response", Response, ResponseURI)
       Return
     End If
@@ -2385,11 +2385,11 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub DN_Login_Verify_Response(Response As String, ResponseURI As Uri, ExpectedURI As String)
     If CheckForErrors(Response, ResponseURI, True) Then Return
-    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
-    If Not ResponseURI.OriginalString.ToLower.Contains(ExpectedURI.ToLower) Then
+    If Not ResponseURI.OriginalString.ToUpperInvariant.Contains(ExpectedURI.ToUpperInvariant) Then
       RaiseError("Login Failed: Could not understand response.", True, "Dish Login Verify Response", Response, ResponseURI)
       Return
     End If
@@ -2412,7 +2412,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub DN_Download_Home_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI, True) Then Return
-    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
       RaiseError("Login Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -2420,7 +2420,7 @@ Public Class localRestrictionTracker
       RaiseError("Login Failed: The server rejected the request.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("accountsummary") Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("ACCOUNTSUMMARY") Then
       RaiseError("Home Read Failed: Could not load home page. Redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """.", "DN Download Home Response", Response, ResponseURI)
       Return
     End If
@@ -2438,7 +2438,7 @@ Public Class localRestrictionTracker
   End Sub
   Private Sub DN_Download_Table_Response(Response As String, ResponseURI As Uri)
     If CheckForErrors(Response, ResponseURI) Then Return
-    If Not ResponseURI.Host.ToLower = "my.dish.com" Then
+    If Not ResponseURI.Host.ToUpperInvariant = "MY.DISH.COM" Then
       RaiseError("Usage Failed: Connection redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """, check your Internet connection.")
       Return
     End If
@@ -2446,7 +2446,7 @@ Public Class localRestrictionTracker
       RaiseError("Usage Failed: The server rejected the request.")
       Return
     End If
-    If Not ResponseURI.AbsolutePath.ToLower.Contains("internet") Then
+    If Not ResponseURI.AbsolutePath.ToUpperInvariant.Contains("INTERNET") Then
       RaiseError("Usage Failed: Could not load usage meter page. Redirected to """ & srlFunctions.TruncateURL(ResponseURI.OriginalString) & """.", "DN Download Table Response", Response, ResponseURI)
       Return
     End If
@@ -2460,7 +2460,7 @@ Public Class localRestrictionTracker
       Return
     End If
     sUsageDiv = sUsageDiv.Substring(0, sUsageDiv.IndexOf("</form>"))
-    If Not sUsageDiv.ToLower.Contains("remaining capacity") Then
+    If Not sUsageDiv.ToUpperInvariant.Contains("REMAINING CAPACITY") Then
       RaiseError("Usage Failed: Could not detect usage data.", "DN Download Table Response", Response, ResponseURI)
       Return
     End If
@@ -2769,9 +2769,9 @@ Public Class localRestrictionTracker
     If cl IsNot Nothing Then
       For Each cookie As Net.Cookie In cl
         sCookieData &= cookie.Domain & vbTab &
-                       (Not cookie.HttpOnly).ToString.ToLower & vbTab &
-                       cookie.Secure.ToString.ToLower & vbTab &
-                       cookie.Domain.StartsWith(".").ToString.ToLower & vbTab &
+                       (Not cookie.HttpOnly).ToString.ToLowerInvariant & vbTab &
+                       cookie.Secure.ToString.ToLowerInvariant & vbTab &
+                       cookie.Domain.StartsWith(".").ToString.ToLowerInvariant & vbTab &
                        cookie.Path & vbTab &
                        (cookie.Expires.ToUniversalTime - New DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds & vbTab &
                        cookie.Name & vbTab &
@@ -2899,7 +2899,7 @@ Public Class localRestrictionTracker
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
       Return True
     End If
-    If response.ToLower.Contains("504 gateway time-out") Then
+    If response.ToUpperInvariant.Contains("504 GATEWAY TIME-OUT") Then
       RaiseEvent ConnectionFailure(Me, New ConnectionFailureEventArgs(ConnectionFailureEventArgs.FailureType.ConnectionTimeout))
       Return True
     End If
@@ -2907,7 +2907,7 @@ Public Class localRestrictionTracker
       RaiseError("The server is unavailable. Please try again later.")
       Return True
     End If
-    If response.ToLower.Contains("internal server error") Or (response.ToLower.Contains("internal error") And response.Contains("500")) Then
+    If response.ToUpperInvariant.Contains("INTERNAL SERVER ERROR") Or (response.ToUpperInvariant.Contains("INTERNAL ERROR") And response.Contains("500")) Then
       RaiseError("The server ran into an internal error. Please try again later.")
       Return True
     End If

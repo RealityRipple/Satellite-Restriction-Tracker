@@ -185,8 +185,8 @@ Class AppSettings
       If m_ProxySetting.Contains(":"c) Then
         Dim myProxySettings() As String = Split(m_ProxySetting, ":")
         Dim pType As String = myProxySettings(0)
-        Select Case pType.ToLower
-          Case "ip"
+        Select Case pType.ToUpperInvariant
+          Case "IP"
             Dim pIP As String = myProxySettings(1)
             Dim pPort As Integer = 80
             If myProxySettings.Length > 2 Then pPort = Replace(myProxySettings(2), "/", String.Empty)
@@ -202,7 +202,7 @@ Class AppSettings
             Else
               Return New Net.WebProxy(pIP, pPort)
             End If
-          Case "url"
+          Case "URL"
             Dim pURL As String = myProxySettings(1)
             If myProxySettings.Length > 2 Then
               Dim pUser As String = myProxySettings(2)
@@ -220,9 +220,9 @@ Class AppSettings
             Return Nothing
         End Select
       Else
-        Select Case m_ProxySetting.ToLower
-          Case "none" : Return Nothing
-          Case "system" : Return Net.WebRequest.DefaultWebProxy
+        Select Case m_ProxySetting.ToUpperInvariant
+          Case "NONE" : Return Nothing
+          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
           Case Else : Return Nothing
         End Select
       End If
@@ -243,8 +243,8 @@ Class AppSettings
       If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
-        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
-        If sHost = "satelliteinternetco.com" Then
+        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant
+        If sHost = "SATELLITEINTERNETCO.COM" Then
           Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id3", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
         Else
           Return Nothing
@@ -270,8 +270,8 @@ Class AppSettings
       If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
-        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToLower
-        If sHost = "satelliteinternetco.com" Then
+        Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant
+        If sHost = "SATELLITEINTERNETCO.COM" Then
           Return {"j_id0:idForm:j_id2", "j_id0:idForm:j_id4", "j_id0:idForm:j_id5"}
         Else
           Return Nothing

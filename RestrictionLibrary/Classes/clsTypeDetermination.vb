@@ -68,7 +68,7 @@ Public Class DetermineType
           End Using
           If String.IsNullOrEmpty(sData) Then
             c_callback.Invoke(ar.AsyncState, False)
-          ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
+          ElseIf sData.ToUpperInvariant.Contains("<META HTTP-EQUIV=""REFREQH""") Then
             c_callback.Invoke(ar.AsyncState, False)
           Else
             c_callback.Invoke(ar.AsyncState, True)
@@ -108,11 +108,11 @@ Public Class DetermineType
   End Sub
   Private Delegate Sub BeginTestInvoker(Provider As String)
   Private Sub BeginTest(Provider As String)
-    If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
+    If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then
       c_callback.Invoke(SatHostGroup.Dish)
-    ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
+    ElseIf Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then
       c_callback.Invoke(SatHostGroup.Exede)
-    ElseIf Provider.ToLower = "satelliteinternetco.com" Then
+    ElseIf Provider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
       c_callback.Invoke(SatHostGroup.ExedeReseller)
     Else
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
@@ -192,9 +192,9 @@ Public Class UpdateAJAXLists
         End Using
         If String.IsNullOrEmpty(sData) Then
           c_callback.Invoke(ar.AsyncState, "DATA_EMPTY", Nothing)
-        ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
+        ElseIf sData.ToUpperInvariant.Contains("<META HTTP-EQUIV=""REFRESH""") Then
           c_callback.Invoke(ar.AsyncState, "DATA_REDIR_" & sData, Nothing)
-        ElseIf Not sData.ToLower.Contains(vbLf) Then
+        ElseIf Not sData.Contains(vbLf) Then
           c_callback.Invoke(ar.AsyncState, "DATA_SEP_" & sData, Nothing)
         Else
           Dim minAndFull() As String = Split(sData, vbLf, 2)

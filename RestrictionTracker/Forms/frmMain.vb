@@ -72,11 +72,11 @@ Public Class frmMain
     End Sub
     Private Delegate Sub BeginTestInvoker(Provider As String)
     Private Sub BeginTest(Provider As String)
-      If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then
+      If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then
         c_callback.Invoke(SatHostTypes.Dish_EXEDE)
-      ElseIf Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then
+      ElseIf Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then
         c_callback.Invoke(SatHostTypes.WildBlue_EXEDE)
-      ElseIf Provider.ToLower = "satelliteinternetco.com" Then
+      ElseIf Provider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
         c_callback.Invoke(SatHostTypes.WildBlue_EXEDE_RESELLER)
       Else
         OfflineCheck()
@@ -797,7 +797,7 @@ Public Class frmMain
       End If
     End If
     If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
+      sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
     Else
       sAccount = String.Empty
       sProvider = String.Empty
@@ -824,7 +824,7 @@ Public Class frmMain
         Else
           If Not String.IsNullOrEmpty(sAccount) Then
             If String.IsNullOrEmpty(sProvider) Then
-              sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
+              sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
               SetStatusText("Reloading", "Reloading History...", False)
               LOG_Initialize(sAccount, False)
               If ClosingTime Then Return
@@ -1287,7 +1287,7 @@ Public Class frmMain
     End If
     If didHostListSave Then Return
     Try
-      Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLower
+      Dim myProvider As String = mySettings.Account.Substring(mySettings.Account.LastIndexOf("@") + 1).ToLowerInvariant
       Dim sckHostList As Net.WebRequest = Net.HttpWebRequest.Create("http://wb.realityripple.com/hosts/?add=" & myProvider)
       sckHostList.BeginGetResponse(Nothing, Nothing)
       didHostListSave = True

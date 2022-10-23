@@ -219,7 +219,7 @@
             If sNext = """" Then Exit Do
             If sNext = "[" Then Exit Do
             If sNext = "{" Then Exit Do
-            If sNext.ToLower = "t" Or sNext.ToLower = "f" Or sNext.ToLower = "n" Then Exit Do
+            If sNext.ToUpperInvariant = "T" Or sNext.ToUpperInvariant = "F" Or sNext.ToUpperInvariant = "N" Then Exit Do
             If IsNumeric(sNext) Or sNext = "-" Then Exit Do
           End If
           If Not stream.CanRead Then
@@ -247,13 +247,13 @@
             If Not stream.CanRead Then Exit Do
             workElement = ReadElement(stream, streamEncoding)
           Loop
-        ElseIf sNext.ToLower = "t" Then
+        ElseIf sNext.ToUpperInvariant = "T" Then
           sText = sNext
           Dim sVal As String = Nothing
           Do Until String.IsNullOrEmpty(sText)
             If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
               stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToLower = "true") Then Exit Do
+              If (sVal.ToUpperInvariant = "TRUE") Then Exit Do
             Else
               sVal &= sText
             End If
@@ -266,13 +266,13 @@
             sText = ReadCharacter(stream, streamEncoding)
           Loop
           el.Value = sVal
-        ElseIf sNext.ToLower = "f" Then
+        ElseIf sNext.ToUpperInvariant = "F" Then
           sText = sNext
           Dim sVal As String = Nothing
           Do Until String.IsNullOrEmpty(sText)
             If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
               stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToLower = "false") Then Exit Do
+              If (sVal.ToUpperInvariant = "FALSE") Then Exit Do
             Else
               sVal &= sText
             End If
@@ -285,13 +285,13 @@
             sText = ReadCharacter(stream, streamEncoding)
           Loop
           el.Value = sVal
-        ElseIf sNext.ToLower = "n" Then
+        ElseIf sNext.ToUpperInvariant = "N" Then
           sText = sNext
           Dim sVal As String = Nothing
           Do Until String.IsNullOrEmpty(sText)
             If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
               stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToLower = "null") Then Exit Do
+              If (sVal.ToUpperInvariant = "NULL") Then Exit Do
             Else
               sVal &= sText
             End If

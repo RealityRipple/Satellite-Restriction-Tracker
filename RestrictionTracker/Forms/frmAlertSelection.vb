@@ -11,17 +11,17 @@
   Private Sub frmAlertSelection_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     lstStyles.Items.Clear()
     Dim iFirst As Integer = lstStyles.Items.Add("Default")
-    If AlertStyle.ToLower = "default" Then lstStyles.SelectedIndex = iFirst
+    If AlertStyle.ToUpperInvariant = "DEFAULT" Then lstStyles.SelectedIndex = iFirst
     For Each sFile As String In IO.Directory.GetFiles(LocalAppDataDirectory)
       Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(sFile)
-      Dim sExt As String = IO.Path.GetExtension(sFile).ToLower
+      Dim sExt As String = IO.Path.GetExtension(sFile).ToUpperInvariant
       Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
-        sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
+        sExt = IO.Path.GetExtension(sTitle).ToUpperInvariant & sExt
         sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
       Loop
-      If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
+      If (sExt = ".TGZ") Or (sExt = ".TAR.GZ") Or (sExt = ".TAR") Then
         Dim iItem As Integer = lstStyles.Items.Add(sTitle)
-        If sTitle.ToLower = AlertStyle.ToLower Then
+        If sTitle.ToUpperInvariant = AlertStyle.ToUpperInvariant Then
           lstStyles.SelectedIndex = iItem
         End If
       End If
@@ -48,12 +48,12 @@
       If UBound(Data) = 0 Then
         Dim StylePath As String = Data(0)
         Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
-        Dim sExt As String = IO.Path.GetExtension(StylePath).ToLower
+        Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
         Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
-          sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
+          sExt = IO.Path.GetExtension(sTitle).ToUpperInvariant & sExt
           sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
         Loop
-        If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
+        If (sExt = ".TGZ") Or (sExt = ".TAR.GZ") Or (sExt = ".TAR") Then
           IO.File.Copy(StylePath, IO.Path.Combine(LocalAppDataDirectory, sTitle & sExt.ToLowerInvariant), True)
           Dim iItem As Integer = -1
           If lstStyles.Items.Contains(sTitle) Then
@@ -68,12 +68,12 @@
       ElseIf UBound(Data) > 0 Then
         For Each StylePath As String In Data
           Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
-          Dim sExt As String = IO.Path.GetExtension(StylePath).ToLower
+          Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
           Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
-            sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
+            sExt = IO.Path.GetExtension(sTitle).ToUpperInvariant & sExt
             sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
           Loop
-          If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
+          If (sExt = ".TGZ") Or (sExt = ".TAR.GZ") Or (sExt = ".TAR") Then
             IO.File.Copy(StylePath, IO.Path.Combine(LocalAppDataDirectory, sTitle & sExt.ToLowerInvariant), True)
             If Not lstStyles.Items.Contains(sTitle) Then lstStyles.Items.Add(sTitle)
           End If
@@ -94,12 +94,12 @@
       If UBound(Data) = 0 Then
         Dim StylePath As String = Data(0)
         Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
-        Dim sExt As String = IO.Path.GetExtension(StylePath).ToLower
+        Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
         Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
-          sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
+          sExt = IO.Path.GetExtension(sTitle).ToUpperInvariant & sExt
           sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
         Loop
-        If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
+        If (sExt = ".TGZ") Or (sExt = ".TAR.GZ") Or (sExt = ".TAR") Then
           e.Effect = DragDropEffects.Link
         Else
           e.Effect = DragDropEffects.None
@@ -108,12 +108,12 @@
         Dim hasTar As Boolean = False
         For Each StylePath As String In Data
           Dim sTitle As String = IO.Path.GetFileNameWithoutExtension(StylePath)
-          Dim sExt As String = IO.Path.GetExtension(StylePath).ToLower
+          Dim sExt As String = IO.Path.GetExtension(StylePath).ToUpperInvariant
           Do While Not String.IsNullOrEmpty(IO.Path.GetExtension(sTitle))
-            sExt = IO.Path.GetExtension(sTitle).ToLower & sExt
+            sExt = IO.Path.GetExtension(sTitle).ToUpperInvariant & sExt
             sTitle = IO.Path.GetFileNameWithoutExtension(sTitle)
           Loop
-          If (sExt = ".tgz") Or (sExt = ".tar.gz") Or (sExt = ".tar") Then
+          If (sExt = ".TGZ") Or (sExt = ".TAR.GZ") Or (sExt = ".TAR") Then
             hasTar = True
             Exit For
           End If
@@ -204,7 +204,7 @@
       If lstStyles.SelectedItem Is Nothing Then
         cmdSave.Enabled = False
       Else
-        cmdSave.Enabled = Not (lstStyles.SelectedItem.ToLower = AlertStyle.ToLower)
+        cmdSave.Enabled = Not String.Compare(lstStyles.SelectedItem, AlertStyle, StringComparison.OrdinalIgnoreCase) = 0
       End If
     Catch ex As Exception
       pctPreview.BackgroundImage = Nothing

@@ -81,9 +81,9 @@ Public Class remoteRestrictionTracker
     Public Sub New(Failure As FailType, Optional Extra As String = Nothing)
       Type = Failure
       If Type = FailType.NotBase64 Then
-        If Not String.IsNullOrEmpty(Extra) AndAlso Extra.ToLower.Contains("<html") Then
-          If Extra.ToLower.Contains("<title") Then
-            Dim htmlTitle As String = Extra.Substring(Extra.IndexOf("<title"))
+        If Not String.IsNullOrEmpty(Extra) AndAlso Extra.ToUpperInvariant.Contains("<HTML") Then
+          If Extra.ToUpperInvariant.Contains("<TITLE") Then
+            Dim htmlTitle As String = Extra.Substring(Extra.IndexOf("<TITLE", StringComparison.OrdinalIgnoreCase))
             htmlTitle = htmlTitle.Substring(htmlTitle.IndexOf(">") + 1)
             htmlTitle = htmlTitle.Substring(0, htmlTitle.IndexOf("</"))
             Details = """" & htmlTitle & """ received"
@@ -389,7 +389,7 @@ Public Class remoteRestrictionTracker
         ElseIf row.Contains(":") And row.Contains("|") Then
           Dim sTime As String = Split(row, ":", 2)(0)
           Dim dish As Boolean = False
-          If sTime.StartsWith("d") Then
+          If sTime.StartsWith("d", StringComparison.Ordinal) Then
             dish = True
             sTime = sTime.Substring(1)
           End If
@@ -430,7 +430,7 @@ Public Class remoteRestrictionTracker
       Dim rData As New Collections.Generic.List(Of remoteRestrictionTracker.SuccessEventArgs.Result)
       Dim sTime As String = Split(sRet, ":", 2)(0)
       Dim dish As Boolean = False
-      If sTime.StartsWith("d") Then
+      If sTime.StartsWith("d", StringComparison.Ordinal) Then
         dish = True
         sTime = sTime.Substring(1)
       End If

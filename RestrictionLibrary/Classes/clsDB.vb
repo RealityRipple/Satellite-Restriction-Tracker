@@ -199,7 +199,7 @@ Public Class DataBase
     StopNew = False
     If IO.File.Exists(sPath) Then
       Try
-        If LCase(IO.Path.GetExtension(sPath)).CompareTo(".xml") = 0 Then
+        If IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".XML") = 0 Then
           Dim m_xmld As New XmlDocument
           m_xmld.Load(sPath)
           Dim m_nodelist As XmlNodeList = m_xmld.ChildNodes(1).ChildNodes
@@ -228,7 +228,7 @@ Public Class DataBase
             If StopNew Then Return
           Next
           m_xmld = Nothing
-        ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".wb") = 0 Then
+        ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".WB") = 0 Then
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Using nIn As New IO.BinaryReader(nRead)
               Dim uRows As UInt64 = LOAD_ReadULong(nIn)
@@ -246,11 +246,11 @@ Public Class DataBase
               nIn.Close()
             End Using
           End Using
-        ElseIf LCase(IO.Path.GetExtension(sPath)).CompareTo(".csv") = 0 Then
+        ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".CSV") = 0 Then
           Using nRead As New IO.FileStream(sPath, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Using nIn As New IO.StreamReader(nRead)
               Dim firstLine As String = nIn.ReadLine
-              If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", True) = 0 Then
+              If Not String.Compare(firstLine, "Time,Download,Download Limit,Upload,Upload Limit", StringComparison.OrdinalIgnoreCase) = 0 Then
                 Dim firstData() As String = Split(firstLine, ",")
                 Dim DT As Date = Date.Parse(firstData(0))
                 Dim Down As Long = firstData(1)
@@ -524,7 +524,7 @@ Public Class DataBase
       End If
     Next
     Try
-      If LCase(IO.Path.GetExtension(Path)).CompareTo(".xml") = 0 Then
+      If IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".XML") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.StreamWriter(nWrite)
             nOut.WriteLine("<?xml version=""1.0"" standalone=""yes""?>")
@@ -546,7 +546,7 @@ Public Class DataBase
             nOut.Write("</RestrictionTrackerUsage>")
           End Using
         End Using
-      ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".wb") = 0 Then
+      ElseIf IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".WB") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.BinaryWriter(nWrite)
             Dim uData As UInt64 = CULng(dVals.Length)
@@ -572,7 +572,7 @@ Public Class DataBase
             nOut.Close()
           End Using
         End Using
-      ElseIf LCase(IO.Path.GetExtension(Path)).CompareTo(".csv") = 0 Then
+      ElseIf IO.Path.GetExtension(Path).ToUpperInvariant.CompareTo(".CSV") = 0 Then
         Using nWrite As New IO.FileStream(Path, IO.FileMode.OpenOrCreate, IO.FileAccess.ReadWrite, IO.FileShare.None)
           Using nOut As New IO.StreamWriter(nWrite)
             Dim uData As UInt64 = CULng(dVals.Length)

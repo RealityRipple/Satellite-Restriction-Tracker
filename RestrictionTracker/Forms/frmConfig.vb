@@ -272,9 +272,9 @@
       cmdPortableDir.Enabled = False
       cmdMakePortable.Enabled = False
       ttConfig.SetToolTip(cmdMakePortable, "This application is already portable!")
-    ElseIf String.Compare(hD, AppDataAllPath, True) = 0 Then
+    ElseIf String.Compare(hD, AppDataAllPath, StringComparison.OrdinalIgnoreCase) = 0 Then
       optHistoryProgramData.Checked = True
-    ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
+    ElseIf String.Compare(hD, AppDataPath, StringComparison.OrdinalIgnoreCase) = 0 Then
       optHistoryAppData.Checked = True
     Else
       optHistoryCustom.Checked = True
@@ -715,9 +715,9 @@
       txtHistoryDir.Tag = Nothing
       Dim hD As String = mySettings.HistoryDir
       If String.IsNullOrEmpty(hD) Then hD = AppDataPath
-      If String.Compare(hD, AppDataAllPath, True) = 0 Then
+      If String.Compare(hD, AppDataAllPath) = 0 Then
         optHistoryProgramData.Checked = True
-      ElseIf String.Compare(hD, AppDataPath, True) = 0 Then
+      ElseIf String.Compare(hD, AppDataPath, StringComparison.OrdinalIgnoreCase) = 0 Then
         optHistoryAppData.Checked = True
       Else
         optHistoryCustom.Checked = True
@@ -1409,13 +1409,13 @@
         Return
       End If
     Next
-    If cmbProvider.Text.ToLower.Contains("excede") Or
-       cmbProvider.Text.ToLower.Contains("force") Or
-       cmbProvider.Text.ToLower.Contains("mysso") Or
-       cmbProvider.Text.ToLower.Contains("myexede") Or
-       cmbProvider.Text.ToLower.Contains("my.exede") Then cmbProvider.Text = "exede.net"
-    If cmbProvider.Text.ToLower = "dish.net" Or
-       cmbProvider.Text.ToLower = "dish.com" Then cmbProvider.Text = "mydish.com"
+    If cmbProvider.Text.ToUpperInvariant.Contains("EXCEDE") Or
+       cmbProvider.Text.ToUpperInvariant.Contains("FORCE") Or
+       cmbProvider.Text.ToUpperInvariant.Contains("MYSSO") Or
+       cmbProvider.Text.ToUpperInvariant.Contains("MYEXEDE") Or
+       cmbProvider.Text.ToUpperInvariant.Contains("MY.EXEDE") Then cmbProvider.Text = "exede.net"
+    If cmbProvider.Text.ToUpperInvariant = "DISH.NET" Or
+       cmbProvider.Text.ToUpperInvariant = "DISH.COM" Then cmbProvider.Text = "mydish.com"
     If String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) <> 0 Then
       mySettings.Account = txtAccount.Text & "@" & cmbProvider.Text
       bAccount = True
@@ -1424,7 +1424,7 @@
     If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
       newPass = True
     Else
-      newPass = (String.Compare(StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt), txtPassword.Text, False) <> 0)
+      newPass = (String.Compare(StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt), txtPassword.Text, StringComparison.Ordinal) <> 0)
     End If
     If newPass Then
       Dim newKey() As Byte = StoredPassword.GenerateKey()
@@ -1438,7 +1438,7 @@
       If optAccountTypeWBL.Checked Then
         mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       ElseIf optAccountTypeWBX.Checked Then
-        If cmbProvider.Text.ToLower = "satelliteinternetco.com" Then
+        If cmbProvider.Text.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
           mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
         Else
           mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
@@ -1456,7 +1456,7 @@
     End If
     Dim sKey As String = ""
     If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    If String.Compare(mySettings.RemoteKey, sKey, True) <> 0 Then
+    If String.Compare(mySettings.RemoteKey, sKey, StringComparison.OrdinalIgnoreCase) <> 0 Then
       If pctKeyState.Tag = 1 Then
         mySettings.RemoteKey = sKey
         bAccount = True
@@ -1599,33 +1599,33 @@
         End Try
       End If
       LOG_Terminate(True)
-      Dim sSkipFiles() As String = {"user.config",
-                                    "del.bat",
-                                    "restrictioncontroller.exe",
-                                    "restrictionlogger.exe",
-                                    "restrictiontracker.exe",
-                                    "restrictiontracker.pdb",
-                                    "restrictiontrackerlib.dll",
-                                    "restrictiontrackerlib.pdb",
-                                    "unins*"}
+      Dim sSkipFiles() As String = {"USER.CONFIG",
+                                    "DEL.BAT",
+                                    "RESTRICTIONCONTROLLER.EXE",
+                                    "RESTRICTIONLOGGER.EXE",
+                                    "RESTRICTIONTRACKER.EXE",
+                                    "RESTRICTIONTRACKER.PDB",
+                                    "RESTRICTIONTRACKERLIB.DLL",
+                                    "RESTRICTIONTRACKERLIB.PDB",
+                                    "UNINS*"}
       If sOldFiles IsNot Nothing AndAlso sOldFiles.Count > 0 Then
         If sNewFiles IsNot Nothing AndAlso sNewFiles.Count > 0 Then
           Dim sOverWrites As New Collections.Generic.List(Of String)
           For Each sOld In sOldFiles
             For Each sNew In sNewFiles
-              If String.Compare(IO.Path.GetFileName(sNew), IO.Path.GetFileName(sOld), True) = 0 Then
+              If String.Compare(IO.Path.GetFileName(sNew), IO.Path.GetFileName(sOld), StringComparison.OrdinalIgnoreCase) = 0 Then
                 Dim DoSkip As Boolean = False
                 For Each sSkip In sSkipFiles
                   If sSkip.Contains("*") Then
                     If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sNew).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sNew).ToUpperInvariant.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.StartsWith("*") Then
-                      If IO.Path.GetFileName(sNew).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sNew).ToUpperInvariant.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sNew).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sNew).ToUpperInvariant.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     End If
                   Else
-                    If IO.Path.GetFileName(sNew).ToLower = sSkip Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sNew).ToUpperInvariant = sSkip Then DoSkip = True : Exit For
                   End If
                 Next
                 If DoSkip Then Continue For
@@ -1642,14 +1642,14 @@
                 For Each sSkip In sSkipFiles
                   If sSkip.Contains("*") Then
                     If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.StartsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     End If
                   Else
-                    If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sFile).ToUpperInvariant = sSkip Then DoSkip = True : Exit For
                   End If
                 Next
                 If DoSkip Then Continue For
@@ -1675,14 +1675,14 @@
                 For Each sSkip In sSkipFiles
                   If sSkip.Contains("*") Then
                     If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.StartsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     ElseIf sSkip.EndsWith("*") Then
-                      If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                      If IO.Path.GetFileName(sFile).ToUpperInvariant.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                     End If
                   Else
-                    If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sFile).ToUpperInvariant = sSkip Then DoSkip = True : Exit For
                   End If
                 Next
                 If DoSkip Then Continue For
@@ -1706,14 +1706,14 @@
               For Each sSkip In sSkipFiles
                 If sSkip.Contains("*") Then
                   If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
-                    If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sFile).ToUpperInvariant.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                   ElseIf sSkip.StartsWith("*") Then
-                    If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sFile).ToUpperInvariant.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                   ElseIf sSkip.EndsWith("*") Then
-                    If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                    If IO.Path.GetFileName(sFile).ToUpperInvariant.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                   End If
                 Else
-                  If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                  If IO.Path.GetFileName(sFile).ToUpperInvariant = sSkip Then DoSkip = True : Exit For
                 End If
               Next
               If DoSkip Then Continue For
@@ -1736,14 +1736,14 @@
             For Each sSkip In sSkipFiles
               If sSkip.Contains("*") Then
                 If sSkip.StartsWith("*") And sSkip.EndsWith("*") Then
-                  If IO.Path.GetFileName(sFile).ToLower.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  If IO.Path.GetFileName(sFile).ToUpperInvariant.Contains(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                 ElseIf sSkip.StartsWith("*") Then
-                  If IO.Path.GetFileName(sFile).ToLower.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  If IO.Path.GetFileName(sFile).ToUpperInvariant.EndsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                 ElseIf sSkip.EndsWith("*") Then
-                  If IO.Path.GetFileName(sFile).ToLower.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
+                  If IO.Path.GetFileName(sFile).ToUpperInvariant.StartsWith(sSkip.Replace("*", "")) Then DoSkip = True : Exit For
                 End If
               Else
-                If IO.Path.GetFileName(sFile).ToLower = sSkip Then DoSkip = True : Exit For
+                If IO.Path.GetFileName(sFile).ToUpperInvariant = sSkip Then DoSkip = True : Exit For
               End If
             Next
             If DoSkip Then Continue For
@@ -1773,7 +1773,7 @@
       If String.IsNullOrEmpty(cSave.PassKey) Or String.IsNullOrEmpty(cSave.PassSalt) Then
         newSvcPass = True
       Else
-        newSvcPass = (String.Compare(StoredPassword.Decrypt(cSave.PassCrypt, cSave.PassKey, cSave.PassSalt), txtPassword.Text, False) <> 0)
+        newSvcPass = (String.Compare(StoredPassword.Decrypt(cSave.PassCrypt, cSave.PassKey, cSave.PassSalt), txtPassword.Text, StringComparison.Ordinal) <> 0)
       End If
       If newSvcPass Then
         Dim svcKey() As Byte = StoredPassword.GenerateKey()
@@ -1799,7 +1799,7 @@
   Private Function SettingsChanged() As Boolean
     If mySettings Is Nothing Then Return False
     If bHardChange Then Return True
-    If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, True) = 0 Then Return True
+    If Not String.Compare(mySettings.Account, txtAccount.Text & "@" & cmbProvider.Text, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
     If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then
       Return True
     Else
@@ -1818,7 +1818,7 @@
     End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
     If sKey.Contains("--") Then sKey = ""
-    If Not String.Compare(mySettings.RemoteKey, sKey, True) = 0 Then Return True
+    If Not String.Compare(mySettings.RemoteKey, sKey, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
     If Not mySettings.AutoHide = chkAutoHide.Checked Then Return True
     If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
@@ -1827,7 +1827,7 @@
     If Not mySettings.Retries = txtRetries.Value Then Return True
     If chkStartUp.Checked Xor My.Computer.FileSystem.FileExists(StartupPath) Then Return True
     If Not mySettings.Service = chkService.Checked Then Return True
-    If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, True) = 0 Then Return True
+    If Not String.Compare(mySettings.HistoryDir, txtHistoryDir.Text, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
     If chkOverAlert.Checked Xor mySettings.Overuse > 0 Then Return True
     If chkOverAlert.Checked Then If Not mySettings.Overuse = txtOverSize.Value Then Return True
     If Not mySettings.Overtime = txtOverTime.Value Then Return True

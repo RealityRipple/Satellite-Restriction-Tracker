@@ -102,8 +102,8 @@ Class SvcSettings
       If m_ProxySetting.Contains(":"c) Then
         Dim myProxySettings() As String = Split(m_ProxySetting, ":")
         Dim pType As String = myProxySettings(0)
-        Select Case pType.ToLower
-          Case "ip"
+        Select Case pType.ToUpperInvariant
+          Case "IP"
             Dim pIP As String = myProxySettings(1)
             Dim pPort As Integer = myProxySettings(2)
             If myProxySettings.Length > 3 Then
@@ -118,7 +118,7 @@ Class SvcSettings
             Else
               Return New Net.WebProxy(pIP, pPort)
             End If
-          Case "url"
+          Case "URL"
             Dim pURL As String = myProxySettings(1)
             If myProxySettings.Length > 2 Then
               Dim pUser As String = myProxySettings(2)
@@ -136,9 +136,9 @@ Class SvcSettings
             Return Nothing
         End Select
       Else
-        Select Case m_ProxySetting.ToLower
-          Case "none" : Return Nothing
-          Case "system" : Return Net.WebRequest.DefaultWebProxy
+        Select Case m_ProxySetting.ToUpperInvariant
+          Case "NONE" : Return Nothing
+          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
           Case Else : Return Nothing
         End Select
       End If
@@ -1168,7 +1168,7 @@ Class AppSettings
     Dim sProtocol As String = ""
     For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
       If (m_SecurProtocol And protocolTest) = protocolTest Then
-        sProtocol &= [Enum].GetName(GetType(SecurityProtocolTypeEx), protocolTest).ToUpper & ", "
+        sProtocol &= [Enum].GetName(GetType(SecurityProtocolTypeEx), protocolTest).ToUpperInvariant & ", "
       End If
     Next
     If Not String.IsNullOrEmpty(sProtocol) AndAlso sProtocol.EndsWith(", ") Then sProtocol = sProtocol.Substring(0, sProtocol.Length - 2)
@@ -1611,8 +1611,8 @@ Class AppSettings
       If m_ProxySetting.Contains(":"c) Then
         Dim myProxySettings() As String = Split(m_ProxySetting, ":")
         Dim pType As String = myProxySettings(0)
-        Select Case pType.ToLower
-          Case "ip"
+        Select Case pType.ToUpperInvariant
+          Case "IP"
             Dim pIP As String = myProxySettings(1)
             Dim pPort As Integer = 80
             If myProxySettings.Length > 2 Then pPort = Replace(myProxySettings(2), "/", String.Empty)
@@ -1628,7 +1628,7 @@ Class AppSettings
             Else
               Return New Net.WebProxy(pIP, pPort)
             End If
-          Case "url"
+          Case "URL"
             Dim pURL As String = myProxySettings(1)
             If myProxySettings.Length > 2 Then
               If myProxySettings.Length > 3 Then
@@ -1651,9 +1651,9 @@ Class AppSettings
             Return Nothing
         End Select
       Else
-        Select Case m_ProxySetting.ToLower
-          Case "none" : Return Nothing
-          Case "system" : Return Net.WebRequest.DefaultWebProxy
+        Select Case m_ProxySetting.ToUpperInvariant
+          Case "NONE" : Return Nothing
+          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
           Case Else : Return Nothing
         End Select
       End If

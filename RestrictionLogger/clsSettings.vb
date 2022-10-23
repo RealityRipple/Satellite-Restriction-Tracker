@@ -149,8 +149,8 @@
       If m_ProxySetting.Contains(":"c) Then
         Dim myProxySettings() As String = Split(m_ProxySetting, ":")
         Dim pType As String = myProxySettings(0)
-        Select Case pType.ToLower
-          Case "ip"
+        Select Case pType.ToUpperInvariant
+          Case "IP"
             Dim pIP As String = myProxySettings(1)
             Dim pPort As Integer = myProxySettings(2)
             If myProxySettings.Length > 3 Then
@@ -165,7 +165,7 @@
             Else
               Return New Net.WebProxy(pIP, pPort)
             End If
-          Case "url"
+          Case "URL"
             Dim pURL As String = myProxySettings(1)
             If myProxySettings.Length > 2 Then
               Dim pUser As String = myProxySettings(2)
@@ -183,16 +183,16 @@
             Return Nothing
         End Select
       Else
-        Select Case m_ProxySetting.ToLower
-          Case "none" : Return Nothing
-          Case "system" : Return Net.WebRequest.DefaultWebProxy
+        Select Case m_ProxySetting.ToUpperInvariant
+          Case "NONE" : Return Nothing
+          Case "SYSTEM" : Return Net.WebRequest.DefaultWebProxy
           Case Else : Return Nothing
         End Select
       End If
     End Get
   End Property
   Private Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
-    Select Case st.ToUpper
+    Select Case st.ToUpperInvariant
       Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
       Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
       Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER

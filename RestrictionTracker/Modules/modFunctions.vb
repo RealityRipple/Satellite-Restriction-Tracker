@@ -178,7 +178,7 @@ Module modFunctions
     Try
       Dim TempAlertDir As String = IO.Path.Combine(LocalAppDataDirectory, "notifier")
       Dim TempAlertTAR As String = IO.Path.Combine(LocalAppDataDirectory, "notifier.tar")
-      If Path.EndsWith(".tar") Then
+      If Path.EndsWith(".tar", StringComparison.OrdinalIgnoreCase) Then
         ExtractTar(Path, TempAlertDir)
       Else
         Try
@@ -417,7 +417,7 @@ Module modFunctions
       If Application.StartupPath.Contains(Environment.SpecialFolder.ProgramFiles) Or Not My.Computer.FileSystem.DirectoryExists(IO.Path.Combine(Application.StartupPath, "Config")) Then
         If String.IsNullOrEmpty(mySettings.HistoryDir) Then
           If My.Computer.FileSystem.DirectoryExists(AppDataPath) Then
-            If Array.Exists(My.Computer.FileSystem.GetFiles(AppDataPath).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToLower = ".xml" Or IO.Path.GetExtension(appFile).ToLower = ".wb") Then
+            If Array.Exists(My.Computer.FileSystem.GetFiles(AppDataPath).ToArray, Function(appFile As String) IO.Path.GetExtension(appFile).ToUpperInvariant = ".XML" Or IO.Path.GetExtension(appFile).ToUpperInvariant = ".WB") Then
               mySettings.HistoryDir = IIf(Create, LocalAppDataDirectory, AppDataPath)
             Else
               mySettings.HistoryDir = IIf(Create, CommonAppDataDirectory, AppDataAllPath)

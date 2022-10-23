@@ -50,14 +50,14 @@
       End If
       Try
         Dim sHTML As String = sRet
-        If sHTML.ToLower.Contains("shortcut icon") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
-        If sHTML.ToLower.Contains("rel=""icon""") Then
-          If sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).Contains("<") Then
-            sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToLower.IndexOf("rel=""icon""")).LastIndexOf("<"))
+        If sHTML.ToUpperInvariant.Contains("SHORTCUT ICON") Then sHTML = Replace(sHTML, "shortcut icon", "icon", , , CompareMethod.Text)
+        If sHTML.ToUpperInvariant.Contains("REL=""ICON""") Then
+          If sHTML.Substring(0, sHTML.ToUpperInvariant.IndexOf("REL=""ICON""")).Contains("<") Then
+            sHTML = sHTML.Substring(sHTML.Substring(0, sHTML.ToUpperInvariant.IndexOf("REL=""ICON""")).LastIndexOf("<"))
             If sHTML.Contains(">") Then
               sHTML = sHTML.Substring(0, sHTML.IndexOf(">") + 1)
-              If sHTML.ToLower.Contains("href") Then
-                sHTML = sHTML.Substring(sHTML.IndexOf("href"))
+              If sHTML.ToUpperInvariant.Contains("HREF") Then
+                sHTML = sHTML.Substring(sHTML.IndexOf("href", StringComparison.OrdinalIgnoreCase))
                 If sHTML.Contains("""") Then
                   sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
                   If sHTML.Contains("""") Then

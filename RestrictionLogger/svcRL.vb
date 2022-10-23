@@ -10,9 +10,9 @@ Public Class svcRL
   Private typeDetermination As DetermineType
   Private Class DetermineType
     Public Shared Function Determine(Provider As String, Timeout As Integer, Proxy As Net.IWebProxy) As SatHostTypes
-      If Provider.ToLower = "mydish.com" Or Provider.ToLower = "dish.com" Or Provider.ToLower = "dish.net" Then Return SatHostTypes.Dish
-      If Provider.ToLower = "exede.com" Or Provider.ToLower = "exede.net" Then Return SatHostTypes.Exede
-      If Provider.ToLower = "satelliteinternetco.com" Then Return SatHostTypes.ExedeReseller
+      If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then Return SatHostTypes.Dish
+      If Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then Return SatHostTypes.Exede
+      If Provider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then Return SatHostTypes.ExedeReseller
       If Provider.Contains(".") Then Provider = Provider.Substring(0, Provider.LastIndexOf("."))
       Provider = Provider & ".ruralportal.net"
       If CheckURL("wildblue.com", Timeout, Proxy) Then
@@ -122,7 +122,7 @@ Public Class svcRL
           End Using
           If String.IsNullOrEmpty(sData) Then
             Return False
-          ElseIf sData.ToLower.Contains("<meta http-equiv=""refresh""") Then
+          ElseIf sData.ToUpperInvariant.Contains("<META HTTP-EQUIV=""REFRESH""") Then
             Return False
           Else
             Return True
@@ -221,7 +221,7 @@ Public Class svcRL
       If Not sAccount = MySettings.Account Then
         sAccount = MySettings.Account
         If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then
-          sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLower
+          sProvider = sAccount.Substring(sAccount.LastIndexOf("@") + 1).ToLowerInvariant
           If My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb")) Then
             LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb"))
           ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".xml")) Then
