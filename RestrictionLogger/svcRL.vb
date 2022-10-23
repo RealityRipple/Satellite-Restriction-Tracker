@@ -6,7 +6,7 @@ Friend Class svcRL
   Private tmrCheck As System.Threading.Timer
   Private myLog As EventLog
   Private DataPath As String
-  Private WithEvents tracker As localRestrictionTracker
+  Private WithEvents tracker As Local.SiteConnection
   Private Class DetermineType
     Private Sub New()
     End Sub
@@ -165,12 +165,12 @@ Friend Class svcRL
         If myLog IsNot Nothing Then myLog.WriteEntry("Settings failed to load.", EventLogEntryType.Warning)
       Else
         InitAccount()
-        If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then
+        If MySettings.AccountType = Local.SatHostTypes.Other Then
           Try
             MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
           Catch ex As Exception
             If myLog IsNot Nothing Then myLog.WriteEntry("Failed to determine type: " & ex.Message, EventLogEntryType.Warning)
-            MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
+            MySettings.AccountType = Local.SatHostTypes.Other
           End Try
         End If
       End If
@@ -205,7 +205,7 @@ Friend Class svcRL
       Dim dataPath As String = state
       iChecks = 1
       InitAccount()
-      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker = New localRestrictionTracker(dataPath)
+      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sProvider) And Not String.IsNullOrEmpty(sPassword) Then tracker = New Local.SiteConnection(dataPath)
     End If
   End Sub
   Private Sub InitAccount()
@@ -229,9 +229,9 @@ Friend Class svcRL
           Else
             LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb"))
           End If
-          If MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
+          If MySettings.AccountType = Local.SatHostTypes.Other Then MySettings.AccountType = DetermineType.Determine(sProvider, MySettings.Timeout, MySettings.Proxy)
         Else
-          MySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
+          MySettings.AccountType = Local.SatHostTypes.Other
           sAccount = String.Empty
           sProvider = String.Empty
         End If
@@ -240,33 +240,33 @@ Friend Class svcRL
       If myLog IsNot Nothing Then myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 2)
     End Try
   End Sub
-  Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
+  Private Sub tracker_ConnectionDNXResult(sender As Object, e As RestrictionLibrary.Local.TYPEA2ResultEventArgs) Handles tracker.ConnectionDNXResult
+    MySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit)
   End Sub
-  Private Sub tracker_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles tracker.ConnectionFailure
+  Private Sub tracker_ConnectionFailure(sender As Object, e As Local.SiteConnectionFailureEventArgs) Handles tracker.ConnectionFailure
     If myLog IsNot Nothing Then myLog.WriteEntry(e.Type.ToString & ": " & e.Message & " (" & e.Fail & ")", EventLogEntryType.Error, 3)
   End Sub
-  Private Sub tracker_ConnectionRPXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+  Private Sub tracker_ConnectionRPXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles tracker.ConnectionRPXResult
+    MySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
-  Private Sub tracker_ConnectionRPLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionRPLResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+  Private Sub tracker_ConnectionRPLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles tracker.ConnectionRPLResult
+    MySettings.AccountType = Local.SatHostTypes.RuralPortal_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-  Private Sub tracker_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles tracker.ConnectionStatus
+  Private Sub tracker_ConnectionStatus(sender As Object, e As Local.SiteConnectionStatusEventArgs) Handles tracker.ConnectionStatus
   End Sub
-  Private Sub tracker_ConnectionWBLResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+  Private Sub tracker_ConnectionWBLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles tracker.ConnectionWBLResult
+    MySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit)
   End Sub
-  Private Sub tracker_ConnectionWBXResult(sender As Object, e As RestrictionLibrary.localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWBXResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+  Private Sub tracker_ConnectionWBXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles tracker.ConnectionWBXResult
+    MySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
-  Private Sub tracker_ConnectionWXRResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles tracker.ConnectionWXRResult
-    MySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
+  Private Sub tracker_ConnectionWXRResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles tracker.ConnectionWXRResult
+    MySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit)
   End Sub
 End Class

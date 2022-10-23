@@ -2,7 +2,7 @@
 Class AppSettings
   Private m_Config As String
   Private m_Account As String
-  Private m_AccountType As localRestrictionTracker.SatHostTypes
+  Private m_AccountType As Local.SatHostTypes
   Private m_Interval As Integer
   Private m_PassCrypt As String
   Private m_PassKey As String
@@ -42,7 +42,7 @@ Class AppSettings
                     If m_node.Attributes.Count > 1 Then
                       m_AccountType = srlFunctions.StringToHostType(m_node.Attributes(1).InnerText)
                     Else
-                      m_AccountType = localRestrictionTracker.SatHostTypes.Other
+                      m_AccountType = Local.SatHostTypes.Other
                     End If
                   ElseIf xName.CompareTo("Interval") = 0 Then
                     If Not Integer.TryParse(xValue, m_Interval) Then m_Interval = 15
@@ -108,7 +108,7 @@ Class AppSettings
   End Sub
   Private Sub Reset()
     m_Account = Nothing
-    m_AccountType = localRestrictionTracker.SatHostTypes.Other
+    m_AccountType = Local.SatHostTypes.Other
     m_Interval = 15
     m_PassCrypt = Nothing
     m_PassKey = ""
@@ -126,11 +126,11 @@ Class AppSettings
       Return m_Account
     End Get
   End Property
-  Public Property AccountType As localRestrictionTracker.SatHostTypes
+  Public Property AccountType As Local.SatHostTypes
     Get
       Return m_AccountType
     End Get
-    Set(value As localRestrictionTracker.SatHostTypes)
+    Set(value As Local.SatHostTypes)
       m_AccountType = value
     End Set
   End Property
@@ -220,7 +220,7 @@ Class AppSettings
   End Property
   Public ReadOnly Property AJAXFullOrder As String()
     Get
-      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
+      If Not m_AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
         Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant
@@ -247,7 +247,7 @@ Class AppSettings
   End Property
   Public ReadOnly Property AJAXShortOrder As String()
     Get
-      If Not m_AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
+      If Not m_AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then Return Nothing
       If String.IsNullOrEmpty(m_AJAXFull) Then
         If String.IsNullOrEmpty(m_Account) Then Return Nothing
         Dim sHost As String = m_Account.Substring(m_Account.LastIndexOf("@"c) + 1).ToUpperInvariant

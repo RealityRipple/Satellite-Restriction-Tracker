@@ -1,4 +1,4 @@
-﻿Imports RestrictionLibrary.localRestrictionTracker
+﻿Imports RestrictionLibrary.Local
 Public NotInheritable Class frmHistory
   Friend mySettings As AppSettings
   Private lastRect As Rectangle
@@ -154,7 +154,7 @@ Public NotInheritable Class frmHistory
   End Sub
   Private Sub DoGraph(state As Object)
     Dim graphStyle As Byte = state(0)
-    Dim graphData As DataBase.DataRow() = state(1)
+    Dim graphData As DataRow() = state(1)
     Dim downSize As Size = state(2)
     Select Case graphStyle
       Case 0
@@ -178,7 +178,7 @@ Public NotInheritable Class frmHistory
             fDB.Show(Me)
             fDB.SetAction("Drawing Graph...", "Collecting data, estimating, and resizing...")
           End If
-          Dim lItems() As DataBase.DataRow = pnlGraph.Tag
+          Dim lItems() As DataRow = pnlGraph.Tag
           If usageDB Is Nothing OrElse usageDB.Count = 0 Then
             pnlGraph.RowStyles(0).Height = 100
             pnlGraph.RowStyles(1).Height = 0
@@ -272,7 +272,7 @@ Public NotInheritable Class frmHistory
     If graphSpaceD.Contains(e.Location) Then
       Dim dNow As Date = CalculateNow(graphSpaceD, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
-      Dim gShow As DataBase.DataRow = GetGraphData(dNow, True)
+      Dim gShow As DataRow = GetGraphData(dNow, True)
       If gShow.IsEmpty Then Return
       Dim showTime As String = gShow.sDATETIME
       Dim Show As String = showTime & " : " & gShow.sDOWNLOAD & " MB / " & gShow.sDOWNLIM & " MB"
@@ -288,7 +288,7 @@ Public NotInheritable Class frmHistory
     If graphSpaceU.Contains(e.Location) Then
       Dim dNow As Date = CalculateNow(graphSpaceU, graphMinX, graphMaxX, e.Location)
       Static lastShow As String
-      Dim gShow As DataBase.DataRow = GetGraphData(dNow, False)
+      Dim gShow As DataRow = GetGraphData(dNow, False)
       If gShow.IsEmpty Then Return
       Dim Show As String = gShow.sDATETIME & " : " & gShow.sUPLOAD & " MB / " & gShow.sUPLIM & " MB"
       If lastShow = Show Then Return
@@ -319,7 +319,7 @@ Public NotInheritable Class frmHistory
       dgvUsage.Visible = False
       pnlGraph.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
+        Dim lItems() As DataRow = LOG_GetRange(dFrom, dTo)
         pnlGraph.Tag = lItems
         DoResize(True)
       Else
@@ -331,7 +331,7 @@ Public NotInheritable Class frmHistory
       pnlGraph.Visible = False
       dgvUsage.Visible = True
       If usageDB IsNot Nothing AndAlso usageDB.Count > 0 Then
-        Dim lItems() As DataBase.DataRow = LOG_GetRange(dFrom, dTo)
+        Dim lItems() As DataRow = LOG_GetRange(dFrom, dTo)
         dgvUsage.Rows.Clear()
         Dim SameLim As Boolean = True
         ChangeStyle()
@@ -340,7 +340,7 @@ Public NotInheritable Class frmHistory
           Case SatHostTypes.Dish_EXEDE
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
-            For Each lItem As DataBase.DataRow In lItems
+            For Each lItem As DataRow In lItems
               If myDLim = 0 Then
                 myDLim = lItem.DOWNLIM
               Else
@@ -359,23 +359,23 @@ Public NotInheritable Class frmHistory
               End If
             Next
             If SameLim Then
-              For Each lItem As DataBase.DataRow In lItems
+              For Each lItem As DataRow In lItems
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
               Next lItem
             Else
-              For Each lItem As DataBase.DataRow In lItems
+              For Each lItem As DataRow In lItems
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
           Case SatHostTypes.RuralPortal_EXEDE, SatHostTypes.WildBlue_EXEDE, SatHostTypes.WildBlue_EXEDE_RESELLER
 
-            For Each lItem As DataBase.DataRow In lItems
+            For Each lItem As DataRow In lItems
               dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sDOWNLIM)
             Next lItem
           Case Else
             Dim myDLim As Long = 0
             Dim myULim As Long = 0
-            For Each lItem As DataBase.DataRow In lItems
+            For Each lItem As DataRow In lItems
               If myDLim = 0 Then
                 myDLim = lItem.DOWNLIM
               Else
@@ -394,11 +394,11 @@ Public NotInheritable Class frmHistory
               End If
             Next
             If SameLim Then
-              For Each lItem As DataBase.DataRow In lItems
+              For Each lItem As DataRow In lItems
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD, lItem.sUPLOAD)
               Next lItem
             Else
-              For Each lItem As DataBase.DataRow In lItems
+              For Each lItem As DataRow In lItems
                 dgvUsage.Rows.Add(lItem.DATETIME, lItem.sDOWNLOAD & " / " & lItem.sDOWNLIM, lItem.sUPLOAD & " / " & lItem.sUPLIM)
               Next lItem
             End If
@@ -456,7 +456,7 @@ Public NotInheritable Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing Then
-        Dim dbValues() As DataBase.DataRow = usageDB.ToArray()
+        Dim dbValues() As DataRow = usageDB.ToArray()
         If dbValues.Length > 1 Then
           If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
@@ -469,10 +469,10 @@ Public NotInheritable Class frmHistory
               fDB.SetProgress(dbValues.Length - I, dbValues.Length)
             Catch
             End Try
-            Dim thisDB As DataBase.DataRow = dbValues(I)
-            Dim lastDB As DataBase.DataRow = thisDB
+            Dim thisDB As DataRow = dbValues(I)
+            Dim lastDB As DataRow = thisDB
             If I > 0 Then lastDB = dbValues(I - 1)
-            Dim nextDB As DataBase.DataRow = thisDB
+            Dim nextDB As DataRow = thisDB
             If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
             If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
               ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
@@ -540,7 +540,7 @@ Public NotInheritable Class frmHistory
       End If
     Else
       If usageDB IsNot Nothing Then
-        Dim dbValues() As DataBase.DataRow = usageDB.ToArray()
+        Dim dbValues() As DataRow = usageDB.ToArray()
         If dbValues.Length > 1 Then
           If fDB Is Nothing Then fDB = New frmDBProgress
           If Not fDB.Visible Then
@@ -554,10 +554,10 @@ Public NotInheritable Class frmHistory
               fDB.SetProgress(dbValues.Length - I, dbValues.Length)
             Catch
             End Try
-            Dim thisDB As DataBase.DataRow = dbValues(I)
-            Dim lastDB As DataBase.DataRow = thisDB
+            Dim thisDB As DataRow = dbValues(I)
+            Dim lastDB As DataRow = thisDB
             If I > 0 Then lastDB = dbValues(I - 1)
-            Dim nextDB As DataBase.DataRow = thisDB
+            Dim nextDB As DataRow = thisDB
             If I < dbValues.Length - 1 Then nextDB = dbValues(I + 1)
             If ((thisDB.DOWNLOAD < lastDB.DOWNLOAD) Or (thisDB.DOWNLOAD = 0 And lastDB.DOWNLOAD = 0)) And
               ((thisDB.UPLOAD < lastDB.UPLOAD) Or (thisDB.UPLOAD = 0 And lastDB.UPLOAD = 0)) And
@@ -693,7 +693,7 @@ Public NotInheritable Class frmHistory
       MsgDlg(Me, "Your history has been exported to " & IO.Path.GetFileName(cdlSave.FileName) & ".", "The data was successfully exported.", "Database Exported", MessageBoxButtons.OK, _TaskDialogIcon.ResourceMonitor, MessageBoxIcon.Information)
     End If
   End Sub
-  Private Sub usageTmp_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageTmp.ProgressState
+  Private Sub usageTmp_ProgressState(sender As Object, e As RestrictionLibrary.DataBaseProgressEventArgs) Handles usageTmp.ProgressState
     If fDB IsNot Nothing AndAlso fDB.Visible Then fDB.SetProgress(e.Value, e.Total)
   End Sub
   Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click

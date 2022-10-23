@@ -1,6 +1,6 @@
 ﻿Friend Class Settings
   Private m_Account As String
-  Private m_AccountType As localRestrictionTracker.SatHostTypes
+  Private m_AccountType As Local.SatHostTypes
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
@@ -13,7 +13,7 @@
       xConfig = XElement.Load(ConfigPath)
     Catch ex As Exception
       m_Account = String.Empty
-      m_AccountType = localRestrictionTracker.SatHostTypes.Other
+      m_AccountType = Local.SatHostTypes.Other
       m_PassCrypt = String.Empty
       m_PassKey = ""
       m_PassSalt = ""
@@ -27,7 +27,7 @@
     Dim xAccount As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Account")
     If xAccount Is Nothing Then
       m_Account = String.Empty
-      m_AccountType = localRestrictionTracker.SatHostTypes.Other
+      m_AccountType = Local.SatHostTypes.Other
     Else
       Try
         m_Account = xAccount.Element("value").Value
@@ -37,12 +37,12 @@
       Try
         Dim xAccountType As XAttribute = Array.Find(xAccount.Attributes.ToArray, Function(xSetting As XAttribute) xSetting.Name.ToString = "type")
         If xAccountType Is Nothing Then
-          m_AccountType = localRestrictionTracker.SatHostTypes.Other
+          m_AccountType = Local.SatHostTypes.Other
         Else
           m_AccountType = StringToHostType(xAccountType.Value)
         End If
       Catch ex As Exception
-        m_AccountType = localRestrictionTracker.SatHostTypes.Other
+        m_AccountType = Local.SatHostTypes.Other
       End Try
     End If
     Dim xPassCrypt As XElement = Array.Find(xwbMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
@@ -111,11 +111,11 @@
       Return m_Account
     End Get
   End Property
-  Public Property AccountType As localRestrictionTracker.SatHostTypes
+  Public Property AccountType As Local.SatHostTypes
     Get
       Return m_AccountType
     End Get
-    Set(value As localRestrictionTracker.SatHostTypes)
+    Set(value As Local.SatHostTypes)
       m_AccountType = value
     End Set
   End Property
@@ -191,19 +191,19 @@
       End If
     End Get
   End Property
-  Private Shared Function StringToHostType(st As String) As localRestrictionTracker.SatHostTypes
+  Private Shared Function StringToHostType(st As String) As Local.SatHostTypes
     Select Case st.ToUpperInvariant
-      Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
-      Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-      Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
-      Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DISH", "DISHNET" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
-      Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case Else : Return localRestrictionTracker.SatHostTypes.Other
+      Case "WBL" : Return Local.SatHostTypes.WildBlue_LEGACY
+      Case "WBX", "WBV" : Return Local.SatHostTypes.WildBlue_EXEDE
+      Case "WXR" : Return Local.SatHostTypes.WildBlue_EXEDE_RESELLER
+      Case "RPL" : Return Local.SatHostTypes.RuralPortal_LEGACY
+      Case "RPX" : Return Local.SatHostTypes.RuralPortal_EXEDE
+      Case "DNX" : Return Local.SatHostTypes.Dish_EXEDE
+      Case "WILDBLUE" : Return Local.SatHostTypes.WildBlue_LEGACY
+      Case "EXEDE" : Return Local.SatHostTypes.WildBlue_EXEDE
+      Case "DISH", "DISHNET" : Return Local.SatHostTypes.Dish_EXEDE
+      Case "RURALPORTAL" : Return Local.SatHostTypes.RuralPortal_EXEDE
+      Case Else : Return Local.SatHostTypes.Other
     End Select
   End Function
 End Class

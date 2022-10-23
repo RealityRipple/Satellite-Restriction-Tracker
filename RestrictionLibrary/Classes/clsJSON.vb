@@ -1,72 +1,72 @@
-﻿Public NotInheritable Class JSONReader
-  Public Enum ElementType
-    None
-    Group
-    Array
-    KeyValue
-    [String]
-  End Enum
-  Public Structure JSElement
-    Private mType As ElementType
-    Private mSubElements As ObjectModel.ReadOnlyCollection(Of JSElement)
-    Private mCollection As ObjectModel.ReadOnlyCollection(Of JSElement)
-    Private mKey As String
-    Private mValue As String
-    Public Sub New(sMsg As String)
-      mType = ElementType.String
-      mKey = sMsg
-      mValue = sMsg
-    End Sub
-    Public Sub New(sKey As String, sValue As String)
-      mType = ElementType.KeyValue
-      mKey = sKey
-      mValue = sValue
-    End Sub
-    Public Sub New(sKey As String, lSubElements As ObjectModel.ReadOnlyCollection(Of JSElement))
-      mType = ElementType.Group
-      mKey = sKey
-      mSubElements = lSubElements
-    End Sub
-    Public Sub New(lCollection As ObjectModel.ReadOnlyCollection(Of JSElement))
-      mType = ElementType.Array
-      mCollection = lCollection
-    End Sub
-    Public Shared ReadOnly Property Empty As JSElement
-      Get
-        Return New JSElement(ElementType.None)
-      End Get
-    End Property
-
-    Public ReadOnly Property Type As ElementType
-      Get
-        Return mType
-      End Get
-    End Property
-    Public ReadOnly Property SubElements As ObjectModel.ReadOnlyCollection(Of JSElement)
-      Get
-        Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mSubElements)
-      End Get
-    End Property
-    Public ReadOnly Property Collection As ObjectModel.ReadOnlyCollection(Of JSElement)
-      Get
-        Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mCollection)
-      End Get
-    End Property
-    Public ReadOnly Property Key As String
-      Get
-        Return mKey
-      End Get
-    End Property
-    Public ReadOnly Property Value As String
-      Get
-        Return mValue
-      End Get
-    End Property
-  End Structure
-  Private mSerial As List(Of JSElement)
-  Public ReadOnly Property Serial As ObjectModel.ReadOnlyCollection(Of JSElement)
+﻿Public Enum JSONElementType
+  None
+  Group
+  Array
+  KeyValue
+  [String]
+End Enum
+Public Structure JSONElement
+  Private mType As JSONElementType
+  Private mSubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
+  Private mCollection As ObjectModel.ReadOnlyCollection(Of JSONElement)
+  Private mKey As String
+  Private mValue As String
+  Public Sub New(sMsg As String)
+    mType = JSONElementType.String
+    mKey = sMsg
+    mValue = sMsg
+  End Sub
+  Public Sub New(sKey As String, sValue As String)
+    mType = JSONElementType.KeyValue
+    mKey = sKey
+    mValue = sValue
+  End Sub
+  Public Sub New(sKey As String, lSubElements As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    mType = JSONElementType.Group
+    mKey = sKey
+    mSubElements = lSubElements
+  End Sub
+  Public Sub New(lCollection As ObjectModel.ReadOnlyCollection(Of JSONElement))
+    mType = JSONElementType.Array
+    mCollection = lCollection
+  End Sub
+  Public Shared ReadOnly Property Empty As JSONElement
     Get
-      Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mSerial)
+      Return New JSONElement(JSONElementType.None)
+    End Get
+  End Property
+
+  Public ReadOnly Property Type As JSONElementType
+    Get
+      Return mType
+    End Get
+  End Property
+  Public ReadOnly Property SubElements As ObjectModel.ReadOnlyCollection(Of JSONElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mSubElements)
+    End Get
+  End Property
+  Public ReadOnly Property Collection As ObjectModel.ReadOnlyCollection(Of JSONElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mCollection)
+    End Get
+  End Property
+  Public ReadOnly Property Key As String
+    Get
+      Return mKey
+    End Get
+  End Property
+  Public ReadOnly Property Value As String
+    Get
+      Return mValue
+    End Get
+  End Property
+End Structure
+Public NotInheritable Class JSONReader
+  Private mSerial As List(Of JSONElement)
+  Public ReadOnly Property Serial As ObjectModel.ReadOnlyCollection(Of JSONElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSONElement)(mSerial)
     End Get
   End Property
   Private enc As System.Text.Encoding
@@ -75,7 +75,6 @@
       Return enc
     End Get
   End Property
-
   Public Sub New(stream As IO.Stream, ExpectUTF8 As Boolean)
     enc = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     Dim bom0 As Integer = stream.ReadByte
@@ -99,9 +98,9 @@
       stream.Seek(0, IO.SeekOrigin.Begin)
       If ExpectUTF8 Then enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
     End If
-    mSerial = New List(Of JSElement)
-    Dim workElement As JSElement = ReadElement(stream, TextEncoding)
-    Do Until workElement.Type = ElementType.None
+    mSerial = New List(Of JSONElement)
+    Dim workElement As JSONElement = ReadElement(stream, TextEncoding)
+    Do Until workElement.Type = JSONElementType.None
       mSerial.Add(workElement)
       workElement = Nothing
       workElement = ReadElement(stream, TextEncoding)
@@ -181,24 +180,24 @@
         Return ChrW(b)
     End Select
   End Function
-  Public Shared Function ReadElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSElement
-    If Not stream.CanRead Then Return JSElement.Empty
+  Public Shared Function ReadElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSONElement
+    If Not stream.CanRead Then Return JSONElement.Empty
     Dim myKey As String = Nothing
     Dim sRead As String = ReadCharacter(stream, streamEncoding)
     Do Until String.IsNullOrEmpty(sRead)
       If sRead = "{" Or sRead = "[" Then
-        Dim workElement As JSElement = ReadElement(stream, streamEncoding)
-        Dim myList As New List(Of JSElement)
-        Do Until workElement.Type = ElementType.None
+        Dim workElement As JSONElement = ReadElement(stream, streamEncoding)
+        Dim myList As New List(Of JSONElement)
+        Do Until workElement.Type = JSONElementType.None
           myList.Add(workElement)
           workElement = Nothing
           If Not stream.CanRead Then Exit Do
           workElement = ReadElement(stream, streamEncoding)
         Loop
-        If sRead = "[" Then Return New JSElement(New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
-        Return New JSElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
+        If sRead = "[" Then Return New JSONElement(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+        Return New JSONElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
       End If
-      If sRead = "}" Or sRead = "]" Then Return JSElement.Empty
+      If sRead = "}" Or sRead = "]" Then Return JSONElement.Empty
       If Not sRead = """" Then
         If Not stream.CanRead Then Exit Do
         sRead = ReadCharacter(stream, streamEncoding)
@@ -219,11 +218,11 @@
           sKey &= sText
           escape = False
         End If
-        If Not stream.CanRead Then Return JSElement.Empty
+        If Not stream.CanRead Then Return JSONElement.Empty
         sText = ReadCharacter(stream, streamEncoding)
       Loop
       myKey = sKey
-      If Not stream.CanRead Then Return JSElement.Empty
+      If Not stream.CanRead Then Return JSONElement.Empty
       Dim sSplit As String = ReadCharacter(stream, streamEncoding)
       Do Until String.IsNullOrEmpty(sSplit)
         If Not String.IsNullOrEmpty(sSplit) Then
@@ -241,7 +240,7 @@
       Loop
       If Not sSplit = ":" Then
         stream.Seek(-1, IO.SeekOrigin.Current)
-        Return New JSElement(myKey)
+        Return New JSONElement(myKey)
       End If
       Dim sNext As String = ReadCharacter(stream, streamEncoding)
       Do Until String.IsNullOrEmpty(sNext)
@@ -258,16 +257,16 @@
         sNext = ReadCharacter(stream, streamEncoding)
       Loop
       If sNext = "{" Or sNext = "[" Then
-        Dim myList As New List(Of JSElement)
-        Dim workElement As JSElement = ReadElement(stream, streamEncoding)
-        Do Until workElement.Type = ElementType.None
+        Dim myList As New List(Of JSONElement)
+        Dim workElement As JSONElement = ReadElement(stream, streamEncoding)
+        Do Until workElement.Type = JSONElementType.None
           myList.Add(workElement)
           workElement = Nothing
           If Not stream.CanRead Then Exit Do
           workElement = ReadElement(stream, streamEncoding)
         Loop
-        If sNext = "[" Then Return New JSElement(New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
-        Return New JSElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
+        If sNext = "[" Then Return New JSONElement(New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
+        Return New JSONElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSONElement)(myList))
       End If
       Dim sVal As String = Nothing
       If sNext.ToUpperInvariant = "T" Then
@@ -279,10 +278,10 @@
           Else
             sVal &= sText
           End If
-          If Not stream.CanRead Then Return JSElement.Empty
+          If Not stream.CanRead Then Return JSONElement.Empty
           sText = ReadCharacter(stream, streamEncoding)
         Loop
-        Return New JSElement(myKey, sVal)
+        Return New JSONElement(myKey, sVal)
       End If
       If sNext.ToUpperInvariant = "F" Then
         sText = sNext
@@ -293,10 +292,10 @@
           Else
             sVal &= sText
           End If
-          If Not stream.CanRead Then Return JSElement.Empty
+          If Not stream.CanRead Then Return JSONElement.Empty
           sText = ReadCharacter(stream, streamEncoding)
         Loop
-        Return New JSElement(myKey, sVal)
+        Return New JSONElement(myKey, sVal)
       End If
       If sNext.ToUpperInvariant = "N" Then
         sText = sNext
@@ -307,10 +306,10 @@
           Else
             sVal &= sText
           End If
-          If Not stream.CanRead Then Return JSElement.Empty
+          If Not stream.CanRead Then Return JSONElement.Empty
           sText = ReadCharacter(stream, streamEncoding)
         Loop
-        Return New JSElement(myKey, sVal)
+        Return New JSONElement(myKey, sVal)
       End If
       If IsNumeric(sNext) Or sNext = "-" Then
         sText = sNext
@@ -321,10 +320,10 @@
           Else
             sVal &= sText
           End If
-          If Not stream.CanRead Then Return JSElement.Empty
+          If Not stream.CanRead Then Return JSONElement.Empty
           sText = ReadCharacter(stream, streamEncoding)
         Loop
-        Return New JSElement(myKey, sVal)
+        Return New JSONElement(myKey, sVal)
       End If
       sText = ReadCharacter(stream, streamEncoding)
       escape = False
@@ -340,36 +339,36 @@
           sVal &= sText
           escape = False
         End If
-        If Not stream.CanRead Then Return JSElement.Empty
+        If Not stream.CanRead Then Return JSONElement.Empty
         sText = ReadCharacter(stream, streamEncoding)
       Loop
-      Return New JSElement(myKey, sVal)
+      Return New JSONElement(myKey, sVal)
     Loop
-    Return JSElement.Empty
+    Return JSONElement.Empty
   End Function
 End Class
 
 Friend NotInheritable Class JSONAssociator
   Private Sub New()
   End Sub
-  Private Shared Function MakeAssoc(jsIn As JSONReader.JSElement) As Object
+  Private Shared Function MakeAssoc(jsIn As JSONElement) As Object
     Select Case jsIn.Type
-      Case JSONReader.ElementType.None
+      Case JSONElementType.None
         Return Nothing
-      Case JSONReader.ElementType.String
+      Case JSONElementType.String
         Return jsIn.Value
-      Case JSONReader.ElementType.KeyValue
+      Case JSONElementType.KeyValue
         Return jsIn.Value
-      Case JSONReader.ElementType.Array
+      Case JSONElementType.Array
         Dim dArr As New List(Of Object)
         For I As Integer = 0 To jsIn.Collection.Count - 1
           Dim assocList As Object = MakeAssoc(jsIn.Collection(I))
           dArr.Add(assocList)
         Next
         Return dArr.ToArray
-      Case JSONReader.ElementType.Group
+      Case JSONElementType.Group
         Dim dGrp As New Dictionary(Of String, Object)
-        For Each gEnt As JSONReader.JSElement In jsIn.SubElements
+        For Each gEnt As JSONElement In jsIn.SubElements
           Dim grpList As Object = MakeAssoc(gEnt)
           dGrp.Add(gEnt.Key, grpList)
         Next
@@ -380,7 +379,7 @@ Friend NotInheritable Class JSONAssociator
   Public Shared Function Associate(jsIn As JSONReader, Optional index As Integer = 0) As Object
     If index < 0 Then Return Nothing
     If index > jsIn.Serial.Count - 1 Then Return Nothing
-    Dim jEl As JSONReader.JSElement = jsIn.Serial(index)
+    Dim jEl As JSONElement = jsIn.Serial(index)
     Return MakeAssoc(jEl)
   End Function
   Public Shared Function MakeString(dIn As Dictionary(Of String, Object)) As String

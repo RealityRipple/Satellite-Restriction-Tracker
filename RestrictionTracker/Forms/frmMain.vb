@@ -1,5 +1,5 @@
 ﻿Public NotInheritable Class frmMain
-  Private myPanel As localRestrictionTracker.SatHostTypes
+  Private myPanel As Local.SatHostTypes
   Private Enum LoadStates
     Loading
     Loaded
@@ -9,8 +9,8 @@
   Private Delegate Sub ParamaterizedInvoker2(parameter As Object, secondParam As Object)
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
-  Private WithEvents remoteData As remoteRestrictionTracker
-  Private WithEvents localData As localRestrictionTracker
+  Private WithEvents remoteData As Remote.ServiceConnection
+  Private WithEvents localData As Local.SiteConnection
 #Region "Constants"
   Private Const sWB As String = "https://myaccount.{0}/wbisp/{2}/{1}.jsp"
   Private Const sRP As String = "https://{0}.ruralportal.net/us/{1}.do"
@@ -62,7 +62,7 @@
   End Property
 #Region "Server Type Determination"
   Private Class DetermineTypeOffline
-    Public Delegate Sub TypeDeterminedOfflineCallback(HostType As localRestrictionTracker.SatHostTypes)
+    Public Delegate Sub TypeDeterminedOfflineCallback(HostType As Local.SatHostTypes)
     Private c_callback As TypeDeterminedOfflineCallback
     Public Sub New(callback As TypeDeterminedOfflineCallback)
       c_callback = callback
@@ -74,11 +74,11 @@
     Private Delegate Sub BeginTestInvoker(Provider As String)
     Private Sub BeginTest(Provider As String)
       If Provider.ToUpperInvariant = "MYDISH.COM" Or Provider.ToUpperInvariant = "DISH.COM" Or Provider.ToUpperInvariant = "DISH.NET" Then
-        c_callback.Invoke(localRestrictionTracker.SatHostTypes.Dish_EXEDE)
+        c_callback.Invoke(Local.SatHostTypes.Dish_EXEDE)
       ElseIf Provider.ToUpperInvariant = "EXEDE.COM" Or Provider.ToUpperInvariant = "EXEDE.NET" Then
-        c_callback.Invoke(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
+        c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
       ElseIf Provider.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-        c_callback.Invoke(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER)
+        c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE_RESELLER)
       Else
         OfflineCheck()
       End If
@@ -126,19 +126,19 @@
       Dim rpP, exP, wbP As Single
       OfflineStats(rpP, exP, wbP)
       If rpP = 0 And exP = 0 And wbP = 0 Then
-        c_callback.Invoke(localRestrictionTracker.SatHostTypes.Other)
+        c_callback.Invoke(Local.SatHostTypes.Other)
       Else
         If rpP > exP And rpP > wbP Then
-          c_callback.Invoke(localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE)
+          c_callback.Invoke(Local.SatHostTypes.RuralPortal_EXEDE)
         ElseIf exP > rpP And exP > wbP Then
-          c_callback.Invoke(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
+          c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
         ElseIf wbP > rpP And wbP > exP Then
-          c_callback.Invoke(localRestrictionTracker.SatHostTypes.WildBlue_LEGACY)
+          c_callback.Invoke(Local.SatHostTypes.WildBlue_LEGACY)
         Else
           If rpP > wbP And exP > wbP And rpP = exP Then
-            c_callback.Invoke(localRestrictionTracker.SatHostTypes.WildBlue_EXEDE)
+            c_callback.Invoke(Local.SatHostTypes.WildBlue_EXEDE)
           Else
-            c_callback.Invoke(localRestrictionTracker.SatHostTypes.Other)
+            c_callback.Invoke(Local.SatHostTypes.Other)
             'TODO: Handle unknown host type
             Debug.Print("Oh noes! I don't know what type of host this is!")
           End If
@@ -146,30 +146,30 @@
       End If
     End Sub
   End Class
-  Private Sub TypeDetermination_TypeDetermined(HostGroup As DetermineType.SatHostGroup)
+  Private Sub TypeDetermination_TypeDetermined(HostGroup As Local.SatHostGroup)
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New DetermineType.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
+        Me.Invoke(New Local.TypeDeterminedCallback(AddressOf TypeDetermination_TypeDetermined), HostGroup)
       Catch ex As Exception
       End Try
       Return
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    If HostGroup = DetermineType.SatHostGroup.Other Then
+    If HostGroup = Local.SatHostGroup.Other Then
       iconStop = True
       Dim TypeDeterminationOffline As New DetermineTypeOffline(AddressOf TypeDeterminationOffline_TypeDetermined)
       TypeDeterminationOffline.Start(sProvider)
     Else
-      If HostGroup = DetermineType.SatHostGroup.Dish Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
-      ElseIf HostGroup = DetermineType.SatHostGroup.WildBlue Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      ElseIf HostGroup = DetermineType.SatHostGroup.RuralPortal Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      ElseIf HostGroup = DetermineType.SatHostGroup.Exede Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      ElseIf HostGroup = DetermineType.SatHostGroup.ExedeReseller Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
+      If HostGroup = Local.SatHostGroup.Dish Then
+        mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
+      ElseIf HostGroup = Local.SatHostGroup.WildBlue Then
+        mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
+      ElseIf HostGroup = Local.SatHostGroup.RuralPortal Then
+        mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
+      ElseIf HostGroup = Local.SatHostGroup.Exede Then
+        mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
+      ElseIf HostGroup = Local.SatHostGroup.ExedeReseller Then
+        mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
       End If
       ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
       mySettings.Save()
@@ -179,10 +179,10 @@
         localData = Nothing
       End If
       GrabAttempt = 0
-      localData = New localRestrictionTracker(LocalAppDataDirectory)
+      localData = New Local.SiteConnection(LocalAppDataDirectory)
     End If
   End Sub
-  Private Sub TypeDeterminationOffline_TypeDetermined(HostType As localRestrictionTracker.SatHostTypes)
+  Private Sub TypeDeterminationOffline_TypeDetermined(HostType As Local.SatHostTypes)
     If Me.InvokeRequired Then
       Try
         Me.Invoke(New DetermineTypeOffline.TypeDeterminedOfflineCallback(AddressOf TypeDeterminationOffline_TypeDetermined), HostType)
@@ -191,7 +191,7 @@
       Return
     End If
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    If HostType = localRestrictionTracker.SatHostTypes.Other Then
+    If HostType = Local.SatHostTypes.Other Then
       iconStop = True
       DisplayUsage(False, True)
       SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please connect to the Internet.", True)
@@ -205,7 +205,7 @@
         localData = Nothing
       End If
       GrabAttempt = 0
-      localData = New localRestrictionTracker(LocalAppDataDirectory)
+      localData = New Local.SiteConnection(LocalAppDataDirectory)
     End If
   End Sub
 #End Region
@@ -446,13 +446,13 @@
       pnlDetails.Font = Me.Font
     End If
     ResizePanels()
-    If myPanel = localRestrictionTracker.SatHostTypes.Other Then
+    If myPanel = Local.SatHostTypes.Other Then
       lblRRS.Font = pnlDetails.Font
       lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
     End If
     If myState = LoadStates.Loaded Then
       If Me.WindowState = FormWindowState.Normal Then mySettings.MainSize = Me.Size
-    ElseIf Not myPanel = localRestrictionTracker.SatHostTypes.Other Then
+    ElseIf Not myPanel = Local.SatHostTypes.Other Then
       lblRRS.Font = pnlDetails.Font
       lblNothing.Font = New Font(Me.Font.FontFamily, pnlDetails.Font.Size * 2.5, Me.Font.Style, Me.Font.Unit, Me.Font.GdiCharSet, Me.Font.GdiVerticalFont)
     End If
@@ -484,7 +484,7 @@
   End Sub
   Private Sub ResizePanels()
     Dim trayIcoVal As Icon = Nothing
-    If myPanel = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY Or myPanel = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY Or myPanel = localRestrictionTracker.SatHostTypes.Dish_EXEDE Then
+    If myPanel = Local.SatHostTypes.WildBlue_LEGACY Or myPanel = Local.SatHostTypes.RuralPortal_LEGACY Or myPanel = Local.SatHostTypes.Dish_EXEDE Then
       If typeA_dlim = 0 And typeA_ulim = 0 Then
         pctTypeADld.Image = DisplayProgress(pctTypeADld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, 0, 0, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
@@ -494,7 +494,7 @@
         pctTypeAUld.Image = DisplayProgress(pctTypeAUld.DisplayRectangle.Size, typeA_up, typeA_ulim, mySettings.Accuracy, mySettings.Colors.MainUpA, mySettings.Colors.MainUpB, mySettings.Colors.MainUpC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = CreateTypeATrayIcon(typeA_down, typeA_dlim, typeA_up, typeA_ulim)
       End If
-    ElseIf myPanel = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE Or myPanel = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE Or myPanel = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then
+    ElseIf myPanel = Local.SatHostTypes.RuralPortal_EXEDE Or myPanel = Local.SatHostTypes.WildBlue_EXEDE Or myPanel = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
       If typeB_lim = 0 Then
         pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, 0, 1, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = MakeIcon(IconName.norm)
@@ -502,7 +502,7 @@
         pctTypeB.Image = DisplayRProgress(pctTypeB.DisplayRectangle.Size, typeB_used, typeB_lim, mySettings.Accuracy, mySettings.Colors.MainDownA, mySettings.Colors.MainDownB, mySettings.Colors.MainDownC, mySettings.Colors.MainText, mySettings.Colors.MainBackground)
         trayIcoVal = CreateTypeBTrayIcon(typeB_used, typeB_lim)
       End If
-    ElseIf myPanel = localRestrictionTracker.SatHostTypes.Other Then
+    ElseIf myPanel = Local.SatHostTypes.Other Then
       lblNothing.Text = My.Application.Info.ProductName
       lblRRS.Text = "by " & Application.CompanyName
       ttUI.SetToolTip(lblRRS, "Visit realityripple.com.")
@@ -782,12 +782,12 @@
     SetStatusText("Loading History", "Reading usage history into memory...", False)
     LOG_Initialize(sAccount, False)
     If ClosingTime Then Return
-    If mySettings.AccountType = localRestrictionTracker.SatHostTypes.Other Then
+    If mySettings.AccountType = Local.SatHostTypes.Other Then
       If mySettings.AccountTypeForced Then
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
       Else
         SetStatusText("Analyzing Account", "Determining your account type...", False)
-        Dim TypeDetermination As New DetermineType(AddressOf TypeDetermination_TypeDetermined)
+        Dim TypeDetermination As New Local.DetermineType(AddressOf TypeDetermination_TypeDetermined)
         TypeDetermination.Start(sProvider, mySettings.Timeout, mySettings.Proxy)
       End If
     Else
@@ -852,9 +852,9 @@
                 NextGrabTick = Long.MaxValue
                 PauseActivity = "Preparing Connection"
                 EnableProgressIcon()
-                If Not CheckedAJAX And mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then
+                If Not CheckedAJAX And mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
                   SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
-                  Dim AJAXUpdate As New UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
+                  Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
                   AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage")
                 Else
                   SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing Connection...", False)
@@ -895,7 +895,7 @@
             localData = Nothing
           End If
           GrabAttempt = 0
-          localData = New localRestrictionTracker(LocalAppDataDirectory)
+          localData = New Local.SiteConnection(LocalAppDataDirectory)
         End If
       Else
         If remoteData IsNot Nothing Then
@@ -933,7 +933,7 @@
     Dim fromDate = mySettings.LastSyncTime
     If My.Computer.Keyboard.CtrlKeyDown Then fromDate = New Date(2000, 1, 1)
     If LOG_GetCount() = 0 Then fromDate = New Date(2000, 1, 1)
-    remoteData = New remoteRestrictionTracker(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, LocalAppDataDirectory)
+    remoteData = New Remote.ServiceConnection(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, LocalAppDataDirectory)
   End Sub
   Private Sub DisplayUsage(bStatusText As Boolean, bHardTime As Boolean)
     If Me.InvokeRequired Then
@@ -978,10 +978,10 @@
   End Sub
 #End Region
 #Region "Local Usage Events"
-  Private Sub localData_ConnectionStatus(sender As Object, e As localRestrictionTracker.ConnectionStatusEventArgs) Handles localData.ConnectionStatus
+  Private Sub localData_ConnectionStatus(sender As Object, e As Local.SiteConnectionStatusEventArgs) Handles localData.ConnectionStatus
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.ConnectionStatusEventArgs)(AddressOf localData_ConnectionStatus), sender, e)
+        Me.Invoke(New EventHandler(Of Local.SiteConnectionStatusEventArgs)(AddressOf localData_ConnectionStatus), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -998,46 +998,46 @@
       sAppend = " (Stage " & (e.Stage + 1) & ")"
     End If
     Select Case e.Status
-      Case localRestrictionTracker.ConnectionStates.Initialize : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Initializing Connection" & sAppend & "...", False)
-      Case localRestrictionTracker.ConnectionStates.Prepare : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing to Log In" & sAppend & "...", False)
-      Case localRestrictionTracker.ConnectionStates.Login
+      Case Local.SiteConnectionStates.Initialize : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Initializing Connection" & sAppend & "...", False)
+      Case Local.SiteConnectionStates.Prepare : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Preparing to Log In" & sAppend & "...", False)
+      Case Local.SiteConnectionStates.Login
         Select Case e.SubState
-          Case localRestrictionTracker.ConnectionSubStates.ReadLogin : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Login Page" & sAppend & "...", False)
-          Case localRestrictionTracker.ConnectionSubStates.Authenticate : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Authenticating" & sAppend & "...", False)
-          Case localRestrictionTracker.ConnectionSubStates.Verify : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Verifying" & sAppend & "...", False)
+          Case Local.SiteConnectionSubStates.ReadLogin : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Login Page" & sAppend & "...", False)
+          Case Local.SiteConnectionSubStates.Authenticate : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Authenticating" & sAppend & "...", False)
+          Case Local.SiteConnectionSubStates.Verify : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Verifying" & sAppend & "...", False)
           Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Logging In" & sAppend & "...", False)
         End Select
-      Case localRestrictionTracker.ConnectionStates.TableDownload
+      Case Local.SiteConnectionStates.TableDownload
         Select Case e.SubState
-          Case localRestrictionTracker.ConnectionSubStates.LoadHome : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Home Page" & sAppend & "...", False)
-          Case localRestrictionTracker.ConnectionSubStates.LoadAJAX
+          Case Local.SiteConnectionSubStates.LoadHome : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Home Page" & sAppend & "...", False)
+          Case Local.SiteConnectionSubStates.LoadAJAX
             If e.Attempt = 0 Then
               SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXFirstTryRequests & ")...", False)
             Else
               SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading AJAX Data (" & e.Stage & " of " & localData.ExedeResellerAJAXSecondTryRequests & ")...", False)
             End If
-          Case localRestrictionTracker.ConnectionSubStates.LoadTable : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
+          Case Local.SiteConnectionSubStates.LoadTable : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
           Case Else : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Downloading Usage Table" & sAppend & "...", False)
         End Select
-      Case localRestrictionTracker.ConnectionStates.TableRead : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Usage Table" & sAppend & "...", False)
+      Case Local.SiteConnectionStates.TableRead : SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Reading Usage Table" & sAppend & "...", False)
     End Select
   End Sub
-  Private Sub localData_ConnectionFailure(sender As Object, e As localRestrictionTracker.ConnectionFailureEventArgs) Handles localData.ConnectionFailure
+  Private Sub localData_ConnectionFailure(sender As Object, e As Local.SiteConnectionFailureEventArgs) Handles localData.ConnectionFailure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.ConnectionFailureEventArgs)(AddressOf localData_ConnectionFailure), sender, e)
+        Me.Invoke(New EventHandler(Of Local.SiteConnectionFailureEventArgs)(AddressOf localData_ConnectionFailure), sender, e)
       Catch ex As Exception
       End Try
       Return
     End If
     Select Case e.Type
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.LoginIssue
+      Case Local.SiteConnectionFailureType.LoginIssue
         GrabAttempt = 0
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail, True)
         DisplayUsage(False, False)
         Return
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.ConnectionTimeout
+      Case Local.SiteConnectionFailureType.ConnectionTimeout
         If GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
           Dim sMessage As String = "Connection Timed Out! Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
@@ -1052,12 +1052,12 @@
             Threading.Thread.Sleep(1)
             Threading.Thread.Sleep(0)
           Loop
-          localData = New localRestrictionTracker(LocalAppDataDirectory)
+          localData = New Local.SiteConnection(LocalAppDataDirectory)
           Return
         End If
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Connection Timed Out!", True)
         DisplayUsage(False, False)
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.TLSTooOld
+      Case Local.SiteConnectionFailureType.TLSTooOld
         GrabAttempt = 0
         If mySettings.TLSProxy Then
           SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enable TLS 1.1 or 1.2 under Security Protocol in the Network tab of the Config window to connect.", True)
@@ -1079,7 +1079,7 @@
             End If
           End If
         End If
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.LoginFailure
+      Case Local.SiteConnectionFailureType.LoginFailure
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         If e.Message.EndsWith("Please try again.") And GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
@@ -1095,7 +1095,7 @@
             Threading.Thread.Sleep(1)
             Threading.Thread.Sleep(0)
           Loop
-          localData = New localRestrictionTracker(LocalAppDataDirectory)
+          localData = New Local.SiteConnection(LocalAppDataDirectory)
           Return
         End If
         If (e.Message = "AJAX failed to yield data table." Or e.Message = "Can't determine AJAX order.") And GrabAttempt < 1 Then
@@ -1106,32 +1106,32 @@
           End If
           Dim sMessage As String = e.Message & " Attempting to Update AJAX Lists..."
           SetStatusText(srlFunctions.TimeToString(LOG_GetLast), sMessage, False)
-          Dim AJAXUpdate As New UpdateAJAXLists(AddressOf UpdateAJAXLists_ListUpdated)
+          Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_ListUpdated)
           AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, GrabAttempt)
           Return
         End If
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         DisplayUsage(False, True)
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.FatalLoginFailure
+      Case Local.SiteConnectionFailureType.FatalLoginFailure
         GrabAttempt = 0
-        If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.Other
+        If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.Other
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
         If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         DisplayUsage(False, False)
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountDetails
+      Case Local.SiteConnectionFailureType.UnknownAccountDetails
         GrabAttempt = 0
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Please enter your account details in the Config window.", True)
         DisplayUsage(False, False)
         RestoreWindow()
         cmdConfig.Focus()
         MsgDlg(Me, "Please enter your account details in the Config window by clicking Configuration.", "You haven't entered your account details.", "Account Details Required", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Case localRestrictionTracker.ConnectionFailureEventArgs.FailureType.UnknownAccountType
+      Case Local.SiteConnectionFailureType.UnknownAccountType
         GrabAttempt = 0
         If mySettings.AccountTypeForced Then
           SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Unknown Account Type.", True)
         Else
           SetStatusText("Analyzing Account", "Determining your account type...", False)
-          Dim TypeDetermination As New DetermineType(AddressOf TypeDetermination_TypeDetermined)
+          Dim TypeDetermination As New Local.DetermineType(AddressOf TypeDetermination_TypeDetermined)
           TypeDetermination.Start(sProvider, mySettings.Timeout, mySettings.Proxy)
         End If
     End Select
@@ -1140,10 +1140,10 @@
       localData = Nothing
     End If
   End Sub
-  Private Sub localData_ConnectionDNXResult(sender As Object, e As localRestrictionTracker.TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
+  Private Sub localData_ConnectionDNXResult(sender As Object, e As Local.TYPEA2ResultEventArgs) Handles localData.ConnectionDNXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEA2ResultEventArgs)(AddressOf localData_ConnectionDNXResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEA2ResultEventArgs)(AddressOf localData_ConnectionDNXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1152,8 +1152,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.AnyTime, e.AnyTimeLimit, e.OffPeak, e.OffPeakLimit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.Dish_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
+    myPanel = Local.SatHostTypes.Dish_EXEDE
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1166,10 +1166,10 @@
     Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
     hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionRPXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
+  Private Sub localData_ConnectionRPXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionRPXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEBResultEventArgs)(AddressOf localData_ConnectionRPXResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionRPXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1178,8 +1178,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+    myPanel = Local.SatHostTypes.RuralPortal_EXEDE
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1192,10 +1192,10 @@
     Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
     hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionRPLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
+  Private Sub localData_ConnectionRPLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles localData.ConnectionRPLResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEAResultEventArgs)(AddressOf localData_ConnectionRPLResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEAResultEventArgs)(AddressOf localData_ConnectionRPLResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1204,8 +1204,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+    myPanel = Local.SatHostTypes.RuralPortal_LEGACY
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.RuralPortal_LEGACY
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1218,10 +1218,10 @@
     Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
     hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionWBLResult(sender As Object, e As localRestrictionTracker.TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
+  Private Sub localData_ConnectionWBLResult(sender As Object, e As Local.TYPEAResultEventArgs) Handles localData.ConnectionWBLResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEAResultEventArgs)(AddressOf localData_ConnectionWBLResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEAResultEventArgs)(AddressOf localData_ConnectionWBLResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1230,8 +1230,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Download, e.DownloadLimit, e.Upload, e.UploadLimit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+    myPanel = Local.SatHostTypes.WildBlue_LEGACY
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1244,10 +1244,10 @@
     Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
     hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionWBXResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
+  Private Sub localData_ConnectionWBXResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionWBXResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEBResultEventArgs)(AddressOf localData_ConnectionWBXResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionWBXResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1256,8 +1256,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+    myPanel = Local.SatHostTypes.WildBlue_EXEDE
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1270,10 +1270,10 @@
     Dim hostInvoker As New MethodInvoker(AddressOf SaveToHostList)
     hostInvoker.BeginInvoke(Nothing, Nothing)
   End Sub
-  Private Sub localData_ConnectionWXRResult(sender As Object, e As localRestrictionTracker.TYPEBResultEventArgs) Handles localData.ConnectionWXRResult
+  Private Sub localData_ConnectionWXRResult(sender As Object, e As Local.TYPEBResultEventArgs) Handles localData.ConnectionWXRResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of localRestrictionTracker.TYPEBResultEventArgs)(AddressOf localData_ConnectionWXRResult), sender, e)
+        Me.Invoke(New EventHandler(Of Local.TYPEBResultEventArgs)(AddressOf localData_ConnectionWXRResult), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1282,8 +1282,8 @@
     SetStatusText(srlFunctions.TimeToString(e.Update), "Saving History...", False)
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     LOG_Add(e.Update, e.Used, e.Limit, e.Used, e.Limit, True)
-    myPanel = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
-    If Not mySettings.AccountTypeForced Then mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
+    myPanel = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
+    If Not mySettings.AccountTypeForced Then mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
     mySettings.Save()
     ScreenDefaultColors(mySettings.Colors, mySettings.AccountType)
     If e.SlowedDetected Then imSlowed = True
@@ -1319,39 +1319,39 @@
 #End Region
 #End Region
 #Region "Remote Usage Events"
-  Private Sub remoteData_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteData.Failure
+  Private Sub remoteData_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteData.Failure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.FailureEventArgs)(AddressOf remoteData_Failure), sender, e)
+        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteData_Failure), sender, e)
       Catch ex As Exception
       End Try
       Return
     End If
     Dim sErr As String = "There was an error verifying your Product Key."
     Select Case e.Type
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin
+      Case Remote.ServiceFailType.BadLogin
         sErr = "There was a server error. Please try again later."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadPassword
+      Case Remote.ServiceFailType.BadPassword
         sErr = "Your Password is incorrect."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct
+      Case Remote.ServiceFailType.BadProduct
         sErr = "Your Product Key has been disabled."
         mySettings.RemoteKey = String.Empty
         Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
         UsageInvoker.BeginInvoke(Nothing, Nothing)
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer
+      Case Remote.ServiceFailType.BadServer
         sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData
+      Case Remote.ServiceFailType.NoData
         sErr = "There is no usage data." & IIf(String.IsNullOrEmpty(e.Details), "Please wait 15 minutes.", " " & e.Details)
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoPassword
+      Case Remote.ServiceFailType.NoPassword
         sErr = "Your Password has not been Registered on the Remote Service."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername
+      Case Remote.ServiceFailType.NoUsername
         sErr = "Your Account is not Registered for the Remote Service."
         mySettings.RemoteKey = String.Empty
         Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
         UsageInvoker.BeginInvoke(Nothing, Nothing)
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.Network
+      Case Remote.ServiceFailType.Network
         sErr = "Network Connection Error" & IIf(String.IsNullOrEmpty(e.Details), ".", " (" & e.Details & ")")
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
+      Case Remote.ServiceFailType.NotBase64
         sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
     End Select
     If remoteData IsNot Nothing Then
@@ -1372,10 +1372,10 @@
     NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
     SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Account Accessed! Getting Usage...", False)
   End Sub
-  Private Sub remoteData_Success(sender As Object, e As remoteRestrictionTracker.SuccessEventArgs) Handles remoteData.Success
+  Private Sub remoteData_Success(sender As Object, e As Remote.ServiceSuccessEventArgs) Handles remoteData.Success
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.SuccessEventArgs)(AddressOf remoteData_Success), sender, e)
+        Me.Invoke(New EventHandler(Of Remote.ServiceSuccessEventArgs)(AddressOf remoteData_Success), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1395,21 +1395,21 @@
       Dim iInterval As Integer = 1
       Dim iStart As Long = srlFunctions.TickCount()
       ttUI.UseFading = False
-      For I As Integer = 0 To e.Results.Length - 1
-        Dim Row As remoteRestrictionTracker.SuccessEventArgs.Result = e.Results(I)
+      For I As Integer = 0 To e.Results.Count - 1
+        Dim Row As Remote.ServiceResult = e.Results(I)
         If FullCheck Then
-          If Math.Abs(iPercent - Math.Floor((I / (e.Results.Length - 1)) * 100)) >= iInterval Then
-            iPercent = Math.Floor((I / (e.Results.Length - 1)) * 100)
+          If Math.Abs(iPercent - Math.Floor((I / (e.Results.Count - 1)) * 100)) >= iInterval Then
+            iPercent = Math.Floor((I / (e.Results.Count - 1)) * 100)
             SetStatusText(LastTime, "Synchronizing History [" & iPercent & "%]...", False)
             If (iPercent = 4) Then
               Dim iDur As Long = srlFunctions.TickCount() - iStart
               If iDur <= 700 Then iInterval = 2
             End If
           End If
-          LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Length - 1))
+          LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Count - 1))
         Else
           If DateDiff(DateInterval.Minute, LOG_GetLast, Row.Time) > 1 Then
-            LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Length - 1))
+            LOG_Add(Row.Time, Row.Down, Row.DownMax, Row.Up, Row.UpMax, (I = e.Results.Count - 1))
           End If
         End If
       Next
@@ -1777,29 +1777,29 @@
       Dim sLastUpdate As String = lastUpdate.ToString("M/d h:mm tt", Globalization.CultureInfo.InvariantCulture)
       myPanel = mySettings.AccountType
       Select Case mySettings.AccountType
-        Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
-        Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case Local.SatHostTypes.RuralPortal_EXEDE, Local.SatHostTypes.WildBlue_EXEDE, Local.SatHostTypes.WildBlue_EXEDE_RESELLER : DisplayTypeBResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
+        Case Local.SatHostTypes.Dish_EXEDE : DisplayTypeA2Results(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
         Case Else : DisplayTypeAResults(lDown, lDownLim, lUp, lUpLim, sLastUpdate)
       End Select
     Else
       pnlTypeA.Visible = False
       pnlTypeB.Visible = False
       pnlNothing.Visible = True
-      myPanel = localRestrictionTracker.SatHostTypes.Other
+      myPanel = Local.SatHostTypes.Other
       trayIcon.Text = Me.Text
       iconBefore = MakeIcon(IconName.norm)
       iconStop = True
     End If
   End Sub
-  Private Sub DisplayResultAlert(Type As localRestrictionTracker.SatHostTypes, lDown As Long, lUp As Long)
+  Private Sub DisplayResultAlert(Type As Local.SatHostTypes, lDown As Long, lUp As Long)
     If mySettings.Overuse > 0 Then
       If lastBalloon > 0 AndAlso srlFunctions.TickCount() - lastBalloon < mySettings.Overtime * 60 * 1000 Then Return
       Dim TimeCheck As Integer = -mySettings.Overtime
       If TimeCheck <= -15 Then
-        Dim lItems() As DataBase.DataRow = LOG_GetRange(Now.AddMinutes(TimeCheck), Now) ' Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
+        Dim lItems() As DataRow = LOG_GetRange(Now.AddMinutes(TimeCheck), Now) ' Array.FindAll(usageDB.ToArray, Function(satRow As DataBase.DataRow) satRow.DATETIME.CompareTo(Now.AddMinutes(TimeCheck)) >= 0 And satRow.DATETIME.CompareTo(Now) <= 0)
         For I As Integer = lItems.Count - 2 To 0 Step -1
           Select Case Type
-            Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY, localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+            Case Local.SatHostTypes.WildBlue_LEGACY, Local.SatHostTypes.RuralPortal_LEGACY
               If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
@@ -1815,7 +1815,7 @@
                 lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
-            Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER, localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+            Case Local.SatHostTypes.WildBlue_EXEDE, Local.SatHostTypes.WildBlue_EXEDE_RESELLER, Local.SatHostTypes.RuralPortal_EXEDE
               If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
@@ -1824,7 +1824,7 @@
                 lastBalloon = srlFunctions.TickCount()
                 Exit For
               End If
-            Case localRestrictionTracker.SatHostTypes.Dish_EXEDE
+            Case Local.SatHostTypes.Dish_EXEDE
               If lDown - lItems(I).DOWNLOAD >= mySettings.Overuse Then
                 Dim ChangeSize As Long = Math.Abs(lDown - lItems(I).DOWNLOAD)
                 Dim ChangeTime As Long = Math.Abs(DateDiff(DateInterval.Minute, lItems(I).DATETIME, Now) * 60 * 1000)
@@ -1864,9 +1864,9 @@
         If ClosingTime Then Return
         cmdRefresh.Enabled = True
       End If
-      If Not CheckedAJAX And mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER Then
+      If Not CheckedAJAX And mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER Then
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Checking for AJAX List Update...", False)
-        Dim AJAXUpdate As New UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
+        Dim AJAXUpdate As New Local.UpdateAJAXLists(AddressOf UpdateAJAXLists_UpdateChecked)
         AJAXUpdate.Start(sProvider, mySettings.Timeout, mySettings.Proxy, "GetUsage")
       Else
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Beginning Usage Request...", False)
@@ -2458,7 +2458,7 @@
       localData.Dispose()
       localData = Nothing
     End If
-    localData = New localRestrictionTracker(LocalAppDataDirectory)
+    localData = New Local.SiteConnection(LocalAppDataDirectory)
   End Sub
   Private Sub UpdateAJAXLists_UpdateChecked(asyncState As Object, shortList As String, fullList As String)
     CheckedAJAX = True

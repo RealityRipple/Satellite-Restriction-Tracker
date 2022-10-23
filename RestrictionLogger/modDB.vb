@@ -16,14 +16,14 @@
     If Not isLoaded Then Return
     If lDownLim <= 0 Then Return
     If wbDB Is Nothing Then wbDB = New DataBase
-    wbDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    wbDB.Add(New DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
     LOG_Save()
   End Sub
   Public Sub LOG_Get(ByVal lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
     If Not isLoaded Then Return
     If LOG_GetCount() <= lngIndex Then Return
-    Dim dArr() As DataBase.DataRow = wbDB.ToArray()
-    Dim dbRow As DataBase.DataRow = dArr(lngIndex)
+    Dim dArr() As DataRow = wbDB.ToArray()
+    Dim dbRow As DataRow = dArr(lngIndex)
     dtDate = dbRow.DATETIME
     lngDown = dbRow.DOWNLOAD
     lngDownLim = dbRow.DOWNLIM

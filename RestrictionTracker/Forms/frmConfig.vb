@@ -1,5 +1,5 @@
 ﻿Friend NotInheritable Class frmConfig
-  Private WithEvents remoteTest As remoteRestrictionTracker
+  Private WithEvents remoteTest As Remote.ServiceConnection
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
   Private pChecker As Threading.Timer
@@ -36,12 +36,12 @@
       End If
     End If
     Select Case mySettings.AccountType
-      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : optAccountTypeWBX.Checked = True
-      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : optAccountTypeDNX.Checked = True
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
+      Case Local.SatHostTypes.WildBlue_LEGACY : optAccountTypeWBL.Checked = True
+      Case Local.SatHostTypes.WildBlue_EXEDE : optAccountTypeWBX.Checked = True
+      Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : optAccountTypeWBX.Checked = True
+      Case Local.SatHostTypes.Dish_EXEDE : optAccountTypeDNX.Checked = True
+      Case Local.SatHostTypes.RuralPortal_LEGACY : optAccountTypeRPL.Checked = True
+      Case Local.SatHostTypes.RuralPortal_EXEDE : optAccountTypeRPX.Checked = True
     End Select
     chkAccountTypeAuto.Checked = Not mySettings.AccountTypeForced
     txtKey1.ContextMenu = mnuKey
@@ -311,7 +311,7 @@
     Else
       Return
     End If
-    remoteTest = New remoteRestrictionTracker(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
+    remoteTest = New Remote.ServiceConnection(txtAccount.Text & "@" & cmbProvider.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub RunNetworkProtocolTest()
     If pctKeyState.Tag = 1 Then
@@ -1166,10 +1166,10 @@
     End If
     pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
   End Sub
-  Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
+  Private Sub remoteTest_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.FailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
+        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -1181,13 +1181,13 @@
     pctKeyState.Image = My.Resources.ico_err
     Dim sErr As String = "There was an error verifying your key!"
     Select Case e.Type
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!"
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
+      Case Remote.ServiceFailType.BadLogin : sErr = "There was a server error. Please try again later."
+      Case Remote.ServiceFailType.BadProduct : sErr = "Your Product Key is incorrect."
+      Case Remote.ServiceFailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
+      Case Remote.ServiceFailType.NoData : sErr = "The server did not receive login negotiation data!"
+      Case Remote.ServiceFailType.NoUsername : sErr = "Your account is not registered!"
+      Case Remote.ServiceFailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
+      Case Remote.ServiceFailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
     End Select
     If pChecker IsNot Nothing Then
       pChecker.Dispose()
@@ -1440,19 +1440,19 @@
     End If
     If Not chkAccountTypeAuto.Checked Then
       If optAccountTypeWBL.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
+        mySettings.AccountType = Local.SatHostTypes.WildBlue_LEGACY
       ElseIf optAccountTypeWBX.Checked Then
         If cmbProvider.Text.ToUpperInvariant = "SATELLITEINTERNETCO.COM" Then
-          mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
+          mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE_RESELLER
         Else
-          mySettings.AccountType = localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+          mySettings.AccountType = Local.SatHostTypes.WildBlue_EXEDE
         End If
       ElseIf optAccountTypeDNX.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.Dish_EXEDE
+        mySettings.AccountType = Local.SatHostTypes.Dish_EXEDE
       ElseIf optAccountTypeRPL.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+        mySettings.AccountType = Local.SatHostTypes.RuralPortal_LEGACY
       ElseIf optAccountTypeRPX.Checked Then
-        mySettings.AccountType = localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
+        mySettings.AccountType = Local.SatHostTypes.RuralPortal_EXEDE
       End If
       mySettings.AccountTypeForced = True
     Else
@@ -1812,12 +1812,12 @@
     If mySettings.AccountTypeForced = chkAccountTypeAuto.Checked Then Return True
     If Not chkAccountTypeAuto.Checked Then
       Select Case mySettings.AccountType
-        Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : If Not optAccountTypeWBX.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
-        Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True
+        Case Local.SatHostTypes.WildBlue_LEGACY : If Not optAccountTypeWBL.Checked Then Return True
+        Case Local.SatHostTypes.WildBlue_EXEDE : If Not optAccountTypeWBX.Checked Then Return True
+        Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : If Not optAccountTypeWBX.Checked Then Return True
+        Case Local.SatHostTypes.Dish_EXEDE : If Not optAccountTypeDNX.Checked Then Return True
+        Case Local.SatHostTypes.RuralPortal_LEGACY : If Not optAccountTypeRPL.Checked Then Return True
+        Case Local.SatHostTypes.RuralPortal_EXEDE : If Not optAccountTypeRPX.Checked Then Return True
       End Select
     End If
     Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text

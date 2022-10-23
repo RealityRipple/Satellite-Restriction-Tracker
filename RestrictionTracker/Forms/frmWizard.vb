@@ -1,4 +1,4 @@
-﻿Imports RestrictionLibrary.localRestrictionTracker
+﻿Imports RestrictionLibrary.Local
 Imports System.Runtime.InteropServices
 Friend NotInheritable Class frmWizard
   <StructLayout(LayoutKind.Explicit)>
@@ -14,8 +14,8 @@ Friend NotInheritable Class frmWizard
   Private Shared Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
-  Private WithEvents remoteTest As remoteRestrictionTracker
-  Private WithEvents localTest As localRestrictionTracker
+  Private WithEvents remoteTest As Remote.ServiceConnection
+  Private WithEvents localTest As SiteConnection
   Private pChecker As Threading.Timer
   Private AccountType As SatHostTypes = SatHostTypes.Other
   Private NeedsTLSProxy As Boolean = False
@@ -594,25 +594,25 @@ Friend NotInheritable Class frmWizard
     Else
       Return
     End If
-    remoteTest = New remoteRestrictionTracker(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), LocalAppDataDirectory)
+    remoteTest = New Remote.ServiceConnection(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
-  Private Sub remoteTest_Failure(sender As Object, e As remoteRestrictionTracker.FailureEventArgs) Handles remoteTest.Failure
+  Private Sub remoteTest_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteTest.Failure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of remoteRestrictionTracker.FailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
+        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
       Catch ex As Exception
       End Try
       Return
     End If
     Dim sErr As String = "There was an error verifying your key!"
     Select Case e.Type
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin : sErr = "There was a server error. Please try again later."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct : sErr = "Your Product Key is incorrect."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NoUsername : sErr = "Your account is not registered!"
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
+      Case Remote.ServiceFailType.BadLogin : sErr = "There was a server error. Please try again later."
+      Case Remote.ServiceFailType.BadProduct : sErr = "Your Product Key is incorrect."
+      Case Remote.ServiceFailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
+      Case Remote.ServiceFailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
+      Case Remote.ServiceFailType.NoUsername : sErr = "Your account is not registered!"
+      Case Remote.ServiceFailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
+      Case Remote.ServiceFailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
     End Select
     If pChecker IsNot Nothing Then
       pChecker.Dispose()
@@ -623,7 +623,7 @@ Friend NotInheritable Class frmWizard
       remoteTest = Nothing
     End If
     Select Case e.Type
-      Case remoteRestrictionTracker.FailureEventArgs.FailType.BadLogin, remoteRestrictionTracker.FailureEventArgs.FailType.BadProduct, remoteRestrictionTracker.FailureEventArgs.FailType.NoData, remoteRestrictionTracker.FailureEventArgs.FailType.Network, remoteRestrictionTracker.FailureEventArgs.FailType.NotBase64
+      Case Remote.ServiceFailType.BadLogin, Remote.ServiceFailType.BadProduct, Remote.ServiceFailType.NoData, Remote.ServiceFailType.Network, Remote.ServiceFailType.NotBase64
         MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Warning)
       Case Else
         optNone.Checked = True
@@ -671,7 +671,7 @@ Friend NotInheritable Class frmWizard
     If NeedsTLSProxy Then newSettings.TLSProxy = True
     newSettings.Save()
     newSettings = Nothing
-    localTest = New localRestrictionTracker(LocalAppDataDirectory, True)
+    localTest = New Local.SiteConnection(LocalAppDataDirectory, True)
   End Sub
   Private Sub LocalComplete(acct As SatHostTypes)
     If Me.InvokeRequired Then
@@ -695,10 +695,10 @@ Friend NotInheritable Class frmWizard
       localTest = Nothing
     End If
   End Sub
-  Private Sub localTest_ConnectionFailure(sender As Object, e As ConnectionFailureEventArgs) Handles localTest.ConnectionFailure
+  Private Sub localTest_ConnectionFailure(sender As Object, e As SiteConnectionFailureEventArgs) Handles localTest.ConnectionFailure
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of ConnectionFailureEventArgs)(AddressOf localTest_ConnectionFailure), sender, e)
+        Me.Invoke(New EventHandler(Of SiteConnectionFailureEventArgs)(AddressOf localTest_ConnectionFailure), sender, e)
       Catch ex As Exception
       End Try
       Return
@@ -708,8 +708,8 @@ Friend NotInheritable Class frmWizard
     Dim skipIt As Boolean = False
     Dim forceRetry As Boolean = False
     Select Case e.Type
-      Case ConnectionFailureEventArgs.FailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.TLSTooOld
+      Case SiteConnectionFailureType.ConnectionTimeout : MsgDlg(Me, "The server did not respond within a reasonable amount of time.", "Connection to server timed out.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetTime, MessageBoxIcon.Error)
+      Case SiteConnectionFailureType.TLSTooOld
         If NeedsTLSProxy = True Then
           skipIt = True
         Else
@@ -727,10 +727,10 @@ Friend NotInheritable Class frmWizard
             End If
           End If
         End If
-      Case ConnectionFailureEventArgs.FailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Case ConnectionFailureEventArgs.FailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1
+      Case SiteConnectionFailureType.LoginFailure : MsgDlg(Me, e.Message, "There was an error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case SiteConnectionFailureType.FatalLoginFailure : MsgDlg(Me, e.Message, "There was a fatal error while logging in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.InternetRJ45, MessageBoxIcon.Error)
+      Case SiteConnectionFailureType.UnknownAccountDetails : MsgDlg(Me, "Account information was missing. Please enter all account details before proceeding.", "Unable to log in to the server.", "Failed to Log In", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
+      Case SiteConnectionFailureType.UnknownAccountType : tbsWizardPages.SelectedIndex += 1
     End Select
     If localTest IsNot Nothing Then
       localTest.Dispose()
@@ -749,7 +749,7 @@ Friend NotInheritable Class frmWizard
     End If
     DrawStatus(False)
   End Sub
-  Private Sub localTest_ConnectionStatus(sender As Object, e As ConnectionStatusEventArgs) Handles localTest.ConnectionStatus
+  Private Sub localTest_ConnectionStatus(sender As Object, e As SiteConnectionStatusEventArgs) Handles localTest.ConnectionStatus
     Dim sAppend As String = ""
     If e.Attempt > 0 Then
       If e.Stage > 0 Then
@@ -761,31 +761,31 @@ Friend NotInheritable Class frmWizard
       sAppend = " (Stage " & (e.Stage + 1) & ")"
     End If
     Select Case e.Status
-      Case ConnectionStates.Initialize : DrawStatus(True, "Initializing Connection" & sAppend & "...")
-      Case ConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In" & sAppend & "...")
-      Case ConnectionStates.Login
+      Case SiteConnectionStates.Initialize : DrawStatus(True, "Initializing Connection" & sAppend & "...")
+      Case SiteConnectionStates.Prepare : DrawStatus(True, "Preparing to Log In" & sAppend & "...")
+      Case SiteConnectionStates.Login
         Select Case e.SubState
-          Case ConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page" & sAppend & "...")
-          Case ConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating" & sAppend & "...")
-          Case ConnectionSubStates.Verify : DrawStatus(True, "Verifying" & sAppend & "...")
+          Case SiteConnectionSubStates.ReadLogin : DrawStatus(True, "Reading Login Page" & sAppend & "...")
+          Case SiteConnectionSubStates.Authenticate : DrawStatus(True, "Authenticating" & sAppend & "...")
+          Case SiteConnectionSubStates.Verify : DrawStatus(True, "Verifying" & sAppend & "...")
           Case Else : DrawStatus(True, "Logging In" & sAppend & "...")
         End Select
-      Case ConnectionStates.TableDownload
+      Case SiteConnectionStates.TableDownload
         Select Case e.SubState
-          Case ConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page" & sAppend & "...")
-          Case ConnectionSubStates.LoadAJAX
+          Case SiteConnectionSubStates.LoadHome : DrawStatus(True, "Downloading Home Page" & sAppend & "...")
+          Case SiteConnectionSubStates.LoadAJAX
             If e.Attempt = 0 Then
               DrawStatus(True, "Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXFirstTryRequests & ")...")
             Else
               DrawStatus(True, "Re-Downloading AJAX Data (" & e.Stage & " of " & localTest.ExedeResellerAJAXSecondTryRequests & ")...")
             End If
-          Case ConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
+          Case SiteConnectionSubStates.LoadTable : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
           Case Else : DrawStatus(True, "Downloading Usage Table" & sAppend & "...")
         End Select
-      Case ConnectionStates.TableRead : DrawStatus(False, "Complete!")
+      Case SiteConnectionStates.TableRead : DrawStatus(False, "Complete!")
     End Select
   End Sub
-  Private Sub localTest_LoginComplete(sender As Object, e As RestrictionLibrary.localRestrictionTracker.LoginCompletionEventArgs) Handles localTest.LoginComplete
+  Private Sub localTest_LoginComplete(sender As Object, e As Local.LoginCompletionEventArgs) Handles localTest.LoginComplete
     LocalComplete(e.HostType)
   End Sub
   Private Sub localTest_ConnectionDNXResult(sender As Object, e As TYPEA2ResultEventArgs) Handles localTest.ConnectionDNXResult

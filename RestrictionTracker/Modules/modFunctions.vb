@@ -838,7 +838,7 @@ Friend Module modFunctions
 #Region "History"
   Private dGraph, uGraph As Rectangle
   Private oldDate, newDate As Date
-  Private dData(), uData() As DataBase.DataRow
+  Private dData(), uData() As DataRow
   Private Enum Direction
     No
     Down
@@ -853,10 +853,10 @@ Friend Module modFunctions
       Return uGraph
     End If
   End Function
-  Friend Function GetGraphData(fromDate As Date, DownGraph As Boolean) As DataBase.DataRow
+  Friend Function GetGraphData(fromDate As Date, DownGraph As Boolean) As DataRow
     If DownGraph Then
-      If dData Is Nothing Then Return DataBase.DataRow.Empty
-      Dim closestRow As DataBase.DataRow
+      If dData Is Nothing Then Return DataRow.Empty
+      Dim closestRow As DataRow
       Dim closestVal As Integer = Integer.MaxValue
       For Each item In dData
         If Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate)) < closestVal Then
@@ -866,8 +866,8 @@ Friend Module modFunctions
       Next
       Return closestRow
     Else
-      If uData Is Nothing Then Return DataBase.DataRow.Empty
-      Dim closestRow As DataBase.DataRow
+      If uData Is Nothing Then Return DataRow.Empty
+      Dim closestRow As DataRow
       Dim closestVal As Integer = Integer.MaxValue
       For Each item In uData
         If Math.Abs(DateDiff(DateInterval.Minute, item.DATETIME, fromDate)) < closestVal Then
@@ -878,13 +878,13 @@ Friend Module modFunctions
       Return closestRow
     End If
   End Function
-  Public Function DrawRGraph(Data() As DataBase.DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+  Public Function DrawRGraph(Data() As DataRow, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     Return DrawGraph(Data, Direction.No, ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
-  Public Function DrawLineGraph(Data() As DataBase.DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+  Public Function DrawLineGraph(Data() As DataRow, Down As Boolean, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     Return DrawGraph(Data, IIf(Down, Direction.Down, Direction.Up), ImgSize, ColorLine, ColorA, ColorB, ColorC, ColorText, ColorBG, ColorMax, ColorGridLight, ColorGridDark)
   End Function
-  Private Function DrawGraph(ByVal Data() As DataBase.DataRow, GraphDir As Direction, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
+  Private Function DrawGraph(ByVal Data() As DataRow, GraphDir As Direction, ImgSize As Size, ColorLine As Color, ColorA As Color, ColorB As Color, ColorC As Color, ColorText As Color, ColorBG As Color, ColorMax As Color, ColorGridLight As Color, ColorGridDark As Color) As Image
     If Data Is Nothing OrElse Data.Length = 0 Then
       dData = Nothing
       uData = Nothing
@@ -1628,7 +1628,7 @@ Friend Module modFunctions
     g.FillRectangle(fillBrush, CInt(Math.Floor(icoX / 2)), yUsed, CInt(Math.Ceiling(icoX / 2)), icoY - yUsed)
   End Sub
 #End Region
-  Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors, useStyle As localRestrictionTracker.SatHostTypes)
+  Public Sub ScreenDefaultColors(ByRef Colors As AppSettings.AppColors, useStyle As Local.SatHostTypes)
     Dim defaultColors As AppSettings.AppColors = GetDefaultColors(useStyle)
     If Colors.MainDownA = Color.Transparent Or Colors.MainDownA.A < 255 Then Colors.MainDownA = defaultColors.MainDownA
     If Colors.MainDownB = Color.Transparent Or Colors.MainDownB.A < 255 Then Colors.MainDownB = defaultColors.MainDownB
@@ -1661,10 +1661,10 @@ Friend Module modFunctions
     If Colors.HistoryLightGrid = Color.Transparent Or Colors.HistoryLightGrid.A < 255 Then Colors.HistoryLightGrid = defaultColors.HistoryLightGrid
     If Colors.HistoryDarkGrid = Color.Transparent Or Colors.HistoryDarkGrid.A < 255 Then Colors.HistoryDarkGrid = defaultColors.HistoryDarkGrid
   End Sub
-  Public Function GetDefaultColors(useStyle As localRestrictionTracker.SatHostTypes) As AppSettings.AppColors
+  Public Function GetDefaultColors(useStyle As Local.SatHostTypes) As AppSettings.AppColors
     Dim outColors As New AppSettings.AppColors
     Select Case useStyle
-      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY, localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
+      Case Local.SatHostTypes.WildBlue_LEGACY, Local.SatHostTypes.RuralPortal_LEGACY
         outColors.MainDownA = Color.DarkBlue
         outColors.MainDownB = Color.Blue
         outColors.MainDownC = Color.Aqua
@@ -1696,7 +1696,7 @@ Friend Module modFunctions
         outColors.HistoryLightGrid = Color.LightGray
         outColors.HistoryDarkGrid = Color.DarkGray
 
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE, localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
+      Case Local.SatHostTypes.RuralPortal_EXEDE, Local.SatHostTypes.WildBlue_EXEDE
         outColors.MainDownA = Color.DarkBlue
         outColors.MainDownB = Color.Blue
         outColors.MainDownC = Color.Aqua
@@ -1728,7 +1728,7 @@ Friend Module modFunctions
         outColors.HistoryLightGrid = Color.LightGray
         outColors.HistoryDarkGrid = Color.DarkGray
 
-      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE
+      Case Local.SatHostTypes.Dish_EXEDE
         outColors.MainDownA = Color.DarkBlue
         outColors.MainDownB = Color.Blue
         outColors.MainDownC = Color.Aqua

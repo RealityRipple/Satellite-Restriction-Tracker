@@ -1,175 +1,209 @@
 ﻿Imports System.Collections.Generic
 Imports System.Xml
 ''' <summary>
+''' Provides data for the <see cref="RestrictionLibrary.DataBase.ProgressState" /> event.
+''' </summary>
+''' <remarks></remarks>
+Public Class DataBaseProgressEventArgs
+  Inherits EventArgs
+  Private m_Value As Integer
+  Private m_Total As Integer
+  ''' <summary>
+  ''' A progress value containing the current number of things done and the total number of things to do.
+  ''' </summary>
+  ''' <param name="Value">The current number of things that have been done.</param>
+  ''' <param name="Total">The total number of things there are to do.</param>
+  Public Sub New(Value As Integer, Total As Integer)
+    m_Value = Value
+    m_Total = Total
+  End Sub
+  ''' <summary>
+  ''' The Current number of things that have been done.
+  ''' </summary>
+  Public ReadOnly Property Value As Integer
+    Get
+      Return m_Value
+    End Get
+  End Property
+  ''' <summary>
+  ''' The total number of things to do.
+  ''' </summary>
+  Public ReadOnly Property Total As Integer
+    Get
+      Return m_Total
+    End Get
+  End Property
+End Class
+''' <summary>
+''' Stores information about usage activity at a single date and time.
+''' </summary>
+Public Structure DataRow
+  Private mDT As Date
+  Private mD As Long
+  Private mDL As Long
+  Private mU As Long
+  Private mUL As Long
+  ''' <summary>
+  ''' The Date and Time of the data stored in this row.
+  ''' </summary>
+  Public Property DATETIME As Date
+    Get
+      Return mDT
+    End Get
+    Set(value As Date)
+      mDT = value
+    End Set
+  End Property
+  ''' <summary>
+  ''' The number of Megabytes used in download activity at the specified date and time.
+  ''' </summary>
+  Public Property DOWNLOAD As Long
+    Get
+      Return mD
+    End Get
+    Set(value As Long)
+      mD = value
+    End Set
+  End Property
+  ''' <summary>
+  ''' The maximum number of Megabytes allowed in download activity for the plan at the specified date and time.
+  ''' </summary>
+  Public Property DOWNLIM As Long
+    Get
+      Return mDL
+    End Get
+    Set(value As Long)
+      mDL = value
+    End Set
+  End Property
+  ''' <summary>
+  ''' The number of Megabytes used in upload activity at the specified date and time.
+  ''' </summary>
+  Public Property UPLOAD As Long
+    Get
+      Return mU
+    End Get
+    Set(value As Long)
+      mU = value
+    End Set
+  End Property
+  ''' <summary>
+  ''' The maximum number of Megabytes allowed in upload activity for the plan at the specified date and time.
+  ''' </summary>
+  Public Property UPLIM As Long
+    Get
+      Return mUL
+    End Get
+    Set(value As Long)
+      mUL = value
+    End Set
+  End Property
+  ''' <summary>
+  ''' Create a new DataRow entry.
+  ''' </summary>
+  ''' <param name="dTime">The Date and Time of the entry.</param>
+  ''' <param name="lDown">The number of Megabytes used in download activity for this entry.</param>
+  ''' <param name="lDownLim">The maximum number of Megabytes allowed in download activity for this entry.</param>
+  ''' <param name="lUp">The number of Megabytes used in upload activity for this entry.</param>
+  ''' <param name="lUpLim">The maximum number of Megabytes allowed in upload activity for this entry.</param>
+  Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
+    mDT = dTime
+    mD = lDown
+    mDL = lDownLim
+    mU = lUp
+    mUL = lUpLim
+  End Sub
+  ''' <summary>
+  ''' Get a string representation of the Date and Time of the data stored in this row.
+  ''' </summary>
+  ''' <returns>The date and time are returned in the format "MM/DD/YYYY HH:MM", or the standard "g".</returns>
+  Public ReadOnly Property sDATETIME As String
+    Get
+      Return srlFunctions.TimeToString(mDT)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Get a string representation of the number of Megabytes used in download activity for this row.
+  ''' </summary>
+  ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sDOWNLOAD As String
+    Get
+      Return mD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Get a string representation of the number of Megabytes allowed in download activity for this row.
+  ''' </summary>
+  ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sDOWNLIM As String
+    Get
+      Return mDL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Get a string representation of the number of Megabytes used in upload activity for this row.
+  ''' </summary>
+  ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sUPLOAD As String
+    Get
+      Return mU.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Get a string representation of the number of Megabytes allowed in upload activity for this row.
+  ''' </summary>
+  ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
+  Public ReadOnly Property sUPLIM As String
+    Get
+      Return mUL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Get a string representation of this row in the format "MM/DD/YYYY HH:MM [Down: 0,000/0,000][, ][Up: 0,000/0,000]".
+  ''' </summary>
+  ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with Download and/or Upload values if either the value or limit is greater than 0.</returns>
+  Public Overrides Function ToString() As String
+    Dim sRet As String = sDATETIME
+    If mD > 0 Or mDL > 0 Then
+      sRet &= " Down: " & sDOWNLOAD & "/" & sDOWNLIM
+    End If
+    If mU > 0 Or mUL > 0 Then
+      If sRet.Contains(" Down: ") Then sRet &= ","
+      sRet &= " Up: " & sUPLOAD & "/" & sUPLIM
+    End If
+    Return sRet
+  End Function
+  ''' <summary>
+  ''' This is a standard empty DataRow with all values set to zero.
+  ''' </summary>
+  ''' <returns></returns>
+  Public Shared ReadOnly Property Empty() As DataRow
+    Get
+      Return New DataRow(Date.FromBinary(0), 0, 0, 0, 0)
+    End Get
+  End Property
+  ''' <summary>
+  ''' Check a <see cref="DataRow" /> entry to see if it is empty or unset.
+  ''' </summary>
+  ''' <param name="dRow">The <see cref="DataRow" /> entry you wish to check.</param>
+  ''' <returns>A boolean value of <c>True</c> is returned if the <paramref name="dRow" /> entry is empty, <c>False</c> otherwise.</returns>
+  Public Shared Function IsEmpty(dRow As DataRow) As Boolean
+    Return (dRow.DATETIME.ToBinary = 0 And dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0)
+  End Function
+  ''' <summary>
+  ''' Check this <see cref="DataRow" /> entry to see if it is empty or unset.
+  ''' </summary>
+  ''' <returns>A boolean value of <c>True</c> is returned if this entry is empty, <c>False</c> otherwise.</returns>
+  Public Function IsEmpty() As Boolean
+    Return (mDT.ToBinary = 0 And mD = 0 And mU = 0 And mDL = 0 And mUL = 0)
+  End Function
+End Structure
+''' <summary>
 ''' Stores information about usage activity for an account, with access to subroutines and functions for manipulating the list and storing it as one of three file types.
 ''' </summary>
-''' <remarks>This class also contains a child <see cref="DataBase.DataRow" /> class which provides access to individual events of this larger list and is used as a Type in some instances.</remarks>
+''' <remarks>This class also contains a child <see cref="DataRow" /> class which provides access to individual events of this larger list and is used as a Type in some instances.</remarks>
 Public Class DataBase
   Implements IDictionary(Of UInt64, DataRow)
-  ''' <summary>
-  ''' Stores information about usage activity at a single date and time.
-  ''' </summary>
-  Public Structure DataRow
-    Private mDT As Date
-    Private mD As Long
-    Private mDL As Long
-    Private mU As Long
-    Private mUL As Long
-    ''' <summary>
-    ''' The Date and Time of the data stored in this row.
-    ''' </summary>
-    Public Property DATETIME As Date
-      Get
-        Return mDT
-      End Get
-      Set(value As Date)
-        mDT = value
-      End Set
-    End Property
-    ''' <summary>
-    ''' The number of Megabytes used in download activity at the specified date and time.
-    ''' </summary>
-    Public Property DOWNLOAD As Long
-      Get
-        Return mD
-      End Get
-      Set(value As Long)
-        mD = value
-      End Set
-    End Property
-    ''' <summary>
-    ''' The maximum number of Megabytes allowed in download activity for the plan at the specified date and time.
-    ''' </summary>
-    Public Property DOWNLIM As Long
-      Get
-        Return mDL
-      End Get
-      Set(value As Long)
-        mDL = value
-      End Set
-    End Property
-    ''' <summary>
-    ''' The number of Megabytes used in upload activity at the specified date and time.
-    ''' </summary>
-    Public Property UPLOAD As Long
-      Get
-        Return mU
-      End Get
-      Set(value As Long)
-        mU = value
-      End Set
-    End Property
-    ''' <summary>
-    ''' The maximum number of Megabytes allowed in upload activity for the plan at the specified date and time.
-    ''' </summary>
-    Public Property UPLIM As Long
-      Get
-        Return mUL
-      End Get
-      Set(value As Long)
-        mUL = value
-      End Set
-    End Property
-    ''' <summary>
-    ''' Create a new DataRow entry.
-    ''' </summary>
-    ''' <param name="dTime">The Date and Time of the entry.</param>
-    ''' <param name="lDown">The number of Megabytes used in download activity for this entry.</param>
-    ''' <param name="lDownLim">The maximum number of Megabytes allowed in download activity for this entry.</param>
-    ''' <param name="lUp">The number of Megabytes used in upload activity for this entry.</param>
-    ''' <param name="lUpLim">The maximum number of Megabytes allowed in upload activity for this entry.</param>
-    Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
-      mDT = dTime
-      mD = lDown
-      mDL = lDownLim
-      mU = lUp
-      mUL = lUpLim
-    End Sub
-    ''' <summary>
-    ''' Get a string representation of the Date and Time of the data stored in this row.
-    ''' </summary>
-    ''' <returns>The date and time are returned in the format "MM/DD/YYYY HH:MM", or the standard "g".</returns>
-    Public ReadOnly Property sDATETIME As String
-      Get
-        Return srlFunctions.TimeToString(mDT)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Get a string representation of the number of Megabytes used in download activity for this row.
-    ''' </summary>
-    ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
-    Public ReadOnly Property sDOWNLOAD As String
-      Get
-        Return mD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Get a string representation of the number of Megabytes allowed in download activity for this row.
-    ''' </summary>
-    ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
-    Public ReadOnly Property sDOWNLIM As String
-      Get
-        Return mDL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Get a string representation of the number of Megabytes used in upload activity for this row.
-    ''' </summary>
-    ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
-    Public ReadOnly Property sUPLOAD As String
-      Get
-        Return mU.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Get a string representation of the number of Megabytes allowed in upload activity for this row.
-    ''' </summary>
-    ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
-    Public ReadOnly Property sUPLIM As String
-      Get
-        Return mUL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Get a string representation of this row in the format "MM/DD/YYYY HH:MM [Down: 0,000/0,000][, ][Up: 0,000/0,000]".
-    ''' </summary>
-    ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with Download and/or Upload values if either the value or limit is greater than 0.</returns>
-    Public Overrides Function ToString() As String
-      Dim sRet As String = sDATETIME
-      If mD > 0 Or mDL > 0 Then
-        sRet &= " Down: " & sDOWNLOAD & "/" & sDOWNLIM
-      End If
-      If mU > 0 Or mUL > 0 Then
-        If sRet.Contains(" Down: ") Then sRet &= ","
-        sRet &= " Up: " & sUPLOAD & "/" & sUPLIM
-      End If
-      Return sRet
-    End Function
-    ''' <summary>
-    ''' This is a standard empty DataRow with all values set to zero.
-    ''' </summary>
-    ''' <returns></returns>
-    Public Shared ReadOnly Property Empty() As DataRow
-      Get
-        Return New DataRow(Date.FromBinary(0), 0, 0, 0, 0)
-      End Get
-    End Property
-    ''' <summary>
-    ''' Check a <see cref="DataRow" /> entry to see if it is empty or unset.
-    ''' </summary>
-    ''' <param name="dRow">The <see cref="DataRow" /> entry you wish to check.</param>
-    ''' <returns>A boolean value of <c>True</c> is returned if the <paramref name="dRow" /> entry is empty, <c>False</c> otherwise.</returns>
-    Public Shared Function IsEmpty(dRow As DataRow) As Boolean
-      Return (dRow.DATETIME.ToBinary = 0 And dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0)
-    End Function
-    ''' <summary>
-    ''' Check this <see cref="DataRow" /> entry to see if it is empty or unset.
-    ''' </summary>
-    ''' <returns>A boolean value of <c>True</c> is returned if this entry is empty, <c>False</c> otherwise.</returns>
-    Public Function IsEmpty() As Boolean
-      Return (mDT.ToBinary = 0 And mD = 0 And mU = 0 And mDL = 0 And mUL = 0)
-    End Function
-  End Structure
   Private data As SortedDictionary(Of UInt64, DataRow)
   ''' <summary>
   ''' Create a new DataBase with no entries.
@@ -189,42 +223,12 @@ Public Class DataBase
   End Sub
   Private sPath As String
   Private bWithDisplay As Boolean
-  Public Class ProgressStateEventArgs
-    Inherits EventArgs
-    Private m_Value As Integer
-    Private m_Total As Integer
-    ''' <summary>
-    ''' A progress value containing the current number of things done and the total number of things to do.
-    ''' </summary>
-    ''' <param name="Value">The current number of things that have been done.</param>
-    ''' <param name="Total">The total number of things there are to do.</param>
-    Public Sub New(Value As Integer, Total As Integer)
-      m_Value = Value
-      m_Total = Total
-    End Sub
-    ''' <summary>
-    ''' The Current number of things that have been done.
-    ''' </summary>
-    Public ReadOnly Property Value As Integer
-      Get
-        Return m_Value
-      End Get
-    End Property
-    ''' <summary>
-    ''' The total number of things to do.
-    ''' </summary>
-    Public ReadOnly Property Total As Integer
-      Get
-        Return m_Total
-      End Get
-    End Property
-  End Class
   ''' <summary>
   ''' The loading of the DataBase has progressed to a specific point.
   ''' </summary>
   ''' <param name="sender">A reference to this <see cref="DataBase" /> class.</param>
-  ''' <param name="e">A <see cref="ProgressStateEventArgs" /> entry with the current Value and Total of the DataBase load's progress.</param>
-  Public Event ProgressState As EventHandler(Of ProgressStateEventArgs)
+  ''' <param name="e">A <see cref="DataBaseProgressEventArgs" /> entry with the current Value and Total of the DataBase load's progress.</param>
+  Public Event ProgressState As EventHandler(Of DataBaseProgressEventArgs)
   ''' <summary>
   ''' Create a new DataBase with entries loaded from the specified <paramref name="Path" />.
   ''' </summary>
@@ -250,7 +254,7 @@ Public Class DataBase
           Dim iMax As Integer = m_nodelist.Count
           For Each m_node As XmlNode In m_nodelist
             I += 1
-            If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, iMax))
+            If bWithDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I, iMax))
             Dim sDT, sD, sDL, sU, sUL As String : sDT = "0" : sD = "0" : sDL = "0" : sU = "0" : sUL = "0"
             For Each m_child As XmlNode In m_node.ChildNodes
               Select Case m_child.Name
@@ -276,7 +280,7 @@ Public Class DataBase
             Dim nIn As New IO.BinaryReader(nRead)
             Dim uRows As UInt64 = LOAD_ReadULong(nIn)
             For I As UInt64 = 1 To uRows
-              If bWithDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I, uRows))
+              If bWithDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I, uRows))
               Dim DT As Date = LOAD_ReadDate(nIn)
               Dim Down As Long = LOAD_ReadLong(nIn)
               Dim DownLim As Long = LOAD_ReadLong(nIn)
@@ -348,7 +352,7 @@ Public Class DataBase
   Public Sub Merge(db As DataBase, withDisplay As Boolean)
     Dim dbVals() As DataRow = db.Values
     For I As Integer = 0 To dbVals.Length - 1
-      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1, dbVals.Length))
+      If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1, dbVals.Length))
       Add(dbVals(I))
     Next
   End Sub
@@ -527,7 +531,7 @@ Public Class DataBase
     Dim uLen As UInt64 = CULng(data.Count)
     Dim I As Integer = 0
     For Each dRow As KeyValuePair(Of UInt64, DataRow) In data
-      If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uLen))
+      If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uLen))
       sDB &= "  <History>" & vbNewLine &
              "    <DATETIME>" & dRow.Value.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "</DATETIME>" & vbNewLine &
              "    <DOWNLOAD>" & dRow.Value.DOWNLOAD.ToString(Globalization.CultureInfo.InvariantCulture) & "</DOWNLOAD>" & vbNewLine &
@@ -573,7 +577,7 @@ Public Class DataBase
           Dim uData As UInt64 = CULng(dVals.Length)
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
-            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
             If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
             If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
             nOut.WriteLine("  <History>")
@@ -600,7 +604,7 @@ Public Class DataBase
           SAVE_Write(nOut, truData)
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
-            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
             If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
             If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
             SAVE_Write(nOut, dRow.DATETIME)
@@ -617,7 +621,7 @@ Public Class DataBase
           nOut.WriteLine("Time,Download,Download Limit,Upload,Upload Limit")
           For I As UInt64 = 0 To uData - 1
             Dim dRow As DataRow = dVals(I)
-            If withDisplay Then RaiseEvent ProgressState(Me, New ProgressStateEventArgs(I + 1UL, uData))
+            If withDisplay Then RaiseEvent ProgressState(Me, New DataBaseProgressEventArgs(I + 1UL, uData))
             If dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 0 And dRow.UPLIM = 0 Then Continue For
             If Not bFreedom And (dRow.DOWNLOAD = 0 And dRow.UPLOAD = 0 And dRow.DOWNLIM = 150000 And dRow.UPLIM = 150000) Then Continue For
             nOut.WriteLine(dRow.DATETIME.ToString("o", Globalization.CultureInfo.InvariantCulture) & "," & dRow.DOWNLOAD & "," & dRow.DOWNLIM & "," & dRow.UPLOAD & "," & dRow.UPLIM)

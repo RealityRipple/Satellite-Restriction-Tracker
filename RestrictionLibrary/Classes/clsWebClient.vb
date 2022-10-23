@@ -1,4 +1,26 @@
-﻿Public Class WebClientCore
+﻿''' <summary>
+''' A <see cref="WebClientCore" /> Upload or Download request failure message containing an <see cref="Exception" />.
+''' </summary>
+Public Class WebClientErrorEventArgs
+  Inherits EventArgs
+  Private mError As Exception
+  Public ReadOnly Property [Error] As Exception
+    Get
+      Return mError
+    End Get
+  End Property
+  ''' <summary>
+  ''' Create a new instance of the <see cref="WebClientErrorEventArgs" /> Class for use with the <see cref="WebClientCore.Failure" /> event.
+  ''' </summary>
+  ''' <param name="Err">The Exception being passed through the <see cref="WebClientCore.Failure" /> event.</param>
+  Public Sub New(Err As Exception)
+    mError = Err
+  End Sub
+End Class
+
+Public Delegate Sub WebClientCallback(asyncState As Object, response As String)
+
+Public Class WebClientCore
   Inherits Net.WebClient
   ''' <summary>
   ''' Create a new instance of the <see cref="WebClientCore" /> Class.
@@ -37,25 +59,6 @@
     c_ResponseCode = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
-  ''' <summary>
-  ''' A <see cref="WebClientCore" /> Upload or Download request failure message containing an <see cref="Exception" />.
-  ''' </summary>
-  Public Class ErrorEventArgs
-    Inherits EventArgs
-    Private mError As Exception
-    Public ReadOnly Property [Error] As Exception
-      Get
-        Return mError
-      End Get
-    End Property
-    ''' <summary>
-    ''' Create a new instance of the <see cref="ErrorEventArgs" /> Class for use with the <see cref="Failure" /> event.
-    ''' </summary>
-    ''' <param name="Err">The Exception being passed through the <see cref="Failure" /> event.</param>
-    Public Sub New(Err As Exception)
-      mError = Err
-    End Sub
-  End Class
   ''' <summary>
   ''' This constant replaces any commas in the values of cookies received, and will be replaced by commas on any cookies being sent.
   ''' </summary>
@@ -203,7 +206,7 @@
   ''' </summary>
   ''' <param name="sender">The class which is triggering the event.</param>
   ''' <param name="e">The exception contained in an EventArg</param>
-  Public Event Failure As EventHandler(Of ErrorEventArgs)
+  Public Event Failure As EventHandler(Of WebClientErrorEventArgs)
   ''' <summary>
   ''' The User Agent for Satellite Restriction Tracker
   ''' </summary>
@@ -256,7 +259,7 @@
     Catch ex As Net.WebException
       MyBase.CancelAsync()
       If c_Events Then
-        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+        RaiseEvent Failure(Me, New WebClientErrorEventArgs(ex))
       Else
         Throw
       End If
@@ -274,7 +277,7 @@
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       If c_Events Then
-        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+        RaiseEvent Failure(Me, New WebClientErrorEventArgs(ex))
       Else
         Throw
       End If
@@ -289,7 +292,7 @@
       If ex.Message = "The request was aborted: The request was canceled." Then Return Nothing
       MyBase.CancelAsync()
       If c_Events Then
-        RaiseEvent Failure(Me, New ErrorEventArgs(ex))
+        RaiseEvent Failure(Me, New WebClientErrorEventArgs(ex))
       Else
         Throw
       End If
@@ -682,13 +685,10 @@ Public Class WebClientEx
   ''' </summary>
   ''' <value></value>
   ''' <returns>A <see cref="System.Net.WebHeaderCollection" /> containing header name/value pairs associated with this request.</returns>
-  Public Property SendHeaders As Net.WebHeaderCollection
+  Public ReadOnly Property SendHeaders As Net.WebHeaderCollection
     Get
       Return c_SendHeaders
     End Get
-    Set(value As Net.WebHeaderCollection)
-      c_SendHeaders = value
-    End Set
   End Property
   Private c_Busy As Boolean
   ''' <summary>
@@ -711,6 +711,7 @@ Public Class WebClientEx
     c_SendJar = False
     c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = DataPath
+    c_SendHeaders = New Net.WebHeaderCollection
     c_Busy = False
     c_ErrorBypass = True
     c_KeepAlive = True
@@ -725,13 +726,13 @@ Public Class WebClientEx
     c_SendJar = False
     c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     sDataPath = Nothing
+    c_SendHeaders = New Net.WebHeaderCollection
     c_Busy = False
     c_ErrorBypass = True
     c_KeepAlive = True
     c_ManualRedirect = True
     ClosingTime = False
   End Sub
-  Public Delegate Sub WebClientCallback(asyncState As Object, response As String)
   Public Sub Cancel()
     If IsBusy Then ClosingTime = True
   End Sub

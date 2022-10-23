@@ -798,10 +798,10 @@ Public NotInheritable Class srlFunctions
     Return d.ToString("g", DateFormatProvider)
   End Function
   ''' <summary>
-  ''' Converts a <see cref="localRestrictionTracker.SatHostTypes" /> value to a simple string.
+  ''' Converts a <see cref="Local.SatHostTypes" /> value to a simple string.
   ''' </summary>
   ''' <param name="hostType">A Satellite Internet host type enumeration.</param>
-  ''' <returns>If the <paramref name="hostType" /> is a valid <see cref="localRestrictionTracker.SatHostTypes" />, the return will be a three-letter value. Otherwise, it will be the letter &quot;O&quot;.</returns>
+  ''' <returns>If the <paramref name="hostType" /> is a valid <see cref="Local.SatHostTypes" />, the return will be a three-letter value. Otherwise, it will be the letter &quot;O&quot;.</returns>
   ''' <remarks>
   '''  <para>WildBlue_LEGACY: &quot;WBL&quot;</para>
   '''  <para>WildBlue_EXEDE: &quot;WBX&quot;</para>
@@ -811,22 +811,22 @@ Public NotInheritable Class srlFunctions
   '''  <para>Other Values: &quot;O&quot;</para>
   '''  <para>See Also: <seealso cref="StringToHostType" /></para>
   ''' </remarks>
-  Public Shared Function HostTypeToString(hostType As localRestrictionTracker.SatHostTypes) As String
+  Public Shared Function HostTypeToString(hostType As Local.SatHostTypes) As String
     Select Case hostType
-      Case localRestrictionTracker.SatHostTypes.WildBlue_LEGACY : Return "WBL"
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE : Return "WBX"
-      Case localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER : Return "WXR"
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
-      Case localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
-      Case localRestrictionTracker.SatHostTypes.Dish_EXEDE : Return "DNX"
+      Case Local.SatHostTypes.WildBlue_LEGACY : Return "WBL"
+      Case Local.SatHostTypes.WildBlue_EXEDE : Return "WBX"
+      Case Local.SatHostTypes.WildBlue_EXEDE_RESELLER : Return "WXR"
+      Case Local.SatHostTypes.RuralPortal_LEGACY : Return "RPL"
+      Case Local.SatHostTypes.RuralPortal_EXEDE : Return "RPX"
+      Case Local.SatHostTypes.Dish_EXEDE : Return "DNX"
       Case Else : Return "O"
     End Select
   End Function
   ''' <summary>
-  ''' Converts a simple string value to a <see cref="localRestrictionTracker.SatHostTypes" />.
+  ''' Converts a simple string value to a <see cref="Local.SatHostTypes" />.
   ''' </summary>
-  ''' <param name="host">The string to be converted to a <see cref="localRestrictionTracker.SatHostTypes" /> enumeration value.</param>
-  ''' <returns>The closest <see cref="localRestrictionTracker.SatHostTypes" /> match detected.</returns>
+  ''' <param name="host">The string to be converted to a <see cref="Local.SatHostTypes" /> enumeration value.</param>
+  ''' <returns>The closest <see cref="Local.SatHostTypes" /> match detected.</returns>
   ''' <remarks>
   '''  <para>These values are <i>not</i> case-sensitive.</para>
   '''  <para>&quot;WBL&quot;, &quot;WildBlue&quot;: WildBlue_LEGACY</para>
@@ -837,19 +837,19 @@ Public NotInheritable Class srlFunctions
   '''  <para>Other Values: Other</para>
   '''  <para>See Also: <seealso cref="HostTypeToString" /></para>
   ''' </remarks>
-  Public Shared Function StringToHostType(host As String) As localRestrictionTracker.SatHostTypes
+  Public Shared Function StringToHostType(host As String) As Local.SatHostTypes
     Select Case host.ToUpperInvariant
-      Case "WBL" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "WBX", "WBV" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "WXR" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE_RESELLER
-      Case "RPL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-      Case "RPX" : Return localRestrictionTracker.SatHostTypes.RuralPortal_EXEDE
-      Case "DNX" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
-      Case "WILDBLUE" : Return localRestrictionTracker.SatHostTypes.WildBlue_LEGACY
-      Case "EXEDE" : Return localRestrictionTracker.SatHostTypes.WildBlue_EXEDE
-      Case "DISH", "DISHNET" : Return localRestrictionTracker.SatHostTypes.Dish_EXEDE
-      Case "RURALPORTAL" : Return localRestrictionTracker.SatHostTypes.RuralPortal_LEGACY
-      Case Else : Return localRestrictionTracker.SatHostTypes.Other
+      Case "WBL" : Return Local.SatHostTypes.WildBlue_LEGACY
+      Case "WBX", "WBV" : Return Local.SatHostTypes.WildBlue_EXEDE
+      Case "WXR" : Return Local.SatHostTypes.WildBlue_EXEDE_RESELLER
+      Case "RPL" : Return Local.SatHostTypes.RuralPortal_LEGACY
+      Case "RPX" : Return Local.SatHostTypes.RuralPortal_EXEDE
+      Case "DNX" : Return Local.SatHostTypes.Dish_EXEDE
+      Case "WILDBLUE" : Return Local.SatHostTypes.WildBlue_LEGACY
+      Case "EXEDE" : Return Local.SatHostTypes.WildBlue_EXEDE
+      Case "DISH", "DISHNET" : Return Local.SatHostTypes.Dish_EXEDE
+      Case "RURALPORTAL" : Return Local.SatHostTypes.RuralPortal_LEGACY
+      Case Else : Return Local.SatHostTypes.Other
     End Select
   End Function
   ''' <summary>

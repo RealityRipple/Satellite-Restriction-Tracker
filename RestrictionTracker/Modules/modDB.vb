@@ -18,7 +18,7 @@
       usageDB = New DataBase
       usageDB.StartNew()
     End If
-    usageDB.Add(New DataBase.DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
+    usageDB.Add(New DataRow(dTime, lDown, lDownLim, lUp, lUpLim))
     If Save Then
       Dim tX As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf LOG_Save))
       tX.Start(False)
@@ -27,20 +27,20 @@
   Public Sub LOG_Get(lngIndex As Long, ByRef dtDate As Date, ByRef lngDown As Long, ByRef lngDownLim As Long, ByRef lngUp As Long, ByRef lngUpLim As Long)
     If Not isLoaded Then Return
     If LOG_GetCount() <= lngIndex Then Return
-    Dim dArr() As DataBase.DataRow = usageDB.ToArray()
-    Dim dbRow As DataBase.DataRow = dArr(lngIndex)
+    Dim dArr() As DataRow = usageDB.ToArray()
+    Dim dbRow As DataRow = dArr(lngIndex)
     dtDate = dbRow.DATETIME
     lngDown = dbRow.DOWNLOAD
     lngDownLim = dbRow.DOWNLIM
     lngUp = dbRow.UPLOAD
     lngUpLim = dbRow.UPLIM
   End Sub
-  Public Function LOG_GetRange(dtStart As Date, dtEnd As Date) As DataBase.DataRow()
-    Dim lRet As New Collections.Generic.List(Of DataBase.DataRow)
+  Public Function LOG_GetRange(dtStart As Date, dtEnd As Date) As DataRow()
+    Dim lRet As New Collections.Generic.List(Of DataRow)
     If Not isLoaded Then Return lRet.ToArray
     Dim kStart As UInt64 = Math.Floor(dtStart.Ticks / 600000000)
     Dim kEnd As UInt64 = Math.Floor(dtEnd.Ticks / 600000000)
-    For Each dRow As Collections.Generic.KeyValuePair(Of UInt64, DataBase.DataRow) In usageDB
+    For Each dRow As Collections.Generic.KeyValuePair(Of UInt64, DataRow) In usageDB
       If dRow.Key >= kStart And dRow.Key <= kEnd Then lRet.Add(dRow.Value)
       If dRow.Key > kEnd Then Exit For
     Next
@@ -101,7 +101,7 @@
       isSaving = False
     End If
   End Sub
-  Private Sub usageDB_ProgressState(sender As Object, e As RestrictionLibrary.DataBase.ProgressStateEventArgs) Handles usageDB.ProgressState
+  Private Sub usageDB_ProgressState(sender As Object, e As RestrictionLibrary.DataBaseProgressEventArgs) Handles usageDB.ProgressState
     If frmDBProgress.Visible Then frmDBProgress.SetProgress(e.Value, e.Total)
   End Sub
 End Module

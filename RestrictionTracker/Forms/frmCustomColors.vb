@@ -1,4 +1,4 @@
-﻿Imports RestrictionLibrary.localRestrictionTracker
+﻿Imports RestrictionLibrary.Local
 Public NotInheritable Class frmCustomColors
   Private lDown, lUp, lDownLim, lUpLim As Long
   Private iD, iU As Integer
@@ -7,7 +7,7 @@ Public NotInheritable Class frmCustomColors
   Private HasSaved As Boolean = False
   Private DisplayAs As SatHostTypes
   Private useStyle As SatHostTypes = SatHostTypes.Other
-  Private FakeData As Collections.Generic.List(Of DataBase.DataRow)
+  Private FakeData As Collections.Generic.List(Of DataRow)
   Private Sub frmCustomColors_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
     If cmdSave.Enabled Then
       Dim saveRet As DialogResult = MsgDlg(Me, "Do you want to save the changes to your color scheme?", "Your changes have not been saved.", "Save Changes?", MessageBoxButtons.YesNoCancel, _TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
@@ -538,7 +538,7 @@ Public NotInheritable Class frmCustomColors
     End Select
   End Function
   Private Sub MakeFakeData()
-    FakeData = New Collections.Generic.List(Of DataBase.DataRow)
+    FakeData = New Collections.Generic.List(Of DataRow)
     Dim DownList As New Collections.Generic.List(Of Integer)
     Dim UpList As New Collections.Generic.List(Of Integer)
     Dim startDate As New Date(2000, 1, 1, 0, 0, 0)
@@ -546,7 +546,7 @@ Public NotInheritable Class frmCustomColors
     Dim startUp As Integer = 0
     If DisplayAs = SatHostTypes.WildBlue_LEGACY Then
       For I As Integer = 1 To 90
-        Dim dRow As New DataBase.DataRow(startDate, startDown, 12000, startUp, 3000)
+        Dim dRow As New DataRow(startDate, startDown, 12000, startUp, 3000)
         Dim DownUsed As Integer = RandSel(50, 500)
         Dim UpUsed As Integer = RandSel(10, 120)
         DownList.Add(DownUsed)
@@ -562,7 +562,7 @@ Public NotInheritable Class frmCustomColors
       Next
     ElseIf DisplayAs = SatHostTypes.RuralPortal_EXEDE Then
       For I As Integer = 1 To 90
-        Dim dRow As New DataBase.DataRow(startDate, startDown, 15000, startDown, 15000)
+        Dim dRow As New DataRow(startDate, startDown, 15000, startDown, 15000)
         Dim DownUsed As Integer = RandSel(50, 500)
         DownList.Add(DownUsed)
         startDown += DownUsed
@@ -574,7 +574,7 @@ Public NotInheritable Class frmCustomColors
       Next
     ElseIf DisplayAs = SatHostTypes.Dish_EXEDE Then
       For I As Integer = 1 To 90
-        Dim dRow As New DataBase.DataRow(startDate, startDown, 10000, startUp, 10000)
+        Dim dRow As New DataRow(startDate, startDown, 10000, startUp, 10000)
         Dim DownUsed As Integer = RandSel(50, 500)
         Dim UpUsed As Integer = RandSel(50, 450)
         DownList.Add(DownUsed)

@@ -50,7 +50,6 @@
     Dim httpReport As New WebClientEx
     httpReport.KeepAlive = False
     httpReport.ErrorBypass = True
-    httpReport.SendHeaders = New Net.WebHeaderCollection
     httpReport.SendHeaders.Add("Accept", "application/vnd.github+json")
     httpReport.SendHeaders.Add("Authorization", "token " & Token)
     Dim sRet As String = httpReport.UploadString("https://api.github.com/repos/RealityRipple/" & ProjectID & "/issues", "POST", sSend)
@@ -58,9 +57,9 @@
       Try
         Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
         For Each jNode In jRet.Serial
-          If Not jNode.Type = JSONReader.ElementType.Group Then Continue For
+          If Not jNode.Type = JSONElementType.Group Then Continue For
           For Each jEl In jNode.SubElements
-            If Not jEl.Type = JSONReader.ElementType.KeyValue Then Continue For
+            If Not jEl.Type = JSONElementType.KeyValue Then Continue For
             If jEl.Key = "html_url" Then Return jEl.Value
           Next
         Next
@@ -79,9 +78,9 @@
     Try
       Dim jRet As New JSONReader(New IO.MemoryStream(httpReport.Encoding.GetBytes(sRet), False), False)
       For Each jNode In jRet.Serial
-        If Not jNode.Type = JSONReader.ElementType.Group Then Continue For
+        If Not jNode.Type = JSONElementType.Group Then Continue For
         For Each jEl In jNode.SubElements
-          If Not jEl.Type = JSONReader.ElementType.KeyValue Then Continue For
+          If Not jEl.Type = JSONElementType.KeyValue Then Continue For
           If jEl.Key = "message" Then
             msg = jEl.Value
             Exit For

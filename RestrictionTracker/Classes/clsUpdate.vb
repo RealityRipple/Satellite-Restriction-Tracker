@@ -218,7 +218,7 @@
   Private Sub wsVer_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsVer.DownloadFileCompleted
     RaiseEvent DownloadResult(sender, e)
   End Sub
-  Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientCore.ErrorEventArgs) Handles wsVer.Failure
+  Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientErrorEventArgs) Handles wsVer.Failure
     RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
   End Sub
 End Class

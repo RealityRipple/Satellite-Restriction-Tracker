@@ -1,5 +1,5 @@
 ﻿Imports System.Xml.Linq
-Imports RestrictionLibrary.localRestrictionTracker
+Imports RestrictionLibrary.Local
 Friend Class SvcSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
