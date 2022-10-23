@@ -1,6 +1,6 @@
 ﻿Imports System.Xml.Linq
 Imports RestrictionLibrary.localRestrictionTracker
-Class SvcSettings
+Friend Class SvcSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
   Private m_PassCrypt As String
@@ -120,7 +120,7 @@ Class SvcSettings
     End Set
   End Property
 End Class
-Class AppSettings
+Friend Class AppSettings
   Private m_Account As String
   Private m_AccountType As SatHostTypes
   Private m_AccountTypeF As Boolean

@@ -1,4 +1,4 @@
-﻿Public Class clsFavicon
+﻿Friend Class clsFavicon
   Implements IDisposable
   Private WithEvents wsFile As WebClientCore
   Public Delegate Sub DownloadIconCompletedCallback(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)

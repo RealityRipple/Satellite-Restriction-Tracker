@@ -1,4 +1,4 @@
-﻿Public Class clsUpdate
+﻿Friend Class clsUpdate
   Implements IDisposable
   Private Const VersionURL As String = "http://update.realityripple.com/Satellite_Restriction_Tracker/ver"
   Class ProgressEventArgs

@@ -1,4 +1,4 @@
-﻿Module modRC
+﻿Friend Module modRC
   Sub Main()
     Dim v As NativeMethods.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
     If Not (v = NativeMethods.Validity.SignedAndValid Or v = NativeMethods.Validity.SignedButUntrusted) Then

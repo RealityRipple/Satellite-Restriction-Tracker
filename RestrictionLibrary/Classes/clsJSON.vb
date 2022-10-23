@@ -349,7 +349,7 @@
   End Function
 End Class
 
-Public Class JSONAssociator
+Friend Class JSONAssociator
   Private Shared Function MakeAssoc(jsIn As JSONReader.JSElement) As Object
     Select Case jsIn.Type
       Case JSONReader.ElementType.None

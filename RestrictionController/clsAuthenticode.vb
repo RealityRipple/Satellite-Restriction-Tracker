@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Security.Cryptography.X509Certificates
 
-Public Class Authenticode
+Friend Class Authenticode
   Private Const RRRootThumb As String = "25E10B83C6F3EA44EE5E8C290EB17200A5F77EBB"
   Private Const RRRootSerial As String = "0087448327"
   Private Const RRRootSubject As String = "CN=RealityRipple Software Root CA, OU=RealityRipple Software Certificate Authority, O=RealityRipple Software, L=Los Berros Canyon, S=California, C=US"

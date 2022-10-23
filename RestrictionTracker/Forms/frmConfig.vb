@@ -1,4 +1,4 @@
-﻿Public Class frmConfig
+﻿Friend Class frmConfig
   Private WithEvents remoteTest As remoteRestrictionTracker
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings

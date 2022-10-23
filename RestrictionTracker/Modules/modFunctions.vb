@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports Microsoft.WindowsAPICodePack.Dialogs
 
-Module modFunctions
+Friend Module modFunctions
   Friend Structure WindowAnimationData
     Public destPoint As Point
     Public startRect As Rectangle

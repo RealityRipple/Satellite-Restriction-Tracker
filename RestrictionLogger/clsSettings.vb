@@ -1,4 +1,4 @@
-﻿Class Settings
+﻿Friend Class Settings
   Private m_Account As String
   Private m_AccountType As localRestrictionTracker.SatHostTypes
   Private m_PassCrypt As String

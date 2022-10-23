@@ -1,5 +1,5 @@
 ﻿Imports RestrictionLibrary
-Public Class svcRL
+Friend Class svcRL
   Private Const LATIN_1 As Integer = 28591
   Private MySettings As Settings
   Private sAccount, sPassword, sProvider As String

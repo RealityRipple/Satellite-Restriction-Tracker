@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Public Class NativeMethods
+Friend Class NativeMethods
   Public Enum Validity As UInteger
     Unsigned = &H800B0100UI
     SignedButBad = &H80096010UI

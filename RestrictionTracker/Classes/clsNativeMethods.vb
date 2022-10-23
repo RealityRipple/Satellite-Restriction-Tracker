@@ -1,5 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
-Public NotInheritable Class NativeMethods
+Friend NotInheritable Class NativeMethods
   Public Const WM_WINDOWPOSCHANGING As Int32 = &H46
   Public Const WM_SYSCOMMAND As Int32 = &H112
   Public Const WM_DWMCOMPOSITIONCHANGED As Int32 = &H31E
