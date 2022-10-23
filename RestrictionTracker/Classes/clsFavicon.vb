@@ -3,19 +3,19 @@
   Private WithEvents wsFile As WebClientCore
   Public Delegate Sub DownloadIconCompletedCallback(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
   Private c_callback As DownloadIconCompletedCallback
-  Public Sub New(URL As String, callback As DownloadIconCompletedCallback, token As Object)
-    If String.IsNullOrEmpty(URL) Then Return
+  Public Sub New(sAddr As String, callback As DownloadIconCompletedCallback, token As Object)
+    If String.IsNullOrEmpty(sAddr) Then Return
     c_callback = callback
     Dim connectThread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf BeginConnection))
-    connectThread.Start({URL, token})
+    connectThread.Start({sAddr, token})
   End Sub
   Private Sub BeginConnection(obj As Object)
-    Dim URL As String = obj(0)
+    Dim sAddr As String = obj(0)
     Dim token As Object = obj(1)
-    If Not URL.Contains(Uri.SchemeDelimiter) Then URL = "http://" & URL
+    If Not sAddr.Contains(Uri.SchemeDelimiter) Then sAddr = "http://" & sAddr
     Dim uURI As Uri
     Try
-      uURI = New Uri(URL)
+      uURI = New Uri(sAddr)
     Catch ex As Exception
       Return
     End Try
@@ -61,27 +61,27 @@
                 If sHTML.Contains("""") Then
                   sHTML = sHTML.Substring(sHTML.IndexOf("""") + 1)
                   If sHTML.Contains("""") Then
-                    Dim URL As String = sHTML.Substring(0, sHTML.IndexOf(""""))
-                    If URL.Contains(URI.SchemeDelimiter) Then
+                    Dim sAddr As String = sHTML.Substring(0, sHTML.IndexOf(""""))
+                    If sAddr.Contains(URI.SchemeDelimiter) Then
 
-                    ElseIf URL.Contains("//") Then
-                      Dim oldURL As String = URI.OriginalString
-                      If oldURL.Contains(URI.SchemeDelimiter) Then oldURL = oldURL.Substring(0, oldURL.IndexOf(URI.SchemeDelimiter) + 1)
-                      URL = oldURL & URL
+                    ElseIf sAddr.Contains("//") Then
+                      Dim oldAddr As String = URI.OriginalString
+                      If oldAddr.Contains(URI.SchemeDelimiter) Then oldAddr = oldAddr.Substring(0, oldAddr.IndexOf(URI.SchemeDelimiter) + 1)
+                      sAddr = oldAddr & sAddr
                     Else
                       Dim oldURL As String = URI.OriginalString
                       If Not oldURL.EndsWith("/") And oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.LastIndexOf("/") + 1)
-                      If URL.StartsWith("/") Then
+                      If sAddr.StartsWith("/") Then
                         If oldURL.IndexOf("/", oldURL.IndexOf("//") + 2) > -1 Then oldURL = oldURL.Substring(0, oldURL.IndexOf("/", oldURL.IndexOf("//") + 2))
-                        URL = oldURL & URL
+                        sAddr = oldURL & sAddr
                       ElseIf oldURL.EndsWith("/") Then
-                        URL = oldURL & URL
+                        sAddr = oldURL & sAddr
                       Else
-                        URL = oldURL & "/" & URL
+                        sAddr = oldURL & "/" & sAddr
                       End If
                     End If
                     Try
-                      ConnectToFile(New Uri(URL), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
+                      ConnectToFile(New Uri(sAddr), IO.Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, "srt_nettest_favicon.ico"), token, True)
                     Catch ex As Exception
 
                     End Try

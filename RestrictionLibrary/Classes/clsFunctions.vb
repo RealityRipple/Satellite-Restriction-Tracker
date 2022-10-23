@@ -752,22 +752,23 @@ Public Class srlFunctions
   ''' </summary>
   ''' <param name="url">The address you'd like to cut down.</param>
   ''' <returns>A smaller version of the address.</returns>
-  Public Shared Function TruncateURL(url As String) As String
+  Public Shared Function TruncateAddress(url As Uri) As String
+    Dim addr As String = url.OriginalString
     Const maxLen As Integer = 125
-    If url.Length < maxLen Then Return url
-    If url.Contains("?") Then
-      If url.Substring(url.IndexOf("?") + 1).Contains("=") Then
-        url = url.Substring(0, url.IndexOf("=", url.IndexOf("?") + 1) + ((maxLen - 4) - url.IndexOf("=", url.IndexOf("?") + 1))) & "..."
+    If addr.Length < maxLen Then Return addr
+    If addr.Contains("?") Then
+      If addr.Substring(addr.IndexOf("?") + 1).Contains("=") Then
+        addr = addr.Substring(0, addr.IndexOf("=", addr.IndexOf("?") + 1) + ((maxLen - 4) - addr.IndexOf("=", addr.IndexOf("?") + 1))) & "..."
       Else
-        url = url.Substring(0, url.IndexOf("?") + ((maxLen - 4) - url.IndexOf("?"))) & "..."
+        addr = addr.Substring(0, addr.IndexOf("?") + ((maxLen - 4) - addr.IndexOf("?"))) & "..."
       End If
     End If
-    If url.Length < maxLen Then Return url
-    If url.Contains("/") Then
-      Dim endingBit As String = url.Substring(url.LastIndexOf("/"))
-      url = url.Substring(0, url.Substring(0, maxLen - endingBit.Length).LastIndexOf("/") + 1) & "..." & endingBit
+    If addr.Length < maxLen Then Return addr
+    If addr.Contains("/") Then
+      Dim endingBit As String = addr.Substring(addr.LastIndexOf("/"))
+      addr = addr.Substring(0, addr.Substring(0, maxLen - endingBit.Length).LastIndexOf("/") + 1) & "..." & endingBit
     End If
-    Return url
+    Return addr
   End Function
   ''' <summary>
   ''' Converts a <see cref="localRestrictionTracker.SatHostTypes" /> value to a simple string.
