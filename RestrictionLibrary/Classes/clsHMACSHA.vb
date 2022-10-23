@@ -139,10 +139,7 @@ Public MustInherit Class RR_HMAC
     Return DirectCast(CryptoConfig.CreateFromName(algorithmName), HMAC)
   End Function
   Protected Class KeyBuilder
-    Private Shared rng As RandomNumberGenerator
-    Shared Sub New()
-      rng = RandomNumberGenerator.Create()
-    End Sub
+    Private Shared rng As RandomNumberGenerator = RandomNumberGenerator.Create()
     Public Shared Function Key(size As Integer) As Byte()
       Dim key__1 As Byte() = New Byte(size - 1) {}
       rng.GetBytes(key__1)
@@ -208,11 +205,8 @@ End Class
 ''' </summary>
 Public Class RR_HMACSHA512
   Inherits RR_HMAC
-  Shared legacy_mode As Boolean
+  Shared legacy_mode As Boolean = False
   Private legacy As Boolean
-  Shared Sub New()
-    legacy_mode = False
-  End Sub
   ''' <summary>
   ''' Initializes a new instance of the <see cref="RestrictionLibrary.RR_HMACSHA512" /> class with a randomly generated key.
   ''' </summary>
