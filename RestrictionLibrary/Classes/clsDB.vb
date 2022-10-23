@@ -10,26 +10,66 @@ Public Class DataBase
   ''' Stores information about usage activity at a single date and time.
   ''' </summary>
   Public Structure DataRow
+    Private mDT As Date
+    Private mD As Long
+    Private mDL As Long
+    Private mU As Long
+    Private mUL As Long
     ''' <summary>
     ''' The Date and Time of the data stored in this row.
     ''' </summary>
-    Public DATETIME As Date
+    Public Property DATETIME As Date
+      Get
+        Return mDT
+      End Get
+      Set(value As Date)
+        mDT = value
+      End Set
+    End Property
     ''' <summary>
     ''' The number of Megabytes used in download activity at the specified date and time.
     ''' </summary>
-    Public DOWNLOAD As Long
+    Public Property DOWNLOAD As Long
+      Get
+        Return mD
+      End Get
+      Set(value As Long)
+        mD = value
+      End Set
+    End Property
     ''' <summary>
     ''' The maximum number of Megabytes allowed in download activity for the plan at the specified date and time.
     ''' </summary>
-    Public DOWNLIM As Long
+    Public Property DOWNLIM As Long
+      Get
+        Return mDL
+      End Get
+      Set(value As Long)
+        mDL = value
+      End Set
+    End Property
     ''' <summary>
     ''' The number of Megabytes used in upload activity at the specified date and time.
     ''' </summary>
-    Public UPLOAD As Long
+    Public Property UPLOAD As Long
+      Get
+        Return mU
+      End Get
+      Set(value As Long)
+        mU = value
+      End Set
+    End Property
     ''' <summary>
     ''' The maximum number of Megabytes allowed in upload activity for the plan at the specified date and time.
     ''' </summary>
-    Public UPLIM As Long
+    Public Property UPLIM As Long
+      Get
+        Return mUL
+      End Get
+      Set(value As Long)
+        mUL = value
+      End Set
+    End Property
     ''' <summary>
     ''' Create a new DataRow entry.
     ''' </summary>
@@ -39,11 +79,11 @@ Public Class DataBase
     ''' <param name="lUp">The number of Megabytes used in upload activity for this entry.</param>
     ''' <param name="lUpLim">The maximum number of Megabytes allowed in upload activity for this entry.</param>
     Public Sub New(dTime As Date, lDown As Long, lDownLim As Long, lUp As Long, lUpLim As Long)
-      DATETIME = dTime
-      DOWNLOAD = lDown
-      DOWNLIM = lDownLim
-      UPLOAD = lUp
-      UPLIM = lUpLim
+      mDT = dTime
+      mD = lDown
+      mDL = lDownLim
+      mU = lUp
+      mUL = lUpLim
     End Sub
     ''' <summary>
     ''' Get a string representation of the Date and Time of the data stored in this row.
@@ -51,7 +91,7 @@ Public Class DataBase
     ''' <returns>The date and time are returned in the format "MM/DD/YYYY HH:MM", or the standard "g".</returns>
     Public ReadOnly Property sDATETIME As String
       Get
-        Return srlFunctions.TimeToString(DATETIME)
+        Return srlFunctions.TimeToString(mDT)
       End Get
     End Property
     ''' <summary>
@@ -60,7 +100,7 @@ Public Class DataBase
     ''' <returns>The download value is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sDOWNLOAD As String
       Get
-        Return DOWNLOAD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+        Return mD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -69,7 +109,7 @@ Public Class DataBase
     ''' <returns>The download limit is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sDOWNLIM As String
       Get
-        Return DOWNLIM.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+        Return mDL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -78,7 +118,7 @@ Public Class DataBase
     ''' <returns>The upload value is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sUPLOAD As String
       Get
-        Return UPLOAD.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+        Return mU.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -87,7 +127,7 @@ Public Class DataBase
     ''' <returns>The upload limit is returned with standard thousands separators and no decimal.</returns>
     Public ReadOnly Property sUPLIM As String
       Get
-        Return UPLIM.ToString("N0", Globalization.CultureInfo.InvariantCulture)
+        Return mUL.ToString("N0", Globalization.CultureInfo.InvariantCulture)
       End Get
     End Property
     ''' <summary>
@@ -96,10 +136,10 @@ Public Class DataBase
     ''' <returns>The return value will always contain the <see cref="sDATETIME" /> value, and will be followed with Download and/or Upload values if either the value or limit is greater than 0.</returns>
     Public Overrides Function ToString() As String
       Dim sRet As String = sDATETIME
-      If DOWNLOAD > 0 Or DOWNLIM > 0 Then
+      If mD > 0 Or mDL > 0 Then
         sRet &= " Down: " & sDOWNLOAD & "/" & sDOWNLIM
       End If
-      If UPLOAD > 0 Or UPLIM > 0 Then
+      If mU > 0 Or mUL > 0 Then
         If sRet.Contains(" Down: ") Then sRet &= ","
         sRet &= " Up: " & sUPLOAD & "/" & sUPLIM
       End If
@@ -127,7 +167,7 @@ Public Class DataBase
     ''' </summary>
     ''' <returns>A boolean value of <c>True</c> is returned if this entry is empty, <c>False</c> otherwise.</returns>
     Public Function IsEmpty() As Boolean
-      Return (DATETIME.ToBinary = 0 And DOWNLOAD = 0 And UPLOAD = 0 And DOWNLIM = 0 And UPLIM = 0)
+      Return (mDT.ToBinary = 0 And mD = 0 And mU = 0 And mDL = 0 And mUL = 0)
     End Function
   End Structure
   Private data As SortedDictionary(Of UInt64, DataRow)
@@ -140,10 +180,13 @@ Public Class DataBase
     data.Clear()
     data = Nothing
   End Sub
+  Private mStopNew As Boolean
   ''' <summary>
-  ''' Set this value to true to stop loading a databased called from the initialization subroutine.
+  ''' Stop loading a databased called from the initialization subroutine.
   ''' </summary>
-  Public StopNew As Boolean
+  Public Sub StopNew()
+    mStopNew = True
+  End Sub
   Private sPath As String
   Private bWithDisplay As Boolean
   Public Class ProgressStateEventArgs
@@ -196,7 +239,7 @@ Public Class DataBase
   ''' Begin loading DataBase entries from the path specified in the snitialization subroutine.
   ''' </summary>
   Public Sub StartNew()
-    StopNew = False
+    mStopNew = False
     If IO.File.Exists(sPath) Then
       Try
         If IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".XML") = 0 Then
@@ -225,7 +268,7 @@ Public Class DataBase
             Dim UpLim As Long = Long.Parse(sUL, Globalization.CultureInfo.InvariantCulture)
             If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
             Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-            If StopNew Then Return
+            If mStopNew Then Return
           Next
           m_xmld = Nothing
         ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".WB") = 0 Then
@@ -241,7 +284,7 @@ Public Class DataBase
               Dim UpLim As Long = LOAD_ReadLong(nIn)
               If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
               Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              If StopNew Then Return
+              If mStopNew Then Return
             Next
           End Using
         ElseIf IO.Path.GetExtension(sPath).ToUpperInvariant.CompareTo(".CSV") = 0 Then
@@ -267,7 +310,7 @@ Public Class DataBase
               Dim UpLim As Long = rowData(4)
               If data Is Nothing Then data = New SortedDictionary(Of UInt64, DataRow)
               Add(New DataRow(DT, Down, DownLim, Up, UpLim))
-              If StopNew Then Return
+              If mStopNew Then Return
             Loop
           End Using
         End If

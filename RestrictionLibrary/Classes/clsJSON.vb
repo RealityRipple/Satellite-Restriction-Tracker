@@ -7,47 +7,106 @@
     [String]
   End Enum
   Public Structure JSElement
-    Public Type As ElementType
-    Public SubElements As List(Of JSElement)
-    Public Collection As List(Of JSElement)
-    Public Key As String
-    Public Value As String
+    Private mType As ElementType
+    Private mSubElements As ObjectModel.ReadOnlyCollection(Of JSElement)
+    Private mCollection As ObjectModel.ReadOnlyCollection(Of JSElement)
+    Private mKey As String
+    Private mValue As String
+    Public Sub New(sMsg As String)
+      mType = ElementType.String
+      mKey = sMsg
+      mValue = sMsg
+    End Sub
+    Public Sub New(sKey As String, sValue As String)
+      mType = ElementType.KeyValue
+      mKey = sKey
+      mValue = sValue
+    End Sub
+    Public Sub New(sKey As String, lSubElements As ObjectModel.ReadOnlyCollection(Of JSElement))
+      mType = ElementType.Group
+      mKey = sKey
+      mSubElements = lSubElements
+    End Sub
+    Public Sub New(lCollection As ObjectModel.ReadOnlyCollection(Of JSElement))
+      mType = ElementType.Array
+      mCollection = lCollection
+    End Sub
+    Public Shared ReadOnly Property Empty As JSElement
+      Get
+        Return New JSElement(ElementType.None)
+      End Get
+    End Property
+
+    Public ReadOnly Property Type As ElementType
+      Get
+        Return mType
+      End Get
+    End Property
+    Public ReadOnly Property SubElements As ObjectModel.ReadOnlyCollection(Of JSElement)
+      Get
+        Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mSubElements)
+      End Get
+    End Property
+    Public ReadOnly Property Collection As ObjectModel.ReadOnlyCollection(Of JSElement)
+      Get
+        Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mCollection)
+      End Get
+    End Property
+    Public ReadOnly Property Key As String
+      Get
+        Return mKey
+      End Get
+    End Property
+    Public ReadOnly Property Value As String
+      Get
+        Return mValue
+      End Get
+    End Property
   End Structure
-  Public Serial As List(Of JSElement)
-  Public TextEncoding As System.Text.Encoding
+  Private mSerial As List(Of JSElement)
+  Public ReadOnly Property Serial As ObjectModel.ReadOnlyCollection(Of JSElement)
+    Get
+      Return New ObjectModel.ReadOnlyCollection(Of JSElement)(mSerial)
+    End Get
+  End Property
+  Private enc As System.Text.Encoding
+  Public ReadOnly Property TextEncoding As System.Text.Encoding
+    Get
+      Return enc
+    End Get
+  End Property
 
   Public Sub New(stream As IO.Stream, ExpectUTF8 As Boolean)
-    TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
+    enc = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
     Dim bom0 As Integer = stream.ReadByte
     Dim bom1 As Integer = stream.ReadByte
     Dim bom2 As Integer = stream.ReadByte
     Dim bom3 As Integer = stream.ReadByte
     If bom0 = &HEF And bom1 = &HBB And bom2 = &HBF Then
-      TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
+      enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
       stream.Seek(3, IO.SeekOrigin.Begin)
     ElseIf bom0 = &H0 And bom1 = &H0 And bom2 = &HFE And bom3 = &HFF Then
-      TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_32_BE)
+      enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_32_BE)
     ElseIf bom0 = &HFF And bom1 = &HFE And bom2 = &H0 And bom3 = &H0 Then
-      TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_32_LE)
+      enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_32_LE)
     ElseIf bom0 = &HFE And bom1 = &HFF Then
-      TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_16_BE)
+      enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_16_BE)
       stream.Seek(2, IO.SeekOrigin.Begin)
     ElseIf bom0 = &HFF And bom1 = &HFE Then
-      TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_16_LE)
+      enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_16_LE)
       stream.Seek(2, IO.SeekOrigin.Begin)
     Else
       stream.Seek(0, IO.SeekOrigin.Begin)
-      If ExpectUTF8 Then TextEncoding = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
+      If ExpectUTF8 Then enc = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8)
     End If
-    Serial = New List(Of JSElement)
+    mSerial = New List(Of JSElement)
     Dim workElement As JSElement = ReadElement(stream, TextEncoding)
     Do Until workElement.Type = ElementType.None
-      Serial.Add(workElement)
+      mSerial.Add(workElement)
       workElement = Nothing
       workElement = ReadElement(stream, TextEncoding)
     Loop
   End Sub
-
   Private Shared Function ReadCharacter(stream As IO.Stream, streamEncoding As System.Text.Encoding) As String
     Select Case streamEncoding.CodePage
       Case srlFunctions.LATIN_1
@@ -122,240 +181,171 @@
         Return ChrW(b)
     End Select
   End Function
-
   Public Shared Function ReadElement(stream As IO.Stream, streamEncoding As System.Text.Encoding) As JSElement
-    Dim el As New JSElement
-    If Not stream.CanRead Then
-      el.Type = ElementType.None
-      Return el
-    End If
+    If Not stream.CanRead Then Return JSElement.Empty
+    Dim myKey As String = Nothing
     Dim sRead As String = ReadCharacter(stream, streamEncoding)
     Do Until String.IsNullOrEmpty(sRead)
-      If sRead = "{" Then
-        el.Type = ElementType.Group
-        el.SubElements = New List(Of JSElement)
+      If sRead = "{" Or sRead = "[" Then
         Dim workElement As JSElement = ReadElement(stream, streamEncoding)
+        Dim myList As New List(Of JSElement)
         Do Until workElement.Type = ElementType.None
-          el.SubElements.Add(workElement)
+          myList.Add(workElement)
           workElement = Nothing
           If Not stream.CanRead Then Exit Do
           workElement = ReadElement(stream, streamEncoding)
         Loop
-        Return el
-      ElseIf sRead = "}" Then
-        el.Type = ElementType.None
-        Return el
-      ElseIf sRead = "[" Then
-        el.Type = ElementType.Array
-        el.Collection = New List(Of JSElement)
-        Dim workElement As JSElement = ReadElement(stream, streamEncoding)
-        Do Until workElement.Type = ElementType.None
-          el.Collection.Add(workElement)
-          workElement = Nothing
-          If Not stream.CanRead Then Exit Do
-          workElement = ReadElement(stream, streamEncoding)
-        Loop
-        Return el
-      ElseIf sRead = "]" Then
-        el.Type = ElementType.None
-        Return el
-      ElseIf sRead = """" Then
-
-        el.Type = ElementType.KeyValue
-        Dim sKey As String = Nothing
-        Dim sText As String = ReadCharacter(stream, streamEncoding)
-        Dim escape As Boolean = False
-        Do Until String.IsNullOrEmpty(sText)
-          If escape Then
-            sKey &= "\" & sText
-            escape = False
-          ElseIf sText = "\" Then
-            escape = True
-          ElseIf sText = """" Then
-            Exit Do
-          Else
-            sKey &= sText
-            escape = False
-          End If
-          If Not stream.CanRead Then
-            el.Type = ElementType.None
-            el.Key = Nothing
-            Return el
-          End If
-          sText = ReadCharacter(stream, streamEncoding)
-        Loop
-        el.Key = sKey
-        If Not stream.CanRead Then
-          el.Type = ElementType.None
-          el.Key = Nothing
-          Return el
-        End If
-
-        Dim sSplit As String = ReadCharacter(stream, streamEncoding)
-        Do Until String.IsNullOrEmpty(sSplit)
-          If Not String.IsNullOrEmpty(sSplit) Then
-            If sSplit = ":" Then Exit Do
-            If sSplit = "," Then Exit Do
-            If sSplit = "[" Then Exit Do
-            If sSplit = "]" Then Exit Do
-            If sSplit = "{" Then Exit Do
-            If sSplit = "}" Then Exit Do
-          End If
-          If Not stream.CanRead Then
-            Exit Do
-          End If
-          sSplit = ReadCharacter(stream, streamEncoding)
-        Loop
-        If Not sSplit = ":" Then
-          el.Type = ElementType.String
-          el.Value = el.Key
-          stream.Seek(-1, IO.SeekOrigin.Current)
-          Return el
-        End If
-
-        Dim sNext As String = ReadCharacter(stream, streamEncoding)
-        Do Until String.IsNullOrEmpty(sNext)
-          If Not String.IsNullOrEmpty(sNext) Then
-            If sNext = """" Then Exit Do
-            If sNext = "[" Then Exit Do
-            If sNext = "{" Then Exit Do
-            If sNext.ToUpperInvariant = "T" Or sNext.ToUpperInvariant = "F" Or sNext.ToUpperInvariant = "N" Then Exit Do
-            If IsNumeric(sNext) Or sNext = "-" Then Exit Do
-          End If
-          If Not stream.CanRead Then
-            Exit Do
-          End If
-          sNext = ReadCharacter(stream, streamEncoding)
-        Loop
-        If sNext = "[" Then
-          el.Type = ElementType.Array
-          el.Collection = New List(Of JSElement)
-          Dim workElement As JSElement = ReadElement(stream, streamEncoding)
-          Do Until workElement.Type = ElementType.None
-            el.Collection.Add(workElement)
-            workElement = Nothing
-            If Not stream.CanRead Then Exit Do
-            workElement = ReadElement(stream, streamEncoding)
-          Loop
-        ElseIf sNext = "{" Then
-          el.Type = ElementType.Group
-          el.SubElements = New List(Of JSElement)
-          Dim workElement As JSElement = ReadElement(stream, streamEncoding)
-          Do Until workElement.Type = ElementType.None
-            el.SubElements.Add(workElement)
-            workElement = Nothing
-            If Not stream.CanRead Then Exit Do
-            workElement = ReadElement(stream, streamEncoding)
-          Loop
-        ElseIf sNext.ToUpperInvariant = "T" Then
-          sText = sNext
-          Dim sVal As String = Nothing
-          Do Until String.IsNullOrEmpty(sText)
-            If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-              stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToUpperInvariant = "TRUE") Then Exit Do
-            Else
-              sVal &= sText
-            End If
-            If Not stream.CanRead Then
-              el.Type = ElementType.None
-              el.Key = Nothing
-              el.Value = Nothing
-              Return el
-            End If
-            sText = ReadCharacter(stream, streamEncoding)
-          Loop
-          el.Value = sVal
-        ElseIf sNext.ToUpperInvariant = "F" Then
-          sText = sNext
-          Dim sVal As String = Nothing
-          Do Until String.IsNullOrEmpty(sText)
-            If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-              stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToUpperInvariant = "FALSE") Then Exit Do
-            Else
-              sVal &= sText
-            End If
-            If Not stream.CanRead Then
-              el.Type = ElementType.None
-              el.Key = Nothing
-              el.Value = Nothing
-              Return el
-            End If
-            sText = ReadCharacter(stream, streamEncoding)
-          Loop
-          el.Value = sVal
-        ElseIf sNext.ToUpperInvariant = "N" Then
-          sText = sNext
-          Dim sVal As String = Nothing
-          Do Until String.IsNullOrEmpty(sText)
-            If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-              stream.Seek(-1, IO.SeekOrigin.Current)
-              If (sVal.ToUpperInvariant = "NULL") Then Exit Do
-            Else
-              sVal &= sText
-            End If
-            If Not stream.CanRead Then
-              el.Type = ElementType.None
-              el.Key = Nothing
-              el.Value = Nothing
-              Return el
-            End If
-            sText = ReadCharacter(stream, streamEncoding)
-          Loop
-          el.Value = sVal
-        ElseIf IsNumeric(sNext) Or sNext = "-" Then
-          sText = sNext
-          Dim sVal As String = Nothing
-          Do Until String.IsNullOrEmpty(sText)
-            If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
-              stream.Seek(-1, IO.SeekOrigin.Current)
-              If IsNumeric(sVal) Then Exit Do
-            Else
-              sVal &= sText
-            End If
-            If Not stream.CanRead Then
-              el.Type = ElementType.None
-              el.Key = Nothing
-              el.Value = Nothing
-              Return el
-            End If
-            sText = ReadCharacter(stream, streamEncoding)
-          Loop
-          el.Value = sVal
-        Else
-          sText = ReadCharacter(stream, streamEncoding)
-          escape = False
-          Dim sVal As String = Nothing
-          Do Until String.IsNullOrEmpty(sText)
-            If escape Then
-              sVal &= "\" & sText
-              escape = False
-            ElseIf sText = "\" Then
-              escape = True
-            ElseIf sText = """" Then
-              Exit Do
-            Else
-              sVal &= sText
-              escape = False
-            End If
-            If Not stream.CanRead Then
-              el.Type = ElementType.None
-              el.Key = Nothing
-              el.Value = Nothing
-              Return el
-            End If
-            sText = ReadCharacter(stream, streamEncoding)
-          Loop
-          el.Value = sVal
-        End If
-        Return el
+        If sRead = "[" Then Return New JSElement(New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
+        Return New JSElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
       End If
-      If Not stream.CanRead Then Exit Do
-      sRead = ReadCharacter(stream, streamEncoding)
+      If sRead = "}" Or sRead = "]" Then Return JSElement.Empty
+      If Not sRead = """" Then
+        If Not stream.CanRead Then Exit Do
+        sRead = ReadCharacter(stream, streamEncoding)
+        Continue Do
+      End If
+      Dim sKey As String = Nothing
+      Dim sText As String = ReadCharacter(stream, streamEncoding)
+      Dim escape As Boolean = False
+      Do Until String.IsNullOrEmpty(sText)
+        If escape Then
+          sKey &= "\" & sText
+          escape = False
+        ElseIf sText = "\" Then
+          escape = True
+        ElseIf sText = """" Then
+          Exit Do
+        Else
+          sKey &= sText
+          escape = False
+        End If
+        If Not stream.CanRead Then Return JSElement.Empty
+        sText = ReadCharacter(stream, streamEncoding)
+      Loop
+      myKey = sKey
+      If Not stream.CanRead Then Return JSElement.Empty
+      Dim sSplit As String = ReadCharacter(stream, streamEncoding)
+      Do Until String.IsNullOrEmpty(sSplit)
+        If Not String.IsNullOrEmpty(sSplit) Then
+          If sSplit = ":" Then Exit Do
+          If sSplit = "," Then Exit Do
+          If sSplit = "[" Then Exit Do
+          If sSplit = "]" Then Exit Do
+          If sSplit = "{" Then Exit Do
+          If sSplit = "}" Then Exit Do
+        End If
+        If Not stream.CanRead Then
+          Exit Do
+        End If
+        sSplit = ReadCharacter(stream, streamEncoding)
+      Loop
+      If Not sSplit = ":" Then
+        stream.Seek(-1, IO.SeekOrigin.Current)
+        Return New JSElement(myKey)
+      End If
+      Dim sNext As String = ReadCharacter(stream, streamEncoding)
+      Do Until String.IsNullOrEmpty(sNext)
+        If Not String.IsNullOrEmpty(sNext) Then
+          If sNext = """" Then Exit Do
+          If sNext = "[" Then Exit Do
+          If sNext = "{" Then Exit Do
+          If sNext.ToUpperInvariant = "T" Or sNext.ToUpperInvariant = "F" Or sNext.ToUpperInvariant = "N" Then Exit Do
+          If IsNumeric(sNext) Or sNext = "-" Then Exit Do
+        End If
+        If Not stream.CanRead Then
+          Exit Do
+        End If
+        sNext = ReadCharacter(stream, streamEncoding)
+      Loop
+      If sNext = "{" Or sNext = "[" Then
+        Dim myList As New List(Of JSElement)
+        Dim workElement As JSElement = ReadElement(stream, streamEncoding)
+        Do Until workElement.Type = ElementType.None
+          myList.Add(workElement)
+          workElement = Nothing
+          If Not stream.CanRead Then Exit Do
+          workElement = ReadElement(stream, streamEncoding)
+        Loop
+        If sNext = "[" Then Return New JSElement(New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
+        Return New JSElement(myKey, New ObjectModel.ReadOnlyCollection(Of JSElement)(myList))
+      End If
+      Dim sVal As String = Nothing
+      If sNext.ToUpperInvariant = "T" Then
+        sText = sNext
+        Do Until String.IsNullOrEmpty(sText)
+          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
+            stream.Seek(-1, IO.SeekOrigin.Current)
+            If (sVal.ToUpperInvariant = "TRUE") Then Exit Do
+          Else
+            sVal &= sText
+          End If
+          If Not stream.CanRead Then Return JSElement.Empty
+          sText = ReadCharacter(stream, streamEncoding)
+        Loop
+        Return New JSElement(myKey, sVal)
+      End If
+      If sNext.ToUpperInvariant = "F" Then
+        sText = sNext
+        Do Until String.IsNullOrEmpty(sText)
+          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
+            stream.Seek(-1, IO.SeekOrigin.Current)
+            If (sVal.ToUpperInvariant = "FALSE") Then Exit Do
+          Else
+            sVal &= sText
+          End If
+          If Not stream.CanRead Then Return JSElement.Empty
+          sText = ReadCharacter(stream, streamEncoding)
+        Loop
+        Return New JSElement(myKey, sVal)
+      End If
+      If sNext.ToUpperInvariant = "N" Then
+        sText = sNext
+        Do Until String.IsNullOrEmpty(sText)
+          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
+            stream.Seek(-1, IO.SeekOrigin.Current)
+            If (sVal.ToUpperInvariant = "NULL") Then Exit Do
+          Else
+            sVal &= sText
+          End If
+          If Not stream.CanRead Then Return JSElement.Empty
+          sText = ReadCharacter(stream, streamEncoding)
+        Loop
+        Return New JSElement(myKey, sVal)
+      End If
+      If IsNumeric(sNext) Or sNext = "-" Then
+        sText = sNext
+        Do Until String.IsNullOrEmpty(sText)
+          If (sText = "," Or sText = "]" Or sText = "}") And Not String.IsNullOrEmpty(sVal) Then
+            stream.Seek(-1, IO.SeekOrigin.Current)
+            If IsNumeric(sVal) Then Exit Do
+          Else
+            sVal &= sText
+          End If
+          If Not stream.CanRead Then Return JSElement.Empty
+          sText = ReadCharacter(stream, streamEncoding)
+        Loop
+        Return New JSElement(myKey, sVal)
+      End If
+      sText = ReadCharacter(stream, streamEncoding)
+      escape = False
+      Do Until String.IsNullOrEmpty(sText)
+        If escape Then
+          sVal &= "\" & sText
+          escape = False
+        ElseIf sText = "\" Then
+          escape = True
+        ElseIf sText = """" Then
+          Exit Do
+        Else
+          sVal &= sText
+          escape = False
+        End If
+        If Not stream.CanRead Then Return JSElement.Empty
+        sText = ReadCharacter(stream, streamEncoding)
+      Loop
+      Return New JSElement(myKey, sVal)
     Loop
-    el.Type = ElementType.None
-    Return el
+    Return JSElement.Empty
   End Function
 End Class
 

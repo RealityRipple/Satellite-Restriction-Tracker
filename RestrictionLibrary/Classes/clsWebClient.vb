@@ -42,13 +42,18 @@
   ''' </summary>
   Public Class ErrorEventArgs
     Inherits EventArgs
-    Public [Error] As Exception
+    Private mError As Exception
+    Public ReadOnly Property [Error] As Exception
+      Get
+        Return mError
+      End Get
+    End Property
     ''' <summary>
     ''' Create a new instance of the <see cref="ErrorEventArgs" /> Class for use with the <see cref="Failure" /> event.
     ''' </summary>
     ''' <param name="Err">The Exception being passed through the <see cref="Failure" /> event.</param>
     Public Sub New(Err As Exception)
-      [Error] = Err
+      mError = Err
     End Sub
   End Class
   ''' <summary>

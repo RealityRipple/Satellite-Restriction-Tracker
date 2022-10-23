@@ -64,37 +64,43 @@ Public Class remoteRestrictionTracker
       ''' </summary>
       NotBase64
     End Enum
+    Private mType As FailType
     ''' <summary>
     ''' The type of failure received from the server.
     ''' </summary>
-    Public Type As FailType
+    Public ReadOnly Property [Type] As FailType
+      Get
+        Return mType
+      End Get
+    End Property
+    Private mDetails As String
     ''' <summary>
     ''' Details regarding the failure received from the server.
     ''' </summary>
-    Public Details As String
+    Public ReadOnly Property Details As String
+      Get
+        Return mDetails
+      End Get
+    End Property
     ''' <summary>
     ''' Generate a failure message as received from the server.
     ''' </summary>
     ''' <param name="Failure">The type of failure received from the server.</param>
     ''' <param name="Extra">Details regarding the failure from the server (optional). This data will be parsed down to the HTML title if one exists.</param>
     Public Sub New(Failure As FailType, Optional Extra As String = Nothing)
-      Type = Failure
-      If Type = FailType.NotBase64 Then
+      mType = Failure
+      If mType = FailType.NotBase64 Then
         If Not String.IsNullOrEmpty(Extra) AndAlso Extra.ToUpperInvariant.Contains("<HTML") Then
           If Extra.ToUpperInvariant.Contains("<TITLE") Then
             Dim htmlTitle As String = Extra.Substring(Extra.IndexOf("<TITLE", StringComparison.OrdinalIgnoreCase))
             htmlTitle = htmlTitle.Substring(htmlTitle.IndexOf(">") + 1)
             htmlTitle = htmlTitle.Substring(0, htmlTitle.IndexOf("</"))
-            Details = """" & htmlTitle & """ received"
-          Else
-            Details = Extra
+            mDetails = """" & htmlTitle & """ received"
+            Return
           End If
-        Else
-          Details = Extra
         End If
-      Else
-        Details = Extra
       End If
+      mDetails = Extra
     End Sub
   End Class
   ''' <summary>
@@ -108,40 +114,70 @@ Public Class remoteRestrictionTracker
   ''' </summary>
   Public Class SuccessEventArgs
     Inherits EventArgs
+    Private mProvider As localRestrictionTracker.SatHostTypes
     ''' <summary>
     ''' The type of provider which this account uses.
     ''' </summary>
-    Public Provider As localRestrictionTracker.SatHostTypes
+    Public ReadOnly Property Provider As localRestrictionTracker.SatHostTypes
+      Get
+        Return mProvider
+      End Get
+    End Property
     ''' <summary>
     ''' A structure containing a single moment in usage history.
     ''' </summary>
     Public Structure Result
+      Private mTime As DateTime
       ''' <summary>
       ''' The exact date and time this usage data belongs to.
       ''' </summary>
-      Public Time As DateTime
+      Public ReadOnly Property Time As DateTime
+        Get
+          Return mTime
+        End Get
+      End Property
+      Private mDown As Integer
       ''' <summary>
       ''' Number of megabytes used in download.
       ''' </summary>
-      Public Down As Integer
+      Public ReadOnly Property Down As Integer
+        Get
+          Return mDown
+        End Get
+      End Property
+      Private mDownMax As Integer
       ''' <summary>
       ''' Number of megabytes allowed in download.
       ''' </summary>
-      Public DownMax As Integer
+      Public ReadOnly Property DownMax As Integer
+        Get
+          Return mDownMax
+        End Get
+      End Property
+      Private mUp As Integer
       ''' <summary>
       ''' Number of megabytes used in upload.
       ''' </summary>
-      Public Up As Integer
+      Public ReadOnly Property Up As Integer
+        Get
+          Return mUp
+        End Get
+      End Property
+      Private mUpMax As Integer
       ''' <summary>
       ''' Number of megabytes allowed in upload.
       ''' </summary>
-      Public UpMax As Integer
+      Public ReadOnly Property UpMax As Integer
+        Get
+          Return mUpMax
+        End Get
+      End Property
       Private Ditto As Boolean
       Public Overrides Function ToString() As String
         If Ditto Then
-          Return Time.ToString("G", srlFunctions.DateFormatProvider) & ":" & Down & "/" & DownMax
+          Return mTime.ToString("G", srlFunctions.DateFormatProvider) & ":" & mDown & "/" & mDownMax
         Else
-          Return Time.ToString("G", srlFunctions.DateFormatProvider) & ":" & Down & "/" & DownMax & ", " & Up & "/" & UpMax
+          Return mTime.ToString("G", srlFunctions.DateFormatProvider) & ":" & mDown & "/" & mDownMax & ", " & mUp & "/" & mUpMax
         End If
       End Function
       ''' <summary>
@@ -153,11 +189,11 @@ Public Class remoteRestrictionTracker
       ''' <remarks><see cref="localRestrictionTracker.TYPEBResultEventArgs">Type B</see> history data does not separate Download and Upload data, and stores the Used and Max values in both Down and Up variables.</remarks>
       Public Sub New(AtTime As DateTime, iUsed As Integer, iMax As Integer)
         Ditto = True
-        Time = AtTime
-        Down = iUsed
-        Up = iUsed
-        DownMax = iMax
-        UpMax = iMax
+        mTime = AtTime
+        mDown = iUsed
+        mUp = iUsed
+        mDownMax = iMax
+        mUpMax = iMax
       End Sub
       ''' <summary>
       ''' Generate a new <see cref="Result" /> using a <see cref="localRestrictionTracker.TYPEAResultEventArgs">Type A</see> history.
@@ -170,25 +206,30 @@ Public Class remoteRestrictionTracker
       ''' <remarks><see cref="localRestrictionTracker.TYPEAResultEventArgs">Type A</see> history data separates Download and Upload data, providing a more accurate breakdown of usage.</remarks>
       Public Sub New(AtTime As DateTime, iDown As Integer, iDownMax As Integer, iUp As Integer, iUpMax As Integer)
         Ditto = False
-        Time = AtTime
-        Down = iDown
-        Up = iUp
-        DownMax = iDownMax
-        UpMax = iUpMax
+        mTime = AtTime
+        mDown = iDown
+        mUp = iUp
+        mDownMax = iDownMax
+        mUpMax = iUpMax
       End Sub
     End Structure
+    Private mResults As Result()
     ''' <summary>
     ''' List of <see cref="Result" /> values in an array. This contains all the results which fit the range requested in the UpdateFrom param in the <see cref="remoteRestrictionTracker" /> constructor.
     ''' </summary>
-    Public Results() As Result
+    Public ReadOnly Property Results() As Result()
+      Get
+        Return mResults
+      End Get
+    End Property
     ''' <summary>
     ''' Generate a success message containing the data received from the server.
     ''' </summary>
-    ''' <param name="mProvider">The type of provider which this account uses.</param>
-    ''' <param name="mResults">An array of <see cref="Result" /> values containing all the responses from the server.</param>
-    Public Sub New(mProvider As localRestrictionTracker.SatHostTypes, mResults() As Result)
-      Provider = mProvider
-      Results = mResults
+    ''' <param name="tProvider">The type of provider which this account uses.</param>
+    ''' <param name="aResults">An array of <see cref="Result" /> values containing all the responses from the server.</param>
+    Public Sub New(tProvider As localRestrictionTracker.SatHostTypes, aResults() As Result)
+      mProvider = tProvider
+      mResults = aResults
     End Sub
   End Class
   ''' <summary>

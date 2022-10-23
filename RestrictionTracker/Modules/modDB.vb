@@ -77,7 +77,7 @@
   End Sub
   Public Sub LOG_Terminate(withSave As Boolean)
     If Not isLoaded Then
-      If usageDB IsNot Nothing Then usageDB.StopNew = True
+      If usageDB IsNot Nothing Then usageDB.StopNew()
       Return
     End If
     Do While isSaving

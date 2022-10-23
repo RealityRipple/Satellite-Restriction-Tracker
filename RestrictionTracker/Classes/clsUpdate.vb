@@ -3,13 +3,28 @@
   Private Const VersionURL As String = "http://update.realityripple.com/Satellite_Restriction_Tracker/ver"
   Class ProgressEventArgs
     Inherits EventArgs
-    Public BytesReceived As Long
-    Public ProgressPercentage As Integer
-    Public TotalBytesToReceive As Long
+    Private mBytesReceived As Long
+    Public ReadOnly Property BytesReceived As Long
+      Get
+        Return mBytesReceived
+      End Get
+    End Property
+    Private mProgressPercentage As Integer
+    Public ReadOnly Property ProgressPercentage As Integer
+      Get
+        Return mProgressPercentage
+      End Get
+    End Property
+    Private mTotalBytesToReceive As Long
+    Public ReadOnly Property TotalBytesToReceive As Long
+      Get
+        Return mTotalBytesToReceive
+      End Get
+    End Property
     Friend Sub New(bReceived As Long, bToReceive As Long, iPercentage As Integer)
-      BytesReceived = bReceived
-      TotalBytesToReceive = bToReceive
-      ProgressPercentage = iPercentage
+      mBytesReceived = bReceived
+      mTotalBytesToReceive = bToReceive
+      mProgressPercentage = iPercentage
     End Sub
   End Class
   Class CheckEventArgs
@@ -19,29 +34,27 @@
       NewUpdate
       NewBeta
     End Enum
-    Public Result As ResultType
-    Public Version As String
+    Private mResult As ResultType
+    Public ReadOnly Property Result As ResultType
+      Get
+        Return mResult
+      End Get
+    End Property
+    Private mVersion As String
+    Public ReadOnly Property Version As String
+      Get
+        Return mVersion
+      End Get
+    End Property
     Friend Sub New(rtResult As ResultType, sVersion As String, ex As Exception, bCancelled As Boolean)
       MyBase.New(ex, bCancelled, Nothing)
-      Version = sVersion
-      Result = rtResult
+      mVersion = sVersion
+      mResult = rtResult
     End Sub
     Friend Sub New(rtResult As ResultType, sVersion As String, e As System.ComponentModel.AsyncCompletedEventArgs)
       MyBase.New(e.Error, e.Cancelled, e.UserState)
-      Version = sVersion
-      Result = rtResult
-    End Sub
-  End Class
-  Class DownloadEventArgs
-    Inherits System.ComponentModel.AsyncCompletedEventArgs
-    Public Version As String
-    Friend Sub New(sVersion As String, [error] As Exception, [cancelled] As Boolean)
-      MyBase.New([error], [cancelled], Nothing)
-      Version = sVersion
-    End Sub
-    Friend Sub New(sVersion As String, e As System.ComponentModel.AsyncCompletedEventArgs)
-      MyBase.New(e.Error, e.Cancelled, e.UserState)
-      Version = sVersion
+      mVersion = sVersion
+      mResult = rtResult
     End Sub
   End Class
   Public Event CheckingVersion As EventHandler
@@ -49,7 +62,7 @@
   Public Event CheckResult As EventHandler(Of CheckEventArgs)
   Public Event DownloadingUpdate As EventHandler
   Public Event UpdateProgressChanged As EventHandler(Of ProgressEventArgs)
-  Public Event DownloadResult As EventHandler(Of DownloadEventArgs)
+  Public Event DownloadResult As EventHandler(Of System.ComponentModel.AsyncCompletedEventArgs)
   Private WithEvents wsVer As WebClientCore
   Private DownloadURL As String
   Private VerNumber As String
@@ -140,7 +153,7 @@
       wsVer.DownloadFileAsync(New Uri(DownloadURL), toLocation, "FILE")
       RaiseEvent DownloadingUpdate(Me, New EventArgs)
     Else
-      RaiseEvent DownloadResult(Me, New DownloadEventArgs(Nothing, New Exception("Version Check was not run."), True))
+      RaiseEvent DownloadResult(Me, New System.ComponentModel.AsyncCompletedEventArgs(New Exception("Version Check was not run."), True, Nothing))
     End If
   End Sub
   Private Sub wsVer_DownloadProgressChanged(sender As Object, e As System.Net.DownloadProgressChangedEventArgs) Handles wsVer.DownloadProgressChanged
@@ -203,7 +216,7 @@
     RaiseEvent CheckResult(sender, New CheckEventArgs(rRet, VerNumber, e))
   End Sub
   Private Sub wsVer_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsVer.DownloadFileCompleted
-    RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, e))
+    RaiseEvent DownloadResult(sender, e)
   End Sub
   Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientCore.ErrorEventArgs) Handles wsVer.Failure
     RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
