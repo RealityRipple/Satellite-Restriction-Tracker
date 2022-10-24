@@ -987,17 +987,17 @@
           Return
         End If
         Dim jUsage As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")
-        If Not jUsage.ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(jUsage("dataCapGB")) Then
+        If Not jUsage.ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(jUsage("dataCapGB").ToString) Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If Not jUsage.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jUsage("dataUsedGB")) Then
+        If Not jUsage.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jUsage("dataUsedGB").ToString) Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
         If jUsage.ContainsKey("dataLeftText") AndAlso jUsage("dataLeftText") = "NONE" Then imSlowed = True
-        sDown = jUsage("dataUsedGB")
-        sDownT = jUsage("dataCapGB")
+        sDown = jUsage("dataUsedGB").ToString
+        sDownT = jUsage("dataCapGB").ToString
         RaiseEvent ConnectionResult(Me, New SiteResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
       Catch ex As Exception
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
