@@ -110,6 +110,17 @@
     wsCheck.Proxy = mySettings.Proxy
     wsCheck.Timeout = mySettings.Timeout
     sVerStr = wsCheck.DownloadString(VersionURL)
+    Dim sHash As String = Nothing
+    For Each sKey As String In wsCheck.ResponseHeaders
+      If sKey.ToLower = "x-update-signature" Then
+        sHash = wsCheck.ResponseHeaders(sKey)
+        Exit For
+      End If
+    Next
+    If Not VerifySignature(sVerStr, sHash) Then
+      mySettings = Nothing
+      Return CheckEventArgs.ResultType.NoUpdate
+    End If
     If sVerStr.StartsWith("Error: ") Then
       mySettings = Nothing
       Return CheckEventArgs.ResultType.NoUpdate
@@ -170,6 +181,17 @@
     If e.Error Is Nothing Then
       Try
         Dim sVerStr As String = e.Result
+        Dim sHash As String = Nothing
+        For Each sKey As String In wsVer.ResponseHeaders
+          If sKey.ToLower = "x-update-signature" Then
+            sHash = wsVer.ResponseHeaders(sKey)
+            Exit For
+          End If
+        Next
+        If Not VerifySignature(sVerStr, sHash) Then
+          RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, VerNumber, New Exception("Invalid Server Response"), e.Cancelled))
+          Return
+        End If
         Dim sSplit As String = Nothing
         If sVerStr.Contains(vbNewLine) Then
           sSplit = vbNewLine
@@ -221,4 +243,17 @@
   Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientErrorEventArgs) Handles wsVer.Failure
     RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
   End Sub
+  Private Shared Function VerifySignature(ByVal Message As String, ByVal Signature As String) As Boolean
+    If String.IsNullOrEmpty(Signature) Then Return False
+    Dim bMsg() As Byte = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1).GetBytes(Message)
+    Dim bSig() As Byte = Nothing
+    Try
+      bSig = System.Convert.FromBase64String(Signature)
+    Catch ex As Exception
+      Return False
+    End Try
+    Dim rsa As New Security.Cryptography.RSACryptoServiceProvider
+    rsa.FromXmlString(My.Resources.pubkey)
+    Return rsa.VerifyData(bMsg, Security.Cryptography.CryptoConfig.MapNameToOID("SHA1"), bSig)
+  End Function
 End Class

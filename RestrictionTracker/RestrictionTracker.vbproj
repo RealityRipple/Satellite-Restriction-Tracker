@@ -303,6 +303,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\srt.xml" />
     <None Include="Resources\tray_32\throbsprite\0.ico" />
     <None Include="Resources\tray_32\throbsprite\11.ico" />
     <None Include="Resources\tray_32\throbsprite\6.ico" />

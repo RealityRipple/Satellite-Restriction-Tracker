@@ -39,6 +39,7 @@ Public Class WebClientCore
     c_ManualRedirect = True
     c_ResponseURI = Nothing
     c_ResponseCode = Nothing
+    c_ResponseHeaders = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   ''' <summary>
@@ -57,6 +58,7 @@ Public Class WebClientCore
     c_ManualRedirect = True
     c_ResponseURI = Nothing
     c_ResponseCode = Nothing
+    c_ResponseHeaders = Nothing
     System.Net.ServicePointManager.Expect100Continue = False
   End Sub
   ''' <summary>
@@ -114,6 +116,16 @@ Public Class WebClientCore
   Public ReadOnly Property ResponseCode As Net.HttpStatusCode
     Get
       Return c_ResponseCode
+    End Get
+  End Property
+  Private c_ResponseHeaders As Net.WebHeaderCollection
+  ''' <summary>
+  ''' The <see cref="Net.WebHeaderCollection" /> of the last <see cref="GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="GetWebResponse" /> event occurs.</returns>
+  Public Overloads ReadOnly Property ResponseHeaders As Net.WebHeaderCollection
+    Get
+      Return c_ResponseHeaders
     End Get
   End Property
   Private c_Timeout As Integer
@@ -318,6 +330,7 @@ Public Class WebClientCore
       If response.GetType Is GetType(Net.HttpWebResponse) Then
         Dim hResponse As Net.HttpWebResponse = response
         c_ResponseCode = hResponse.StatusCode
+        c_ResponseHeaders = hResponse.Headers
         If Not String.IsNullOrEmpty(hResponse.CharacterSet) Then
           Dim charSet As String = hResponse.CharacterSet
           Try
@@ -637,6 +650,16 @@ Public Class WebClientEx
       Return c_ResponseCode
     End Get
   End Property
+  Private c_ResponseHeaders As Net.WebHeaderCollection
+  ''' <summary>
+  ''' The <see cref="Net.WebHeaderCollection" /> of the last <see cref="WebClientCore.GetWebResponse" /> event after any redirection.
+  ''' </summary>
+  ''' <returns>Initially, the value will be <c>Nothing</c> until a <see cref="WebClientCore.GetWebResponse" /> event occurs.</returns>
+  Public ReadOnly Property ResponseHeaders As Net.WebHeaderCollection
+    Get
+      Return c_ResponseHeaders
+    End Get
+  End Property
   Private c_ErrorBypass As Boolean
   ''' <summary>
   ''' Gets or sets a <see cref="Boolean" /> value which determines how the <see cref="WebClientCore" /> reacts to the HTTP 400 Status Code set of errors.
@@ -781,6 +804,7 @@ Public Class WebClientEx
           c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
           c_ResponseCode = wsDownload.ResponseCode
+          c_ResponseHeaders = wsDownload.ResponseHeaders
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
@@ -789,6 +813,7 @@ Public Class WebClientEx
           Else
             c_ResponseURI = wsDownload.ResponseURI
             c_ResponseCode = wsDownload.ResponseCode
+            c_ResponseHeaders = wsDownload.ResponseHeaders
             DownloadResults(RunName) = "Error: " & sNetErr
           End If
           Return
@@ -872,6 +897,7 @@ Public Class WebClientEx
           c_Jar = wsDownload.CookieJar
           c_ResponseURI = wsDownload.ResponseURI
           c_ResponseCode = wsDownload.ResponseCode
+          c_ResponseHeaders = wsDownload.ResponseHeaders
         Catch ex As Exception
           Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
@@ -880,6 +906,7 @@ Public Class WebClientEx
           Else
             c_ResponseURI = wsDownload.ResponseURI
             c_ResponseCode = wsDownload.ResponseCode
+            c_ResponseHeaders = wsDownload.ResponseHeaders
             callback(aState, "Error: " & sNetErr)
           End If
           Return
@@ -962,6 +989,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -970,6 +998,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -988,6 +1017,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
             '
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
@@ -997,6 +1027,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1092,6 +1123,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1100,6 +1132,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1110,6 +1143,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1118,6 +1152,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1183,6 +1218,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1191,6 +1227,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1209,6 +1246,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1217,6 +1255,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               UploadResults(RunName) = "Error: " & sNetErr
             End If
             Return
@@ -1305,6 +1344,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1313,6 +1353,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               callback(aState, "Error: " & sNetErr)
             End If
             Return
@@ -1324,6 +1365,7 @@ Public Class WebClientEx
             c_Jar = wsUpload.CookieJar
             c_ResponseURI = wsUpload.ResponseURI
             c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
             Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
@@ -1332,6 +1374,7 @@ Public Class WebClientEx
             Else
               c_ResponseURI = wsUpload.ResponseURI
               c_ResponseCode = wsUpload.ResponseCode
+              c_ResponseHeaders = wsUpload.ResponseHeaders
               callback(aState, "Error: " & sNetErr)
             End If
             Return

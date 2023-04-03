@@ -341,6 +341,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to &lt;RSAKeyValue&gt;&lt;Modulus&gt;s/QxJsAcRmGQEnKdvSLxwaulFNbgaEJHiXM5y8pKIGi7oNyDwf4YP1+W0H3QXsjhYyMBXi1zmHFCDCi9aWGXirJCwkZYum6iml/cuMFEOkFDUMvKjGQir2UrWR3BVu92irV4mCNqlk/JVfgpICcpXOy+xBBB50S/v0TPHgL4Bycb8DkKMQKOsNr7cBMhP+kdSoFBj6Mfkx5cz57IBaS9s82AEt+ZKzR+WRAppb55tTUrT7jjpp0CPKwsd+UyjCHkPMksjf3Z9oH69m6ntQwVSm/klqBPuMsRwEjCnQ5Uu/HuhuYxUXk7v4nUxYVfScwC5NQXQEkoqK3ZzCKW1IL42LEtj4mSiGC/b/KDVAdiRCVkZv/Eig99NZWHj/kcmlcuw+z8xU5mEWA9CfT1SbUUVisGqoJqCs31Xz0klvC4nPUDFhMf5m/aJHKWi6kt/YXVdCNLtTyRxIPXrhIsR8nU7ZTZPUl10NlSLY6g9H5PP3 [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property pubkey() As String
+            Get
+                Return ResourceManager.GetString("pubkey", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         '''</summary>
         Friend ReadOnly Property sat() As System.Drawing.Icon
