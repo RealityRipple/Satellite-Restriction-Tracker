@@ -16,11 +16,7 @@
     If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then mySettings.HistoryDir = IO.Path.Combine(Application.StartupPath, "Config")
     RepadAllItems(Me)
     Dim Username As String = mySettings.Account
-    If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
-      txtAccount.Text = Username.Substring(0, Username.LastIndexOf("@"))
-    Else
-      txtAccount.Text = Username
-    End If
+    txtAccount.Text = Username
     ttConfig.SetToolTip(txtPassword.Button, "Toggle display of the Password.")
     If Not String.IsNullOrEmpty(mySettings.PassCrypt) Then
       If String.IsNullOrEmpty(mySettings.PassKey) Or String.IsNullOrEmpty(mySettings.PassSalt) Then

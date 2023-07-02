@@ -338,12 +338,7 @@
           sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
         End If
       End If
-      Dim Username As String = mySettings.Account
-      If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
-        sUsername = Username.Substring(0, Username.LastIndexOf("@"))
-      Else
-        sUsername = Username
-      End If
+      sUsername = mySettings.Account
       c_TLSProxy = mySettings.TLSProxy
       If c_TLSProxy Then c_TLSProxyAddr = "http://wb.realityripple.com/tls.php"
       c_Timeout = mySettings.Timeout

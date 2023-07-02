@@ -619,7 +619,6 @@
         sPassword = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
       End If
     End If
-    If Not String.IsNullOrEmpty(sAccount) AndAlso (sAccount.Contains("@") And sAccount.Contains(".")) Then sAccount = sAccount.Substring(0, sAccount.LastIndexOf("@"))
   End Sub
 #End Region
 #Region "Login Functions"

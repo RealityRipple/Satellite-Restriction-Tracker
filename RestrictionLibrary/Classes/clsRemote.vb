@@ -227,11 +227,7 @@ Namespace Remote
     ''' <param name="ConfigPath">The directory where configuration data is stored. This is used for reporting socket errors. If this value is null, then socket errors are not reported.</param>
     Public Sub New(Username As String, Password As String, ProductKey As String, Proxy As Net.IWebProxy, Timeout As Integer, UpdateFrom As Date, ConfigPath As String)
       ClosingTime = False
-      If Not String.IsNullOrEmpty(Username) AndAlso (Username.Contains("@") And Username.Contains(".")) Then
-        sUsername = Username.Substring(0, Username.LastIndexOf("@"))
-      Else
-        sUsername = Username
-      End If
+      sUsername = Username
       sPassword = Password
       dFrom = UpdateFrom
       sDataPath = ConfigPath

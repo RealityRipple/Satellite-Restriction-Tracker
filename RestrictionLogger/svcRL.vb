@@ -85,7 +85,6 @@ Friend Class svcRL
       If Not sAccount = MySettings.Account Then
         sAccount = MySettings.Account
         If Not String.IsNullOrEmpty(sAccount) Then
-          If (sAccount.Contains("@") And sAccount.Contains(".")) Then sAccount = sAccount.Substring(0, sAccount.LastIndexOf("@"))
           If My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb")) Then
             LOG_Initialize(IO.Path.Combine(DataPath, "History-" & sAccount & ".wb"))
           ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(DataPath, "History-" & sAccount & ".xml")) Then
