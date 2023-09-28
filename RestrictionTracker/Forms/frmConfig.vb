@@ -290,7 +290,7 @@
     Else
       Return
     End If
-    remoteTest = New Remote.ServiceConnection(txtAccount.Text & "@exede.net", String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
+    remoteTest = New Remote.ServiceConnection(txtAccount.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
   End Sub
   Private Sub RunNetworkProtocolTest()
     If pctKeyState.Tag = 1 Then
@@ -1069,7 +1069,7 @@
       End Try
     ElseIf lblPurchaseKey.Text = LINK_PANEL Then
       Try
-        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "@exede.net&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
+        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
       Catch ex As Exception
         Dim taskNotifier As TaskbarNotifier = Nothing
         MakeNotifier(taskNotifier, False)

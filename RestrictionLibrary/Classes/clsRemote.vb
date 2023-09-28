@@ -218,7 +218,7 @@ Namespace Remote
     ''' <summary>
     ''' Constructor of the class, which also starts the connection process.
     ''' </summary>
-    ''' <param name="Username">The Remote Usage Service account to connect to, which consists of the meter page Username and Provider Domain separated by an "@".</param>
+    ''' <param name="Username">The Remote Usage Service account to connect to. This may be a name or an E-Mail address.</param>
     ''' <param name="Password">The password for the account. If this is set to blank, the connection will terminate after the <see cref="OKKey" /> event, which is useful for verifying the legitimacy of a <paramref name="ProductKey" /> without initiating a full connection.</param>
     ''' <param name="ProductKey">The account's Product Key, including hyphens, in the format XXXXXX-XXXX-XXXX-XXXX-XXXXXX</param>
     ''' <param name="Proxy">Proxy settings for connecting to the Remote Usage Service.</param>
@@ -265,7 +265,7 @@ Namespace Remote
     Private Sub Login()
       c_Jar = New Net.CookieContainer
       MakeSocket()
-      Dim sPost As String = "s=init&user=" & sUsername & "@exede.net" & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
+      Dim sPost As String = "s=init&user=" & sUsername & IIf(dFrom.Year = 2000, String.Empty, "&up=" & DateDiff(DateInterval.Second, (New DateTime(1970, 1, 1, 0, 0, 0, 0)), dFrom.ToUniversalTime))
       Dim sRet As String = wsSocket.UploadString(URLPath, "POST", sPost)
       If ClosingTime Then Return
       If CheckForErrors(sRet, wsSocket.ResponseURI) Then Return
