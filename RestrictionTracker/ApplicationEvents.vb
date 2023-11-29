@@ -38,14 +38,26 @@
             Catch ex As Exception
               Dim taskNotifier As TaskbarNotifier = Nothing
               MakeNotifier(taskNotifier, False)
-              If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & AppDataWB & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+              Try
+                Clipboard.SetText(AppDataWB)
+              Catch ex2 As Exception
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & AppDataWB & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                Return
+              End Try
+              If taskNotifier IsNot Nothing Then taskNotifier.Show("Path Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & AppDataWB & """, so the path was copied to your clipboard instead!", 200, 3000, 100)
             End Try
             Try
               Process.Start("explorer", "/select,""" & AppDataSRT & """")
             Catch ex As Exception
               Dim taskNotifier As TaskbarNotifier = Nothing
               MakeNotifier(taskNotifier, False)
-              If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & AppDataSRT & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+              Try
+                Clipboard.SetText(AppDataSRT)
+              Catch ex2 As Exception
+                If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & AppDataSRT & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                Return
+              End Try
+              If taskNotifier IsNot Nothing Then taskNotifier.Show("Path Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & AppDataSRT & """, so the path was copied to your clipboard instead!", 200, 3000, 100)
             End Try
           End If
       End Select
@@ -65,14 +77,26 @@
                 Catch ex As Exception
                   Dim taskNotifier As TaskbarNotifier = Nothing
                   MakeNotifier(taskNotifier, False)
-                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & oldHistoryDir & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                  Try
+                    Clipboard.SetText(oldHistoryDir)
+                  Catch ex2 As Exception
+                    If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & oldHistoryDir & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                    Return
+                  End Try
+                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Path Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & oldHistoryDir & """, so the path was copied to your clipboard instead!", 200, 3000, 100)
                 End Try
                 Try
                   Process.Start("explorer", "/select,""" & cSettings.HistoryDir & """")
                 Catch ex As Exception
                   Dim taskNotifier As TaskbarNotifier = Nothing
                   MakeNotifier(taskNotifier, False)
-                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & cSettings.HistoryDir & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                  Try
+                    Clipboard.SetText(cSettings.HistoryDir)
+                  Catch ex2 As Exception
+                    If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & cSettings.HistoryDir & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+                    Return
+                  End Try
+                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Path Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & cSettings.HistoryDir & """, so the path was copied to your clipboard instead!", 200, 3000, 100)
                 End Try
               End If
           End Select
@@ -138,7 +162,13 @@
                 Catch ex2 As Exception
                   Dim taskNotifier As TaskbarNotifier = Nothing
                   MakeNotifier(taskNotifier, False)
-                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & OldDir & """!" & vbNewLine & ex2.Message, 200, 3000, 100)
+                  Try
+                    Clipboard.SetText(OldDir)
+                  Catch ex3 As Exception
+                    If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Explorer", My.Application.Info.ProductName & " could not navigate to """ & OldDir & """!" & vbNewLine & ex2.Message, 200, 3000, 100)
+                    Return
+                  End Try
+                  If taskNotifier IsNot Nothing Then taskNotifier.Show("Path Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & OldDir & """, so the path was copied to your clipboard instead!", 200, 3000, 100)
                 End Try
               End If
             End Try
