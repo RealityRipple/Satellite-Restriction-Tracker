@@ -127,7 +127,6 @@ Friend Class AppSettings
   Private m_UpdateTime As Byte
   Private m_ScaleScreen As Boolean
   Private m_MainSize As Size
-  Private m_RemoteKey As String
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
@@ -364,16 +363,6 @@ Friend Class AppSettings
           m_MainSize = New Size(sSizes(0), sSizes(1))
         Catch ex As Exception
           m_MainSize = New Size(450, 200)
-        End Try
-      End If
-      Dim xRemoteKey As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "RemoteKey")
-      If xRemoteKey Is Nothing Then
-        m_RemoteKey = Nothing
-      Else
-        Try
-          m_RemoteKey = xRemoteKey.Element("value").Value
-        Catch ex As Exception
-          m_RemoteKey = Nothing
         End Try
       End If
       Dim xPassCrypt As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "PassCrypt")
@@ -835,7 +824,6 @@ Friend Class AppSettings
     m_UpdateTime = 15
     m_ScaleScreen = False
     m_MainSize = New Size(450, 200)
-    m_RemoteKey = Nothing
     m_PassCrypt = Nothing
     m_PassKey = ""
     m_PassSalt = ""
@@ -922,7 +910,6 @@ Friend Class AppSettings
                                                           New XElement("setting", New XAttribute("name", "UpdateTime"), New XElement("value", m_UpdateTime)),
                                                           New XElement("setting", New XAttribute("name", "ScaleScreen"), New XElement("value", IIf(m_ScaleScreen, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "MainSize"), New XElement("value", m_MainSize.Width & "," & m_MainSize.Height)),
-                                                          New XElement("setting", New XAttribute("name", "RemoteKey"), New XElement("value", m_RemoteKey)),
                                                           New XElement("setting", New XAttribute("name", "TopMost"), New XElement("value", IIf(m_TopMost, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
                                                           New XElement("setting", New XAttribute("name", "Retries"), New XElement("value", m_Retries)),
@@ -1206,14 +1193,6 @@ Friend Class AppSettings
     End Get
     Set(value As Size)
       m_MainSize = value
-    End Set
-  End Property
-  Public Property RemoteKey As String
-    Get
-      Return m_RemoteKey
-    End Get
-    Set(value As String)
-      m_RemoteKey = value
     End Set
   End Property
   Public Property TopMost As Boolean

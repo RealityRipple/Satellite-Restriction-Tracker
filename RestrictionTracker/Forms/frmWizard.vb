@@ -13,7 +13,6 @@ Friend NotInheritable Class frmWizard
   Private Shared Function MakeLong(ByVal LoWord As Integer, ByVal HiWord As Integer) As Integer
     Return (New DWord(LoWord, HiWord)).LongValue
   End Function
-  Private WithEvents remoteTest As Remote.ServiceConnection
   Private WithEvents localTest As Local.SiteConnection
   Private pChecker As Threading.Timer
   Private NeedsTLSProxy As Boolean = False
@@ -50,32 +49,10 @@ Friend NotInheritable Class frmWizard
         UsageTest()
         Return
       Case 2
-        If Not (optRemote.Checked Or optLocal.Checked Or optNone.Checked) Then
+        If Not (optLocal.Checked Or optNone.Checked) Then
           optNone.Focus()
           Beep()
           Return
-        ElseIf optRemote.Checked Then
-          If Not pnlKey.Tag = 1 Then
-            If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-              DrawStatus(True, "Checking your Product Key...")
-              KeyCheck()
-              Return
-            Else
-              If txtKey1.TextLength < 6 Then
-                txtKey1.Focus()
-              ElseIf txtKey2.TextLength < 4 Then
-                txtKey2.Focus()
-              ElseIf txtKey3.TextLength < 4 Then
-                txtKey3.Focus()
-              ElseIf txtKey4.TextLength < 4 Then
-                txtKey4.Focus()
-              ElseIf txtKey5.TextLength < 6 Then
-                txtKey5.Focus()
-              End If
-              Beep()
-              Return
-            End If
-          End If
         End If
     End Select
     If tbsWizardPages.SelectedIndex < tbsWizardPages.TabCount - 1 Then
@@ -100,14 +77,7 @@ Friend NotInheritable Class frmWizard
         txtAccountPass.Focus()
         Me.DialogResult = Windows.Forms.DialogResult.None
       Else
-        If optRemote.Checked Then
-          If Not pnlKey.Tag = 1 Then
-            tbsWizardPages.SelectedIndex = 2
-            optRemote.Focus()
-            MsgDlg(Me, "Please verify your Remote Usage Service Product Key before continuing.", "Your Product Key has not been validated.", "Verify your Product Key", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Error)
-            Me.DialogResult = Windows.Forms.DialogResult.None
-          End If
-        ElseIf optLocal.Checked Then
+        If optLocal.Checked Then
 
         ElseIf optNone.Checked Then
 
@@ -125,11 +95,7 @@ Friend NotInheritable Class frmWizard
       newSettings.PassCrypt = StoredPassword.Encrypt(txtAccountPass.Text, newKey, newSalt)
       newSettings.PassKey = Convert.ToBase64String(newKey)
       newSettings.PassSalt = Convert.ToBase64String(newSalt)
-      If optRemote.Checked And pnlKey.Tag = 1 Then
-        newSettings.Service = False
-        newSettings.RemoteKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-        newSettings.Interval = 30
-      ElseIf optLocal.Checked Then
+      If optLocal.Checked Then
         newSettings.Service = True
         newSettings.Interval = 15
       Else
@@ -229,10 +195,6 @@ Friend NotInheritable Class frmWizard
       localTest.Dispose()
       localTest = Nothing
     End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
   End Sub
   Private Sub frmWizard_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     Me.Icon = My.Resources.t16_norm
@@ -241,159 +203,8 @@ Friend NotInheritable Class frmWizard
     ttWizard.SetToolTip(txtAccountPass.Button, "Toggle display of the Password.")
     txtOverSize.Margin = New Padding(3)
     txtOverTime.Margin = New Padding(3)
-    txtKey1.ContextMenu = mnuKey
-    txtKey2.ContextMenu = mnuKey
-    txtKey3.ContextMenu = mnuKey
-    txtKey4.ContextMenu = mnuKey
-    txtKey5.ContextMenu = mnuKey
   End Sub
-  Private Sub txtAccountUsername_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountUsername.TextChanged
-    pnlKey.Tag = 0
-  End Sub
-  Private Sub txtAccountPass_TextChanged(sender As System.Object, e As System.EventArgs) Handles txtAccountPass.TextChanged
-    pnlKey.Tag = 0
-  End Sub
-  Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
-    If e.KeyValue = 86 And e.Control Then
-      If Not String.IsNullOrEmpty(Clipboard.GetText) Then
-        Dim sKey As String = Trim(Clipboard.GetText)
-        If sKey.Contains("-") Then
-          Dim sKeys() As String = Split(sKey, "-")
-          If sKeys.Length = 5 Then
-            txtKey1.Text = sKeys(0)
-            txtKey2.Text = sKeys(1)
-            txtKey3.Text = sKeys(2)
-            txtKey4.Text = sKeys(3)
-            txtKey5.Text = sKeys(4)
-            e.Handled = True
-          Else
-            sender.Text = sKey
-          End If
-        Else
-          sender.Text = sKey
-        End If
-      End If
-    ElseIf e.KeyValue = 46 Or (e.KeyValue = 88 And e.Control) Or (e.KeyValue = 67 And e.Control) Or e.KeyValue = 35 Or e.KeyValue = 36 Or e.KeyValue = 37 Or e.KeyValue = 39 Or e.KeyValue = 9 Or e.KeyValue = 16 Or e.KeyValue = 17 Or e.KeyValue = 18 Then
-
-    ElseIf e.KeyValue = 8 Then
-      If String.IsNullOrEmpty(sender.text) And sender.SelectionLength = 0 Then
-        Select Case sender.Name.ToString
-          Case "txtKey1"
-            e.SuppressKeyPress = True
-            e.Handled = True
-          Case "txtKey2"
-            txtKey1.Focus()
-            txtKey1.SelectionStart = txtKey1.TextLength
-            txtKey1.SelectionLength = 0
-          Case "txtKey3"
-            txtKey2.Focus()
-            txtKey2.SelectionStart = txtKey2.TextLength
-            txtKey2.SelectionLength = 0
-          Case "txtKey4"
-            txtKey3.Focus()
-            txtKey3.SelectionStart = txtKey3.TextLength
-            txtKey3.SelectionLength = 0
-          Case "txtKey5"
-            txtKey4.Focus()
-            txtKey4.SelectionStart = txtKey4.TextLength
-            txtKey4.SelectionLength = 0
-        End Select
-      End If
-    Else
-      If sender.TextLength = sender.MaxLength And sender.SelectionLength = 0 Then
-        Select Case sender.Name
-          Case "txtKey1"
-            txtKey2.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey2"
-            txtKey3.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey3"
-            txtKey4.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey4"
-            txtKey5.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-        End Select
-        e.SuppressKeyPress = True
-        e.Handled = True
-      End If
-    End If
-  End Sub
-  Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
-    pnlKey.Tag = 0
-  End Sub
-#Region "Context Menu"
-  Private Sub mnuKey_Popup(sender As System.Object, e As System.EventArgs) Handles mnuKey.Popup
-    Dim txtKey As TextBox = CType(CType(sender, ContextMenu).SourceControl, TextBox)
-    mnuKeyCut.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
-    mnuKeyCopy.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
-    mnuKeyPaste.Enabled = Not String.IsNullOrEmpty(Clipboard.GetText)
-    mnuKeyDelete.Enabled = Not String.IsNullOrEmpty(txtKey.Text)
-    mnuKeyClear.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
-  End Sub
-  Private Sub mnuKeyPaste_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyPaste.Click
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    If Not String.IsNullOrEmpty(Clipboard.GetText) Then
-      Dim sKey As String = Trim(Clipboard.GetText)
-      If sKey.Contains("-") Then
-        Dim sKeys() As String = Split(sKey, "-")
-        If sKeys.Length = 5 Then
-          txtKey1.Text = sKeys(0)
-          txtKey2.Text = sKeys(1)
-          txtKey3.Text = sKeys(2)
-          txtKey4.Text = sKeys(3)
-          txtKey5.Text = sKeys(4)
-        Else
-          If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
-          txtKey.Text = sKey
-        End If
-      Else
-        If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
-        txtKey.Text = sKey
-      End If
-    End If
-  End Sub
-  Private Sub mnuKeyCut_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCut.Click
-    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
-      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-        Clipboard.SetText(sKey)
-        txtKey1.Clear()
-        txtKey2.Clear()
-        txtKey3.Clear()
-        txtKey4.Clear()
-        txtKey5.Clear()
-        Return
-      End If
-    End If
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Cut()
-  End Sub
-  Private Sub mnuKeyCopy_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCopy.Click
-    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
-      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-        Clipboard.SetText(sKey)
-        Return
-      End If
-    End If
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Copy()
-  End Sub
-  Private Sub mnuKeyDelete_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyDelete.Click
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Clear()
-  End Sub
-  Private Sub mnuKeyClear_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyClear.Click
-    txtKey1.Clear()
-    txtKey2.Clear()
-    txtKey3.Clear()
-    txtKey4.Clear()
-    txtKey5.Clear()
-  End Sub
-#End Region
-  Private Sub txtSignUp_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles txtSignUp.LinkClicked
+  Private Sub txtSignUp_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
     Try
       Process.Start("http://srt.realityripple.com/c_signup.php")
     Catch ex As Exception
@@ -402,15 +213,9 @@ Friend NotInheritable Class frmWizard
       If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
     End Try
   End Sub
-  Private Sub optServices_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optRemote.CheckedChanged, optLocal.CheckedChanged, optNone.CheckedChanged
-    txtKey1.Enabled = optRemote.Checked
-    txtKey2.Enabled = optRemote.Checked
-    txtKey3.Enabled = optRemote.Checked
-    txtKey4.Enabled = optRemote.Checked
-    txtKey5.Enabled = optRemote.Checked
+  Private Sub optServices_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optLocal.CheckedChanged, optNone.CheckedChanged
     lblLocal.Enabled = optLocal.Checked
     lblNone.Enabled = optNone.Checked
-    If optRemote.Checked Then txtKey1.Focus()
   End Sub
   Private Sub chkOverAlert_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkOverAlert.CheckedChanged
     txtOverSize.Enabled = chkOverAlert.Checked
@@ -464,12 +269,6 @@ Friend NotInheritable Class frmWizard
     If Busy Then
       txtAccountUsername.Enabled = False
       txtAccountPass.Enabled = False
-      optRemote.Enabled = False
-      txtKey1.Enabled = False
-      txtKey2.Enabled = False
-      txtKey3.Enabled = False
-      txtKey4.Enabled = False
-      txtKey5.Enabled = False
       optLocal.Enabled = False
       optNone.Enabled = False
       cmdPrevious.Enabled = False
@@ -482,12 +281,6 @@ Friend NotInheritable Class frmWizard
       lblActivity.Text = Nothing
       txtAccountUsername.Enabled = True
       txtAccountPass.Enabled = True
-      optRemote.Enabled = True
-      txtKey1.Enabled = optRemote.Checked
-      txtKey2.Enabled = optRemote.Checked
-      txtKey3.Enabled = optRemote.Checked
-      txtKey4.Enabled = optRemote.Checked
-      txtKey5.Enabled = optRemote.Checked
       optLocal.Enabled = True
       optNone.Enabled = True
       If cmdNext.Enabled Then
@@ -496,88 +289,6 @@ Friend NotInheritable Class frmWizard
         cmdClose.Focus()
       End If
     End If
-  End Sub
-  Private sAccount As String
-  Private Sub KeyCheck()
-    Dim sKeyTest As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If String.IsNullOrEmpty(txtAccountUsername.Text) Then
-      tbsWizardPages.SelectedIndex = 1
-      txtAccountUsername.Focus()
-      DrawStatus(False)
-      MsgDlg(Me, "You must enter an Account Username before validating your Product Key!", "You did not enter a Username.", "Missing Account Information", MessageBoxButtons.OK, _TaskDialogIcon.User, MessageBoxIcon.Error)
-      Return
-    End If
-    sAccount = txtAccountUsername.Text
-    pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
-  End Sub
-  Private Sub RunAccountTest(sKey As String)
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    Else
-      Return
-    End If
-    remoteTest = New Remote.ServiceConnection(sAccount, String.Empty, sKey, Nothing, 60, New Date(2000, 1, 1), LocalAppDataDirectory)
-  End Sub
-  Private Sub remoteTest_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteTest.Failure
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Dim sErr As String = "There was an error verifying your key!"
-    Select Case e.Type
-      Case Remote.ServiceFailType.BadLogin : sErr = "There was a server error. Please try again later."
-      Case Remote.ServiceFailType.BadProduct : sErr = "Your Product Key is incorrect."
-      Case Remote.ServiceFailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case Remote.ServiceFailType.NoData : sErr = "The server did not receive login negotiation data!" & vbNewLine & "Please check your Internet connection and try again."
-      Case Remote.ServiceFailType.NoUsername : sErr = "Your account is not registered!"
-      Case Remote.ServiceFailType.Network : sErr = "You must be online to activate the Remote Usage Service." & vbNewLine & "Please check your Internet connection and try again."
-      Case Remote.ServiceFailType.NotBase64 : sErr = "The server responded in an unexpected format, which may indicate a problem with your connection or with the server." & vbNewLine & "Please check your Internet connection and try again."
-    End Select
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    Select Case e.Type
-      Case Remote.ServiceFailType.BadLogin, Remote.ServiceFailType.BadProduct, Remote.ServiceFailType.NoData, Remote.ServiceFailType.Network, Remote.ServiceFailType.NotBase64
-        MsgDlg(Me, sErr, "There was an error verifying your key.", "Unable to Verify", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Warning)
-      Case Else
-        optNone.Checked = True
-        MsgDlg(Me, sErr, "Your key could not be verified.", "Failed to Verify", MessageBoxButtons.OK, _TaskDialogIcon.Key, MessageBoxIcon.Error)
-    End Select
-    DrawStatus(False)
-    pnlKey.Tag = 0
-  End Sub
-  Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    DrawStatus(True)
-    pnlKey.Tag = 1
-    tbsWizardPages.SelectedIndex += 1
   End Sub
   Private Sub UsageTest()
     If localTest IsNot Nothing Then
@@ -592,7 +303,6 @@ Friend NotInheritable Class frmWizard
     newSettings.PassKey = Convert.ToBase64String(newKey)
     newSettings.PassSalt = Convert.ToBase64String(newSalt)
     newSettings.Service = False
-    newSettings.RemoteKey = Nothing
     newSettings.SecurityProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
     If NeedsTLSProxy Then newSettings.TLSProxy = True
     newSettings.Save()

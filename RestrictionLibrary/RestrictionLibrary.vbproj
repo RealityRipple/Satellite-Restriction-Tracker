@@ -79,7 +79,6 @@
     <Compile Include="Classes\clsFunctions.vb" />
     <Compile Include="Classes\clsHMACSHA.vb" />
     <Compile Include="Classes\clsJSON.vb" />
-    <Compile Include="Classes\clsRemote.vb" />
     <Compile Include="Classes\clsRestrictionTracker.vb" />
     <Compile Include="Classes\clsSettings.vb" />
     <Compile Include="Classes\clsStoredPassword.vb" />

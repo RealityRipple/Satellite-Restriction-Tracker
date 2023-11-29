@@ -136,16 +136,13 @@ Press Next to begin or Cancel to close this wizard.</value>
     <value>Please enter the password to your ViaSat Account. This password should be the one used to log in to the meter site.
 If you don't know your password, please contact your ViaSat provider to get your usage meter login information.</value>
   </data>
-  <data name="lblRemoteText.Text" xml:space="preserve">
-    <value>If you need to keep track of your Internet usage more accurately, you can sign up for the Remote Usage Service to get usage data every 15 minutes, whether your Internet is running or not. Using a remote server, your usage will be stored and synchronized regularly to Satellite Restriction Tracker, providing the best possible picture of your usage.</value>
-  </data>
   <data name="lblLocalText.Text" xml:space="preserve">
-    <value>If you want to use Satellite Restriction Tracker for free, you are of course welcome to. We also provide a local service which runs on your computer at all times, gathering your usage data even if no users are logged in or your computer is locked.</value>
+    <value>If you need to keep track of your Internet usage more accurately, we provide a local service which runs on your computer at all times, gathering your usage data even if no users are logged in or your computer is locked.</value>
   </data>
   <data name="lblFinishedText.Text" xml:space="preserve">
     <value>Satellite Restriction Tracker has been configured and is ready to begin collecting your usage statistics. If you need to change your settings later, you can use the Configuration window to improve your experience.
 
-Please note that your usage history needs a few days to accumulate before the graphing functions will display useful numbers, and that the history is only accumulated while the program is active without the Remote Usage Service.
+Please note that your usage history needs a few days to accumulate before the graphing functions will display useful numbers, and that the history is only accumulated while the program is active.
 
 If you need any help or run into any problems, you can press F1 when using Satellite Restriction Tracker to view the Frequently Asked Questions. You can also leave comments on the website.
 

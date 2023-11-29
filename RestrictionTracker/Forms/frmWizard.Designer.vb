@@ -51,22 +51,12 @@ Partial Class frmWizard
     Me.tabService = New System.Windows.Forms.TabPage()
     Me.pnlService = New System.Windows.Forms.TableLayoutPanel()
     Me.lblServiceTitle = New System.Windows.Forms.Label()
-    Me.lblRemoteText = New System.Windows.Forms.Label()
-    Me.optRemote = New System.Windows.Forms.RadioButton()
-    Me.pnlKey = New System.Windows.Forms.TableLayoutPanel()
-    Me.txtKey1 = New System.Windows.Forms.TextBox()
-    Me.txtKey2 = New System.Windows.Forms.TextBox()
-    Me.txtKey3 = New System.Windows.Forms.TextBox()
-    Me.txtKey4 = New System.Windows.Forms.TextBox()
-    Me.txtKey5 = New System.Windows.Forms.TextBox()
     Me.lblLocalText = New System.Windows.Forms.Label()
     Me.optLocal = New System.Windows.Forms.RadioButton()
     Me.optNone = New System.Windows.Forms.RadioButton()
     Me.lblLocal = New System.Windows.Forms.Label()
     Me.lblNone = New System.Windows.Forms.Label()
-    Me.txtSignUp = New RestrictionTracker.LinkLabel()
     Me.lnServiceSpace2 = New RestrictionTracker.LineBreak()
-    Me.lnServiceSpace1 = New RestrictionTracker.LineBreak()
     Me.tabDisplay = New System.Windows.Forms.TabPage()
     Me.pnlDisplay = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlOverAlert = New System.Windows.Forms.TableLayoutPanel()
@@ -112,7 +102,6 @@ Partial Class frmWizard
     Me.pnlAccount.SuspendLayout()
     Me.tabService.SuspendLayout()
     Me.pnlService.SuspendLayout()
-    Me.pnlKey.SuspendLayout()
     Me.tabDisplay.SuspendLayout()
     Me.pnlDisplay.SuspendLayout()
     Me.pnlOverAlert.SuspendLayout()
@@ -406,6 +395,7 @@ Partial Class frmWizard
     Me.txtAccountPass.Location = New System.Drawing.Point(84, 205)
     Me.txtAccountPass.Name = "txtAccountPass"
     Me.txtAccountPass.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
+    Me.txtAccountPass.ShowContents = False
     Me.txtAccountPass.Size = New System.Drawing.Size(360, 20)
     Me.txtAccountPass.TabIndex = 11
     Me.ttWizard.SetToolTip(Me.txtAccountPass, "Enter your ViaSat provider Account Password.")
@@ -475,36 +465,27 @@ Partial Class frmWizard
     '
     'pnlService
     '
-    Me.pnlService.ColumnCount = 3
-    Me.pnlService.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+    Me.pnlService.ColumnCount = 2
     Me.pnlService.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
     Me.pnlService.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlService.Controls.Add(Me.lblServiceTitle, 0, 0)
-    Me.pnlService.Controls.Add(Me.lblRemoteText, 0, 1)
-    Me.pnlService.Controls.Add(Me.optRemote, 0, 2)
-    Me.pnlService.Controls.Add(Me.pnlKey, 1, 2)
-    Me.pnlService.Controls.Add(Me.lblLocalText, 0, 4)
-    Me.pnlService.Controls.Add(Me.optLocal, 0, 5)
-    Me.pnlService.Controls.Add(Me.optNone, 0, 7)
-    Me.pnlService.Controls.Add(Me.lblLocal, 1, 5)
-    Me.pnlService.Controls.Add(Me.lblNone, 1, 7)
-    Me.pnlService.Controls.Add(Me.txtSignUp, 2, 2)
-    Me.pnlService.Controls.Add(Me.lnServiceSpace2, 0, 6)
-    Me.pnlService.Controls.Add(Me.lnServiceSpace1, 0, 3)
+    Me.pnlService.Controls.Add(Me.lblLocalText, 0, 1)
+    Me.pnlService.Controls.Add(Me.optLocal, 0, 2)
+    Me.pnlService.Controls.Add(Me.optNone, 0, 4)
+    Me.pnlService.Controls.Add(Me.lblLocal, 1, 2)
+    Me.pnlService.Controls.Add(Me.lblNone, 1, 4)
+    Me.pnlService.Controls.Add(Me.lnServiceSpace2, 0, 3)
     Me.pnlService.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlService.Location = New System.Drawing.Point(0, 0)
     Me.pnlService.Margin = New System.Windows.Forms.Padding(0)
     Me.pnlService.Name = "pnlService"
-    Me.pnlService.RowCount = 8
+    Me.pnlService.RowCount = 6
     Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
     Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlService.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
     Me.pnlService.Size = New System.Drawing.Size(447, 311)
     Me.pnlService.TabIndex = 0
     '
@@ -512,7 +493,7 @@ Partial Class frmWizard
     '
     Me.lblServiceTitle.Anchor = System.Windows.Forms.AnchorStyles.None
     Me.lblServiceTitle.AutoSize = True
-    Me.pnlService.SetColumnSpan(Me.lblServiceTitle, 3)
+    Me.pnlService.SetColumnSpan(Me.lblServiceTitle, 2)
     Me.lblServiceTitle.Font = New System.Drawing.Font("Times New Roman", 18.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.lblServiceTitle.Location = New System.Drawing.Point(80, 3)
     Me.lblServiceTitle.Margin = New System.Windows.Forms.Padding(3)
@@ -522,143 +503,16 @@ Partial Class frmWizard
     Me.lblServiceTitle.Text = "Keep Track of Your Usage!"
     Me.lblServiceTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
     '
-    'lblRemoteText
-    '
-    Me.lblRemoteText.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblRemoteText.AutoSize = True
-    Me.pnlService.SetColumnSpan(Me.lblRemoteText, 3)
-    Me.lblRemoteText.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblRemoteText.Location = New System.Drawing.Point(3, 35)
-    Me.lblRemoteText.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblRemoteText.Name = "lblRemoteText"
-    Me.lblRemoteText.Size = New System.Drawing.Size(435, 80)
-    Me.lblRemoteText.TabIndex = 1
-    Me.lblRemoteText.Text = resources.GetString("lblRemoteText.Text")
-    '
-    'optRemote
-    '
-    Me.optRemote.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.optRemote.AutoSize = True
-    Me.optRemote.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.optRemote.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.optRemote.Location = New System.Drawing.Point(3, 121)
-    Me.optRemote.Name = "optRemote"
-    Me.optRemote.Size = New System.Drawing.Size(129, 22)
-    Me.optRemote.TabIndex = 2
-    Me.optRemote.Text = "&Remote Service"
-    Me.ttWizard.SetToolTip(Me.optRemote, "Use the Remote Usage Service to keep track of your usage 24/7, for only $15 per y" & _
-        "ear!")
-    Me.optRemote.UseVisualStyleBackColor = True
-    '
-    'pnlKey
-    '
-    Me.pnlKey.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pnlKey.AutoSize = True
-    Me.pnlKey.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlKey.ColumnCount = 5
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.Controls.Add(Me.txtKey1, 0, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey2, 1, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey3, 2, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey4, 3, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey5, 4, 0)
-    Me.pnlKey.Location = New System.Drawing.Point(135, 120)
-    Me.pnlKey.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlKey.Name = "pnlKey"
-    Me.pnlKey.RowCount = 1
-    Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlKey.Size = New System.Drawing.Size(210, 24)
-    Me.pnlKey.TabIndex = 3
-    '
-    'txtKey1
-    '
-    Me.txtKey1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey1.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey1.Enabled = False
-    Me.txtKey1.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey1.Location = New System.Drawing.Point(3, 3)
-    Me.txtKey1.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
-    Me.txtKey1.MaxLength = 6
-    Me.txtKey1.Name = "txtKey1"
-    Me.txtKey1.Size = New System.Drawing.Size(48, 18)
-    Me.txtKey1.TabIndex = 0
-    Me.txtKey1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttWizard.SetToolTip(Me.txtKey1, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey2
-    '
-    Me.txtKey2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey2.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey2.Enabled = False
-    Me.txtKey2.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey2.Location = New System.Drawing.Point(53, 3)
-    Me.txtKey2.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey2.MaxLength = 4
-    Me.txtKey2.Name = "txtKey2"
-    Me.txtKey2.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey2.TabIndex = 1
-    Me.txtKey2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttWizard.SetToolTip(Me.txtKey2, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey3
-    '
-    Me.txtKey3.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey3.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey3.Enabled = False
-    Me.txtKey3.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey3.Location = New System.Drawing.Point(89, 3)
-    Me.txtKey3.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey3.MaxLength = 4
-    Me.txtKey3.Name = "txtKey3"
-    Me.txtKey3.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey3.TabIndex = 2
-    Me.txtKey3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttWizard.SetToolTip(Me.txtKey3, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey4
-    '
-    Me.txtKey4.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey4.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey4.Enabled = False
-    Me.txtKey4.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey4.Location = New System.Drawing.Point(125, 3)
-    Me.txtKey4.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey4.MaxLength = 4
-    Me.txtKey4.Name = "txtKey4"
-    Me.txtKey4.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey4.TabIndex = 3
-    Me.txtKey4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttWizard.SetToolTip(Me.txtKey4, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey5
-    '
-    Me.txtKey5.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey5.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey5.Enabled = False
-    Me.txtKey5.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey5.Location = New System.Drawing.Point(161, 3)
-    Me.txtKey5.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey5.MaxLength = 6
-    Me.txtKey5.Name = "txtKey5"
-    Me.txtKey5.Size = New System.Drawing.Size(48, 18)
-    Me.txtKey5.TabIndex = 4
-    Me.txtKey5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttWizard.SetToolTip(Me.txtKey5, "Your Remote Usage Service Product Key.")
-    '
     'lblLocalText
     '
     Me.lblLocalText.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblLocalText.AutoSize = True
-    Me.pnlService.SetColumnSpan(Me.lblLocalText, 3)
+    Me.pnlService.SetColumnSpan(Me.lblLocalText, 2)
     Me.lblLocalText.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblLocalText.Location = New System.Drawing.Point(3, 168)
+    Me.lblLocalText.Location = New System.Drawing.Point(3, 35)
     Me.lblLocalText.Margin = New System.Windows.Forms.Padding(3)
     Me.lblLocalText.Name = "lblLocalText"
-    Me.lblLocalText.Size = New System.Drawing.Size(441, 64)
+    Me.lblLocalText.Size = New System.Drawing.Size(436, 48)
     Me.lblLocalText.TabIndex = 6
     Me.lblLocalText.Text = resources.GetString("lblLocalText.Text")
     '
@@ -668,7 +522,7 @@ Partial Class frmWizard
     Me.optLocal.AutoSize = True
     Me.optLocal.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.optLocal.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.optLocal.Location = New System.Drawing.Point(3, 238)
+    Me.optLocal.Location = New System.Drawing.Point(3, 89)
     Me.optLocal.Name = "optLocal"
     Me.optLocal.Size = New System.Drawing.Size(114, 22)
     Me.optLocal.TabIndex = 7
@@ -683,7 +537,7 @@ Partial Class frmWizard
     Me.optNone.AutoSize = True
     Me.optNone.FlatStyle = System.Windows.Forms.FlatStyle.System
     Me.optNone.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.optNone.Location = New System.Drawing.Point(3, 285)
+    Me.optNone.Location = New System.Drawing.Point(3, 137)
     Me.optNone.Name = "optNone"
     Me.optNone.Size = New System.Drawing.Size(118, 22)
     Me.optNone.TabIndex = 10
@@ -696,10 +550,9 @@ Partial Class frmWizard
     '
     Me.lblLocal.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblLocal.AutoSize = True
-    Me.pnlService.SetColumnSpan(Me.lblLocal, 2)
     Me.lblLocal.Enabled = False
     Me.lblLocal.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblLocal.Location = New System.Drawing.Point(138, 241)
+    Me.lblLocal.Location = New System.Drawing.Point(127, 92)
     Me.lblLocal.Name = "lblLocal"
     Me.lblLocal.Size = New System.Drawing.Size(261, 16)
     Me.lblLocal.TabIndex = 8
@@ -709,55 +562,26 @@ Partial Class frmWizard
     '
     Me.lblNone.Anchor = System.Windows.Forms.AnchorStyles.Left
     Me.lblNone.AutoSize = True
-    Me.pnlService.SetColumnSpan(Me.lblNone, 2)
     Me.lblNone.Enabled = False
     Me.lblNone.Font = New System.Drawing.Font("Times New Roman", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblNone.Location = New System.Drawing.Point(138, 288)
+    Me.lblNone.Location = New System.Drawing.Point(127, 140)
     Me.lblNone.Name = "lblNone"
     Me.lblNone.Size = New System.Drawing.Size(265, 16)
     Me.lblNone.TabIndex = 11
     Me.lblNone.Text = "Just gather data when the program is running"
-    '
-    'txtSignUp
-    '
-    Me.txtSignUp.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.txtSignUp.AutoSize = True
-    Me.txtSignUp.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.txtSignUp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-    Me.txtSignUp.ForeColor = System.Drawing.Color.MediumBlue
-    Me.txtSignUp.Location = New System.Drawing.Point(355, 125)
-    Me.txtSignUp.Name = "txtSignUp"
-    Me.txtSignUp.Size = New System.Drawing.Size(81, 13)
-    Me.txtSignUp.TabIndex = 4
-    Me.txtSignUp.Text = "&Sign Up Today!"
-    Me.ttWizard.SetToolTip(Me.txtSignUp, "Sign up for the Remote Usage Service on the Satellite Restriction Tracker website" & _
-        ".")
     '
     'lnServiceSpace2
     '
     Me.lnServiceSpace2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lnServiceSpace2.AutoValidate = System.Windows.Forms.AutoValidate.Disable
     Me.lnServiceSpace2.CausesValidation = False
-    Me.pnlService.SetColumnSpan(Me.lnServiceSpace2, 3)
-    Me.lnServiceSpace2.Location = New System.Drawing.Point(3, 270)
+    Me.pnlService.SetColumnSpan(Me.lnServiceSpace2, 2)
+    Me.lnServiceSpace2.Location = New System.Drawing.Point(3, 122)
     Me.lnServiceSpace2.Name = "lnServiceSpace2"
     Me.lnServiceSpace2.Padding = New System.Windows.Forms.Padding(1)
     Me.lnServiceSpace2.Size = New System.Drawing.Size(441, 4)
     Me.lnServiceSpace2.TabIndex = 9
     Me.lnServiceSpace2.TabStop = False
-    '
-    'lnServiceSpace1
-    '
-    Me.lnServiceSpace1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnServiceSpace1.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnServiceSpace1.CausesValidation = False
-    Me.pnlService.SetColumnSpan(Me.lnServiceSpace1, 3)
-    Me.lnServiceSpace1.Location = New System.Drawing.Point(3, 153)
-    Me.lnServiceSpace1.Name = "lnServiceSpace1"
-    Me.lnServiceSpace1.Padding = New System.Windows.Forms.Padding(1)
-    Me.lnServiceSpace1.Size = New System.Drawing.Size(441, 4)
-    Me.lnServiceSpace1.TabIndex = 5
-    Me.lnServiceSpace1.TabStop = False
     '
     'tabDisplay
     '
@@ -1100,7 +924,7 @@ Partial Class frmWizard
     Me.lblFinishedText.Location = New System.Drawing.Point(3, 35)
     Me.lblFinishedText.Margin = New System.Windows.Forms.Padding(3)
     Me.lblFinishedText.Name = "lblFinishedText"
-    Me.lblFinishedText.Size = New System.Drawing.Size(435, 238)
+    Me.lblFinishedText.Size = New System.Drawing.Size(435, 221)
     Me.lblFinishedText.TabIndex = 1
     Me.lblFinishedText.Text = resources.GetString("lblFinishedText.Text")
     '
@@ -1199,8 +1023,6 @@ Partial Class frmWizard
     Me.tabService.ResumeLayout(False)
     Me.pnlService.ResumeLayout(False)
     Me.pnlService.PerformLayout()
-    Me.pnlKey.ResumeLayout(False)
-    Me.pnlKey.PerformLayout()
     Me.tabDisplay.ResumeLayout(False)
     Me.pnlDisplay.ResumeLayout(False)
     Me.pnlDisplay.PerformLayout()
@@ -1238,14 +1060,6 @@ Partial Class frmWizard
   Friend WithEvents lblAccountPass As System.Windows.Forms.Label
   Friend WithEvents tabService As System.Windows.Forms.TabPage
   Friend WithEvents pnlService As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblRemoteText As System.Windows.Forms.Label
-  Friend WithEvents optRemote As System.Windows.Forms.RadioButton
-  Friend WithEvents pnlKey As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents txtKey1 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey2 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey3 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey4 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey5 As System.Windows.Forms.TextBox
   Friend WithEvents lblLocalText As System.Windows.Forms.Label
   Friend WithEvents optLocal As System.Windows.Forms.RadioButton
   Friend WithEvents optNone As System.Windows.Forms.RadioButton
@@ -1261,7 +1075,6 @@ Partial Class frmWizard
   Friend WithEvents lblAccountName As System.Windows.Forms.Label
   Friend WithEvents lblAccountUsername As System.Windows.Forms.Label
   Friend WithEvents lblServiceTitle As System.Windows.Forms.Label
-  Friend WithEvents txtSignUp As RestrictionTracker.LinkLabel
   Friend WithEvents lblActivity As System.Windows.Forms.Label
   Friend WithEvents pnlDisplay As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblDisplayTitle As System.Windows.Forms.Label
@@ -1282,7 +1095,6 @@ Partial Class frmWizard
   Friend WithEvents lblAccountTitle As System.Windows.Forms.Label
   Friend WithEvents ttWizard As RestrictionTracker.ToolTip
   Friend WithEvents lnAccountSpace As RestrictionTracker.LineBreak
-  Friend WithEvents lnServiceSpace1 As RestrictionTracker.LineBreak
   Friend WithEvents lnServiceSpace2 As RestrictionTracker.LineBreak
   Friend WithEvents lnDisplaySpace1 As RestrictionTracker.LineBreak
   Friend WithEvents lnDisplaySpace2 As RestrictionTracker.LineBreak

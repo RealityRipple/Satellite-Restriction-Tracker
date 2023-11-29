@@ -1,14 +1,8 @@
 ﻿Friend NotInheritable Class frmConfig
-  Private WithEvents remoteTest As Remote.ServiceConnection
   Private bSaved, bAccount, bLoaded, bHardChange As Boolean
   Private mySettings As AppSettings
-  Private pChecker As Threading.Timer
   Private keyPasting As Boolean = False
   Private dwmComp As Boolean
-  Private Const LINK_PURCHASE As String = "Purchase a Remote Usage Service Subscription"
-  Private Const LINK_PURCHASE_TT As String = "If you do not have a Product Key for the Remote Usage Service, you can purchase one online for as little as $15.00 a year."
-  Private Const LINK_PANEL As String = "Visit the Remote Usage Service User Panel Page"
-  Private Const LINK_PANEL_TT As String = "Manage your Remote Usage Service account online, chat with other users, and contact support directly, all from one page."
 #Region "Form Events"
   Private Sub frmConfig_Shown(sender As Object, e As System.EventArgs) Handles Me.Shown
     bLoaded = False
@@ -24,47 +18,6 @@
       Else
         txtPassword.Text = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
       End If
-    End If
-    txtKey1.ContextMenu = mnuKey
-    txtKey2.ContextMenu = mnuKey
-    txtKey3.ContextMenu = mnuKey
-    txtKey4.ContextMenu = mnuKey
-    txtKey5.ContextMenu = mnuKey
-    Dim sKey As String = mySettings.RemoteKey
-    If sKey.Contains("-") Then
-      Dim sKeys() As String = Split(sKey, "-")
-      If sKeys.Length = 5 Then
-        txtKey1.Text = Trim(sKeys(0))
-        txtKey2.Text = Trim(sKeys(1))
-        txtKey3.Text = Trim(sKeys(2))
-        txtKey4.Text = Trim(sKeys(3))
-        txtKey5.Text = Trim(sKeys(4))
-      Else
-        txtKey1.Text = Nothing
-        txtKey2.Text = Nothing
-        txtKey3.Text = Nothing
-        txtKey4.Text = Nothing
-        txtKey5.Text = Nothing
-      End If
-    Else
-      txtKey1.Text = Nothing
-      txtKey2.Text = Nothing
-      txtKey3.Text = Nothing
-      txtKey4.Text = Nothing
-      txtKey5.Text = Nothing
-    End If
-    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-      pctKeyState.Tag = 1
-      pctKeyState.Image = My.Resources.ico_ok
-      ttConfig.SetToolTip(pctKeyState, "Thank you for purchasing the Remote Usage Service for " & My.Application.Info.ProductName & "!")
-      lblPurchaseKey.Text = LINK_PANEL
-      ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
-    Else
-      pctKeyState.Tag = 0
-      pctKeyState.Image = Nothing
-      ttConfig.SetToolTip(pctKeyState, String.Empty)
-      lblPurchaseKey.Text = LINK_PURCHASE
-      ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
     End If
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
@@ -276,51 +229,7 @@
     fswController.EnableRaisingEvents = True
     bLoaded = True
   End Sub
-  Private Sub RunAccountTest(sKey As String)
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New Threading.ContextCallback(AddressOf RunAccountTest), sKey)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    Else
-      Return
-    End If
-    remoteTest = New Remote.ServiceConnection(txtAccount.Text, String.Empty, sKey, mySettings.Proxy, mySettings.Timeout, New Date(2000, 1, 1), LocalAppDataDirectory)
-  End Sub
   Private Sub RunNetworkProtocolTest()
-    If pctKeyState.Tag = 1 Then
-      chkNetworkSecurityEnforce.Checked = False
-      chkNetworkSecurityEnforce.Enabled = False
-      ttConfig.SetToolTip(chkNetworkSecurityEnforce, "The Remote Usage Service uses its own security and verification methods.")
-      chkTLSProxy.Checked = False
-      chkTLSProxy.Enabled = False
-      ttConfig.SetToolTip(chkTLSProxy, "The TLS Proxy is disabled when using the Remote Usage Service.")
-      chkNetworkProtocolSSL3.Checked = False
-      chkNetworkProtocolSSL3.Enabled = False
-      ttConfig.SetToolTip(chkNetworkProtocolSSL3, "SSL 3.0 is disabled when using the Remote Usage Service.")
-      chkNetworkProtocolTLS10.Checked = False
-      chkNetworkProtocolTLS10.Enabled = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS10, "TLS 1.0 is disabled when using the Remote Usage Service.")
-      chkNetworkProtocolTLS11.Checked = False
-      chkNetworkProtocolTLS11.Enabled = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS11, "TLS 1.1 is disabled when using the Remote Usage Service.")
-      chkNetworkProtocolTLS12.Checked = False
-      chkNetworkProtocolTLS12.Enabled = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS12, "TLS 1.2 is disabled when using the Remote Usage Service.")
-      chkNetworkProtocolTLS13.Checked = False
-      chkNetworkProtocolTLS13.Enabled = False
-      ttConfig.SetToolTip(chkNetworkProtocolTLS13, "TLS 1.3 is disabled when using the Remote Usage Service.")
-      lblRetries1.Enabled = False
-      txtRetries.Enabled = False
-      lblRetries2.Enabled = False
-      ttConfig.SetToolTip(txtRetries, "Automatic Retry is not implemented for the Remote Usage Service at this time.")
-      Return
-    End If
     lblRetries1.Enabled = True
     txtRetries.Enabled = True
     lblRetries2.Enabled = True
@@ -454,14 +363,6 @@
     MyBase.WndProc(m)
   End Sub
   Private Sub frmConfig_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
     If e.CloseReason = CloseReason.ApplicationExitCall Then
       Me.DialogResult = Windows.Forms.DialogResult.Abort
     Else
@@ -501,7 +402,6 @@
   Private isShown As Boolean = False
   Private Sub Panel_MouseMove(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pnlAccount.MouseMove,
     pnlAccountViaSat.MouseMove, pnlAccountViaSatInput.MouseMove,
-    pnlAccountKey.MouseMove, pnlKey.MouseMove,
     pnlPrefs.MouseMove,
     pnlPrefStart.MouseMove, pnlPrefStartInput.MouseMove,
     pnlPrefAccuracy.MouseMove, pnlPrefAccuracyInput.MouseMove,
@@ -557,119 +457,7 @@
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged
     If Not bLoaded Then Return
-    If pChecker IsNot Nothing Then
-      pctKeyState.Tag = IIf(CheckState, 1, 0)
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      pctKeyState.Tag = IIf(CheckState, 1, 0)
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    lblPurchaseKey.Text = LINK_PURCHASE
-    ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
-    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-      KeyCheck()
-    Else
-      cmdSave.Enabled = SettingsChanged()
-    End If
-  End Sub
-  Private Sub txtProductKey_KeyDown(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtKey1.KeyDown, txtKey2.KeyDown, txtKey3.KeyDown, txtKey4.KeyDown, txtKey5.KeyDown
-    If e.KeyValue = 86 And e.Control Then
-      If Not String.IsNullOrEmpty(Clipboard.GetText) Then
-        Dim sKey As String = Trim(Clipboard.GetText)
-        If sKey.Contains("-") Then
-          Dim sKeys() As String = Split(sKey, "-")
-          If sKeys.Length = 5 Then
-            keyPasting = True
-            txtKey1.Text = sKeys(0)
-            txtKey2.Text = sKeys(1)
-            txtKey3.Text = sKeys(2)
-            txtKey4.Text = sKeys(3)
-            txtKey5.Text = sKeys(4)
-            keyPasting = False
-            e.Handled = True
-          Else
-            If sKey.Length > sender.MaxLength Then sKey = sKey.Substring(0, sender.MaxLength)
-            sender.Text = sKey
-          End If
-        Else
-          If sKey.Length > sender.MaxLength Then sKey = sKey.Substring(0, sender.MaxLength)
-          sender.Text = sKey
-        End If
-      End If
-    ElseIf e.KeyValue = 46 Or (e.KeyValue = 88 And e.Control) Or (e.KeyValue = 67 And e.Control) Or e.KeyValue = 35 Or e.KeyValue = 36 Or e.KeyValue = 37 Or e.KeyValue = 39 Or e.KeyValue = 9 Or e.KeyValue = 16 Or e.KeyValue = 17 Or e.KeyValue = 18 Then
-
-    ElseIf e.KeyValue = 8 Then
-      If String.IsNullOrEmpty(sender.text) And sender.SelectionLength = 0 Then
-        Select Case sender.Name.ToString
-          Case "txtKey1"
-            e.SuppressKeyPress = True
-            e.Handled = True
-          Case "txtKey2"
-            txtKey1.Focus()
-            txtKey1.SelectionStart = txtKey1.TextLength
-            txtKey1.SelectionLength = 0
-          Case "txtKey3"
-            txtKey2.Focus()
-            txtKey2.SelectionStart = txtKey2.TextLength
-            txtKey2.SelectionLength = 0
-          Case "txtKey4"
-            txtKey3.Focus()
-            txtKey3.SelectionStart = txtKey3.TextLength
-            txtKey3.SelectionLength = 0
-          Case "txtKey5"
-            txtKey4.Focus()
-            txtKey4.SelectionStart = txtKey4.TextLength
-            txtKey4.SelectionLength = 0
-        End Select
-      End If
-    Else
-      If sender.TextLength = sender.MaxLength And sender.SelectionLength = 0 Then
-        Select Case sender.Name
-          Case "txtKey1"
-            txtKey2.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey2"
-            txtKey3.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey3"
-            txtKey4.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-          Case "txtKey4"
-            txtKey5.Focus()
-            SendKeys.Send(Chr(e.KeyValue))
-        End Select
-        e.SuppressKeyPress = True
-        e.Handled = True
-      End If
-    End If
-  End Sub
-  Private Sub txtProductKey_TextChanged(sender As Object, e As System.EventArgs) Handles txtKey1.TextChanged, txtKey2.TextChanged, txtKey3.TextChanged, txtKey4.TextChanged, txtKey5.TextChanged
-    If Not bLoaded Then Return
-    If keyPasting Then Return
-    If pChecker IsNot Nothing Then
-      pctKeyState.Tag = IIf(CheckState, 1, 0)
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      pctKeyState.Tag = IIf(CheckState, 1, 0)
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    lblPurchaseKey.Text = LINK_PURCHASE
-    ttConfig.SetToolTip(lblPurchaseKey, LINK_PURCHASE_TT)
-    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-      KeyCheck()
-    Else
-      pctKeyState.Tag = 0
-      pctKeyState.Image = Nothing
-      ttConfig.SetToolTip(pctKeyState, String.Empty)
-      cmdSave.Enabled = SettingsChanged()
-      DoCheck()
-    End If
+    cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub chkService_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkService.CheckedChanged
     If chkService.Checked Then
@@ -920,89 +708,6 @@
     ttConfig.SetToolTip(cmdMakePortable, "Copy " & My.Application.Info.ProductName & " to the selected directory.")
     pctAdvancedPortableIcon.Image = My.Resources.advanced_portable
   End Sub
-#Region "Context Menu"
-  Private Sub mnuKey_Popup(sender As System.Object, e As System.EventArgs) Handles mnuKey.Popup
-    Dim txtKey As TextBox = CType(CType(sender, ContextMenu).SourceControl, TextBox)
-    If String.IsNullOrEmpty(txtKey1.Text) Or String.IsNullOrEmpty(txtKey2.Text) Or String.IsNullOrEmpty(txtKey3.Text) Or String.IsNullOrEmpty(txtKey4.Text) Or String.IsNullOrEmpty(txtKey5.Text) Then
-      If Not String.IsNullOrEmpty(txtKey.Text) AndAlso txtKey.SelectionLength > 0 Then
-        mnuKeyCut.Enabled = True
-        mnuKeyCopy.Enabled = True
-      Else
-        mnuKeyCut.Enabled = False
-        mnuKeyCopy.Enabled = False
-      End If
-    Else
-      mnuKeyCut.Enabled = True
-      mnuKeyCopy.Enabled = True
-    End If
-    mnuKeyPaste.Enabled = Not String.IsNullOrEmpty(Clipboard.GetText)
-    mnuKeyDelete.Enabled = Not String.IsNullOrEmpty(txtKey.Text)
-    mnuKeyClear.Enabled = Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text))
-  End Sub
-  Private Sub mnuKeyPaste_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyPaste.Click
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    If Not String.IsNullOrEmpty(Clipboard.GetText) Then
-      Dim sKey As String = Trim(Clipboard.GetText)
-      If sKey.Contains("-") Then
-        Dim sKeys() As String = Split(sKey, "-")
-        If sKeys.Length = 5 Then
-          keyPasting = True
-          txtKey1.Text = sKeys(0)
-          txtKey2.Text = sKeys(1)
-          txtKey3.Text = sKeys(2)
-          txtKey4.Text = sKeys(3)
-          txtKey5.Text = sKeys(4)
-          keyPasting = False
-          txtProductKey_TextChanged(sender, e)
-        Else
-          If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
-          txtKey.Text = sKey
-        End If
-      Else
-        If sKey.Length > txtKey.MaxLength Then sKey = sKey.Substring(0, txtKey.MaxLength)
-        txtKey.Text = sKey
-      End If
-    End If
-  End Sub
-  Private Sub mnuKeyCut_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCut.Click
-    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
-      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-        Clipboard.SetText(sKey)
-        txtKey1.Clear()
-        txtKey2.Clear()
-        txtKey3.Clear()
-        txtKey4.Clear()
-        txtKey5.Clear()
-        Return
-      End If
-    End If
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Cut()
-  End Sub
-  Private Sub mnuKeyCopy_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyCopy.Click
-    If Not (String.IsNullOrEmpty(txtKey1.Text) And String.IsNullOrEmpty(txtKey2.Text) And String.IsNullOrEmpty(txtKey3.Text) And String.IsNullOrEmpty(txtKey4.Text) And String.IsNullOrEmpty(txtKey5.Text)) Then
-      If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then
-        Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-        Clipboard.SetText(sKey)
-        Return
-      End If
-    End If
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Copy()
-  End Sub
-  Private Sub mnuKeyDelete_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyDelete.Click
-    Dim txtKey As TextBox = CType(CType(CType(sender, MenuItem).Parent, ContextMenu).SourceControl, TextBox)
-    txtKey.Clear()
-  End Sub
-  Private Sub mnuKeyClear_Click(sender As System.Object, e As System.EventArgs) Handles mnuKeyClear.Click
-    txtKey1.Clear()
-    txtKey2.Clear()
-    txtKey3.Clear()
-    txtKey4.Clear()
-    txtKey5.Clear()
-  End Sub
-#End Region
 #Region "Net Test"
   Private Sub wsFavicon_DownloadIconCompleted(icon16 As Image, icon32 As Image, token As Object, [Error] As Exception)
     If Me.InvokeRequired Then
@@ -1057,106 +762,6 @@
     Return CInt(iToken)
   End Function
 #End Region
-#End Region
-  Private Sub lblPurchaseKey_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblPurchaseKey.LinkClicked
-    If lblPurchaseKey.Text = LINK_PURCHASE Then
-      Try
-        Process.Start("http://srt.realityripple.com/c_signup.php")
-      Catch ex As Exception
-        Dim taskNotifier As TaskbarNotifier = Nothing
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    ElseIf lblPurchaseKey.Text = LINK_PANEL Then
-      Try
-        Process.Start("http://wb.realityripple.com?wbEMail=" & txtAccount.Text & "&wbKey=" & txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text & "&wbSubmit=")
-      Catch ex As Exception
-        Dim taskNotifier As TaskbarNotifier = Nothing
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""wb.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
-  End Sub
-#Region "Remote Service Results"
-  Private Sub pctKeyState_Click(sender As System.Object, e As System.EventArgs) Handles pctKeyState.Click
-    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then KeyCheck()
-  End Sub
-  Private CheckState As Boolean
-  Private Sub KeyCheck()
-    pctKeyState.Image = My.Resources.throbber
-    CheckState = pctKeyState.Tag = 1
-    pctKeyState.Tag = 0
-    ttConfig.SetToolTip(pctKeyState, "Verifying your key...")
-    Dim sKeyTest As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    cmdSave.Enabled = False
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    pChecker = New Threading.Timer(New Threading.TimerCallback(AddressOf RunAccountTest), sKeyTest, 500, 1000)
-  End Sub
-  Private Sub remoteTest_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteTest.Failure
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteTest_Failure), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Dim bToSave As Boolean = True
-    If Not CheckState Then bToSave = False
-    If SettingsChanged() Then bToSave = True
-    pctKeyState.Tag = 0
-    pctKeyState.Image = My.Resources.ico_err
-    Dim sErr As String = "There was an error verifying your key!"
-    Select Case e.Type
-      Case Remote.ServiceFailType.BadLogin : sErr = "There was a server error. Please try again later."
-      Case Remote.ServiceFailType.BadProduct : sErr = "Your Product Key is incorrect."
-      Case Remote.ServiceFailType.BadServer : sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case Remote.ServiceFailType.NoData : sErr = "The server did not receive login negotiation data!"
-      Case Remote.ServiceFailType.NoUsername : sErr = "Your account is not registered!"
-      Case Remote.ServiceFailType.Network : sErr = "There was a connection related error. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-      Case Remote.ServiceFailType.NotBase64 : sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-    End Select
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    ttConfig.SetToolTip(pctKeyState, sErr)
-    DoCheck()
-    cmdSave.Enabled = bToSave
-  End Sub
-  Private Sub remoteTest_OKKey(sender As Object, e As System.EventArgs) Handles remoteTest.OKKey
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(AddressOf remoteTest_OKKey), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Dim bToSave As Boolean = True
-    If CheckState Then bToSave = False
-    If SettingsChanged() Then bToSave = True
-    pctKeyState.Tag = 1
-    pctKeyState.Image = My.Resources.ico_ok
-    ttConfig.SetToolTip(pctKeyState, "Your key has been verified!")
-    lblPurchaseKey.Text = LINK_PANEL
-    If pChecker IsNot Nothing Then
-      pChecker.Dispose()
-      pChecker = Nothing
-    End If
-    If remoteTest IsNot Nothing Then
-      remoteTest.Dispose()
-      remoteTest = Nothing
-    End If
-    ttConfig.SetToolTip(lblPurchaseKey, LINK_PANEL_TT)
-    DoCheck()
-    cmdSave.Enabled = bToSave
-  End Sub
 #End Region
 #Region "Buttons"
   Private Sub cmdAlertStyle_Click(sender As System.Object, e As System.EventArgs) Handles cmdAlertStyle.Click
@@ -1296,7 +901,7 @@
       txtPassword.Focus()
       Return
     End If
-    If Not pctKeyState.Tag = 1 And Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked Or chkNetworkProtocolTLS13.Checked) Then
+    If Not (chkNetworkProtocolSSL3.Checked Or chkNetworkProtocolTLS10.Checked Or chkNetworkProtocolTLS11.Checked Or chkNetworkProtocolTLS12.Checked Or chkNetworkProtocolTLS13.Checked) Then
       MsgDlg(Me, "Please select at least one Security Protocol type to connect with before saving the Configuration.", "Please select your Security Protocol.", "Unable to Save", MessageBoxButtons.OK, _TaskDialogIcon.Padlock, MessageBoxIcon.Information)
       If chkNetworkProtocolTLS13.CanFocus Then
         chkNetworkProtocolTLS13.Focus()
@@ -1354,17 +959,6 @@
       mySettings.PassKey = Convert.ToBase64String(newKey)
       mySettings.PassSalt = Convert.ToBase64String(newSalt)
       bAccount = True
-    End If
-    Dim sKey As String = ""
-    If txtKey1.TextLength = txtKey1.MaxLength And txtKey2.TextLength = txtKey2.MaxLength And txtKey3.TextLength = txtKey3.MaxLength And txtKey4.TextLength = txtKey4.MaxLength And txtKey5.TextLength = txtKey5.MaxLength Then sKey = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    If String.Compare(mySettings.RemoteKey, sKey, StringComparison.OrdinalIgnoreCase) <> 0 Then
-      If pctKeyState.Tag = 1 Then
-        mySettings.RemoteKey = sKey
-        bAccount = True
-      Else
-        mySettings.RemoteKey = Nothing
-        bAccount = True
-      End If
     End If
     If chkStartUp.Checked Then
       If Not My.Computer.FileSystem.FileExists(StartupPath) Then
@@ -1705,9 +1299,6 @@
     Else
       If Not StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt) = txtPassword.Text Then Return True
     End If
-    Dim sKey As String = txtKey1.Text & "-" & txtKey2.Text & "-" & txtKey3.Text & "-" & txtKey4.Text & "-" & txtKey5.Text
-    If sKey.Contains("--") Then sKey = ""
-    If Not String.Compare(mySettings.RemoteKey, sKey, StringComparison.OrdinalIgnoreCase) = 0 Then Return True
     If Not mySettings.AutoHide = chkAutoHide.Checked Then Return True
     If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True
@@ -1791,28 +1382,21 @@
     Return False
   End Function
   Private Sub DoCheck()
-    If pctKeyState.Tag = 0 Then
-      If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then
-        ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
-        'txtInterval.Minimum = 15
-        chkService.Enabled = False
-        chkService.Checked = False
-      ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
-        'txtInterval.Minimum = 15
-        chkService.Enabled = True
-        chkService.Checked = mySettings.Service
-        ttConfig.SetToolTip(chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracker is closed." & vbNewLine & "This service will continue running on the system so that logging may continue on any (or no) account." & vbNewLine & "Requires admin privilege prompt when the Restriction Tracker is run or closed, and the Data Directory may not be customized.")
-      Else
-        'txtInterval.Minimum = 15
-        chkService.Enabled = False
-        chkService.Checked = False
-        ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & My.Application.Info.ProductName & " if you wish to use this feature.")
-      End If
-    Else
-      'txtInterval.Minimum = 30
+    If LocalAppDataDirectory = IO.Path.Combine(Application.StartupPath, "Config") Then
+      ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not included with the Portable version of " & My.Application.Info.ProductName & ".")
+      'txtInterval.Minimum = 15
       chkService.Enabled = False
       chkService.Checked = False
-      ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service is not needed when using the Remote Service!")
+    ElseIf My.Computer.FileSystem.FileExists(IO.Path.Combine(Application.StartupPath, "RestrictionController.exe")) Then
+      'txtInterval.Minimum = 15
+      chkService.Enabled = True
+      chkService.Checked = mySettings.Service
+      ttConfig.SetToolTip(chkService, "Run Satellite Restriction Logger system service when Satellite Restriction Tracker is closed." & vbNewLine & "This service will continue running on the system so that logging may continue on any (or no) account." & vbNewLine & "Requires admin privilege prompt when the Restriction Tracker is run or closed, and the Data Directory may not be customized.")
+    Else
+      'txtInterval.Minimum = 15
+      chkService.Enabled = False
+      chkService.Checked = False
+      ttConfig.SetToolTip(chkService, "The Satellite Restriction Logger Service Controller was not found!" & vbNewLine & "Please Reinstall " & My.Application.Info.ProductName & " if you wish to use this feature.")
     End If
     RunNetworkProtocolTest()
   End Sub
@@ -1860,12 +1444,8 @@
           ctl.Margin = New Padding(3)
         End If
       ElseIf ctl.GetType = GetType(PictureBox) Then
-        If ctl.Name = pctKeyState.Name Then
-          ctl.Margin = New Padding(1, 3, 3, 3)
-        Else
-          ctl.Margin = New Padding(21, 3, 3, 3)
-          ctl.Height = ctl.Width
-        End If
+        ctl.Margin = New Padding(21, 3, 3, 3)
+        ctl.Height = ctl.Width
       End If
     Next
   End Sub

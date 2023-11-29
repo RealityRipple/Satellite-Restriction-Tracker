@@ -8,7 +8,6 @@
   Private Delegate Sub ParamaterizedInvoker2(parameter As Object, secondParam As Object)
   Private WithEvents updateChecker As clsUpdate
   Private WithEvents taskNotifier As TaskbarNotifier
-  Private WithEvents remoteData As Remote.ServiceConnection
   Private WithEvents localData As Local.SiteConnection
 #Region "Constants"
   Private Const sDISPLAY As String = "Usage Levels (%lt)"
@@ -347,10 +346,6 @@
       localData.Dispose()
       localData = Nothing
     End If
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
-    End If
     StopSong()
     mySettings.Save()
     LOG_Terminate(False)
@@ -455,23 +450,19 @@
         End If
       Next
       If useProtocol = SecurityProtocolTypeEx.None Then
-        If String.IsNullOrEmpty(mySettings.RemoteKey) Then
-          For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
-            Try
-              Net.ServicePointManager.SecurityProtocol = protocolTest
-              useProtocol = useProtocol Or protocolTest
-            Catch ex As Exception
-            End Try
-          Next
+        For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
           Try
-            Net.ServicePointManager.SecurityProtocol = useProtocol
-            mySettings.SecurityProtocol = useProtocol
-            mySettings.Save()
+            Net.ServicePointManager.SecurityProtocol = protocolTest
+            useProtocol = useProtocol Or protocolTest
           Catch ex As Exception
           End Try
-        Else
-          Net.ServicePointManager.SecurityProtocol = SecurityProtocolTypeEx.None
-        End If
+        Next
+        Try
+          Net.ServicePointManager.SecurityProtocol = useProtocol
+          mySettings.SecurityProtocol = useProtocol
+          mySettings.Save()
+        Catch ex As Exception
+        End Try
       Else
         Try
           Net.ServicePointManager.SecurityProtocol = useProtocol
@@ -533,10 +524,6 @@
     If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
-    End If
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
     End If
     InitAccount()
     If Not String.IsNullOrEmpty(sAccount) Then
@@ -673,22 +660,13 @@
       If cmdRefresh.Enabled Then
         cmdRefresh.Enabled = False
         NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-        If KeyCheck(mySettings.RemoteKey) Then
-          Dim remoteCallback As New MethodInvoker(AddressOf GetRemoteUsage)
-          remoteCallback.BeginInvoke(Nothing, Nothing)
-        Else
-          If localData IsNot Nothing Then
-            localData.Dispose()
-            localData = Nothing
-          End If
-          GrabAttempt = 0
-          localData = New Local.SiteConnection(LocalAppDataDirectory)
+        If localData IsNot Nothing Then
+          localData.Dispose()
+          localData = Nothing
         End If
+        GrabAttempt = 0
+        localData = New Local.SiteConnection(LocalAppDataDirectory)
       Else
-        If remoteData IsNot Nothing Then
-          remoteData.Dispose()
-          remoteData = Nothing
-        End If
         If localData IsNot Nothing Then
           localData.Dispose()
           localData = Nothing
@@ -712,16 +690,6 @@
     End If
     Return False
   End Function
-  Private Sub GetRemoteUsage()
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
-    End If
-    Dim fromDate = mySettings.LastSyncTime
-    If My.Computer.Keyboard.CtrlKeyDown Then fromDate = New Date(2000, 1, 1)
-    If LOG_GetCount() = 0 Then fromDate = New Date(2000, 1, 1)
-    remoteData = New Remote.ServiceConnection(sAccount, sPassword, mySettings.RemoteKey, mySettings.Proxy, mySettings.Timeout, fromDate, LocalAppDataDirectory)
-  End Sub
   Private Sub DisplayUsage(bStatusText As Boolean, bHardTime As Boolean)
     If Me.InvokeRequired Then
       Try
@@ -750,10 +718,6 @@
     If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
-    End If
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
     End If
     If MinutesAhead > -1 Then
       NextGrabTick = srlFunctions.TickCount() + (MinutesAhead * 60 * 1000)
@@ -911,117 +875,6 @@
     If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
-    End If
-  End Sub
-#End Region
-#Region "Remote Usage Events"
-  Private Sub remoteData_Failure(sender As Object, e As Remote.ServiceFailureEventArgs) Handles remoteData.Failure
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Remote.ServiceFailureEventArgs)(AddressOf remoteData_Failure), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    Dim sErr As String = "There was an error verifying your Product Key."
-    Select Case e.Type
-      Case Remote.ServiceFailType.BadLogin
-        sErr = "There was a server error. Please try again later."
-      Case Remote.ServiceFailType.BadPassword
-        sErr = "Your Password is incorrect."
-      Case Remote.ServiceFailType.BadProduct
-        sErr = "Your Product Key has been disabled."
-        mySettings.RemoteKey = String.Empty
-        Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-        UsageInvoker.BeginInvoke(Nothing, Nothing)
-      Case Remote.ServiceFailType.BadServer
-        sErr = "There was a fault double-checking the server. You may have a security issue."
-      Case Remote.ServiceFailType.NoData
-        sErr = "There is no usage data." & IIf(String.IsNullOrEmpty(e.Details), "Please wait 15 minutes.", " " & e.Details)
-      Case Remote.ServiceFailType.NoPassword
-        sErr = "Your Password has not been Registered on the Remote Service."
-      Case Remote.ServiceFailType.NoUsername
-        sErr = "Your Account is not Registered for the Remote Service."
-        mySettings.RemoteKey = String.Empty
-        Dim UsageInvoker As New MethodInvoker(AddressOf GetUsage)
-        UsageInvoker.BeginInvoke(Nothing, Nothing)
-      Case Remote.ServiceFailType.Network
-        sErr = "Network Connection Error" & IIf(String.IsNullOrEmpty(e.Details), ".", " (" & e.Details & ")")
-      Case Remote.ServiceFailType.NotBase64
-        sErr = "The server did not respond in the right manner. Please check your Internet connection." & IIf(String.IsNullOrEmpty(e.Details), "", vbNewLine & e.Details)
-    End Select
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
-    End If
-    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Service Failure: " & sErr, True)
-    DisplayUsage(False, True)
-  End Sub
-  Private Sub remoteData_OKKey(sender As Object, e As System.EventArgs) Handles remoteData.OKKey
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(AddressOf remoteData_OKKey), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    SetStatusText(srlFunctions.TimeToString(LOG_GetLast), "Account Accessed! Getting Usage...", False)
-  End Sub
-  Private Sub remoteData_Success(sender As Object, e As Remote.ServiceSuccessEventArgs) Handles remoteData.Success
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New EventHandler(Of Remote.ServiceSuccessEventArgs)(AddressOf remoteData_Success), sender, e)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    NextGrabTick = srlFunctions.TickCount() + (mySettings.Interval * 60 * 1000)
-    Dim LastTime As String = srlFunctions.TimeToString(LOG_GetLast)
-    If FullCheck Then
-      SetStatusText(LastTime, "Synchronizing History...", False)
-    Else
-      SetStatusText(LastTime, "Saving History...", False)
-    End If
-    If e IsNot Nothing Then
-      ScreenDefaultColors(mySettings.Colors)
-      mySettings.Save()
-      Dim iPercent As Integer = 0
-      Dim iInterval As Integer = 1
-      Dim iStart As Long = srlFunctions.TickCount()
-      ttUI.UseFading = False
-      For I As Integer = 0 To e.Results.Count - 1
-        Dim Row As Remote.ServiceResult = e.Results(I)
-        If FullCheck Then
-          If Math.Abs(iPercent - Math.Floor((I / (e.Results.Count - 1)) * 100)) >= iInterval Then
-            iPercent = Math.Floor((I / (e.Results.Count - 1)) * 100)
-            SetStatusText(LastTime, "Synchronizing History [" & iPercent & "%]...", False)
-            If (iPercent = 4) Then
-              Dim iDur As Long = srlFunctions.TickCount() - iStart
-              If iDur <= 700 Then iInterval = 2
-            End If
-          End If
-          LOG_Add(Row.Time, Row.Used, Row.Limit, (I = e.Results.Count - 1))
-        Else
-          If DateDiff(DateInterval.Minute, LOG_GetLast, Row.Time) > 1 Then
-            LOG_Add(Row.Time, Row.Used, Row.Limit, (I = e.Results.Count - 1))
-          End If
-        End If
-      Next
-      ttUI.UseFading = True
-      FullCheck = False
-      mySettings.LastSyncTime = LOG_GetLast()
-      mySettings.Save()
-      DisplayUsage(True, True)
-    Else
-      If LOG_GetCount() = 0 Then
-        SetStatusText("No History", "No data received from the server!", True)
-      End If
-      DisplayUsage(True, True)
-    End If
-    If remoteData IsNot Nothing Then
-      remoteData.Dispose()
-      remoteData = Nothing
     End If
   End Sub
 #End Region
@@ -1227,12 +1080,7 @@
   End Sub
   Private Sub cmdConfig_Click(sender As System.Object, e As System.EventArgs) Handles cmdConfig.Click
     Dim bReRun As Boolean = False
-    If remoteData IsNot Nothing Then
-      bReRun = True
-      remoteData.Dispose()
-      remoteData = Nothing
-      DisplayUsage(True, False)
-    ElseIf localData IsNot Nothing Then
+    If localData IsNot Nothing Then
       localData.Dispose()
       localData = Nothing
       bReRun = True
@@ -1530,10 +1378,7 @@
             fUpdate.NewUpdate(e.Version, False, Not isAdmin())
             Select Case fUpdate.ShowDialog()
               Case Windows.Forms.DialogResult.Yes
-                If remoteData IsNot Nothing Then
-                  remoteData.Dispose()
-                  remoteData = Nothing
-                ElseIf localData IsNot Nothing Then
+                If localData IsNot Nothing Then
                   localData.Dispose()
                   localData = Nothing
                 End If
@@ -1545,10 +1390,7 @@
                 End If
                 NextGrabTick = Long.MinValue
               Case Windows.Forms.DialogResult.OK
-                If remoteData IsNot Nothing Then
-                  remoteData.Dispose()
-                  remoteData = Nothing
-                ElseIf localData IsNot Nothing Then
+                If localData IsNot Nothing Then
                   localData.Dispose()
                   localData = Nothing
                 End If
@@ -1575,10 +1417,7 @@
               fUpdate.NewUpdate(e.Version, True, Not isAdmin())
               Select Case fUpdate.ShowDialog()
                 Case Windows.Forms.DialogResult.Yes
-                  If remoteData IsNot Nothing Then
-                    remoteData.Dispose()
-                    remoteData = Nothing
-                  ElseIf localData IsNot Nothing Then
+                  If localData IsNot Nothing Then
                     localData.Dispose()
                     localData = Nothing
                   End If
@@ -1590,10 +1429,7 @@
                   End If
                   NextGrabTick = Long.MinValue
                 Case Windows.Forms.DialogResult.OK
-                  If remoteData IsNot Nothing Then
-                    remoteData.Dispose()
-                    remoteData = Nothing
-                  ElseIf localData IsNot Nothing Then
+                  If localData IsNot Nothing Then
                     localData.Dispose()
                     localData = Nothing
                   End If
@@ -1627,20 +1463,14 @@
       Else
         Select Case e.Result
           Case clsUpdate.CheckEventArgs.ResultType.NewUpdate
-            If remoteData IsNot Nothing Then
-              remoteData.Dispose()
-              remoteData = Nothing
-            ElseIf localData IsNot Nothing Then
+            If localData IsNot Nothing Then
               localData.Dispose()
               localData = Nothing
             End If
             updateChecker.DownloadUpdate(sEXEPath)
           Case clsUpdate.CheckEventArgs.ResultType.NewBeta
             If mySettings.UpdateBETA Then
-              If remoteData IsNot Nothing Then
-                remoteData.Dispose()
-                remoteData = Nothing
-              ElseIf localData IsNot Nothing Then
+              If localData IsNot Nothing Then
                 localData.Dispose()
                 localData = Nothing
               End If
@@ -1755,10 +1585,6 @@
       If localData IsNot Nothing Then
         localData.Dispose()
         localData = Nothing
-      End If
-      If remoteData IsNot Nothing Then
-        remoteData.Dispose()
-        remoteData = Nothing
       End If
       cmdRefresh.Enabled = True
     ElseIf e.Mode = Microsoft.Win32.PowerModes.Resume Then

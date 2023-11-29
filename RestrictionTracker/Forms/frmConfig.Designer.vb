@@ -27,9 +27,6 @@ Partial Class frmConfig
     Me.tbsConfig = New System.Windows.Forms.TabControl()
     Me.tabAccount = New System.Windows.Forms.TabPage()
     Me.pnlAccount = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlAccountKeyTitle = New System.Windows.Forms.TableLayoutPanel()
-    Me.lblAccountKeyTitle = New System.Windows.Forms.Label()
-    Me.lnAccountKeyTitle = New RestrictionTracker.LineBreak()
     Me.pnlAccountViaSatTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblAccountViaSatTitle = New System.Windows.Forms.Label()
     Me.lnAccountViaSatTitle = New RestrictionTracker.LineBreak()
@@ -41,18 +38,6 @@ Partial Class frmConfig
     Me.txtAccount = New System.Windows.Forms.TextBox()
     Me.txtPassword = New RestrictionTracker.PasswordBox()
     Me.lblAccountViaSatDescription = New System.Windows.Forms.Label()
-    Me.pnlAccountKey = New System.Windows.Forms.TableLayoutPanel()
-    Me.pnlKey = New System.Windows.Forms.TableLayoutPanel()
-    Me.pctKeyState = New System.Windows.Forms.PictureBox()
-    Me.txtKey1 = New System.Windows.Forms.TextBox()
-    Me.txtKey2 = New System.Windows.Forms.TextBox()
-    Me.txtKey3 = New System.Windows.Forms.TextBox()
-    Me.txtKey4 = New System.Windows.Forms.TextBox()
-    Me.txtKey5 = New System.Windows.Forms.TextBox()
-    Me.pctAccountKeyIcon = New System.Windows.Forms.PictureBox()
-    Me.lblKey = New System.Windows.Forms.Label()
-    Me.lblPurchaseKey = New RestrictionTracker.LinkLabel()
-    Me.lblAccountKeyDescription = New System.Windows.Forms.Label()
     Me.tabPrefs = New System.Windows.Forms.TabPage()
     Me.pnlPrefs = New System.Windows.Forms.TableLayoutPanel()
     Me.pnlPrefInterfaceTitle = New System.Windows.Forms.TableLayoutPanel()
@@ -115,13 +100,13 @@ Partial Class frmConfig
     Me.pnlNetworkProtocol = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolDescription = New System.Windows.Forms.Label()
     Me.pctNetworkProtocolIcon = New System.Windows.Forms.PictureBox()
-    Me.chkNetworkProtocolSSL3 = New System.Windows.Forms.CheckBox()
-    Me.chkNetworkProtocolTLS10 = New System.Windows.Forms.CheckBox()
     Me.chkTLSProxy = New System.Windows.Forms.CheckBox()
     Me.chkNetworkSecurityEnforce = New System.Windows.Forms.CheckBox()
-    Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
-    Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
     Me.chkNetworkProtocolTLS13 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolSSL3 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS12 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS10 = New System.Windows.Forms.CheckBox()
+    Me.chkNetworkProtocolTLS11 = New System.Windows.Forms.CheckBox()
     Me.pnlNetworkProtocolTitle = New System.Windows.Forms.TableLayoutPanel()
     Me.lblNetworkProtocolTitle = New System.Windows.Forms.Label()
     Me.lnNetworkProtocolTitle = New RestrictionTracker.LineBreak()
@@ -222,15 +207,10 @@ Partial Class frmConfig
     Me.tbsConfig.SuspendLayout()
     Me.tabAccount.SuspendLayout()
     Me.pnlAccount.SuspendLayout()
-    Me.pnlAccountKeyTitle.SuspendLayout()
     Me.pnlAccountViaSatTitle.SuspendLayout()
     Me.pnlAccountViaSat.SuspendLayout()
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.pnlAccountViaSatInput.SuspendLayout()
-    Me.pnlAccountKey.SuspendLayout()
-    Me.pnlKey.SuspendLayout()
-    CType(Me.pctKeyState, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pctAccountKeyIcon, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.tabPrefs.SuspendLayout()
     Me.pnlPrefs.SuspendLayout()
     Me.pnlPrefInterfaceTitle.SuspendLayout()
@@ -323,65 +303,19 @@ Partial Class frmConfig
     '
     Me.pnlAccount.ColumnCount = 1
     Me.pnlAccount.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccount.Controls.Add(Me.pnlAccountKeyTitle, 0, 3)
     Me.pnlAccount.Controls.Add(Me.pnlAccountViaSatTitle, 0, 0)
     Me.pnlAccount.Controls.Add(Me.pnlAccountViaSat, 0, 1)
-    Me.pnlAccount.Controls.Add(Me.pnlAccountKey, 0, 4)
     Me.pnlAccount.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pnlAccount.Location = New System.Drawing.Point(0, 0)
     Me.pnlAccount.Name = "pnlAccount"
-    Me.pnlAccount.RowCount = 5
+    Me.pnlAccount.RowCount = 3
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle())
+    Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccount.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
     Me.pnlAccount.Size = New System.Drawing.Size(385, 477)
     Me.pnlAccount.TabIndex = 0
-    '
-    'pnlAccountKeyTitle
-    '
-    Me.pnlAccountKeyTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pnlAccountKeyTitle.AutoSize = True
-    Me.pnlAccountKeyTitle.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAccountKeyTitle.ColumnCount = 2
-    Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountKeyTitle.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-    Me.pnlAccountKeyTitle.Controls.Add(Me.lblAccountKeyTitle, 0, 0)
-    Me.pnlAccountKeyTitle.Controls.Add(Me.lnAccountKeyTitle, 1, 0)
-    Me.pnlAccountKeyTitle.Location = New System.Drawing.Point(3, 378)
-    Me.pnlAccountKeyTitle.Margin = New System.Windows.Forms.Padding(3, 10, 3, 5)
-    Me.pnlAccountKeyTitle.Name = "pnlAccountKeyTitle"
-    Me.pnlAccountKeyTitle.RowCount = 1
-    Me.pnlAccountKeyTitle.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountKeyTitle.Size = New System.Drawing.Size(379, 13)
-    Me.pnlAccountKeyTitle.TabIndex = 4
-    '
-    'lblAccountKeyTitle
-    '
-    Me.lblAccountKeyTitle.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblAccountKeyTitle.AutoSize = True
-    Me.lblAccountKeyTitle.Location = New System.Drawing.Point(3, 0)
-    Me.lblAccountKeyTitle.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
-    Me.lblAccountKeyTitle.Name = "lblAccountKeyTitle"
-    Me.lblAccountKeyTitle.Size = New System.Drawing.Size(165, 13)
-    Me.lblAccountKeyTitle.TabIndex = 0
-    Me.lblAccountKeyTitle.Text = "Remote Usage Service (Optional)"
-    '
-    'lnAccountKeyTitle
-    '
-    Me.lnAccountKeyTitle.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lnAccountKeyTitle.AutoValidate = System.Windows.Forms.AutoValidate.Disable
-    Me.lnAccountKeyTitle.CausesValidation = False
-    Me.lnAccountKeyTitle.Location = New System.Drawing.Point(170, 4)
-    Me.lnAccountKeyTitle.Margin = New System.Windows.Forms.Padding(2, 3, 5, 3)
-    Me.lnAccountKeyTitle.Name = "lnAccountKeyTitle"
-    Me.lnAccountKeyTitle.Padding = New System.Windows.Forms.Padding(0, 2, 0, 2)
-    Me.lnAccountKeyTitle.Size = New System.Drawing.Size(204, 4)
-    Me.lnAccountKeyTitle.TabIndex = 1
-    Me.lnAccountKeyTitle.TabStop = False
     '
     'pnlAccountViaSatTitle
     '
@@ -513,6 +447,7 @@ Partial Class frmConfig
     Me.txtPassword.Location = New System.Drawing.Point(67, 48)
     Me.txtPassword.Name = "txtPassword"
     Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
+    Me.txtPassword.ShowContents = False
     Me.txtPassword.Size = New System.Drawing.Size(150, 20)
     Me.txtPassword.TabIndex = 4
     Me.ttConfig.SetToolTip(Me.txtPassword, "The Password to your ViaSat account.")
@@ -520,7 +455,7 @@ Partial Class frmConfig
     'lblAccountViaSatDescription
     '
     Me.lblAccountViaSatDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblAccountViaSatDescription.AutoSize = True
     Me.pnlAccountViaSatInput.SetColumnSpan(Me.lblAccountViaSatDescription, 3)
     Me.lblAccountViaSatDescription.Location = New System.Drawing.Point(3, 3)
@@ -529,190 +464,6 @@ Partial Class frmConfig
     Me.lblAccountViaSatDescription.Size = New System.Drawing.Size(296, 13)
     Me.lblAccountViaSatDescription.TabIndex = 0
     Me.lblAccountViaSatDescription.Text = "This account information should match your meter page login."
-    '
-    'pnlAccountKey
-    '
-    Me.pnlAccountKey.AutoSize = True
-    Me.pnlAccountKey.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlAccountKey.ColumnCount = 3
-    Me.pnlAccountKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlAccountKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlAccountKey.Controls.Add(Me.pnlKey, 2, 1)
-    Me.pnlAccountKey.Controls.Add(Me.pctAccountKeyIcon, 0, 0)
-    Me.pnlAccountKey.Controls.Add(Me.lblKey, 1, 1)
-    Me.pnlAccountKey.Controls.Add(Me.lblPurchaseKey, 2, 2)
-    Me.pnlAccountKey.Controls.Add(Me.lblAccountKeyDescription, 1, 0)
-    Me.pnlAccountKey.Location = New System.Drawing.Point(3, 399)
-    Me.pnlAccountKey.Name = "pnlAccountKey"
-    Me.pnlAccountKey.RowCount = 3
-    Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountKey.RowStyles.Add(New System.Windows.Forms.RowStyle())
-    Me.pnlAccountKey.Size = New System.Drawing.Size(379, 75)
-    Me.pnlAccountKey.TabIndex = 5
-    '
-    'pnlKey
-    '
-    Me.pnlKey.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.pnlKey.AutoSize = True
-    Me.pnlKey.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-    Me.pnlKey.ColumnCount = 6
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-    Me.pnlKey.Controls.Add(Me.pctKeyState, 5, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey1, 0, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey2, 1, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey3, 2, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey4, 3, 0)
-    Me.pnlKey.Controls.Add(Me.txtKey5, 4, 0)
-    Me.pnlKey.Location = New System.Drawing.Point(130, 32)
-    Me.pnlKey.Margin = New System.Windows.Forms.Padding(0)
-    Me.pnlKey.Name = "pnlKey"
-    Me.pnlKey.RowCount = 1
-    Me.pnlKey.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-    Me.pnlKey.Size = New System.Drawing.Size(230, 24)
-    Me.pnlKey.TabIndex = 2
-    '
-    'pctKeyState
-    '
-    Me.pctKeyState.Anchor = System.Windows.Forms.AnchorStyles.None
-    Me.pctKeyState.Location = New System.Drawing.Point(211, 4)
-    Me.pctKeyState.Margin = New System.Windows.Forms.Padding(1, 3, 3, 3)
-    Me.pctKeyState.Name = "pctKeyState"
-    Me.pctKeyState.Size = New System.Drawing.Size(16, 16)
-    Me.pctKeyState.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
-    Me.pctKeyState.TabIndex = 6
-    Me.pctKeyState.TabStop = False
-    '
-    'txtKey1
-    '
-    Me.txtKey1.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey1.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey1.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey1.Location = New System.Drawing.Point(3, 3)
-    Me.txtKey1.Margin = New System.Windows.Forms.Padding(3, 3, 1, 3)
-    Me.txtKey1.MaxLength = 6
-    Me.txtKey1.Name = "txtKey1"
-    Me.txtKey1.Size = New System.Drawing.Size(48, 18)
-    Me.txtKey1.TabIndex = 0
-    Me.txtKey1.Text = "@@@@@@"
-    Me.txtKey1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetToolTip(Me.txtKey1, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey2
-    '
-    Me.txtKey2.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey2.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey2.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey2.Location = New System.Drawing.Point(53, 3)
-    Me.txtKey2.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey2.MaxLength = 4
-    Me.txtKey2.Name = "txtKey2"
-    Me.txtKey2.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey2.TabIndex = 1
-    Me.txtKey2.Text = "@@@@"
-    Me.txtKey2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetToolTip(Me.txtKey2, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey3
-    '
-    Me.txtKey3.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey3.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey3.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey3.Location = New System.Drawing.Point(89, 3)
-    Me.txtKey3.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey3.MaxLength = 4
-    Me.txtKey3.Name = "txtKey3"
-    Me.txtKey3.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey3.TabIndex = 2
-    Me.txtKey3.Text = "@@@@"
-    Me.txtKey3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetToolTip(Me.txtKey3, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey4
-    '
-    Me.txtKey4.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey4.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey4.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey4.Location = New System.Drawing.Point(125, 3)
-    Me.txtKey4.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey4.MaxLength = 4
-    Me.txtKey4.Name = "txtKey4"
-    Me.txtKey4.Size = New System.Drawing.Size(34, 18)
-    Me.txtKey4.TabIndex = 3
-    Me.txtKey4.Text = "@@@@"
-    Me.txtKey4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetToolTip(Me.txtKey4, "Your Remote Usage Service Product Key.")
-    '
-    'txtKey5
-    '
-    Me.txtKey5.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtKey5.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-    Me.txtKey5.Font = New System.Drawing.Font("Lucida Console", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtKey5.Location = New System.Drawing.Point(161, 3)
-    Me.txtKey5.Margin = New System.Windows.Forms.Padding(1, 3, 1, 3)
-    Me.txtKey5.MaxLength = 6
-    Me.txtKey5.Name = "txtKey5"
-    Me.txtKey5.Size = New System.Drawing.Size(48, 18)
-    Me.txtKey5.TabIndex = 4
-    Me.txtKey5.Text = "@@@@@@"
-    Me.txtKey5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-    Me.ttConfig.SetToolTip(Me.txtKey5, "Your Remote Usage Service Product Key.")
-    '
-    'pctAccountKeyIcon
-    '
-    Me.pctAccountKeyIcon.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.pctAccountKeyIcon.Image = Global.RestrictionTracker.My.Resources.Resources.account_key
-    Me.pctAccountKeyIcon.Location = New System.Drawing.Point(21, 3)
-    Me.pctAccountKeyIcon.Margin = New System.Windows.Forms.Padding(21, 3, 3, 3)
-    Me.pctAccountKeyIcon.Name = "pctAccountKeyIcon"
-    Me.pnlAccountKey.SetRowSpan(Me.pctAccountKeyIcon, 2)
-    Me.pctAccountKeyIcon.Size = New System.Drawing.Size(32, 32)
-    Me.pctAccountKeyIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
-    Me.pctAccountKeyIcon.TabIndex = 0
-    Me.pctAccountKeyIcon.TabStop = False
-    '
-    'lblKey
-    '
-    Me.lblKey.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblKey.AutoSize = True
-    Me.lblKey.Location = New System.Drawing.Point(59, 37)
-    Me.lblKey.Name = "lblKey"
-    Me.lblKey.Size = New System.Drawing.Size(68, 13)
-    Me.lblKey.TabIndex = 1
-    Me.lblKey.Text = "Product &Key:"
-    '
-    'lblPurchaseKey
-    '
-    Me.lblPurchaseKey.Anchor = System.Windows.Forms.AnchorStyles.Left
-    Me.lblPurchaseKey.AutoSize = True
-    Me.lblPurchaseKey.Cursor = System.Windows.Forms.Cursors.Hand
-    Me.lblPurchaseKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline)
-    Me.lblPurchaseKey.ForeColor = System.Drawing.Color.MediumBlue
-    Me.lblPurchaseKey.Location = New System.Drawing.Point(133, 59)
-    Me.lblPurchaseKey.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblPurchaseKey.Name = "lblPurchaseKey"
-    Me.lblPurchaseKey.Size = New System.Drawing.Size(235, 13)
-    Me.lblPurchaseKey.TabIndex = 3
-    Me.lblPurchaseKey.TabStop = True
-    Me.lblPurchaseKey.Text = "Purchase a Remote Usage Service Subscription"
-    '
-    'lblAccountKeyDescription
-    '
-    Me.lblAccountKeyDescription.AutoSize = True
-    Me.pnlAccountKey.SetColumnSpan(Me.lblAccountKeyDescription, 2)
-    Me.lblAccountKeyDescription.Location = New System.Drawing.Point(59, 3)
-    Me.lblAccountKeyDescription.Margin = New System.Windows.Forms.Padding(3)
-    Me.lblAccountKeyDescription.Name = "lblAccountKeyDescription"
-    Me.lblAccountKeyDescription.Size = New System.Drawing.Size(316, 26)
-    Me.lblAccountKeyDescription.TabIndex = 0
-    Me.lblAccountKeyDescription.Text = "Let us track your usage for you! 24-hour meter information at your fingertips, pr" & _
-    "ovided by RealityRipple Software."
     '
     'tabPrefs
     '
@@ -804,7 +555,7 @@ Partial Class frmConfig
     'pnlPrefColor
     '
     Me.pnlPrefColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.pnlPrefColor.AutoSize = True
     Me.pnlPrefColor.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
     Me.pnlPrefColor.ColumnCount = 3
@@ -906,7 +657,7 @@ Partial Class frmConfig
     'lblPrefAlertDescription
     '
     Me.lblPrefAlertDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblPrefAlertDescription.AutoSize = True
     Me.pnlPrefAlert.SetColumnSpan(Me.lblPrefAlertDescription, 4)
     Me.lblPrefAlertDescription.Location = New System.Drawing.Point(58, 3)
@@ -1603,7 +1354,7 @@ Partial Class frmConfig
     'lblNetworkProtocolDescription
     '
     Me.lblNetworkProtocolDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblNetworkProtocolDescription.AutoSize = True
     Me.pnlNetworkProtocol.SetColumnSpan(Me.lblNetworkProtocolDescription, 6)
     Me.lblNetworkProtocolDescription.Location = New System.Drawing.Point(59, 3)
@@ -1625,32 +1376,6 @@ Partial Class frmConfig
     Me.pctNetworkProtocolIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
     Me.pctNetworkProtocolIcon.TabIndex = 0
     Me.pctNetworkProtocolIcon.TabStop = False
-    '
-    'chkNetworkProtocolSSL3
-    '
-    Me.chkNetworkProtocolSSL3.AutoSize = True
-    Me.chkNetworkProtocolSSL3.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolSSL3.Location = New System.Drawing.Point(222, 59)
-    Me.chkNetworkProtocolSSL3.Name = "chkNetworkProtocolSSL3"
-    Me.chkNetworkProtocolSSL3.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolSSL3.TabIndex = 7
-    Me.chkNetworkProtocolSSL3.Text = "SS&L 3.0"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to" & _
-        " attacks.")
-    Me.chkNetworkProtocolSSL3.UseVisualStyleBackColor = False
-    '
-    'chkNetworkProtocolTLS10
-    '
-    Me.chkNetworkProtocolTLS10.AutoSize = True
-    Me.chkNetworkProtocolTLS10.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(146, 59)
-    Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
-    Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS10.TabIndex = 6
-    Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
-        "e to attacks.")
-    Me.chkNetworkProtocolTLS10.UseVisualStyleBackColor = True
     '
     'chkTLSProxy
     '
@@ -1680,17 +1405,30 @@ Partial Class frmConfig
     Me.ttConfig.SetToolTip(Me.chkNetworkSecurityEnforce, resources.GetString("chkNetworkSecurityEnforce.ToolTip"))
     Me.chkNetworkSecurityEnforce.UseVisualStyleBackColor = True
     '
-    'chkNetworkProtocolTLS11
+    'chkNetworkProtocolTLS13
     '
-    Me.chkNetworkProtocolTLS11.AutoSize = True
-    Me.chkNetworkProtocolTLS11.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(298, 35)
-    Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
-    Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS11.TabIndex = 5
-    Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
-    Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
+    Me.chkNetworkProtocolTLS13.AutoSize = True
+    Me.chkNetworkProtocolTLS13.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS13.Location = New System.Drawing.Point(146, 35)
+    Me.chkNetworkProtocolTLS13.Name = "chkNetworkProtocolTLS13"
+    Me.chkNetworkProtocolTLS13.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS13.TabIndex = 3
+    Me.chkNetworkProtocolTLS13.Text = "TLS 1.3"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS13, "Check this box to allow use of the latest TLS 1.3 protocol.")
+    Me.chkNetworkProtocolTLS13.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolSSL3
+    '
+    Me.chkNetworkProtocolSSL3.AutoSize = True
+    Me.chkNetworkProtocolSSL3.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolSSL3.Location = New System.Drawing.Point(222, 59)
+    Me.chkNetworkProtocolSSL3.Name = "chkNetworkProtocolSSL3"
+    Me.chkNetworkProtocolSSL3.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolSSL3.TabIndex = 7
+    Me.chkNetworkProtocolSSL3.Text = "SS&L 3.0"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolSSL3, "Check this box to allow use of the older SSL 3.0 protocol, which is vulnerable to" & _
+        " attacks.")
+    Me.chkNetworkProtocolSSL3.UseVisualStyleBackColor = False
     '
     'chkNetworkProtocolTLS12
     '
@@ -1704,17 +1442,30 @@ Partial Class frmConfig
     Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS12, "Check this box to allow use of the newer, safer TLS 1.2 protocol.")
     Me.chkNetworkProtocolTLS12.UseVisualStyleBackColor = True
     '
-    'chkNetworkProtocolTLS13
+    'chkNetworkProtocolTLS10
     '
-    Me.chkNetworkProtocolTLS13.AutoSize = True
-    Me.chkNetworkProtocolTLS13.FlatStyle = System.Windows.Forms.FlatStyle.System
-    Me.chkNetworkProtocolTLS13.Location = New System.Drawing.Point(146, 35)
-    Me.chkNetworkProtocolTLS13.Name = "chkNetworkProtocolTLS13"
-    Me.chkNetworkProtocolTLS13.Size = New System.Drawing.Size(70, 18)
-    Me.chkNetworkProtocolTLS13.TabIndex = 3
-    Me.chkNetworkProtocolTLS13.Text = "TLS 1.3"
-    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS13, "Check this box to allow use of the latest TLS 1.3 protocol.")
-    Me.chkNetworkProtocolTLS13.UseVisualStyleBackColor = True
+    Me.chkNetworkProtocolTLS10.AutoSize = True
+    Me.chkNetworkProtocolTLS10.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS10.Location = New System.Drawing.Point(146, 59)
+    Me.chkNetworkProtocolTLS10.Name = "chkNetworkProtocolTLS10"
+    Me.chkNetworkProtocolTLS10.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS10.TabIndex = 6
+    Me.chkNetworkProtocolTLS10.Text = "TLS 1.0"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS10, "Check this box to allow use of the older TLS 1.0 protocol, which may be vulnerabl" & _
+        "e to attacks.")
+    Me.chkNetworkProtocolTLS10.UseVisualStyleBackColor = True
+    '
+    'chkNetworkProtocolTLS11
+    '
+    Me.chkNetworkProtocolTLS11.AutoSize = True
+    Me.chkNetworkProtocolTLS11.FlatStyle = System.Windows.Forms.FlatStyle.System
+    Me.chkNetworkProtocolTLS11.Location = New System.Drawing.Point(298, 35)
+    Me.chkNetworkProtocolTLS11.Name = "chkNetworkProtocolTLS11"
+    Me.chkNetworkProtocolTLS11.Size = New System.Drawing.Size(70, 18)
+    Me.chkNetworkProtocolTLS11.TabIndex = 5
+    Me.chkNetworkProtocolTLS11.Text = "TLS 1.1"
+    Me.ttConfig.SetToolTip(Me.chkNetworkProtocolTLS11, "Check this box to allow use of the newer, safer TLS 1.1 protocol.")
+    Me.chkNetworkProtocolTLS11.UseVisualStyleBackColor = True
     '
     'pnlNetworkProtocolTitle
     '
@@ -1949,6 +1700,7 @@ Partial Class frmConfig
     Me.txtProxyPassword.Location = New System.Drawing.Point(138, 82)
     Me.txtProxyPassword.Name = "txtProxyPassword"
     Me.txtProxyPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(9679)
+    Me.txtProxyPassword.ShowContents = False
     Me.txtProxyPassword.Size = New System.Drawing.Size(133, 20)
     Me.txtProxyPassword.TabIndex = 9
     Me.ttConfig.SetToolTip(Me.txtProxyPassword, "Optional Password for HTTP Proxy authentication.")
@@ -2055,7 +1807,7 @@ Partial Class frmConfig
     'lblNetworkProxyDescrption
     '
     Me.lblNetworkProxyDescrption.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblNetworkProxyDescrption.AutoSize = True
     Me.lblNetworkProxyDescrption.Location = New System.Drawing.Point(59, 3)
     Me.lblNetworkProxyDescrption.Margin = New System.Windows.Forms.Padding(3)
@@ -2227,7 +1979,7 @@ Partial Class frmConfig
     'lblNetworkTimeoutDescription
     '
     Me.lblNetworkTimeoutDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblNetworkTimeoutDescription.AutoSize = True
     Me.pnlNetworkTimeout.SetColumnSpan(Me.lblNetworkTimeoutDescription, 7)
     Me.lblNetworkTimeoutDescription.Location = New System.Drawing.Point(59, 3)
@@ -2433,7 +2185,7 @@ Partial Class frmConfig
     'lblAdvancedPortableDescription
     '
     Me.lblAdvancedPortableDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblAdvancedPortableDescription.AutoSize = True
     Me.pnlAdvancedPortable.SetColumnSpan(Me.lblAdvancedPortableDescription, 2)
     Me.lblAdvancedPortableDescription.Location = New System.Drawing.Point(59, 3)
@@ -2612,7 +2364,7 @@ Partial Class frmConfig
     'lblAdvancedDataDescription
     '
     Me.lblAdvancedDataDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblAdvancedDataDescription.AutoSize = True
     Me.pnlAdvancedDataInput.SetColumnSpan(Me.lblAdvancedDataDescription, 2)
     Me.lblAdvancedDataDescription.Location = New System.Drawing.Point(3, 3)
@@ -2824,7 +2576,7 @@ Partial Class frmConfig
     'lblAdvancedNetTestInput
     '
     Me.lblAdvancedNetTestInput.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblAdvancedNetTestInput.AutoSize = True
     Me.pnlAdvancedNetTestInput.SetColumnSpan(Me.lblAdvancedNetTestInput, 2)
     Me.lblAdvancedNetTestInput.Location = New System.Drawing.Point(3, 3)
@@ -3033,8 +2785,6 @@ Partial Class frmConfig
     Me.tabAccount.ResumeLayout(False)
     Me.pnlAccount.ResumeLayout(False)
     Me.pnlAccount.PerformLayout()
-    Me.pnlAccountKeyTitle.ResumeLayout(False)
-    Me.pnlAccountKeyTitle.PerformLayout()
     Me.pnlAccountViaSatTitle.ResumeLayout(False)
     Me.pnlAccountViaSatTitle.PerformLayout()
     Me.pnlAccountViaSat.ResumeLayout(False)
@@ -3042,12 +2792,6 @@ Partial Class frmConfig
     CType(Me.pctAccountViaSatIcon, System.ComponentModel.ISupportInitialize).EndInit()
     Me.pnlAccountViaSatInput.ResumeLayout(False)
     Me.pnlAccountViaSatInput.PerformLayout()
-    Me.pnlAccountKey.ResumeLayout(False)
-    Me.pnlAccountKey.PerformLayout()
-    Me.pnlKey.ResumeLayout(False)
-    Me.pnlKey.PerformLayout()
-    CType(Me.pctKeyState, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pctAccountKeyIcon, System.ComponentModel.ISupportInitialize).EndInit()
     Me.tabPrefs.ResumeLayout(False)
     Me.pnlPrefs.ResumeLayout(False)
     Me.pnlPrefs.PerformLayout()
@@ -3233,9 +2977,6 @@ Partial Class frmConfig
   Friend WithEvents cmdAlertStyle As System.Windows.Forms.Button
   Friend WithEvents lblOverSize1 As System.Windows.Forms.Label
   Friend WithEvents pnlAccount As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlAccountKeyTitle As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents lblAccountKeyTitle As System.Windows.Forms.Label
-  Friend WithEvents lnAccountKeyTitle As RestrictionTracker.LineBreak
   Friend WithEvents pnlAccountViaSatTitle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblAccountViaSatTitle As System.Windows.Forms.Label
   Friend WithEvents lnAccountViaSatTitle As RestrictionTracker.LineBreak
@@ -3247,17 +2988,6 @@ Partial Class frmConfig
   Friend WithEvents txtAccount As System.Windows.Forms.TextBox
   Friend WithEvents txtPassword As PasswordBox
   Friend WithEvents lblAccountViaSatDescription As System.Windows.Forms.Label
-  Friend WithEvents pnlAccountKey As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pnlKey As System.Windows.Forms.TableLayoutPanel
-  Friend WithEvents pctKeyState As System.Windows.Forms.PictureBox
-  Friend WithEvents txtKey1 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey2 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey3 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey4 As System.Windows.Forms.TextBox
-  Friend WithEvents txtKey5 As System.Windows.Forms.TextBox
-  Friend WithEvents pctAccountKeyIcon As System.Windows.Forms.PictureBox
-  Friend WithEvents lblKey As System.Windows.Forms.Label
-  Friend WithEvents lblPurchaseKey As LinkLabel
   Friend WithEvents pnlNetworkUpdateTime As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblUpdateInterval As System.Windows.Forms.Label
   Friend WithEvents cmbUpdateInterval As System.Windows.Forms.ComboBox
@@ -3296,7 +3026,6 @@ Partial Class frmConfig
   Friend WithEvents pnlNetworkProtocolTitle As System.Windows.Forms.TableLayoutPanel
   Friend WithEvents lblNetworkProtocolTitle As System.Windows.Forms.Label
   Friend WithEvents lnNetworkProtocolTitle As RestrictionTracker.LineBreak
-  Friend WithEvents lblAccountKeyDescription As System.Windows.Forms.Label
   Friend WithEvents chkUpdateBETA As System.Windows.Forms.CheckBox
   Friend WithEvents cmbUpdateAutomation As System.Windows.Forms.ComboBox
   Friend WithEvents chkAutoHide As System.Windows.Forms.CheckBox
