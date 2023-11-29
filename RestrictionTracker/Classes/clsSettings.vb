@@ -6,8 +6,18 @@ Friend Class SvcSettings
   Private m_PassSalt As String
   Private m_Interval As Integer
   Private m_Timeout As Integer
+  Private m_TLSProxy As Boolean
   Private m_ProxySetting As String
+  Private m_SecurProtocol As Net.SecurityProtocolType
+  Private m_SecurEnforced As Boolean
   Public Function Save() As Boolean
+    Dim sProtocol As String = ""
+    For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
+      If (m_SecurProtocol And protocolTest) = protocolTest Then
+        sProtocol &= [Enum].GetName(GetType(SecurityProtocolTypeEx), protocolTest).ToUpperInvariant & ", "
+      End If
+    Next
+    If Not String.IsNullOrEmpty(sProtocol) AndAlso sProtocol.EndsWith(", ") Then sProtocol = sProtocol.Substring(0, sProtocol.Length - 2)
     Dim xConfig As New XElement("configuration",
                                 New XElement("userSettings",
                                              New XElement("RestrictionLogger.My.MySettings",
@@ -15,7 +25,10 @@ Friend Class SvcSettings
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Timeout"), New XElement("value", m_Timeout)),
-                                                          New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)))))
+                                                          New XElement("setting", New XAttribute("name", "TLSProxy"), New XElement("value", IIf(m_TLSProxy, "True", "False"))),
+                                                          New XElement("setting", New XAttribute("name", "Proxy"), New XElement("value", m_ProxySetting)),
+                                                          New XElement("setting", New XAttribute("name", "Protocol"), New XElement("value", sProtocol)),
+                                                          New XElement("setting", New XAttribute("name", "EnforcedSecurity"), New XElement("value", IIf(m_SecurEnforced, "True", "False"))))))
     If srlFunctions.InUseChecker(IO.Path.Combine(CommonAppDataDirectory, "user.config"), IO.FileAccess.Write) Then
       Try
         xConfig.Save(IO.Path.Combine(CommonAppDataDirectory, "user.config"))
@@ -35,7 +48,10 @@ Friend Class SvcSettings
     m_PassSalt = ""
     m_Interval = 15
     m_Timeout = 120
+    m_TLSProxy = False
     m_ProxySetting = "None"
+    m_SecurProtocol = SecurityProtocolTypeEx.Tls11 Or SecurityProtocolTypeEx.Tls12 Or SecurityProtocolTypeEx.Tls13
+    m_SecurEnforced = False
   End Sub
   Public WriteOnly Property Account As String
     Set(value As String)
@@ -76,6 +92,14 @@ Friend Class SvcSettings
       m_Timeout = value
     End Set
   End Property
+  Public Property TLSProxy
+    Get
+      Return m_TLSProxy
+    End Get
+    Set(value)
+      m_TLSProxy = value
+    End Set
+  End Property
   Public WriteOnly Property Proxy As Net.IWebProxy
     Set(value As Net.IWebProxy)
       If value Is Nothing Then
@@ -108,6 +132,22 @@ Friend Class SvcSettings
           End If
         End If
       End If
+    End Set
+  End Property
+  Public Property SecurityProtocol As Net.SecurityProtocolType
+    Get
+      Return m_SecurProtocol
+    End Get
+    Set(value As Net.SecurityProtocolType)
+      m_SecurProtocol = value
+    End Set
+  End Property
+  Public Property SecurityEnforced As Boolean
+    Get
+      Return m_SecurEnforced
+    End Get
+    Set(value As Boolean)
+      m_SecurEnforced = value
     End Set
   End Property
 End Class

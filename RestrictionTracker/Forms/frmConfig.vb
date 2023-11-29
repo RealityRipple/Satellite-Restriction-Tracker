@@ -1276,8 +1276,11 @@
         cSave.PassKey = Convert.ToBase64String(svcKey)
         cSave.PassSalt = Convert.ToBase64String(svcSalt)
       End If
+      cSave.TLSProxy = mySettings.TLSProxy
       cSave.Proxy = mySettings.Proxy
       cSave.Timeout = mySettings.Timeout
+      cSave.SecurityProtocol = mySettings.SecurityProtocol
+      cSave.SecurityEnforced = mySettings.SecurityEnforced
       If Not cSave.Save() Then saveFail = True
     End If
     If Not saveFail Then
