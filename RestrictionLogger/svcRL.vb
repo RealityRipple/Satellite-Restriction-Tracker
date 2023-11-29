@@ -2,7 +2,8 @@
 Friend Class svcRL
   Private Const LATIN_1 As Integer = 28591
   Private MySettings As Settings
-  Private sAccount, sPassword As String
+  Private sAccount As String
+  Private bAccount As Boolean
   Private tmrCheck As System.Threading.Timer
   Private myLog As EventLog
   Private DataPath As String
@@ -69,12 +70,13 @@ Friend Class svcRL
       Dim dataPath As String = state
       iChecks = 1
       InitAccount()
-      If Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sPassword) Then tracker = New Local.SiteConnection(dataPath)
+      If bAccount Then tracker = New Local.SiteConnection(dataPath)
     End If
   End Sub
   Private Sub InitAccount()
     Try
       MySettings = New Settings(IO.Path.Combine(DataPath, "user.config"))
+      Dim sPassword As String = String.Empty
       If Not String.IsNullOrEmpty(MySettings.PassCrypt) Then
         If String.IsNullOrEmpty(MySettings.PassKey) Or String.IsNullOrEmpty(MySettings.PassSalt) Then
           sPassword = StoredPasswordLegacy.DecryptLogger(MySettings.PassCrypt)
@@ -94,6 +96,7 @@ Friend Class svcRL
           End If
         End If
       End If
+      bAccount = Not String.IsNullOrEmpty(sAccount) And Not String.IsNullOrEmpty(sPassword)
     Catch ex As Exception
       If myLog IsNot Nothing Then myLog.WriteEntry("Error on InitAccount: " & ex.Message, EventLogEntryType.Error, 2)
     End Try
