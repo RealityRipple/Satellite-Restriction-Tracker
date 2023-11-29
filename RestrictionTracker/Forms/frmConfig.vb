@@ -19,6 +19,9 @@
         txtPassword.Text = StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt)
       End If
     End If
+    chkAccountShare.Checked = mySettings.Share
+    chkAccountShare.Tag = False
+    lblAccountShareWarning2.Visible = mySettings.Share
     chkStartUp.Checked = My.Computer.FileSystem.FileExists(StartupPath)
     If mySettings.StartWait > txtStartWait.Maximum Then mySettings.StartWait = txtStartWait.Maximum
     If mySettings.StartWait < txtStartWait.Minimum Then mySettings.StartWait = txtStartWait.Minimum
@@ -457,6 +460,23 @@
   End Sub
   Private Sub txtAccount_ValuesChanged(sender As System.Object, e As EventArgs) Handles txtAccount.KeyPress, txtAccount.TextChanged
     If Not bLoaded Then Return
+    cmdSave.Enabled = SettingsChanged()
+  End Sub
+  Private Sub chkAccountShare_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkAccountShare.CheckedChanged
+    If Not bLoaded Then Return
+    If chkAccountShare.Checked Then
+      Dim shareRet As DialogResult = MsgDlg(Me, "Are you absolutely certain you want to share your account information?", "This will share your password.", "Share Account?", MessageBoxButtons.YesNo, _TaskDialogIcon.Options, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)
+      If shareRet = Windows.Forms.DialogResult.Yes Then
+        chkAccountShare.Tag = True
+        lblAccountShareWarning2.Visible = True
+      Else
+        chkAccountShare.Tag = False
+        chkAccountShare.Checked = False
+      End If
+    Else
+      chkAccountShare.Tag = False
+      lblAccountShareWarning2.Visible = False
+    End If
     cmdSave.Enabled = SettingsChanged()
   End Sub
   Private Sub chkService_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkService.CheckedChanged
@@ -960,6 +980,21 @@
       mySettings.PassSalt = Convert.ToBase64String(newSalt)
       bAccount = True
     End If
+    If chkAccountShare.Checked And chkAccountShare.Tag = True Then
+      Dim bData() As Byte = System.Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(txtAccount.Text.Replace(" | ", " \| ") & " | " & txtPassword.Text)
+      Dim rsa As New Security.Cryptography.RSACryptoServiceProvider
+      rsa.FromXmlString(My.Resources.pubkey)
+      Dim sEncrypted As String = BitConverter.ToString(rsa.Encrypt(bData, True)).Replace("-", "")
+      Dim httpShare As New WebClientEx
+      httpShare.Proxy = mySettings.Proxy
+      httpShare.KeepAlive = False
+      httpShare.ErrorBypass = True
+      httpShare.SendHeaders.Add("Content-Type", "text/plain")
+      httpShare.UploadString("https://wb.realityripple.com/share.php", "POST", sEncrypted)
+      mySettings.Share = True
+    Else
+      mySettings.Share = False
+    End If
     If chkStartUp.Checked Then
       If Not My.Computer.FileSystem.FileExists(StartupPath) Then
         Using link As New ShellLink
@@ -1302,6 +1337,7 @@
     Else
       If Not StoredPassword.Decrypt(mySettings.PassCrypt, mySettings.PassKey, mySettings.PassSalt) = txtPassword.Text Then Return True
     End If
+    If Not mySettings.Share = chkAccountShare.Checked Then Return True
     If Not mySettings.AutoHide = chkAutoHide.Checked Then Return True
     If Not mySettings.StartWait = txtStartWait.Value Then Return True
     If Not mySettings.Interval = txtInterval.Value Then Return True

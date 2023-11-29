@@ -170,6 +170,7 @@ Friend Class AppSettings
   Private m_PassCrypt As String
   Private m_PassKey As String
   Private m_PassSalt As String
+  Private m_Share As Boolean
   Private m_TopMost As Boolean
   Private m_Timeout As Integer
   Private m_Retries As Integer
@@ -435,6 +436,16 @@ Friend Class AppSettings
           m_PassCrypt = Nothing
         End Try
       End If
+      Dim xShare As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Share")
+      If xShare Is Nothing Then
+        m_Share = False
+      Else
+        Try
+          m_Share = xShare.Element("value").Value = "True"
+        Catch ex As Exception
+          m_Share = False
+        End Try
+      End If
       Dim xTopMost As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "TopMost")
       If xTopMost Is Nothing Then
         m_TopMost = False
@@ -564,7 +575,6 @@ Friend Class AppSettings
           m_TLSProxy = False
         End Try
       End If
-
       Dim xProxy As XElement = Array.Find(xMySettings.Elements.ToArray, Function(xSetting As XElement) xSetting.Attribute("name").Value = "Proxy")
       If xProxy Is Nothing Then
         m_ProxySetting = "None"
@@ -867,6 +877,7 @@ Friend Class AppSettings
     m_PassCrypt = Nothing
     m_PassKey = ""
     m_PassSalt = ""
+    m_Share = False
     m_TopMost = False
     m_Timeout = 120
     m_Retries = 2
@@ -936,6 +947,7 @@ Friend Class AppSettings
                                              New XElement("RestrictionTracker.My.MySettings",
                                                           New XElement("setting", New XAttribute("name", "Account"), New XElement("value", m_Account)),
                                                           New XElement("setting", New XAttribute("name", "PassCrypt"), New XAttribute("key", m_PassKey), New XAttribute("salt", m_PassSalt), New XElement("value", m_PassCrypt)),
+                                                          New XElement("setting", New XAttribute("name", "Share"), New XElement("value", IIf(m_Share, "True", "False"))),
                                                           New XElement("setting", New XAttribute("name", "StartWait"), New XElement("value", m_StartWait)),
                                                           New XElement("setting", New XAttribute("name", "Interval"), New XElement("value", m_Interval)),
                                                           New XElement("setting", New XAttribute("name", "Gr"), New XElement("value", m_Gr)),
@@ -1121,6 +1133,14 @@ Friend Class AppSettings
     End Get
     Set(value As String)
       m_PassSalt = value
+    End Set
+  End Property
+  Public Property Share As Boolean
+    Get
+      Return m_Share
+    End Get
+    Set(value As Boolean)
+      m_Share = value
     End Set
   End Property
   Public Property StartWait As Integer
