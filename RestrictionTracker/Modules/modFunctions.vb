@@ -684,28 +684,6 @@ Friend Module modFunctions
     oProc.Start()
   End Sub
   Public Delegate Sub FailResponseInvoker(sRet As String)
-  Public Sub SaveToFTP(oData As Object)
-    Dim sData As String = oData(0)
-    Dim callback As FailResponseInvoker = oData(1)
-    Try
-      Dim bData As Byte() = System.Text.Encoding.UTF8.GetBytes(sData)
-      Dim sBase64Data As String = Convert.ToBase64String(bData, Base64FormattingOptions.None)
-      Dim sckUpload As New WebClientEx()
-      sckUpload.KeepAlive = False
-      Dim params As New Collections.Specialized.NameValueCollection
-      params.Add("eFile", sBase64Data)
-      Dim sRet As String = sckUpload.UploadValues("http://wb.realityripple.com/errmsgs.php", "POST", params)
-      If sRet = "e exists" Then
-        callback.Invoke("exists")
-      ElseIf sRet = "e added" Then
-        callback.Invoke("added")
-      Else
-        callback.Invoke("error")
-      End If
-    Catch ex As Exception
-      callback.Invoke("error")
-    End Try
-  End Sub
   Public Function CopyDirectory(FromDir As String, ToDir As String) As TriState
     If My.Computer.FileSystem.DirectoryExists(FromDir) Then
       Dim bDidSomething As Boolean = False

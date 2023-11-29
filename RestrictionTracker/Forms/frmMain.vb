@@ -776,7 +776,6 @@
       Case Local.SiteConnectionFailureType.LoginIssue
         GrabAttempt = 0
         SetStatusText(srlFunctions.TimeToString(LOG_GetLast), e.Message, True)
-        If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail, True)
         DisplayUsage(False, False)
         Return
       Case Local.SiteConnectionFailureType.ConnectionTimeout
@@ -822,7 +821,6 @@
           End If
         End If
       Case Local.SiteConnectionFailureType.LoginFailure
-        If Not String.IsNullOrEmpty(e.Fail) Then FailFile(e.Fail)
         If e.Message.EndsWith("Please try again.") And GrabAttempt < mySettings.Retries Then
           GrabAttempt += 1
           Dim sMessage As String = e.Message.Substring(0, e.Message.IndexOf("Please try again.")) & "Retry " & GrabAttempt & " of " & mySettings.Retries & "..."
@@ -1309,14 +1307,6 @@
   Private Sub taskNotifier_CloseClick(sender As Object, e As System.EventArgs) Handles taskNotifier.CloseClick
     sFailTray = Nothing
   End Sub
-  Private Sub taskNotifier_ContentClick(sender As Object, e As System.EventArgs) Handles taskNotifier.ContentClick
-    taskNotifier.Hide()
-    If Not String.IsNullOrEmpty(sFailTray) Then
-      Dim tFTP As New ParamaterizedInvoker(AddressOf SaveToFTP)
-      tFTP.BeginInvoke({sFailTray, New FailResponseInvoker(AddressOf FailResponse)}, Nothing, Nothing)
-    End If
-    sFailTray = Nothing
-  End Sub
 #Region "Graphs"
   Private Function CreateUsageTrayIcon(lUsed As Long, lLim As Long) As Icon
     Dim icoX As Integer = NativeMethods.GetSystemMetrics(NativeMethods.MetricsList.SM_CXSMICON)
@@ -1594,50 +1584,6 @@
       SetNextLoginTime(mySettings.StartWait)
     End If
   End Sub
-#Region "Failure Reports"
-  Private PreviousFail As Integer = 0
-  Private PreviousFailS As String = Nothing
-  Public Sub FailResponse(sRet As String)
-    If Me.InvokeRequired Then
-      Try
-        Me.Invoke(New ParamaterizedInvoker(AddressOf FailResponse), sRet)
-      Catch ex As Exception
-      End Try
-      Return
-    End If
-    MakeNotifier(taskNotifier, False)
-    If taskNotifier IsNot Nothing Then
-      If sRet = "added" Then
-        taskNotifier.Show("Error Report Sent", "Your report has been received by " & Application.CompanyName & "." & vbNewLine & "Thank you for helping to improve " & My.Application.Info.ProductName & "!", 200, 15 * 1000, 100)
-      ElseIf sRet = "exists" Then
-        taskNotifier.Show("Error Already Reported", "This error has already been reported. It should be fixed in the next release." & vbNewLine & "Thank you anyway!", 200, 15 * 1000, 100)
-      Else
-        taskNotifier.Show("Error Reporting Error", My.Application.Info.ProductName & " was unable to contact the " & Application.CompanyName & " servers. Please check your internet connection.", 200, 30 * 1000, 100)
-      End If
-    End If
-  End Sub
-  Private Sub FailFile(sFail As String, Optional bJustFeedback As Boolean = False)
-    If clsUpdate.QuickCheckVersion = clsUpdate.CheckEventArgs.ResultType.NoUpdate Then
-      If PreviousFailS = sFail And PreviousFail = Now.DayOfYear Then Return
-      If PreviousFailS = sFail And PreviousFail > 0 Then
-        Dim nextDay As Integer = PreviousFail + 1
-        If nextDay = 366 Then nextDay = 1
-        If Now.DayOfYear = nextDay And Now.Hour < 9 Then Return
-      End If
-      sFailTray = sFail
-      MakeNotifier(taskNotifier, True)
-      If taskNotifier IsNot Nothing Then
-        If bJustFeedback Then
-          taskNotifier.Show("Page Data Feedback Request", Application.CompanyName & " has requested that information from your connection be sent back to the servers for further analysis." & vbNewLine & "Click this alert if you'd like to help out.", 200, 1 * 60 * 1000, 100)
-        Else
-          taskNotifier.Show("Error Reading Page Data", My.Application.Info.ProductName & " encountered data it does not understand." & vbNewLine & "Click this alert to report the problem to " & Application.CompanyName & ".", 200, 3 * 60 * 1000, 100)
-        End If
-        PreviousFail = Now.DayOfYear
-        PreviousFailS = sFail
-      End If
-    End If
-  End Sub
-#End Region
   Private Delegate Sub SetStatusTextCallBack(Status As String, Details As String, Alert As Boolean)
   Private Sub SetStatusText(Status As String, Details As String, Alert As Boolean)
     If Me.InvokeRequired Then

@@ -725,22 +725,6 @@ Public Class WebClientEx
     End Get
   End Property
   Private ClosingTime As Boolean
-  Private sDataPath As String
-  Public Sub New(DataPath As String)
-    c_Timeout = 3 * 60
-    c_RWTimeout = 2 * 60 * 60
-    c_Proxy = New Net.WebProxy
-    c_Jar = New Net.CookieContainer
-    c_SendJar = False
-    c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-    sDataPath = DataPath
-    c_SendHeaders = New Net.WebHeaderCollection
-    c_Busy = False
-    c_ErrorBypass = True
-    c_KeepAlive = True
-    c_ManualRedirect = True
-    ClosingTime = False
-  End Sub
   Public Sub New()
     c_Timeout = 3 * 60
     c_RWTimeout = 2 * 60 * 60
@@ -748,7 +732,6 @@ Public Class WebClientEx
     c_Jar = New Net.CookieContainer
     c_SendJar = False
     c_Encoding = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1)
-    sDataPath = Nothing
     c_SendHeaders = New Net.WebHeaderCollection
     c_Busy = False
     c_ErrorBypass = True
@@ -806,16 +789,11 @@ Public Class WebClientEx
           c_ResponseCode = wsDownload.ResponseCode
           c_ResponseHeaders = wsDownload.ResponseHeaders
         Catch ex As Exception
-          Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
-          If sNetErr.Contains("Please try again.") And iteration < 5 Then
-            AsyncDownloadString({RunName, address, iteration + 1})
-          Else
-            c_ResponseURI = wsDownload.ResponseURI
-            c_ResponseCode = wsDownload.ResponseCode
-            c_ResponseHeaders = wsDownload.ResponseHeaders
-            DownloadResults(RunName) = "Error: " & sNetErr
-          End If
+          c_ResponseURI = wsDownload.ResponseURI
+          c_ResponseCode = wsDownload.ResponseCode
+          c_ResponseHeaders = wsDownload.ResponseHeaders
+          DownloadResults(RunName) = "Error: " & ex.Message
           Return
         End Try
         If String.IsNullOrEmpty(sRet) Then
@@ -899,16 +877,11 @@ Public Class WebClientEx
           c_ResponseCode = wsDownload.ResponseCode
           c_ResponseHeaders = wsDownload.ResponseHeaders
         Catch ex As Exception
-          Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
           c_Jar = wsDownload.CookieJar
-          If sNetErr.Contains("Please try again.") And iteration < 5 Then
-            AsyncDownloadStringWithCallback({callback, aState, address, iteration + 1})
-          Else
-            c_ResponseURI = wsDownload.ResponseURI
-            c_ResponseCode = wsDownload.ResponseCode
-            c_ResponseHeaders = wsDownload.ResponseHeaders
-            callback(aState, "Error: " & sNetErr)
-          End If
+          c_ResponseURI = wsDownload.ResponseURI
+          c_ResponseCode = wsDownload.ResponseCode
+          c_ResponseHeaders = wsDownload.ResponseHeaders
+          callback(aState, "Error: " & ex.Message)
           Return
         End Try
         If String.IsNullOrEmpty(sRet) Then
@@ -991,16 +964,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadString({RunName, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              UploadResults(RunName) = "Error: " & sNetErr
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            UploadResults(RunName) = "Error: " & ex.Message
             Return
           End Try
         Else
@@ -1020,16 +988,11 @@ Public Class WebClientEx
             c_ResponseHeaders = wsUpload.ResponseHeaders
             '
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadString({RunName, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              UploadResults(RunName) = "Error: " & sNetErr
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            UploadResults(RunName) = "Error: " & ex.Message
             Return
           End Try
         End If
@@ -1125,16 +1088,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              callback(aState, "Error: " & sNetErr)
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            callback(aState, "Error: " & ex.Message)
             Return
           End Try
         Else
@@ -1145,17 +1103,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
-            c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadStringWithCallback({callback, aState, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              callback(aState, "Error: " & sNetErr)
-            End If
-            Return
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            callback(aState, "Error: " & ex.Message)
+        Return
           End Try
         End If
         If String.IsNullOrEmpty(sRet) Then
@@ -1220,16 +1172,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadValues({RunName, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              UploadResults(RunName) = "Error: " & sNetErr
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            UploadResults(RunName) = "Error: " & ex.Message
             Return
           End Try
           sRet = wsUpload.Encoding.GetString(bRet)
@@ -1248,16 +1195,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadValues({RunName, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              UploadResults(RunName) = "Error: " & sNetErr
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            UploadResults(RunName) = "Error: " & ex.Message
             Return
           End Try
         End If
@@ -1346,16 +1288,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              callback(aState, "Error: " & sNetErr)
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            callback(aState, "Error: " & ex.Message)
             Return
           End Try
           sRet = wsUpload.Encoding.GetString(bRet)
@@ -1367,16 +1304,11 @@ Public Class WebClientEx
             c_ResponseCode = wsUpload.ResponseCode
             c_ResponseHeaders = wsUpload.ResponseHeaders
           Catch ex As Exception
-            Dim sNetErr As String = srlFunctions.NetworkErrorToString(ex, sDataPath)
             c_Jar = wsUpload.CookieJar
-            If sNetErr.Contains("Please try again.") And iteration < 5 Then
-              AsyncUploadValuesWithCallback({callback, aState, address, method, data, iteration + 1})
-            Else
-              c_ResponseURI = wsUpload.ResponseURI
-              c_ResponseCode = wsUpload.ResponseCode
-              c_ResponseHeaders = wsUpload.ResponseHeaders
-              callback(aState, "Error: " & sNetErr)
-            End If
+            c_ResponseURI = wsUpload.ResponseURI
+            c_ResponseCode = wsUpload.ResponseCode
+            c_ResponseHeaders = wsUpload.ResponseHeaders
+            callback(aState, "Error: " & ex.Message)
             Return
           End Try
         End If

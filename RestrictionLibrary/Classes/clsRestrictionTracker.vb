@@ -286,7 +286,6 @@
     Private c_SendJar As Boolean
     Private c_TLSProxy As Boolean
     Private c_TLSProxyAddr As String
-    Private sDataPath As String
     Private wsSocket As WebClientEx
 #Region "Initialization Functions"
     ''' <summary>
@@ -298,7 +297,6 @@
       justATest = OnlyLogin
       Randomize()
       ClosingTime = False
-      sDataPath = ConfigPath
       If mySettings Is Nothing Then mySettings = New AppSettings(IO.Path.Combine(ConfigPath, "user.config"))
       Dim useProtocol As SecurityProtocolTypeEx = SecurityProtocolTypeEx.None
       For Each protocolTest In [Enum].GetValues(GetType(SecurityProtocolTypeEx))
@@ -391,7 +389,6 @@
       RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableRead))
       EX_Read_Table(Table)
       c_Jar = New Net.CookieContainer
-      srlFunctions.SendSocketErrors(sDataPath)
     End Sub
 #Region "EX Helper Functions"
     Private Shared Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
@@ -1031,7 +1028,7 @@
         If wsSocket.IsBusy Then wsSocket.Cancel()
         wsSocket = Nothing
       End If
-      wsSocket = New WebClientEx(sDataPath)
+      wsSocket = New WebClientEx
       wsSocket.KeepAlive = KeepAlive
       wsSocket.Timeout = c_Timeout
       wsSocket.Proxy = c_Proxy
