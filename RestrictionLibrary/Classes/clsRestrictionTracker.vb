@@ -888,11 +888,17 @@
       aSend.Add("query", "query getPlanData($refetchData: Boolean) {\n" &
                          "  getPlanData(refetchData: $refetchData) {\n" &
                          "    accountStatus\n" &
-                         "    isUnlimited\n" &
                          "    usage {\n" &
-                         "      dataLeftText\n" &
-                         "      dataUsedGB\n" &
-                         "      dataCapGB\n" &
+                         "      monthly {\n" &
+                         "        dataUsedGB\n" &
+                         "        dataAllotmentGB\n" &
+                         "        __typename\n" &
+                         "      },\n" &
+                         "      buymore {\n" &
+                         "        dataUsedGB\n" &
+                         "        dataAllotmentGB\n" &
+                         "        __typename\n" &
+                         "      }\n" &
                          "      __typename\n" &
                          "    }\n" &
                          "    __typename\n" &
@@ -929,7 +935,7 @@
       End If
       Try
         Dim assoc As Object = JSONAssociator.Associate(exJS)
-        Dim sDown As String = String.Empty, sDownT As String = String.Empty
+        Dim dDown As Double = 0.0, dDownT As Double = 0.0
         If assoc.ContainsKey("errors") AndAlso IsArray(assoc("errors")) Then
           For I As Integer = 0 To assoc("errors").Length - 1
             If assoc("errors")(I).ContainsKey("message") Then
@@ -976,23 +982,40 @@
               'Return
           End Select
         End If
-        If assoc("data")("getPlanData").ContainsKey("isUnlimited") AndAlso assoc("data")("getPlanData")("isUnlimited") = "true" Then imFree = True
         If Not assoc("data")("getPlanData").ContainsKey("usage") Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        Dim jUsage As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")
-        If Not jUsage.ContainsKey("dataCapGB") OrElse String.IsNullOrEmpty(jUsage("dataCapGB").ToString) Then
+        If Not assoc("data")("getPlanData")("usage").ContainsKey("monthly") Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If Not jUsage.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jUsage("dataUsedGB").ToString) Then
+        Dim jMonthly As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")("monthly")
+        If Not jMonthly.ContainsKey("dataAllotmentGB") OrElse String.IsNullOrEmpty(jMonthly("dataAllotmentGB").ToString) Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If jUsage.ContainsKey("dataLeftText") AndAlso jUsage("dataLeftText") = "NONE" Then imSlowed = True
-        sDown = jUsage("dataUsedGB").ToString
-        sDownT = jUsage("dataCapGB").ToString
+        If Not jMonthly.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jMonthly("dataUsedGB").ToString) Then
+          RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+          Return
+        End If
+        dDown = CDbl(jMonthly("dataUsedGB"))
+        dDownT = CDbl(jMonthly("dataAllotmentGB"))
+        If assoc("data")("getPlanData")("usage").ContainsKey("buymore") Then
+          Dim jBuyMore As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")("buymore")
+          If Not jBuyMore.ContainsKey("dataAllotmentGB") OrElse String.IsNullOrEmpty(jBuyMore("dataAllotmentGB").ToString) Then
+            RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+            Return
+          End If
+          If Not jBuyMore.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jBuyMore("dataUsedGB").ToString) Then
+            RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
+            Return
+          End If
+          dDown += CDbl(jBuyMore("dataUsedGB"))
+          dDownT += CDbl(jBuyMore("dataAllotmentGB"))
+        End If
+        Dim sDown As String = dDown.ToString
+        Dim sDownT As String = dDownT.ToString
         RaiseEvent ConnectionResult(Me, New SiteResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
       Catch ex As Exception
         RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
