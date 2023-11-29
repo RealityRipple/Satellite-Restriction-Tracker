@@ -812,6 +812,22 @@ Friend Module modFunctions
       ControlPaint.DrawReversibleFrame(drawRect, wad.backColor, FrameStyle.Thick)
     Next
   End Sub
+  Public Sub OpenURL(sURL As String, taskNotifier As TaskbarNotifier)
+    Dim sOpen As String = sURL
+    If Not sOpen.Contains(Uri.SchemeDelimiter) Then sOpen = "http://" & sURL
+    Try
+      Process.Start(sOpen)
+    Catch ex As Exception
+      MakeNotifier(taskNotifier, False)
+      Try
+        Clipboard.SetText(sOpen)
+      Catch ex2 As Exception
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & sURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+        Return
+      End Try
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("URL Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & sURL & """, so the URL was copied to your clipboard!", 200, 3000, 100)
+    End Try
+  End Sub
 #Region "Graphs"
 #Region "History"
   Private dGraph As Rectangle
@@ -1901,7 +1917,13 @@ Friend Module modFunctions
     Catch ex As Exception
       Dim taskNotifier As TaskbarNotifier = Nothing
       MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+      Try
+        Clipboard.SetText(e.LinkText)
+      Catch ex2 As Exception
+        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """!" & vbNewLine & ex.Message, 200, 3000, 100)
+        Return
+      End Try
+      If taskNotifier IsNot Nothing Then taskNotifier.Show("URL Copied to Clipboard", My.Application.Info.ProductName & " could not navigate to """ & e.LinkText & """, so the URL was copied to your clipboard instead!", 200, 3000, 100)
     End Try
   End Sub
   Private Sub RefreshDlg(sender As Object, e As EventArgs)

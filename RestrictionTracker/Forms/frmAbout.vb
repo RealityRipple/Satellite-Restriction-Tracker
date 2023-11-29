@@ -71,42 +71,16 @@
     taskNotifier.SlowHide()
   End Sub
   Private Sub cmdDonate_Click(sender As System.Object, e As System.EventArgs) Handles cmdDonate.Click
-    Try
-      Process.Start("http://realityripple.com/donate.php?itm=Satellite+Restriction+Tracker")
-    Catch ex As Exception
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com/donate.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
+    OpenURL("http://realityripple.com/donate.php?itm=Satellite+Restriction+Tracker", taskNotifier)
   End Sub
   Private Sub lblCompany_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblCompany.LinkClicked
-    If e.Button = Windows.Forms.MouseButtons.Left Then
-      Try
-        Process.Start("http://realityripple.com")
-      Catch ex As Exception
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
+    If e.Button = Windows.Forms.MouseButtons.Left Then OpenURL("realityripple.com", taskNotifier)
   End Sub
   Private Sub lblProduct_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblProduct.LinkClicked
-    If e.Button = Windows.Forms.MouseButtons.Left Then
-      Try
-        Process.Start("http://srt.realityripple.com")
-      Catch ex As Exception
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
+    If e.Button = Windows.Forms.MouseButtons.Left Then OpenURL("srt.realityripple.com", taskNotifier)
   End Sub
   Private Sub lblVersion_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblVersion.LinkClicked
-    If e.Button = Windows.Forms.MouseButtons.Left Then
-      Try
-        Process.Start("http://srt.realityripple.com/changes.php")
-      Catch ex As Exception
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/changes.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
+    If e.Button = Windows.Forms.MouseButtons.Left Then OpenURL("srt.realityripple.com/changes.php", taskNotifier)
   End Sub
   Private Sub lblUpdate_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblUpdate.LinkClicked
     If updateChecker IsNot Nothing Then

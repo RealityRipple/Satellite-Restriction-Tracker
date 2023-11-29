@@ -225,12 +225,6 @@
     End If
   End Sub
   Private Sub lblMore_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblMore.LinkClicked
-    Try
-      Process.Start("http://srt.realityripple.com/Alert-Styles/")
-    Catch ex As Exception
-      Dim tNotifier As TaskbarNotifier = Nothing
-      MakeNotifier(tNotifier, False)
-      If tNotifier IsNot Nothing Then tNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to srt.realityripple.com/changes.php!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
+    OpenURL("http://srt.realityripple.com/Alert-Styles/", taskNotifier)
   End Sub
 End Class

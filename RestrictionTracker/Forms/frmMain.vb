@@ -377,40 +377,13 @@
     End Select
   End Sub
   Private Sub lblRRS_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lblRRS.LinkClicked
-    Try
-      Process.Start("http://realityripple.com")
-    Catch ex As Exception
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""realityripple.com""!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
+    OpenURL("realityripple.com", taskNotifier)
   End Sub
   Private Sub pctNetTest_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles pctNetTest.KeyUp
-    If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then
-      Try
-        If mySettings.NetTestURL.Contains(Uri.SchemeDelimiter) Then
-          Process.Start(mySettings.NetTestURL)
-        Else
-          Process.Start("http://" & mySettings.NetTestURL)
-        End If
-      Catch ex As Exception
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
+    If e.KeyCode = Keys.Space Or e.KeyCode = Keys.Return Then OpenURL(mySettings.NetTestURL, taskNotifier)
   End Sub
   Private Sub pctNetTest_MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles pctNetTest.MouseClick
-    If e.Button = Windows.Forms.MouseButtons.Left Then
-      Try
-        If mySettings.NetTestURL.Contains(Uri.SchemeDelimiter) Then
-          Process.Start(mySettings.NetTestURL)
-        Else
-          Process.Start("http://" & mySettings.NetTestURL)
-        End If
-      Catch ex As Exception
-        MakeNotifier(taskNotifier, False)
-        If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to """ & mySettings.NetTestURL & """!" & vbNewLine & ex.Message, 200, 3000, 100)
-      End Try
-    End If
+    If e.Button = Windows.Forms.MouseButtons.Left Then OpenURL(mySettings.NetTestURL, taskNotifier)
   End Sub
   Protected Overrides Function ProcessKeyPreview(ByRef m As System.Windows.Forms.Message) As Boolean
     Static bDown As Boolean
@@ -422,14 +395,7 @@
       Case &H101, &H105
         Dim iKey As Integer = m.WParam.ToInt32
         Dim Key As Keys = iKey
-        If bDown And (Key = Keys.F1) Then
-          Try
-            Process.Start("http://srt.realityripple.com/faq.php")
-          Catch ex As Exception
-            MakeNotifier(taskNotifier, False)
-            If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-          End Try
-        End If
+        If bDown And (Key = Keys.F1) Then OpenURL("http://srt.realityripple.com/faq.php", taskNotifier)
     End Select
     Return MyBase.ProcessKeyPreview(m)
   End Function

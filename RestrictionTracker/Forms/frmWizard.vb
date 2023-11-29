@@ -24,13 +24,8 @@ Friend NotInheritable Class frmWizard
     End If
   End Sub
   Private Sub cmdFAQ_Click(sender As System.Object, e As System.EventArgs) Handles cmdFAQ.Click
-    Try
-      Process.Start("http://srt.realityripple.com/faq.php")
-    Catch ex As Exception
-      Dim taskNotifier As TaskbarNotifier = Nothing
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/faq.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
+    Dim taskNotifier As TaskbarNotifier = Nothing
+    OpenURL("srt.realityripple.com/faq.php", taskNotifier)
   End Sub
   Private Sub cmdNext_Click(sender As System.Object, e As System.EventArgs) Handles cmdNext.Click
     Select Case tbsWizardPages.SelectedIndex
@@ -203,15 +198,6 @@ Friend NotInheritable Class frmWizard
     ttWizard.SetToolTip(txtAccountPass.Button, "Toggle display of the Password.")
     txtOverSize.Margin = New Padding(3)
     txtOverTime.Margin = New Padding(3)
-  End Sub
-  Private Sub txtSignUp_LinkClicked(sender As System.Object, e As System.Windows.Forms.LinkLabelLinkClickedEventArgs)
-    Try
-      Process.Start("http://srt.realityripple.com/c_signup.php")
-    Catch ex As Exception
-      Dim taskNotifier As TaskbarNotifier = Nothing
-      MakeNotifier(taskNotifier, False)
-      If taskNotifier IsNot Nothing Then taskNotifier.Show("Failed to run Web Browser", My.Application.Info.ProductName & " could not navigate to ""srt.realityripple.com/c_signup.php""!" & vbNewLine & ex.Message, 200, 3000, 100)
-    End Try
   End Sub
   Private Sub optServices_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optLocal.CheckedChanged, optNone.CheckedChanged
     lblLocal.Enabled = optLocal.Checked
