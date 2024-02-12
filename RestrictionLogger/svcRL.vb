@@ -9,11 +9,6 @@ Friend Class svcRL
   Private DataPath As String
   Private WithEvents tracker As Local.SiteConnection
   Protected Overrides Sub OnStart(ByVal args() As String)
-    Dim v As NativeMethods.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
-    If Not (v = NativeMethods.Validity.SignedAndValid Or v = NativeMethods.Validity.SignedButUntrusted) Then
-      Me.Stop()
-      Return
-    End If
     Try
       If Not EventLog.SourceExists("Restriction Logger") Then
         EventLog.CreateEventSource("Restriction Logger", "Application")
@@ -30,6 +25,16 @@ Friend Class svcRL
     Catch ex As Exception
       myLog = Nothing
     End Try
+    Dim v As NativeMethods.Validity = Authenticode.IsSelfSigned(Reflection.Assembly.GetExecutingAssembly().Location)
+    If Not (v = NativeMethods.Validity.SignedAndValid Or v = NativeMethods.Validity.SignedButUntrusted) Then
+      If myLog IsNot Nothing Then
+        Dim sErr As String = "0x" & v.ToString("x")
+        If Not CStr(v) = v.ToString Then sErr = v.ToString & " (0x" & v.ToString("x") & ")"
+        myLog.WriteEntry("The Executable """ & IO.Path.GetFileName(Reflection.Assembly.GetExecutingAssembly().Location) & """ is not signed and may be corrupted or modified. Error Code: " & sErr)
+      End If
+      Me.Stop()
+      Return
+    End If
     Try
       DataPath = IO.Path.GetDirectoryName(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData)
       tmrCheck = New System.Threading.Timer(New Threading.TimerCallback(AddressOf tmrCheck_Tick), DataPath, 5000, 1000)

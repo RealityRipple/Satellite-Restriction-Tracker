@@ -8,9 +8,13 @@
       Console.WriteLine("The Logger Service Executable is not correctly signed.")
       Console.WriteLine("This file may have been modified or corrupted.")
       Console.WriteLine("Please re-install Satellite Restriction Tracker.")
-      Console.WriteLine("Error Code: 0x" & Hex(v))
+      Dim sErr As String = "0x" & v.ToString("x")
+      If Not CStr(v) = v.ToString Then sErr = v.ToString & " (0x" & v.ToString("x") & ")"
+      Console.WriteLine("Error Code: " & sErr)
       System.Threading.Thread.Sleep(5000)
-      Return
+      Console.WriteLine()
+      Console.Write("Would you like to continue loading " & My.Application.Info.ProductName & " anyway? [y/N]")
+      If Not Console.ReadKey(True).Key = ConsoleKey.Y Then Return
     End If
     If Array.Exists(ServiceProcess.ServiceController.GetServices, Function(scService As ServiceProcess.ServiceController) scService.ServiceName = "RestrictionLogger") Then
       Select Case Command()
