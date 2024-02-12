@@ -22,6 +22,7 @@ Thumbs.db
 *.lib
 *.sbr
 *.snk
+*.ruleset
 obj/
 [Rr]elease*/
 _ReSharper*/
