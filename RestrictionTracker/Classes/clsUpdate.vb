@@ -96,6 +96,8 @@
     myS = Nothing
     wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
     RaiseEvent CheckingVersion(Me, New EventArgs)
+    wsVer.Headers.Add("X-Thumb", Authenticode.RRSignThumb)
+    wsVer.Headers.Add("X-Serial", Authenticode.RRSignSerial)
     Dim tSocket As New Threading.Thread(New Threading.ThreadStart(AddressOf BeginCheck))
     tSocket.Start()
   End Sub
@@ -109,6 +111,8 @@
     wsCheck.KeepAlive = False
     wsCheck.Proxy = mySettings.Proxy
     wsCheck.Timeout = mySettings.Timeout
+    wsCheck.SendHeaders.Add("X-Thumb", Authenticode.RRSignThumb)
+    wsCheck.SendHeaders.Add("X-Serial", Authenticode.RRSignSerial)
     sVerStr = wsCheck.DownloadString(VersionURL)
     Dim sHash As String = Nothing
     For Each sKey As String In wsCheck.ResponseHeaders
