@@ -485,9 +485,9 @@
       Return ret
     End Function
     Private Shared Function EX_Helper_Parse_scope(body As String) As String
-      Dim ret As String = "openid profile email offline_access"
-      Dim scopeData As String() = EX_Helper_FindBetween(body, "l=[", "]", """"c, """"c)
-      If scopeData IsNot Nothing Then ret = Join(scopeData)
+      Dim ret As String = "openid profile" ' email offline_access"
+      'Dim scopeData As String() = EX_Helper_FindBetween(body, ",u=[", "]", """"c, """"c)
+      'If scopeData IsNot Nothing Then ret = Join(scopeData)
       Return ret
     End Function
     Private Shared Function EX_Helper_Parse_urlBuilder(body As String) As Dictionary(Of String, String)
