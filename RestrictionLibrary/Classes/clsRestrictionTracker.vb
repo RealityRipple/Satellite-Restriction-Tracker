@@ -380,7 +380,7 @@
     Private Sub Login()
       c_Jar = New Net.CookieContainer
       RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.Prepare))
-      Dim uriString As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/auth"
+      Dim uriString As String = "https://my.viasat.com/"
       EX_Init(uriString)
     End Sub
 #End Region
@@ -391,28 +391,18 @@
       c_Jar = New Net.CookieContainer
     End Sub
 #Region "EX Helper Functions"
-    Private Shared Function EX_Helper_FindBetween(find As String, groupS As String, groupE As String, sepS As Char, sepE As Char) As String()
-      Dim gS As Integer = find.IndexOf(groupS)
-      If gS = -1 Then Return Nothing
-      find = find.Substring(gS + groupS.Length)
-      Dim gE As Integer = find.IndexOf(groupE)
-      If gE = -1 Then Return Nothing
-      find = find.Substring(0, gE)
+    Private Shared Function EX_Helper_Parse_Scripts(body As String) As String()
       Dim ret As New List(Of String)
-      Dim d As String = vbNullChar
-      For I As Integer = 0 To find.Length - 1
-        If d = vbNullChar Then
-          If find(I) = sepS Then d = ""
-        Else
-          If find(I) = sepE Then
-            ret.Add(d)
-            d = vbNullChar
-          Else
-            d = d & find(I)
-          End If
-        End If
-      Next
-      If ret.Count = 0 Then Return Nothing
+      Do While body.IndexOf("<script ") > -1
+        Dim iScriptAt As Integer = body.LastIndexOf("<script ")
+        Dim sScript As String = body.Substring(iScriptAt)
+        body = body.Substring(0, iScriptAt)
+        If sScript.IndexOf(" src=""") = -1 Then Exit Do
+        sScript = sScript.Substring(sScript.IndexOf(" src=""") + 6)
+        If sScript.IndexOf("""") = -1 Then Exit Do
+        sScript = sScript.Substring(0, sScript.IndexOf(""""))
+        ret.Add(sScript)
+      Loop
       Return ret.ToArray
     End Function
     Private Shared Function EX_Helper_WithinParens(find As String) As String
@@ -484,31 +474,6 @@
       End Try
       Return ret
     End Function
-    Private Shared Function EX_Helper_Parse_scope(body As String) As String
-      Dim ret As String = "openid profile" ' email offline_access"
-      'Dim scopeData As String() = EX_Helper_FindBetween(body, ",u=[", "]", """"c, """"c)
-      'If scopeData IsNot Nothing Then ret = Join(scopeData)
-      Return ret
-    End Function
-    Private Shared Function EX_Helper_Parse_urlBuilder(body As String) As Dictionary(Of String, String)
-      Dim ret As New Dictionary(Of String, String)
-      ret.Add("path", "/v1/authorize?")
-      ret.Add("response_type", "code")
-      ret.Add("state", "asdfasdf")
-      Dim fLoc As Integer = body.IndexOf("var i,s="""".concat(t).concat(")
-      If fLoc = -1 Then Return ret
-      Dim f As String = body.Substring(fLoc)
-      Dim fEnd As Integer = f.IndexOf("}))")
-      If fEnd = -1 Then Return ret
-      f = f.Substring(0, fEnd + 3)
-      Dim pathData As String() = EX_Helper_FindBetween(f, "s="""".concat(t).concat(", ")", """"c, """"c)
-      If pathData IsNot Nothing Then ret("path") = Join(pathData, "")
-      Dim respData As String() = EX_Helper_FindBetween(f, "response_type:", ",", """"c, """"c)
-      If respData IsNot Nothing Then ret("response_type") = respData(0)
-      Dim stateData As String() = EX_Helper_FindBetween(f, "state:", "}", """"c, """"c)
-      If stateData IsNot Nothing Then ret("state") = stateData(0)
-      Return ret
-    End Function
     Private Shared Function EX_Helper_MakeLoginFromStruct(struct As Object, valList As Dictionary(Of String, String)) As Dictionary(Of String, Object)
       Dim oRet As New Dictionary(Of String, Object)
       If Not struct.ContainsKey("value") Then Return New Dictionary(Of String, Object)
@@ -550,31 +515,21 @@
     End Sub
     Private Sub EX_Init_Response(Response As String, ResponseURI As Uri)
       If CheckForErrors(Response, ResponseURI) Then Return
-      Dim appLoc As Integer = Response.IndexOf("_app")
-      If appLoc = -1 Then
-        RaiseError("Initialize Failed: Could not find OAuth Script.", "EX Init", Response, ResponseURI)
-        Return
-      End If
-      Dim scriptLoc As Integer = Response.Substring(0, appLoc).LastIndexOf("<script")
-      If scriptLoc = -1 Then
+      Dim scriptList() As String = EX_Helper_Parse_Scripts(Response)
+      Dim scriptSrc As String = Nothing
+      For I As Integer = 0 To scriptList.Length - 1
+        Dim dotAt As Integer = scriptList(I).IndexOf(".")
+        If dotAt = -1 Then Continue For
+        Dim sName As String = scriptList(I).Substring(0, dotAt)
+        If Not sName = "main" Then Continue For
+        scriptSrc = scriptList(I)
+      Next
+      If String.IsNullOrEmpty(scriptSrc) Then
         RaiseError("Initialize Failed: Could not find OAuth Script Tag.", "EX Init", Response, ResponseURI)
         Return
       End If
-      Dim scriptSrc As String = Response.Substring(scriptLoc)
-      Dim srcStart As Integer = scriptSrc.IndexOf("""")
-      If srcStart = -1 Then
-        RaiseError("Initialize Failed: Could not find OAuth Script URL.", "EX Init", Response, ResponseURI)
-        Return
-      End If
-      scriptSrc = scriptSrc.Substring(srcStart + 1)
-      Dim srcEnd As Integer = scriptSrc.IndexOf("""")
-      If srcEnd = -1 Then
-        RaiseError("Initialize Failed: Could not find OAuth Script URL.", "EX Init", Response, ResponseURI)
-        Return
-      End If
-      scriptSrc = scriptSrc.Substring(0, srcEnd)
       Dim host As String = ResponseURI.Scheme & Uri.SchemeDelimiter & ResponseURI.Host
-      Dim url As New Uri(host & scriptSrc)
+      Dim url As New Uri(host & "/" & scriptSrc)
       EX_OAuth(url)
     End Sub
     Private Sub EX_OAuth(sURI As Uri)
@@ -589,13 +544,17 @@
     Private Sub EX_OAuth_Response(Response As String, ResponseURI As Uri)
       If CheckForErrors(Response, ResponseURI) Then Return
       Dim okData As Dictionary(Of String, String) = EX_Helper_Parse_okta(Response)
-      Dim scope As String = EX_Helper_Parse_scope(Response)
-      Dim uData As Dictionary(Of String, String) = EX_Helper_Parse_urlBuilder(Response)
+      'tired of trying to parse these manually
+      Dim uData As New Dictionary(Of String, String)
+      uData.Add("path", "/v1/authorize?")
+      uData.Add("response_type", "code")
+      uData.Add("state", "asdfasdf")
+      uData.Add("scope", "openid profile") '"email", "offline_access", and "sbn" are not needed
       Dim url As New Uri(okData("base") & uData("path") &
                          "client_id=" & System.Uri.EscapeDataString(okData("client_id")) &
                          "&response_type=" & System.Uri.EscapeDataString(uData("response_type")) &
                          "&redirect_uri=" & System.Uri.EscapeDataString(okData("redirect_uri")) &
-                         "&scope=" & System.Uri.EscapeDataString(scope) &
+                         "&scope=" & System.Uri.EscapeDataString(uData("scope")) &
                          "&state=" & System.Uri.EscapeDataString(uData("state")))
       EX_ReadLogin(url)
     End Sub
@@ -827,7 +786,7 @@
       Dim hdrs As New Net.WebHeaderCollection
       hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
       MakeSocket(True)
-      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
+      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadHome, 1))
       Dim responseData As String = Nothing
       Dim responseURI As Uri = Nothing
       SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
@@ -872,32 +831,80 @@
           RaiseEvent LoginComplete(Me, New EventArgs)
           Return
         End If
-        EX_Downlad_Table(sToken)
+        EX_Download_Plan(sToken)
       Catch ex As Exception
         RaiseError("Could not log in.", "EX Token Response", Response, ResponseURI)
       End Try
     End Sub
+    Private Sub EX_Download_Plan(sToken As String)
+      Dim tURI As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/api/graphql"
+      Dim aSend As New Dictionary(Of String, Object)
+      aSend.Add("operationName", "getPlanCharacteristics")
+      aSend.Add("variables", New Dictionary(Of String, Object))
+      aSend.Add("query", "query getPlanCharacteristics($refetchData: Boolean) {\n" &
+                         "  getPlanCharacteristics(refetchData: $refetchData) {\n" &
+                         "    hasUnlimitedUsageMeter\n" &
+                         "    __typename\n" &
+                         "  }\n" &
+                         "}\n")
+      Dim sSend As String = New JSONObject(aSend).ToString
+      Dim hdrs As New Net.WebHeaderCollection
+      hdrs.Add(Net.HttpRequestHeader.ContentType, "application/json")
+      hdrs.Add("x-auth-type", "Okta")
+      hdrs.Add("x-auth-token", sToken)
+      MakeSocket(True)
+      RaiseEvent ConnectionStatus(Me, New SiteConnectionStatusEventArgs(SiteConnectionStates.TableDownload, SiteConnectionSubStates.LoadTable))
+      Dim responseData As String = Nothing
+      Dim responseURI As Uri = Nothing
+      SendPOST(New Uri(tURI), sSend, responseURI, responseData, hdrs)
+      If ClosingTime Then Return
+      EX_Plan_Response(responseData, responseURI, sToken)
+    End Sub
+    Private Sub EX_Plan_Response(Response As String, ResponseURI As Uri, sToken As String)
+      If CheckForErrors(Response, ResponseURI) Then Return
+      Dim exJS As JSONReader
+      Try
+        Using jStream As New System.IO.MemoryStream(Text.Encoding.GetEncoding(srlFunctions.UTF_8).GetBytes(Response))
+          exJS = New JSONReader(jStream, True)
+        End Using
+      Catch ex As Exception
+        EX_Downlad_Table(sToken)
+        Return
+      End Try
+      If exJS.JSON.GetType Is GetType(JSONFailure) Then
+        EX_Downlad_Table(sToken)
+        Return
+      End If
+      Try
+        Dim assoc As Object = JSONAssociator.Associate(exJS)
+        Dim dDown As Double = 0.0, dDownT As Double = 0.0
+        If assoc.ContainsKey("errors") AndAlso IsArray(assoc("errors")) Then
+          EX_Downlad_Table(sToken)
+          Return
+        End If
+        If Not assoc.ContainsKey("data") Then
+          EX_Downlad_Table(sToken)
+          Return
+        End If
+        If Not assoc("data").ContainsKey("getPlanCharacteristics") Then
+          EX_Downlad_Table(sToken)
+          Return
+        End If
+        If assoc("data")("getPlanCharacteristics").ContainsKey("hasUnlimitedUsageMeter") AndAlso assoc("data")("getPlanCharacteristics")("hasUnlimitedUsageMeter") = True Then imFree = True
+      Catch ex As Exception
+      End Try
+      EX_Downlad_Table(sToken)
+    End Sub
     Private Sub EX_Downlad_Table(sToken As String)
       Dim tURI As String = "https://my-viasat.ts-usage.prod.icat.viasat.io/api/graphql"
       Dim aSend As New Dictionary(Of String, Object)
-      aSend.Add("operationName", "getPlanData")
+      aSend.Add("operationName", "getCurrentUsage")
       aSend.Add("variables", New Dictionary(Of String, Object))
-      aSend.Add("query", "query getPlanData($refetchData: Boolean) {\n" &
-                         "  getPlanData(refetchData: $refetchData) {\n" &
-                         "    accountStatus\n" &
-                         "    usage {\n" &
-                         "      monthly {\n" &
-                         "        dataUsedGB\n" &
-                         "        dataAllotmentGB\n" &
-                         "        __typename\n" &
-                         "      },\n" &
-                         "      buymore {\n" &
-                         "        dataUsedGB\n" &
-                         "        dataAllotmentGB\n" &
-                         "        __typename\n" &
-                         "      }\n" &
-                         "      __typename\n" &
-                         "    }\n" &
+      aSend.Add("query", "query getCurrentUsage($refetchData: Boolean) {\n" &
+                         "  getCurrentUsage(refetchData: $refetchData) {\n" &
+                         "    displayedTotalDataUsed\n" &
+                         "    displayedTotalDataCap\n" &
+                         "    hasBreachedDataAllowance\n" &
                          "    __typename\n" &
                          "  }\n" &
                          "}\n")
@@ -957,60 +964,21 @@
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If Not assoc("data").ContainsKey("getPlanData") Then
+        If Not assoc("data").ContainsKey("getCurrentUsage") Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If assoc("data")("getPlanData").ContainsKey("accountStatus") AndAlso Not String.IsNullOrEmpty(assoc("data")("getPlanData")("accountStatus")) Then
-          Select Case assoc("data")("getPlanData")("accountStatus")
-            Case "DISCONNECTED"
-              RaiseError("Login Failed: Exede Account Disconnected. Check your username and password.")
-              Return
-            Case "NON-PAY"
-              RaiseError("Login Failed: Exede Account Unpaid. Check your username and password.")
-              Return
-            Case "DEACTIVATED"
-              RaiseError("Login Failed: Exede Account Inactive. Check your username and password.")
-              Return
-            Case "ACTIVE"
-
-            Case Else
-              'RaiseError("Login Failed: Exede Account in Unknown State: " & assoc("data")("getPlanData")("accountStatus") & ". Check your username and password.")
-              'Return
-          End Select
-        End If
-        If Not assoc("data")("getPlanData").ContainsKey("usage") Then
+        If Not assoc("data")("getCurrentUsage").ContainsKey("displayedTotalDataUsed") OrElse String.IsNullOrEmpty(assoc("data")("getCurrentUsage")("displayedTotalDataUsed").ToString) Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        If Not assoc("data")("getPlanData")("usage").ContainsKey("monthly") Then
+        If Not assoc("data")("getCurrentUsage").ContainsKey("displayedTotalDataCap") OrElse String.IsNullOrEmpty(assoc("data")("getCurrentUsage")("displayedTotalDataCap").ToString) Then
           RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
           Return
         End If
-        Dim jMonthly As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")("monthly")
-        If Not jMonthly.ContainsKey("dataAllotmentGB") OrElse String.IsNullOrEmpty(jMonthly("dataAllotmentGB").ToString) Then
-          RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-          Return
-        End If
-        If Not jMonthly.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jMonthly("dataUsedGB").ToString) Then
-          RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-          Return
-        End If
-        dDown = CDbl(jMonthly("dataUsedGB"))
-        dDownT = CDbl(jMonthly("dataAllotmentGB"))
-        If assoc("data")("getPlanData")("usage").ContainsKey("buymore") Then
-          Dim jBuyMore As Dictionary(Of String, Object) = assoc("data")("getPlanData")("usage")("buymore")
-          If Not jBuyMore.ContainsKey("dataAllotmentGB") OrElse String.IsNullOrEmpty(jBuyMore("dataAllotmentGB").ToString) Then
-            RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-            Return
-          End If
-          If Not jBuyMore.ContainsKey("dataUsedGB") OrElse String.IsNullOrEmpty(jBuyMore("dataUsedGB").ToString) Then
-            RaiseError("Usage Failed: Could not parse usage meter table.", "EX Usage Response", Table)
-            Return
-          End If
-          dDown += CDbl(jBuyMore("dataUsedGB"))
-          dDownT += CDbl(jBuyMore("dataAllotmentGB"))
-        End If
+        If assoc("data")("getCurrentUsage").ContainsKey("hasBreachedDataAllowance") AndAlso assoc("data")("getCurrentUsage")("hasBreachedDataAllowance") = True Then imSlowed = True
+        dDown = CDbl(assoc("data")("getCurrentUsage")("displayedTotalDataUsed"))
+        dDownT = CDbl(assoc("data")("getCurrentUsage")("displayedTotalDataCap"))
         Dim sDown As String = dDown.ToString
         Dim sDownT As String = dDownT.ToString
         RaiseEvent ConnectionResult(Me, New SiteResultEventArgs(StrToVal(sDown, MBPerGB), StrToVal(sDownT, MBPerGB), Now, imSlowed, imFree))
