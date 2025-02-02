@@ -373,10 +373,10 @@
     SetUpdateValue("Downloading Update", True)
     lblUpdate.Link = False
   End Sub
-  Private Sub updateChecker_DownloadResult(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles updateChecker.DownloadResult
+  Private Sub updateChecker_DownloadResult(sender As Object, e As clsUpdate.DownloadEventArgs) Handles updateChecker.DownloadResult
     If Me.InvokeRequired Then
       Try
-        Me.Invoke(New EventHandler(Of System.ComponentModel.AsyncCompletedEventArgs)(AddressOf updateChecker_DownloadResult), sender, e)
+        Me.Invoke(New EventHandler(Of clsUpdate.DownloadEventArgs)(AddressOf updateChecker_DownloadResult), sender, e)
       Catch ex As Exception
       End Try
       Return

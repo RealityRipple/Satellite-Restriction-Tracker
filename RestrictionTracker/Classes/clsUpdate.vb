@@ -57,14 +57,28 @@
       mResult = rtResult
     End Sub
   End Class
+  Class DownloadEventArgs
+    Inherits System.ComponentModel.AsyncCompletedEventArgs
+    Public Version As String
+    Friend Sub New(ByVal sVersion As String, ByVal [error] As Exception, ByVal [cancelled] As Boolean, ByVal [userState] As Object)
+      MyBase.New([error], [cancelled], [userState])
+      Version = sVersion
+    End Sub
+    Friend Sub New(ByVal sVersion As String, ByVal e As System.ComponentModel.AsyncCompletedEventArgs)
+      MyBase.New(e.Error, e.Cancelled, e.UserState)
+      Version = sVersion
+    End Sub
+  End Class
   Public Event CheckingVersion As EventHandler
   Public Event CheckProgressChanged As EventHandler(Of ProgressEventArgs)
   Public Event CheckResult As EventHandler(Of CheckEventArgs)
   Public Event DownloadingUpdate As EventHandler
   Public Event UpdateProgressChanged As EventHandler(Of ProgressEventArgs)
-  Public Event DownloadResult As EventHandler(Of System.ComponentModel.AsyncCompletedEventArgs)
+  Public Event DownloadResult As EventHandler(Of DownloadEventArgs)
   Private WithEvents wsVer As WebClientCore
   Private DownloadURL As String
+  Private DownloadHash As String
+  Private DownloadLoc As String
   Private VerNumber As String
 #Region "IDisposable Support"
   Private disposedValue As Boolean
@@ -164,11 +178,13 @@
   End Function
   Public Sub DownloadUpdate(toLocation As String)
     If Not String.IsNullOrEmpty(DownloadURL) Then
+      DownloadLoc = toLocation
       wsVer.CachePolicy = New Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore)
       wsVer.DownloadFileAsync(New Uri(DownloadURL), toLocation, "FILE")
       RaiseEvent DownloadingUpdate(Me, New EventArgs)
     Else
-      RaiseEvent DownloadResult(Me, New System.ComponentModel.AsyncCompletedEventArgs(New Exception("Version Check was not run."), True, Nothing))
+      DownloadLoc = Nothing
+      RaiseEvent DownloadResult(Me, New DownloadEventArgs(Nothing, New Exception("Version Check was not run."), True, Nothing))
     End If
   End Sub
   Private Sub wsVer_DownloadProgressChanged(sender As Object, e As System.Net.DownloadProgressChangedEventArgs) Handles wsVer.DownloadProgressChanged
@@ -181,6 +197,7 @@
   Private Sub wsVer_DownloadStringCompleted(sender As Object, e As System.Net.DownloadStringCompletedEventArgs) Handles wsVer.DownloadStringCompleted
     Dim rRet As CheckEventArgs.ResultType = CheckEventArgs.ResultType.NoUpdate
     DownloadURL = Nothing
+    downloadhash = Nothing
     VerNumber = Nothing
     If e.Error Is Nothing Then
       Try
@@ -220,12 +237,14 @@
               rRet = CheckEventArgs.ResultType.NewUpdate
               DownloadURL = sVMU(1)
               VerNumber = sVMU(0)
+              DownloadHash = sVMU(2).ToUpper
             ElseIf mySettings.UpdateBETA And Not String.IsNullOrEmpty(sVL(1)) Then
               Dim sVBU() As String = sVL(1).Split("|"c)
               If CompareVersions(sVBU(0)) Then
                 rRet = CheckEventArgs.ResultType.NewBeta
                 DownloadURL = sVBU(1)
                 VerNumber = sVBU(0)
+                DownloadHash = sVBU(2).ToUpper
               End If
             End If
             mySettings = Nothing
@@ -241,8 +260,20 @@
     End If
     RaiseEvent CheckResult(sender, New CheckEventArgs(rRet, VerNumber, e))
   End Sub
-  Private Sub wsVer_DownloadFileCompleted(sender As Object, e As System.ComponentModel.AsyncCompletedEventArgs) Handles wsVer.DownloadFileCompleted
-    RaiseEvent DownloadResult(sender, e)
+  Private Sub wsVer_DownloadFileCompleted(sender As Object, e As clsUpdate.DownloadEventArgs) Handles wsVer.DownloadFileCompleted
+    If Not IO.File.Exists(DownloadLoc) Then
+      RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, New Exception("Download Failure"), e.Cancelled, e.UserState))
+      Return
+    End If
+    Dim bData As Byte() = IO.File.ReadAllBytes(DownloadLoc)
+    Dim sha512 As New Security.Cryptography.SHA512CryptoServiceProvider
+    Dim bHash As Byte() = sha512.ComputeHash(bData)
+    Dim sHash As String = BitConverter.ToString(bHash).Replace("-", "").ToUpper
+    If sHash = DownloadHash Then
+      RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, e))
+    Else
+      RaiseEvent DownloadResult(sender, New DownloadEventArgs(VerNumber, New Exception("Download Failure"), e.Cancelled, e.UserState))
+    End If
   End Sub
   Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientErrorEventArgs) Handles wsVer.Failure
     RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
