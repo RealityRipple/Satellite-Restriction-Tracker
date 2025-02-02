@@ -2,9 +2,6 @@
 Imports System.Security.Cryptography.X509Certificates
 
 Friend Class Authenticode
-  Private Const RRRootThumb As String = "901DEBD92572D0A15821312980981E91E754F276"
-  Private Const RRRootSerial As String = "1D8AB7EB"
-  Private Const RRRootSubject As String = "CN=RealityRipple Root CA (Legacy), OU=RealityRipple Certificate Authority, O=RealityRipple Software, L=Los Berros Canyon, S=California, C=US"
   Private Const RRSignThumb As String = "4A6495CD107A2BA72CF54E15E5E7D87BFC43D911"
   Private Const RRSignSerial As String = "673C039A"
   Private Const RRSignSubject As String = "CN=RealityRipple Software, OU=Software Development, O=RealityRipple Software, L=Los Berros Canyon, S=California, C=US"
@@ -179,26 +176,6 @@ Friend Class Authenticode
     fileInfo = Nothing
     Return result
   End Function
-  Private Shared Function RootIsRealityRipple(sFile As String) As NativeMethods.Validity
-    Dim theCertificate As X509Certificate2
-    Try
-      Dim theSigner As X509Certificate = X509Certificate.CreateFromSignedFile(sFile)
-      theCertificate = New X509Certificate2(theSigner)
-    Catch ex As Exception
-      Return False
-    End Try
-    Dim theCertificateChain = New X509Chain(True)
-    theCertificateChain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain
-    theCertificateChain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck
-    theCertificateChain.ChainPolicy.UrlRetrievalTimeout = New TimeSpan(0, 0, 15)
-    theCertificateChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag
-    theCertificateChain.Build(theCertificate)
-    Dim Root As X509Certificate2 = theCertificateChain.ChainElements(theCertificateChain.ChainElements.Count - 1).Certificate
-    If Not Root.Thumbprint = RRRootThumb Then Return NativeMethods.Validity.BadRootThumb
-    If Not Root.SerialNumber = RRRootSerial Then Return NativeMethods.Validity.BadRootSerial
-    If Not Root.Subject = RRRootSubject Then Return NativeMethods.Validity.BadRootSubject
-    Return 0
-  End Function
   Private Shared Function SignerIsRealityRipple(sFile As String) As NativeMethods.Validity
     Dim theCertificate As X509Certificate2
     Try
@@ -220,9 +197,7 @@ Friend Class Authenticode
     Return 0
   End Function
   Public Shared Function IsSelfSigned(sFile As String) As NativeMethods.Validity
-    Dim iRet As NativeMethods.Validity = RootIsRealityRipple(sFile)
-    If Not iRet = NativeMethods.Validity.SignedAndValid Then Return iRet
-    iRet = SignerIsRealityRipple(sFile)
+    Dim iRet As NativeMethods.Validity = SignerIsRealityRipple(sFile)
     If Not iRet = NativeMethods.Validity.SignedAndValid Then Return iRet
     Return VerifyTrust(sFile)
   End Function
