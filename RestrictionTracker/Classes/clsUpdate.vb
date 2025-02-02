@@ -1,6 +1,6 @@
 ﻿Friend Class clsUpdate
   Implements IDisposable
-  Private Const VersionURL As String = "http://update.realityripple.com/Satellite_Restriction_Tracker/ver"
+  Private Const VersionURL As String = "http://update.realityripple.com/Satellite_Restriction_Tracker/update.ver?sha=512"
   Class ProgressEventArgs
     Inherits EventArgs
     Private mBytesReceived As Long
@@ -258,6 +258,6 @@
     End Try
     Dim rsa As New Security.Cryptography.RSACryptoServiceProvider
     rsa.FromXmlString(My.Resources.pubkey)
-    Return rsa.VerifyData(bMsg, Security.Cryptography.CryptoConfig.MapNameToOID("SHA1"), bSig)
+    Return rsa.VerifyData(bMsg, Security.Cryptography.CryptoConfig.MapNameToOID("SHA512"), bSig)
   End Function
 End Class
