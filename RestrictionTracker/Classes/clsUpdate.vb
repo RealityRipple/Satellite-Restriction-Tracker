@@ -247,7 +247,7 @@
   Private Sub wsVer_Failure(sender As Object, e As RestrictionLibrary.WebClientErrorEventArgs) Handles wsVer.Failure
     RaiseEvent CheckResult(sender, New CheckEventArgs(CheckEventArgs.ResultType.NoUpdate, Nothing, e.Error, False))
   End Sub
-  Private Shared Function VerifySignature(ByVal Message As String, ByVal Signature As String) As Boolean
+  Friend Shared Function VerifySignature(ByVal Message As String, ByVal Signature As String) As Boolean
     If String.IsNullOrEmpty(Signature) Then Return False
     Dim bMsg() As Byte = System.Text.Encoding.GetEncoding(srlFunctions.LATIN_1).GetBytes(Message)
     Dim bSig() As Byte = Nothing

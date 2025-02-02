@@ -66,11 +66,22 @@
     Dim sckVerInfo As New WebClientEx
     sckVerInfo.KeepAlive = False
     If lblBETA.Visible Then
-      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/infob")
+      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/infob.ver?sha=512")
     Else
-      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/info")
+      sRet = sckVerInfo.DownloadString("http://update.realityripple.com/Satellite_Restriction_Tracker/info.ver?sha=512")
     End If
-    SetVerInfo(sRet)
+    Dim sHash As String = Nothing
+    For Each sKey As String In sckVerInfo.ResponseHeaders
+      If sKey.ToLower = "x-update-signature" Then
+        sHash = sckVerInfo.ResponseHeaders(sKey)
+        Exit For
+      End If
+    Next
+    If clsUpdate.VerifySignature(sRet, sHash) Then
+      SetVerInfo(sRet)
+    Else
+      SetVerInfo("Error: Signature could not be verified!")
+    End If
   End Sub
   Private Delegate Sub SetVerInfoCallback(Message As String)
   Private Sub SetVerInfo(Message As String)
